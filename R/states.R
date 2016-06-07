@@ -1,8 +1,15 @@
 #' Display States of the Federal Republic of Nigeria
 #' 
 #' 
-#' @param gpz Geopolitical zone
+#' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc", 
+#' "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
 #' @return The States of Nigeria as a whole or by zones
+#' @details gpz A geo-political zone, in the Nigerian 
+#' context, is a national subdivision that groups contiguous states. 
+#' Historically, they arise from subnational administrative divisions 
+#' known as 'regions' that existed at the time of the country's independence.
+#' There are 6 zones - North-Central, North-East, North-West, South-East,
+#' South-South and South-West
 #' @examples
 #' states()
 #' states(2)
