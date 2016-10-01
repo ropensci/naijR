@@ -22,7 +22,12 @@ states <- function(gpz = NULL)
          "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun",
          "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba",
          "Yobe", "Zamfara")
-  if (!is.null(gpz))
+  if (is.null(gpz))
+  {
+    print(s)
+  }
+  else if (is.character(gpz))
+  {
     switch (gpz,
             nc = s <- s[c(7, 22, 23, 25, 26, 31)],
             ne = s <- s[c(2, 5, 8, 15, 34, 35)],
@@ -33,4 +38,7 @@ states <- function(gpz = NULL)
             stop("non-existent GPZ or incorrect entry")
     )
     print(s)
+  }
+  else
+    stop("supply of non-character value(s) to argument 'gpz'")
 }
