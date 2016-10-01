@@ -24,12 +24,13 @@ states <- function(gpz = NULL)
          "Yobe", "Zamfara")
   if (!is.null(gpz))
     switch (gpz,
-      "nc" = s <- s[c(7, 22, 23, 25, 26, 31)],
-      "ne" = s <- s[c(2, 5, 8, 15, 34, 35)],
-      "nw" = s <- s[c(17:21, 33, 36)],
-      "se" = s <- s[c(1, 4, 11, 14, 16)],
-      "ss" = s <- s[c(3, 6, 9, 10, 12, 32)],
-      "sw" = s <- s[c(13, 24, 27:30)]
+            nc = s <- s[c(7, 22, 23, 25, 26, 31)],
+            ne = s <- s[c(2, 5, 8, 15, 34, 35)],
+            nw = s <- s[c(17:21, 33, 36)],
+            se = s <- s[c(1, 4, 11, 14, 16)],
+            ss = s <- s[c(3, 6, 9, 10, 12, 32)],
+            sw = s <- s[c(13, 24, 27:30)],
+            stop("non-existent GPZ or incorrect entry")
     )
-  print(s)
+    print(s)
 }
