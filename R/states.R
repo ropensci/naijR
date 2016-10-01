@@ -24,7 +24,7 @@ states <- function(gpz = NULL)
          "Yobe", "Zamfara")
   if (is.null(gpz))
   {
-    print(s)
+    s
   }
   else if (is.character(gpz))
   {
@@ -37,7 +37,7 @@ states <- function(gpz = NULL)
             sw = s <- s[c(13, 24, 27:30)],
             stop("non-existent GPZ or incorrect entry")
     )
-    print(s)
+    s
   }
   else
     stop("supply of non-character value(s) to argument 'gpz'")
