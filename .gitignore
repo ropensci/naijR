@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-naijR.Rproj 
-.Rbuildignore 
+naijR.Rproj
+.Rbuildignore
+general-notes.html
