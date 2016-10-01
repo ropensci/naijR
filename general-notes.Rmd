@@ -1,0 +1,33 @@
+---
+title: "General Notes on naijR"
+author: "Victor Ordu"
+date: "29 September 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## General notes on the naijR package
+
+### What this package should do:
+1.  List political divisions
+  i) Geopolitical Zones
+  ii) States
+  iii) Local Government Areas
+  iv) Political Wards
+
+2. Map
+  i) Map of Nigeria
+  ii) Subdivided into states
+  iii) Map of each state
+  iv) subdivided into LGAs
+
+3. Postal codes
+
+4. Access key Nigeria-specific databases
+
+5. Hold key datasets for quick reference and to serve as samples
+
+6. (more to come...)
