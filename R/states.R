@@ -12,7 +12,6 @@
 #' South-South and South-West
 #' @examples
 #' states()
-#' states(2)
 #' states("se")
 states <- function(gpz = NULL)
   {
