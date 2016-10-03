@@ -5,18 +5,14 @@
 #' @details 
 #' @examples 
 lgalist <- function(state = NULL)
+{
+  d <- data("lga-by-state.csv")
+  if (is.null(state))
+    lg <- d[, 2]
+  else
   {
-  ld <- load("data/lgas_nigeria.rda")
-  for (i in 1:2)
-    ld[, i] <- as.character(ld[, i])
-  st <- states()
-  st <- grep(state, ignore.case = TRUE, value = TRUE)
-  ld <- ld[, 2 == st]
-  lgs <- ld
-  print(lgs)
+    sbd <- d[d$state == as.character(state), ]
+    lg <- sbd[, 2] 
   }
-
-# algorithm
-# print out LGAs in the country
-# print out LGAs by State
-#
+  lg
+}
