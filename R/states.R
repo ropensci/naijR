@@ -15,8 +15,8 @@
 #' states("se")
 states <- function(gpz = c("all", "nc", "ne", "nw", "se", "ss", "sw"))
   {
-  # print out all states
-  # print out states by gpz
+  # print out all states - DONE!
+  # print out states by gpz - DONE!
   # print out all states but sort them along the lines of gpz
   
   s <- c("Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa",
