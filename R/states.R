@@ -13,7 +13,7 @@
 #' @examples
 #' states()
 #' states("se")
-states <- function(gpz = NULL)
+states <- function(gpz = c("all", "nc", "ne", "nw", "se", "ss", "sw"))
   {
   s <- c("Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa",
          "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti",
@@ -21,20 +21,17 @@ states <- function(gpz = NULL)
          "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun",
          "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba",
          "Yobe", "Zamfara")
-  if (is.null(gpz))
-  {
-    s
-  }
-  else if (is.character(gpz))
+  gpz <- match.arg(gpz)
+  if (is.character(gpz))
   {
     switch (gpz,
+            all = s,
             nc = s <- s[c(7, 22, 23, 25, 26, 31)],
             ne = s <- s[c(2, 5, 8, 15, 34, 35)],
             nw = s <- s[c(17:21, 33, 36)],
             se = s <- s[c(1, 4, 11, 14, 16)],
             ss = s <- s[c(3, 6, 9, 10, 12, 32)],
-            sw = s <- s[c(13, 24, 27:30)],
-            stop("non-existent GPZ or incorrect entry")
+            sw = s <- s[c(13, 24, 27:30)]
     )
     s
   }
