@@ -12,7 +12,6 @@ ward_data <- ward_data[- which(is.na(ward_data$WARD.NAME)), ]
 
 
 ward_data <- tidyr::fill(ward_data, LGA.NAME)
-ward_data <- apply(ward_data, 1, str_trim)
 colnames(ward_data) <- gsub("([A-Z]+)(.NAME)", "\\1", colnames(ward_data))
 colnames(ward_data)[2] <- str_to_title(colnames(ward_data)[2])
 
