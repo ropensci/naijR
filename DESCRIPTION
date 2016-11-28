@@ -1,0 +1,15 @@
+Package: naijR
+Type: Package
+Title: An R Package about Nigeria
+Version: 0.1
+Date: 2016-04-05
+Author: person("Victor", "Ordu", email = "victorordu@outlook.com",
+  role = c("aut", "cre"))
+Maintainer: Victor Ordu <victorordu@outlook.com>
+Description: This package contains functions and datasets that are about the
+  country Nigeria, and has been written to serve Nigerian residents as well
+  as people working with data and information that are specific or related to
+  the country.
+License: CCO.
+LazyData: TRUE
+RoxygenNote: 5.0.1
