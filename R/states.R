@@ -16,7 +16,12 @@
 #' states()
 #' states("se")
 states <- function(gpz = NULL, all.sorted = FALSE)
-{
+{ # TODO: Optionally display full names e.g. "Gombe State"
+  # TODO: Case insensitivity
+  # TODO: Test/forestall issues with 'whitespace'
+  # TODO: Tighten validation
+  # TODO: FCT or not?
+  # TODO: Confirm spelling of 'Nasarawa'
   sts <- list(nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
               ne = c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
               nw = c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto",
