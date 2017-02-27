@@ -15,7 +15,7 @@
 #' @examples
 #' states()
 #' states("se")
-states <- function(gpz = NULL, all.sorted = FALSE)
+states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
 { # TODO: Optionally display full names e.g. "Gombe State"
   # TODO: Case insensitivity
   # TODO: Test/forestall issues with 'whitespace'
@@ -39,5 +39,7 @@ states <- function(gpz = NULL, all.sorted = FALSE)
   }
   if (all.sorted)
     sts <- sort(sts)
+  if (full.names)
+    sts <- paste(sts, "State")
   print(sts)
 }
