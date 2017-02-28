@@ -16,12 +16,8 @@
 #' states()
 #' states("se")
 states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
-{ # TODO: Optionally display full names e.g. "Gombe State"
-  # TODO: Case insensitivity
-  # TODO: Test/forestall issues with 'whitespace'
-  # TODO: Tighten validation
+{
   # TODO: FCT or not?
-  # TODO: Confirm spelling of 'Nasarawa'
   sts <- list(nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
               ne = c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
               nw = c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto",
@@ -33,13 +29,25 @@ states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
   if (is.null(gpz))
     sts <- as.vector(unlist(sts))
   else {
+    if (!is.character(gpz))
+      stop("argument supplied is not of type 'character'")
+    gpz <- gsub("\\s+", "", gpz)
+    gpz <- tolower(gpz)
     rgn <- match.arg(gpz, c("nc", "ne", "nw", "se", "ss", "sw"),
                      several.ok = TRUE)
     sts <- as.vector(unlist(sts[rgn]))
   }
-  if (all.sorted)
-    sts <- sort(sts)
-  if (full.names)
-    sts <- paste(sts, "State")
+  if (!is.logical(all.sorted))
+    stop("'all.sorted' expected as a logical argument of length 1")
+  else {
+    if (all.sorted)
+      sts <- sort(sts)
+  }
+  if (!is.logical(full.names))
+    stop("'full.names' expected as a logical argument of length 1")
+  else {
+    if (full.names)
+      sts <- paste(sts, "State")
+  }
   print(sts)
 }
