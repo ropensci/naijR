@@ -13,7 +13,7 @@ states(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
 \item{all.sorted}{Whether the results to be all sorted in increasing 
 alphabetical order (default value is \code{FALSE}).}
 
-\item{full.names}{the complete apellation for the States}
+\item{full.names}{the complete appellation for the States}
 }
 \value{
 The States of Nigeria as a whole or by zones, as a character vector

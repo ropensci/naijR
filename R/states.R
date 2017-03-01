@@ -5,7 +5,7 @@
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
 #' @param all.sorted Whether the results to be all sorted in increasing 
 #' alphabetical order (default value is \code{FALSE}).
-#' @param full.names the complete apellation for the States
+#' @param full.names the complete appellation for the States
 #' @return The States of Nigeria as a whole or by zones, as a character vector
 #' @details gpz A geo-political zone, in the Nigerian 
 #' context, is a national subdivision that groups contiguous states. 
