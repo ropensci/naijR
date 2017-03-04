@@ -1,6 +1,6 @@
 #' Nigeria political wards by Local Government Area
 #'
-#' A complete list of political wards in theLocal Government Areas of Nigeria.
+#' A complete list of political wards in the Local Government Areas of Nigeria.
 #' 
 #' @format A data frame with 8799 rows and 2 columns:
 #' \describe{
