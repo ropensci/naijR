@@ -7,5 +7,5 @@ Development of this package is currently ongoing; contributions, comments and fe
 ## The Goal
 The purpose of this package is bring out some of the country-specific peculiarities that will make analysis of data related to Nigeria much easier for R users.
 
-Victor Ordu
-Email: [victorordu@gmail.com](mailto:victorordu@gmail.com)
+Victor Ordu  
+Email: <mailto:victorordu@gmail.com>
