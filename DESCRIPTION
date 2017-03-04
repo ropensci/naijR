@@ -1,11 +1,9 @@
 Package: naijR
 Type: Package
 Title: An R Package about Nigeria
-Version: 0.1
+Version: 0.0.0.9000
 Date: 2016-04-05
-Imports:
-    mapdata,
-    maps
+Imports: maps
 Suggests: testthat
 Author: person("Victor", "Ordu", email = "victorordu@outlook.com",
   role = c("aut", "cre"))
@@ -14,6 +12,7 @@ Description: Contains functions and datasets that are about the West African
   country Nigeria, and has been written to help R users working with data and 
   information that are specific or related to the country.
 License: GPL-3
+Depends: mapdata
 LazyData: TRUE
 RoxygenNote: 5.0.1
 
