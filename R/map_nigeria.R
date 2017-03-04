@@ -1,14 +1,21 @@
-map_nigeria <- function(fill = TRUE, col = "lightgrey", adjoin = FALSE)
+#' Map of Nigeria
+#' 
+#' @param fill Whether to fill the plot or not
+#' 
+#' @param col The colour of the filled portion of the plot.
+#' 
+#' @param adjoin Whether to display borders of neighbouring countries.
+#' 
+#' @export
+map_ng <- function(adjoin = FALSE, fill = TRUE, col = "lightgrey")
 {
-  require(maps)
-  require(mapdata)
   db <- "worldHires"
-  map(db, "Nigeria", fill = fill, col = col)
+  maps::map(db, "Nigeria", fill = fill, col = col)
   if(adjoin) {
-    adjoin.cntry <- c("Cameroon", "Chad", "Niger", "Benin")
-    join <- function(xx) {
-      map(db, xx, add = TRUE)
+    ct <- c("Cameroon", "Chad", "Niger", "Benin")
+    jn <- function(xx) {
+      maps::map(db, xx, add = TRUE)
     }
-    join(adjoin.cntry)
+    jn(ct)
   }
 }
