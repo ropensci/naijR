@@ -66,6 +66,7 @@ states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
 #' list of Local Government Areas in that particular State.
 #' @return A character vector with the list of Local Government Areas. 
 #' @examples 
+#' lgalist("Abia")
 lgalist <- function(state = NULL)
 {
   d <- data("lga-by-state.csv")
