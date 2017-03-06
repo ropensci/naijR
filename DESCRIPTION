@@ -2,7 +2,7 @@ Package: naijR
 Type: Package
 Title: An R Package about Nigeria
 Version: 0.0.0.9000
-Date: 2016-04-05
+Date: 2017-03-03
 Imports: maps
 Suggests: testthat
 Author: person("Victor", "Ordu", email = "victorordu@outlook.com",
