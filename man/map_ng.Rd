@@ -4,16 +4,25 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(fill = TRUE, col = "lightgrey", adjoin = FALSE)
+map_ng(show.neighbours = FALSE, ...)
 }
 \arguments{
-\item{fill}{Whether to fill the plot or not}
+\item{show.neighbours}{logical; \code{TRUE} to display borders of 
+neighbouring countries.}
 
-\item{col}{The colour of the filled portion of the plot.}
-
-\item{adjoin}{Whether to display borders of neighbouring countries.}
+\item{...}{Further arguments for function \code{\link[maps]{map}}}
+}
+\value{
+\code{NULL} invisibly; results in the drawing of a map of Nigeria.
 }
 \description{
-Map of Nigeria
+A basic map of the Federal Republic of Nigeria.
 }
+\details{
+This function is essentially a wrapper to \code{maps::map}.
+}
+\examples{
+map_ng() # Draw a map with default settings
+map_ng(TRUE) # Display portions of neighbouring countries' borders
 
+}

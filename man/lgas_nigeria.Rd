@@ -16,4 +16,3 @@ lgas_nigeria
 A dataset containing the 774 Local Government Areas of Nigeria
 }
 \keyword{datasets}
-

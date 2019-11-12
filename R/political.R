@@ -1,5 +1,20 @@
+# Copyright (C) 2019 DevSolutions Ltd.
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+
 #' Display States of the Federal Republic of Nigeria
-#' 
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
@@ -54,28 +69,5 @@ states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
     if (full.names)
       sts <- paste(sts, "State")
   }
-  print(sts)
-}
-
-
-#' Names of Local Government Areas in Nigeria
-#' 
-#' @param state State of the Federation
-#' @return Local Government Areas
-#' @details When a State is chosen by passing in `state`, the function obtains
-#' list of Local Government Areas in that particular State.
-#' @return A character vector with the list of Local Government Areas. 
-#' @examples 
-#' lgalist("Abia")
-lgalist <- function(state = NULL)
-{
-  d <- data("lga-by-state.csv")
-  if (is.null(state))
-    lg <- d[, 2]
-  else
-  {
-    sbd <- d[d$state == as.character(state), ]
-    lg <- sbd[, 2] 
-  }
-  print(lg)
+  sts
 }

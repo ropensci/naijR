@@ -33,4 +33,3 @@ South-South and South-West.
 states()  # lists names of all States
 states("se")  # lists States in South-East zone
 }
-
