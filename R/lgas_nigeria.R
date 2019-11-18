@@ -29,21 +29,34 @@ globalVariables("lgas_nigeria")
 #' List Local Government Areas
 #'
 #' @param ng.state Character vector of length 1, whose value is the name of a
-#' State in the Federation of Nigeria. Default is \code{NULL}, in which case
-#' all the countries Local Government Areas will be returned.
+#' State in the Federation of Nigeria. Default is \code{NA_character_}, in 
+#' which case all the countrys '774 Local Government Areas will be returned.
+#' @param num Logical; return the number of LGAs. Is only applicable in the
+#' case where \code{length(ng.state) == 1L}.
+#' 
 #'
 #' @return A character vector containing the names of Local Government Areas.
 #'
 #' @export
-lgas_ng <- function(ng.state = NULL) {
-  retlga <- function(s)
-    with(lgas_nigeria, lga[state %in% s])
-  
-  if (!is.null(ng.state)) {
-    stopifnot(all(ng.state %in% naijR::states()))
-    lst <- lapply(ng.state, retlga)
-    if (length(ng.state) == 1L)
-      lst <- unlist(lst)
+lgas_ng <- function(ng.state = NA_character_, num = FALSE) {
+  stopifnot(is.character(ng.state))
+  if (!is.logical(num))
+    stop("argument 'num' can only be a logical 'T/F' value")
+  if (!all(is.na(ng.state))) {
+    if (isFALSE(all(ng.state %in% states())))
+      stop("One or more elements of 'ng.state' is not a State in Nigeria")
+    lst <- sapply(
+      ng.state,
+      USE.NAMES = T,
+      simplify = F,
+      FUN = function(s)
+        with(lgas_nigeria, lga[state %in% s])
+    )
+    if (length(ng.state) == 1L) {
+      lst <- unname(unlist(lst))
+      if (num)
+        return(length(lst))
+    }
     return(lst)
   }
   lgas_nigeria$lga
