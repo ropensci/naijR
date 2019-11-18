@@ -8,8 +8,8 @@ lgas_ng(ng.state = NA_character_, num = FALSE)
 }
 \arguments{
 \item{ng.state}{Character vector of length 1, whose value is the name of a
-State in the Federation of Nigeria. Default is \code{NULL}, in which case
-all the countries Local Government Areas will be returned.}
+State in the Federation of Nigeria. Default is \code{NA_character_}, in 
+which case all the countrys '774 Local Government Areas will be returned.}
 
 \item{num}{Logical; return the number of LGAs. Is only applicable in the
 case where \code{length(ng.state) == 1L}.}
