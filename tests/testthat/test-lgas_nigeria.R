@@ -17,15 +17,27 @@ library(naijR)
 
 test_that("illegal input is caught early", {
   expect_error(lgas_ng("Maryland"),
-               "all(ng.state %in% naijR::states()) is not TRUE",
+               "One or more elements of 'ng.state' is not a State in Nigeria",
                fixed = TRUE)
 })
 
 test_that("LGAs are returned correctly", {
   res <- lgas_ng("Imo")
+  res2 <- lgas_ng(nam <- c("Borno", "Abia"))
   
   expect_match(res, "Owerri North", all = FALSE)
   expect_length(res, 27L)
   expect_type(res, "character")
   expect_is(res, "character")
+  expect_is(res2, "list")
+  expect_type(res2, "list")
+  expect_named(res2, (nam))
+  expect_length(res2, 2)
+})
+
+test_that("number of LGAs is returned", {
+  res <- lgas_ng("Imo", num = TRUE)
+  expect_is(res, "integer")
+  expect_type(res, "integer")
+  expect_length(res, 1L)
 })
