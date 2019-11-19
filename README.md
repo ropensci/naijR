@@ -9,6 +9,8 @@ An R package on Nigeria and for Nigeria
 
 [![Travis build
 status](https://travis-ci.org/DevSolutionsLtd/naijR.svg?branch=master)](https://travis-ci.org/DevSolutionsLtd/naijR)
+[![Codecov test
+coverage](https://codecov.io/gh/DevSolutionsLtd/naijR/branch/master/graph/badge.svg)](https://codecov.io/gh/DevSolutionsLtd/naijR?branch=master)
 <!-- badges: end -->
 
 The goal of naijR is to make it easier for people R users to work with
