@@ -8,13 +8,11 @@ Depends:
     maps (>= 3.3.0),
     mapdata (>= 2.3.0)
 Suggests: 
-    testthat (>= 2.1.0)
-Author: c(person("Victor", "Ordu", 
-                 email = "victorordu@outlook.com",
-                 role = c("aut", "cre"),
-          person("DevSolutions",
-                 email = "info@dev-solu.com"),
-                 role = "cph")
+    testthat,
+    covr
+Authors@R: person("Victor", "Ordu", 
+              email = "victorordu@outlook.com",
+              role = c("aut", "cre"))
 Maintainer: Victor Ordu <victorordu@outlook.com>
 Description: Contains functions and datasets that are about the
   country Nigeria, and has been written to help R users working with data and 
