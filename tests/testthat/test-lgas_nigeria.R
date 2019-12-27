@@ -1,4 +1,4 @@
-# Copyright (C) 2019 DevSolutions Ltd.
+# Copyright (C) 2019 Victor Ordu.
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,11 +33,4 @@ test_that("LGAs are returned correctly", {
   expect_type(res2, "list")
   expect_named(res2, (nam))
   expect_length(res2, 2)
-})
-
-test_that("number of LGAs is returned", {
-  res <- lgas_ng("Imo", num = TRUE)
-  expect_is(res, "integer")
-  expect_type(res, "integer")
-  expect_length(res, 1L)
 })

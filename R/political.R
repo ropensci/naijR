@@ -1,4 +1,4 @@
-# Copyright (C) 2019 DevSolutions Ltd.
+# Copyright (C) 2019 Victor Ordu.
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
+
 #' Display States of the Federal Republic of Nigeria
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
-#' @param all.sorted Whether the results to be all sorted in increasing 
-#' alphabetical order (default value is \code{FALSE}).
+#' @param sorted Whether the results to be all sorted in increasing 
+#' alphabetical order (default value is \code{TRUE}).
 #' @param full.names the complete appellation for the States
 #' 
 #' @return The States of Nigeria as a whole or by zones, as a character vector
@@ -35,7 +36,7 @@
 #' states()  # lists names of all States
 #' states("se")  # lists States in South-East zone
 #' @export
-states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
+states <- function(gpz = NULL, sorted = TRUE, full.names = FALSE)
 {
   # TODO: FCT or not?
   sts <- list(nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
@@ -57,10 +58,10 @@ states <- function(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
                      several.ok = TRUE)
     sts <- as.vector(unlist(sts[rgn]))
   }
-  if (!is.logical(all.sorted))
-    stop("'all.sorted' expected as a logical argument of length 1")
+  if (!is.logical(sorted))
+    stop("'sorted' expected as a logical argument of length 1")
   else {
-    if (all.sorted)
+    if (sorted)
       sts <- sort(sts)
   }
   if (!is.logical(full.names))

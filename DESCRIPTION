@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: An R Package about Nigeria
-Version: 0.0.2
+Version: 0.0.3
 Date: 2019-11-12
 Depends: 
     R (>= 3.6),
