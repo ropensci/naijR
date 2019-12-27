@@ -4,14 +4,14 @@
 \alias{states}
 \title{Display States of the Federal Republic of Nigeria}
 \usage{
-states(gpz = NULL, all.sorted = FALSE, full.names = FALSE)
+states(gpz = NULL, sorted = TRUE, full.names = FALSE)
 }
 \arguments{
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).}
 
-\item{all.sorted}{Whether the results to be all sorted in increasing 
-alphabetical order (default value is \code{FALSE}).}
+\item{sorted}{Whether the results to be all sorted in increasing 
+alphabetical order (default value is \code{TRUE}).}
 
 \item{full.names}{the complete appellation for the States}
 }

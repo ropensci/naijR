@@ -4,19 +4,27 @@
 \alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
-lgas_ng(ng.state = NA_character_, num = FALSE)
+lgas_ng(ng.state = NA_character_)
 }
 \arguments{
 \item{ng.state}{Character vector of length 1, whose value is the name of a
 State in the Federation of Nigeria. Default is \code{NA_character_}, in 
 which case all the countrys '774 Local Government Areas will be returned.}
-
-\item{num}{Logical; return the number of LGAs. Is only applicable in the
-case where \code{length(ng.state) == 1L}.}
 }
 \value{
 A character vector containing the names of Local Government Areas.
 }
 \description{
 List Local Government Areas
+}
+\examples{
+how_many_lgas <- function(state) {
+  require(naijR)
+  stoifnot(state \%in\% states())
+  cat(sprintf("No. of LGAs in \%s State:", state),
+    length(lgas_ng(state)),
+    fill = TRUE)
+}
+how_many_lgas("Sokoto")
+how_many_lgas("Ekiti")
 }
