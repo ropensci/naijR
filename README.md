@@ -16,19 +16,26 @@ coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](htt
 The goal of **naijR** is to make it easier for R users to work with data
 related to Nigeria.
 
-## Installation
+## Usage
+
+### Prerequisites
+
+This is a package for use in the R ecosystem. To install R, visit
+<https://cran.r-project.org>.
+
+### Installation
 
 The development version of this package can be downloaded and installed
-from [GitHub](https://github.com/) with:
+from [GitHub](https://github.com/BroVic/naijR) with:
 
 ``` r
 # If necessary, first do 'install.packages("remotes")'
 remotes::install_github("BroVic/naijR")
 ```
 
-## Examples
+### Examples
 
-### States
+#### States
 
 To create a list of all the States of the Nigerian Federation, simply
 call `states()`
@@ -36,14 +43,14 @@ call `states()`
 ``` r
 library(naijR, quietly = TRUE)  # attach to R session
 states()
-#>  [1] "Benue"       "Kogi"        "Kwara"       "Nasarawa"    "Niger"      
-#>  [6] "Plateau"     "Adamawa"     "Bauchi"      "Borno"       "Gombe"      
-#> [11] "Taraba"      "Yobe"        "Jigawa"      "Kaduna"      "Kano"       
-#> [16] "Katsina"     "Kebbi"       "Sokoto"      "Zamfara"     "Abia"       
-#> [21] "Anambra"     "Ebonyi"      "Enugu"       "Imo"         "Akwa Ibom"  
-#> [26] "Bayelsa"     "Cross River" "Delta"       "Edo"         "Rivers"     
-#> [31] "Ekiti"       "Lagos"       "Ogun"        "Ondo"        "Osun"       
-#> [36] "Oyo"
+#>  [1] "Abia"        "Adamawa"     "Akwa Ibom"   "Anambra"     "Bauchi"     
+#>  [6] "Bayelsa"     "Benue"       "Borno"       "Cross River" "Delta"      
+#> [11] "Ebonyi"      "Edo"         "Ekiti"       "Enugu"       "Gombe"      
+#> [16] "Imo"         "Jigawa"      "Kaduna"      "Kano"        "Katsina"    
+#> [21] "Kebbi"       "Kogi"        "Kwara"       "Lagos"       "Nasarawa"   
+#> [26] "Niger"       "Ogun"        "Ondo"        "Osun"        "Oyo"        
+#> [31] "Plateau"     "Rivers"      "Sokoto"      "Taraba"      "Yobe"       
+#> [36] "Zamfara"
 ```
 
 States from a given geo-political zone can also be selected
@@ -55,7 +62,7 @@ states(gpz = "ne")  # i.e. North-East
 
 For other capabilities of this function, see `?states()`
 
-### Local Government Areas
+#### Local Government Areas
 
 This is a basic example that shows how to very quickly fetch the names
 of Local Government Areas within a given State:
