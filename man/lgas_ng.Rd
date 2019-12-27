@@ -20,7 +20,7 @@ List Local Government Areas
 \examples{
 how_many_lgas <- function(state) {
   require(naijR)
-  stoifnot(state \%in\% states())
+  stopifnot(state \%in\% states())
   cat(sprintf("No. of LGAs in \%s State:", state),
     length(lgas_ng(state)),
     fill = TRUE)
