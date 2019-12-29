@@ -8,9 +8,6 @@
 #'
 #' @param column A character vector of numerical string characters.
 #'
-#' @importFrom dplyr %>%
-#' @importFrom stringr str_replace
-#'
 #' @return An update vector, usually the column of a data frame.
 #'
 #' @export
@@ -24,9 +21,8 @@ fix_mobile <- function(column) {
     ifelse(nchar(column) > 11 | nchar(column) < 10, NA_character_, column)
   
   # Add a leading '0' if there are 10 digits
-  column <- column %>%
-    as.character() %>%
-    str_replace("(^[0-9]{10}$)", "0\\1")
+  column <- as.character(column)
+  column <- sub("(^[0-9]{10}$)", "0\\1", column)
   
   # Remove those that still don't look like local mobile numbers (NG)
   column <-
