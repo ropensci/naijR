@@ -1,4 +1,4 @@
-context("Nigeria mobile numbers")
+library(naijR)
 
 test_that("Wrong mobile numbers are repaired or removed.", {
   numbers <-
