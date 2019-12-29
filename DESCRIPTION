@@ -13,6 +13,7 @@ Suggests:
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
               role = c("aut", "cre"))
+Author: Victor Ordu [aut, cre]
 Maintainer: Victor Ordu <victorordu@outlook.com>
 Description: Contains functions and datasets that are about the
   country Nigeria, and has been written to help R users working with data and 
