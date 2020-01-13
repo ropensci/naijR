@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
-Title: An R Package about Nigeria
-Version: 0.0.3
-Date: 2019-11-12
+Title: An R Package About Nigeria
+Version: 0.0.4
+Date: 2020-01-13
 Depends: 
     R (>= 3.6),
     maps (>= 3.3.0),
@@ -13,6 +13,7 @@ Suggests:
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
               role = c("aut", "cre"))
+Author: Victor Ordu [aut, cre]
 Maintainer: Victor Ordu <victorordu@outlook.com>
 Description: Contains functions and datasets that are about the
   country Nigeria, and has been written to help R users working with data and 
