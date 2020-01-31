@@ -22,3 +22,14 @@ test_that("Wrong mobile numbers are repaired or removed.", {
   expect_true(is.na(numbers[1]))
   expect_true(all(nchar(na.omit(numbers)) == 11))
 })
+
+
+test_that("Numbers read from MS Excel are appropriately treated", {
+  df <- as.data.frame(readxl::read_xlsx("data/numbers.xlsx"))
+  fx <- fix_mobile(df[, 1])
+  
+  expect_true(all(nchar(fx) == 11))
+  expect_false(anyNA(fx))
+  expect_length(fx, nrow(df))
+  expect_type(fx, "character")
+})
