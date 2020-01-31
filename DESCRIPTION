@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
-Title: An R Package About Nigeria
-Version: 0.0.4
+Title: Operations To Ease Data Analyses Specific to Nigeria
+Version: 0.0.5
 Date: 2020-01-13
 Depends: 
     R (>= 3.6),
@@ -9,15 +9,16 @@ Depends:
     mapdata (>= 2.3.0)
 Suggests: 
     testthat,
-    covr
+    covr,
+    readxl
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
               role = c("aut", "cre"))
 Author: Victor Ordu [aut, cre]
 Maintainer: Victor Ordu <victorordu@outlook.com>
-Description: Contains functions and datasets that are about the
-  country Nigeria, and has been written to help R users working with data and 
-  information that are specific or related to the country.
+Description: A set of convenience functions as well as geographical/political 
+  data about Nigeria, aimed at simplifying work with data and information that
+  are specific to the country.
 License: GPL-3
 LazyData: TRUE
 Encoding: UTF-8
