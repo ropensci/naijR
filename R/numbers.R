@@ -1,30 +1,28 @@
-#' Fix up mobile numbers
+#' Fix mobile numbers
 #'
-#' Fixes up mobile numbers to a uniform text format.
+#' Fixes up local mobile phone numbers to a uniform text format.
 #'
 #' @details This format is specific to that used in a given location - for
-#' now the function is useful only for Nigeria mobile numbers which come in
+#' now the function is useful only for Nigeria mobile numbers, which come in
 #' the format expressed by the regex pattern \code{"^0[7-9][0-1][0-9]{8}$"}.
 #'
-#' @param column A character vector of numerical string characters.
+#' @param x A character vector of numerical strings.
 #'
-#' @return An update vector, usually the column of a data frame.
+#' @return The updated vector, usually the column of a data frame.
 #'
 #' @export
-fix_mobile <- function(column) {
-  if (is.numeric(column)) {
-    options(scipen = 999)
-    column <- as.character(column)
+fix_mobile <- function(x) {
+  if (is.numeric(x)) {
+    # options(scipen = 999)
+    x <- as.character(x)
   }
   # Remove entries that are beyond redemption i.e. too long or too short
-  column <-
-    ifelse(nchar(column) > 11 | nchar(column) < 10, NA_character_, column)
+  x <- ifelse(nchar(x) > 11 | nchar(x) < 10, NA_character_, x)
   
   # Add a leading '0' if there are 10 digits
-  column <- as.character(column)
-  column <- sub("(^[0-9]{10}$)", "0\\1", column)
+  x <- as.character(x)
+  x <- sub("(^[0-9]{10}$)", "0\\1", x)
   
   # Remove those that still don't look like local mobile numbers (NG)
-  column <-
-    ifelse(grepl("^0[7-9][0-1][0-9]{8}$", column), column, NA_character_)
+  ifelse(grepl("^0[7-9][0-1][0-9]{8}$", x), x, NA_character_)
 }

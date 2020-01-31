@@ -2,21 +2,21 @@
 % Please edit documentation in R/numbers.R
 \name{fix_mobile}
 \alias{fix_mobile}
-\title{Fix up mobile numbers}
+\title{Fix mobile numbers}
 \usage{
-fix_mobile(column)
+fix_mobile(x)
 }
 \arguments{
-\item{column}{A character vector of numerical string characters.}
+\item{x}{A character vector of numerical strings.}
 }
 \value{
-An update vector, usually the column of a data frame.
+The updated vector, usually the column of a data frame.
 }
 \description{
-Fixes up mobile numbers to a uniform text format.
+Fixes up local mobile phone numbers to a uniform text format.
 }
 \details{
 This format is specific to that used in a given location - for
-now the function is useful only for Nigeria mobile numbers which come in
+now the function is useful only for Nigeria mobile numbers, which come in
 the format expressed by the regex pattern \code{"^0[7-9][0-1][0-9]{8}$"}.
 }
