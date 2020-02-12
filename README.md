@@ -7,6 +7,8 @@ An R package on Nigeria and for Nigeria
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/package=naijR)
 [![Travis build
 status](https://travis-ci.org/BroVic/naijR.svg?branch=master)](https://travis-ci.org/BroVic/naijR)
 [![Codecov test
@@ -25,11 +27,18 @@ This is a package for use in the R ecosystem. To install R, visit
 
 ### Installation
 
-The development version of this package can be downloaded and installed
-from [GitHub](https://github.com/BroVic/naijR) with:
+To download and install the current stable version of this package from
+[CRAN](https://cloud.r-project.org/web/packages/naijR/index.html):
 
 ``` r
-# If necessary, first do 'install.packages("remotes")'
+install.packages("naijR")
+```
+
+The development version can be obtained from
+[GitHub](https://github.com/BroVic/naijR) with:
+
+``` r
+# If necessary, 'install.packages("remotes")' first
 remotes::install_github("BroVic/naijR")
 ```
 
@@ -42,6 +51,7 @@ call `states()`
 
 ``` r
 library(naijR, quietly = TRUE)  # attach to R session
+#> Warning: package 'naijR' was built under R version 3.6.2
 states()
 #>  [1] "Abia"        "Adamawa"     "Akwa Ibom"   "Anambra"     "Bauchi"     
 #>  [6] "Bayelsa"     "Benue"       "Borno"       "Cross River" "Delta"      
