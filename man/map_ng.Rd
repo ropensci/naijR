@@ -7,7 +7,7 @@
 map_ng(show.neighbours = FALSE, ...)
 }
 \arguments{
-\item{show.neighbours}{logical; \code{TRUE} to display borders of 
+\item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
