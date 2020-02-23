@@ -39,7 +39,7 @@
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
 {
-  stopifnot(is.logical(show.neighbours))
+  stopifnot(is.logical(show.neighbours), !is.na(show.neighbours))
   db <- 'mapdata::worldHires'
   mp <- maps::map(db, "Nigeria", ...)
   if (show.neighbours) 

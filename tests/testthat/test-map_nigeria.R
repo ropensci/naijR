@@ -22,7 +22,7 @@ test_that("Input is validated", {
   
   expect_error(map_ng(999), myerr, fixed = TRUE)
   expect_error(map_ng(NULL), myerr, fixed = TRUE)
-  expect_error(map_ng(NA), "missing value where TRUE/FALSE needed")
+  expect_error(map_ng(NA), "!is.na\\(show.neighbours\\) is not TRUE")
   expect_error(map_ng('TRUE'), myerr, fixed = TRUE)
   expect_error(map_ng(pi), myerr, fixed = TRUE)
 })
