@@ -13,7 +13,8 @@ neighbouring countries.}
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
 \value{
-\code{NULL} invisibly; results in the drawing of a map of Nigeria.
+An object of class \code{map}, invisibly; as a side-effect,
+results in the drawing of a map of Nigeria.
 }
 \description{
 A basic map of the Federal Republic of Nigeria.

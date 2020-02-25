@@ -23,7 +23,8 @@
 #'
 #' @details This function is essentially a wrapper to \code{maps::map}.
 #'
-#' @return \code{NULL} invisibly; results in the drawing of a map of Nigeria.
+#' @return An object of class \code{map}, invisibly; as a side-effect,
+#' results in the drawing of a map of Nigeria.
 #'
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
