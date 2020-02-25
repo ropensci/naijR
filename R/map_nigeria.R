@@ -52,7 +52,7 @@ map_ng <- function(show.neighbours = FALSE, ...)
 
 
 #' @importFrom maps map
-jn <- function(mapObj, ...)
+jn <- function(database, ...)
 {
-  maps::map(mapObj, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
+  maps::map(database, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
 }
