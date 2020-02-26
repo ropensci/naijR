@@ -1,3 +1,33 @@
+# Copyright (C) 2019 Victor Ordu.
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+          ##################################################
+          ##################################################
+          ##                  DISCLAIMER                  ##
+          ##   The phone numbers that were used to write  ##
+          ##   these unit tests are purely a figment of   ##
+          ##   the author's imagination and are not in    ##
+          ##   any way intended to represent any actual   ##
+          ##   phone numbers belonging to anyone, living  ##
+          ##   or dead. If any number here looks like a   ##
+          ##   number you know, please notify us via      ##
+          ##   email (victorordu at outlook.com) to have  ##
+          ##   it removed from the source code.           ##
+          ##################################################
+          ##################################################
+
 library(naijR)
 
 test_that("Input corner cases are checked", {
@@ -10,7 +40,8 @@ test_that("Input corner cases are checked", {
 })
 
 test_that("Wrong mobile numbers are repaired or removed.", {
-  numbers <-
+  
+  init.numbers <-
     c(
       "123456789",
       "0123456789",
@@ -20,23 +51,65 @@ test_that("Wrong mobile numbers are repaired or removed.", {
       "08123456789",
       "09064321987",
       "O8055577889",
-      "070456789011"
+      "070456789011",
+      "07031356890",    # http://www.5starsmsng.com/nigerian-phone-prefixes
+      "07061356890",
+      "08031356890",
+      "08061356890",
+      "08101356890",
+      "08131356890",
+      "08141356890",
+      "08161356890",
+      "09031356890",
+      "09061356890",
+      "07051356890",
+      "08051356890",
+      "08071356890",
+      "08111356890",
+      "08151356890",
+      "09051356890",
+      "07011356890",
+      "07081356890",
+      "08021356890",
+      "08081356890",
+      "08121356890",
+      "09021356890",
+      "09071356890",
+      "09011356890",
+      "08091356890",
+      "08171356890",
+      "08181356890",
+      "09081356890",
+      "09091356890",
+      "07028356890",
+      "07029356890",
+      "08191356890",
+      "07025356890",
+      "07026356890",
+      "07041356890",
+      "07027356890",
+      "07091356890",
+      "07071356890",
+      "08042318843",
+      "07021356890"
     )
   
-  numbers <- fix_mobile(numbers)
+  fin.numbers <- fix_mobile(init.numbers)
   
-  expect_type(numbers, "character")
-  expect_true(is.na(numbers[1]))
-  expect_true(all(nchar(na.omit(numbers)) == 11))
-  expect_equal(numbers[1], NA_character_)
-  expect_equal(numbers[2], NA_character_)
-  expect_identical(numbers[3], "08000000001")
-  expect_identical(numbers[4], "09012345678")
-  expect_identical(numbers[5], "07098765432")
-  expect_identical(numbers[6], "08123456789")
-  expect_identical(numbers[7], "09064321987")
-  expect_equal(numbers[8], NA_character_)
-  expect_equal(numbers[9], NA_character_)
+  expect_type(fin.numbers, "character")
+  expect_true(is.na(fin.numbers[1]))
+  expect_true(all(nchar(na.omit(fin.numbers)) == 11))
+  expect_equal(fin.numbers[1], NA_character_)
+  expect_equal(fin.numbers[2], NA_character_)
+  expect_identical(fin.numbers[3], "08000000001")
+  expect_identical(fin.numbers[4], "09012345678")
+  expect_identical(fin.numbers[5], "07098765432")
+  expect_identical(fin.numbers[6], "08123456789")
+  expect_identical(fin.numbers[7], "09064321987")
+  for (i in 10:length(init.numbers))
+    expect_identical(fin.numbers[i], init.numbers[i])
+  expect_equal(fin.numbers[8], NA_character_)
+  expect_equal(fin.numbers[9], NA_character_)
 })
 
 
