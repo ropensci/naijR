@@ -32,19 +32,21 @@
 #'
 #' @import mapdata
 #' @importFrom maps map
+#' @importFrom maps map.text
 #'
 #' @examples
 #' map_ng() # Draw a map with default settings
-#' map_ng(TRUE) # Display portions of neighbouring countries' borders
-#'
+#' map_ng(show = TRUE) # Display portions of neighbouring countries' borders
+#' 
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
 {
   stopifnot(is.logical(show.neighbours), !is.na(show.neighbours))
   db <- 'mapdata::worldHires'
-  mp <- maps::map(db, "Nigeria", ...)
+  mp <- map(db, "Nigeria", fill = TRUE, ...)
   if (show.neighbours) 
-    mp <- jn(db, ...)
+    mp <- .addToCurrentMap(db, fill = TRUE, ...)
+  map.text(mp, ...)
   invisible(mp)
 }
 
@@ -52,7 +54,7 @@ map_ng <- function(show.neighbours = FALSE, ...)
 
 
 #' @importFrom maps map
-jn <- function(database, ...)
+.addToCurrentMap <- function(database, neighbours, ...)
 {
   maps::map(database, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
 }

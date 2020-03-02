@@ -24,6 +24,6 @@ This function is essentially a wrapper to \code{maps::map}.
 }
 \examples{
 map_ng() # Draw a map with default settings
-map_ng(TRUE) # Display portions of neighbouring countries' borders
+map_ng(show = TRUE) # Display portions of neighbouring countries' borders
 
 }
