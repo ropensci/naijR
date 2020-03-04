@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.0.6.9005
+Version: 0.0.6.9006
 Date: 2020-03-01
 Depends: R (>= 3.6)
 Imports:
@@ -13,7 +13,8 @@ Suggests:
     readxl
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
-              role = c("aut", "cre"))
+              role = c("aut", "cre"),
+              comment = c(ORCID = "0000-0003-3716-0668"))
 Description: A set of convenience functions as well as geographical/political
   data about Nigeria, aimed at simplifying work with data and information that
   are specific to the country.
