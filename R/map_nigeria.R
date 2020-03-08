@@ -1,7 +1,7 @@
 # Source file: map_nigeria.R
 #
 # GPL-3 License
-# 
+#
 # Copyright (C) 2019-2020 Victor Ordu.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -32,29 +32,22 @@
 #'
 #' @import mapdata
 #' @importFrom maps map
-#' @importFrom maps map.text
 #'
 #' @examples
 #' map_ng() # Draw a map with default settings
 #' map_ng(show = TRUE) # Display portions of neighbouring countries' borders
 #' 
+#' @return An object of class \code{maps} containing the data used to draw the
+#' map and which can be used for additional calls to \code{\link{[maps]map}}.
+#'
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
 {
-  stopifnot(is.logical(show.neighbours), !is.na(show.neighbours))
+  stopifnot(is.logical(show.neighbours),!is.na(show.neighbours))
   db <- 'mapdata::worldHires'
-  mp <- map(db, "Nigeria", fill = TRUE, ...)
-  if (show.neighbours) 
-    mp <- .addToCurrentMap(db, fill = TRUE, ...)
-  map.text(mp, ...)
-  invisible(mp)
+  m <- map(db, "Nigeria", ...)
+  if (show.neighbours)
+    m <- map(db, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
+  invisible(m)
 }
 
-
-
-
-#' @importFrom maps map
-.addToCurrentMap <- function(database, neighbours, ...)
-{
-  maps::map(database, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
-}

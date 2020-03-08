@@ -15,6 +15,9 @@ neighbouring countries.}
 \value{
 An object of class \code{map}, invisibly; as a side-effect,
 results in the drawing of a map of Nigeria.
+
+An object of class \code{maps} containing the data used to draw the
+map and which can be used for additional calls to \code{\link{[maps]map}}.
 }
 \description{
 A basic map of the Federal Republic of Nigeria.
