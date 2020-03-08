@@ -38,7 +38,7 @@
 #' map_ng(show = TRUE) # Display portions of neighbouring countries' borders
 #' 
 #' @return An object of class \code{maps} containing the data used to draw the
-#' map and which can be used for additional calls to \code{\link{[maps]map}}.
+#' map and which can be used for additional calls to \code{\link[maps]{map}}.
 #'
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
