@@ -28,7 +28,7 @@ This is a package for use in the R ecosystem. To install R, visit
 ### Installation
 
 To download and install the current stable version of this package from
-[CRAN](https://cloud.r-project.org/web/packages/naijR/index.html):
+CRAN:
 
 ``` r
 install.packages("naijR")
@@ -50,8 +50,7 @@ To create a list of all the States of the Nigerian Federation, simply
 call `states()`
 
 ``` r
-library(naijR, quietly = TRUE)  # attach to R session
-#> Warning: package 'naijR' was built under R version 3.6.2
+library(naijR, quietly = TRUE)
 states()
 #>  [1] "Abia"        "Adamawa"     "Akwa Ibom"   "Anambra"     "Bauchi"     
 #>  [6] "Bayelsa"     "Benue"       "Borno"       "Cross River" "Delta"      
@@ -114,7 +113,77 @@ how_many_lgas("Ekiti")
 #> No. of LGAs in Ekiti State: 16
 ```
 
-## Feedback
+#### Working with phone numbers
 
-For bug reports or feature requests, submit an
+It is common to come across datasets where phone numbers are wrongly
+entered or misinterpreted by regular software like MS Excel. The
+function `fix_mobile()` helps with this.
+
+``` r
+fix_mobile("8032000000")
+#> [1] "08032000000"
+```
+
+The function works on vectors; thus an entire column of a table with
+phone numbers can be quickly processed. Illegible or irreparable numbers
+are turned into missing values, e.g.
+
+``` r
+(dat <- data.frame(
+  serialno = 1:8,
+  phone = c(
+    "123456789",
+    "0123456789",
+    "8000000001",
+    "9012345678",
+    "07098765432",
+    "08123456789",
+    "09064321987",
+    "O8055577889"
+  ),
+  stringsAsFactors = FALSE
+))
+#>   serialno       phone
+#> 1        1   123456789
+#> 2        2  0123456789
+#> 3        3  8000000001
+#> 4        4  9012345678
+#> 5        5 07098765432
+#> 6        6 08123456789
+#> 7        7 09064321987
+#> 8        8 O8055577889
+```
+
+``` r
+fix_mobile(dat$phone)
+#> [1] NA            NA            "08000000001" "09012345678" "07098765432"
+#> [6] "08123456789" "09064321987" NA
+```
+
+## Future Work
+
+Some features to expect in the next minor update:
+
+  - The function `map_ng()` can draw a very basic map of Nigeria.
+    Expected features will include sub national divisions and capacity
+    to draw choropleth maps for plotting data.
+  - Manipulation of phone numbers will provide options for the
+    introduction of separators. Also the function will become more
+    intelligent, pre-empting errors in data entry e.g. accepting the
+    letter ‘O’ as a presumed zero (`0`).
+  - `fix_mobile()` currently works with character vectors. It will be
+    allowed to work with numeric vectors, converting these to character
+    vectors internally.
+  - Misspelling of Local Government Areas is very common and it is
+    common to find so many variants, especially where compound names are
+    involved. Functionality to address this problem will be introduced.
+  - A distance matrix for major locations in the country.
+
+## Feedback/Contribution
+
+This is an open source project and contributions are welcome. Pull
+requests for R code or documentation, and any suggestions for making
+this effort worthwhile will be gladly entertained.
+
+For bug reports or feature requests, kindly submit an
 [issue](https://github.com/BroVic/naijR/issues/new).
