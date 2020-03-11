@@ -29,14 +29,6 @@ test_that("Input is validated", {
 
 
 
-test_that("Use of vector longer than 1", {
-  expect_warning(tstmap <- map_ng(c(TRUE, TRUE, FALSE), plot = FALSE),
-                 'has length > 1 and only the first element will be used')
-  expect_is(tstmap, 'map')
-})
-
-
-
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
   mp2 <- map_ng(show = TRUE, plot = FALSE)
