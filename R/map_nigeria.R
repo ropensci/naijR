@@ -36,18 +36,51 @@
 #' @examples
 #' map_ng() # Draw a map with default settings
 #' map_ng(show = TRUE) # Display portions of neighbouring countries' borders
-#' 
+#'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}}.
 #'
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
 {
-  stopifnot(is.logical(show.neighbours),!is.na(show.neighbours))
+  stopifnot(is.logical(show.neighbours), !is.na(show.neighbours))
   db <- 'mapdata::worldHires'
   m <- map(db, "Nigeria", ...)
   if (show.neighbours)
-    m <- map(db, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
+    m <-
+    map(db, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
   invisible(m)
 }
 
+
+#' Choropleth Maps of Nigeria
+#'
+#' @import graphics
+#' @import sp
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom rgdal readOGR
+#' @importFrom tools toTitleCase
+#'
+#' @param x A variable to be mapped
+#' @param base.col The base colour upon which the colour scheme is based
+#' @param breaks Numeric vector > 3 and < 10 representing the limits of the
+#' categories for variable \code{x}.
+#' @param ... Arguments to be passed to \code{\link[graphics]{plot}}
+#'
+#' @export
+## TODO: Change function name
+cmap <- function(x, base.col, breaks, ...) {
+  op <- par()
+  par(mar = c(1, 0.1, 2, 0.1))
+  on.exit(par(op))
+  m <-
+    rgdal::readOGR(
+      dsn = system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE),
+      layer = "nga_admbnda_adm1_osgof_20161215"
+    )
+  clr <- RColorBrewer::brewer.pal(length(breaks) - 1,
+                                  paste0(tools::toTitleCase(base.col), "s"))
+  clr <- clr[findInterval(x, breaks)]
+  plot(m, col = clr, ...)
+  legend("bottomright", legend = levels(cut(x, breaks)), fill = clr)
+}
