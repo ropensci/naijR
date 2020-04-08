@@ -19,9 +19,7 @@
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
-#' @param sorted Whether the results to be all sorted in increasing 
-#' alphabetical order (default value is \code{TRUE}).
-#' @param full.names the complete appellation for the States
+#' @param with.fct logical; whether to include FCT in the result
 #' 
 #' @return The States of Nigeria as a whole or by zones, as a character vector
 #' 
@@ -36,39 +34,47 @@
 #' states()  # lists names of all States
 #' states("se")  # lists States in South-East zone
 #' @export
-states <- function(gpz = NULL, sorted = TRUE, full.names = FALSE)
+states <- function(gpz = NULL, with.fct = FALSE)
 {
-  # TODO: FCT or not?
-  sts <- list(nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
-              ne = c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
-              nw = c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto",
-                     "Zamfara"), 
-              se = c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
-              ss = c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo",
-                     "Rivers"),
-              sw = c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
-  if (is.null(gpz))
-    sts <- as.vector(unlist(sts))
-  else {
+  stopifnot(is.logical(with.fct))
+  stl <- .getStateList()
+  if (!with.fct)
+    stl$X <- NULL
+  if (!is.null(gpz)) {
     if (!is.character(gpz))
-      stop("argument supplied is not of type 'character'")
-    gpz <- gsub("\\s+", "", gpz)
-    gpz <- tolower(gpz)
-    rgn <- match.arg(gpz, c("nc", "ne", "nw", "se", "ss", "sw"),
-                     several.ok = TRUE)
-    sts <- as.vector(unlist(sts[rgn]))
+      stop("argument supplied 'gpz' is not of type 'character'")
+    gpz <- tolower(gsub("\\s+", "", gpz))
+    x <- match.arg(gpz, names(stl), several.ok = TRUE)
+    stl <- stl[x]
   }
-  if (!is.logical(sorted))
-    stop("'sorted' expected as a logical argument of length 1")
-  else {
-    if (sorted)
-      sts <- sort(sts)
-  }
-  if (!is.logical(full.names))
-    stop("'full.names' expected as a logical argument of length 1")
-  else {
-    if (full.names)
-      sts <- paste(sts, "State")
-  }
-  sts
+  ss <- as.vector(unlist(stl), mode = 'character')
+  if (is.null(gpz))
+    ss <- sort(ss)
+  ss
 }
+
+
+
+
+.getStateList <- function()
+{
+  l <- list(
+    c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
+    c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
+    c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
+    c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
+    c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
+    c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
+    "Federal Capital Territory"
+  )
+  names(l) <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', ''))
+  l
+}
+
+
+# is_state <- function(x) {}
+# is_lga <- function(x) {}
+# is_ward <- function(x) {}
+
+# population <- function(x) {}
+# language <- function(x) {}

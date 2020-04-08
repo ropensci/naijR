@@ -4,16 +4,13 @@
 \alias{states}
 \title{Display States of the Federal Republic of Nigeria}
 \usage{
-states(gpz = NULL, sorted = TRUE, full.names = FALSE)
+states(gpz = NULL, with.fct = FALSE)
 }
 \arguments{
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).}
 
-\item{sorted}{Whether the results to be all sorted in increasing 
-alphabetical order (default value is \code{TRUE}).}
-
-\item{full.names}{the complete appellation for the States}
+\item{with.fct}{logical; whether to include FCT in the result}
 }
 \value{
 The States of Nigeria as a whole or by zones, as a character vector
