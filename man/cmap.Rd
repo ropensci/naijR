@@ -4,15 +4,15 @@
 \alias{cmap}
 \title{Choropleth Maps of Nigeria}
 \usage{
-cmap(x, base.col, breaks, ...)
+cmap(x, breaks, base.col = character(), ...)
 }
 \arguments{
 \item{x}{A variable to be mapped}
 
-\item{base.col}{The base colour upon which the colour scheme is based}
-
 \item{breaks}{Numeric vector > 3 and < 10 representing the limits of the
 categories for variable \code{x}.}
+
+\item{base.col}{The base colour upon which the colour scale is based}
 
 \item{...}{Arguments to be passed to \code{\link[graphics]{plot}}}
 }

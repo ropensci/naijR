@@ -62,24 +62,34 @@ map_ng <- function(show.neighbours = FALSE, ...)
 #' @importFrom tools toTitleCase
 #'
 #' @param x A variable to be mapped
-#' @param base.col The base colour upon which the colour scheme is based
 #' @param breaks Numeric vector > 3 and < 10 representing the limits of the
 #' categories for variable \code{x}.
+#' @param base.col The base colour upon which the colour scale is based
 #' @param ... Arguments to be passed to \code{\link[graphics]{plot}}
 #'
 #' @export
 ## TODO: Change function name
-cmap <- function(x, base.col, breaks, ...) {
+cmap <- function(x, breaks, base.col = character(), ...) {
+  # TODO: Validate x and breaks
+  stopifnot(is.character(base.col))
+  if (missing(base.col))
+    base.col <- 'red'
+  scl <- c("red", "purple", "orange", "grey", "green", "blue")
+  bc <- base.col[[1]]
+  if (!tolower(bc) %in% scl)
+    stop("The selected colour scale is not supported")
   op <- par()
   par(mar = c(1, 0.1, 2, 0.1))
-  on.exit(par(op))
+  on.exit(suppressWarnings(par(op)))  # TODO: Review approach to warnings
+  .dir <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+  if (identical(.dir, character(1)))
+    stop("The map data could not be found in 'inst/extdata'")
   m <-
-    rgdal::readOGR(
-      dsn = system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE),
-      layer = "nga_admbnda_adm1_osgof_20161215"
-    )
+    rgdal::readOGR(dsn = .dir,
+                   layer = "nga_admbnda_adm1_osgof_20161215",
+                   verbose = FALSE)
   clr <- RColorBrewer::brewer.pal(length(breaks) - 1,
-                                  paste0(tools::toTitleCase(base.col), "s"))
+                                  paste0(tools::toTitleCase(bc), "s"))
   clr <- clr[findInterval(x, breaks)]
   plot(m, col = clr, ...)
   legend("bottomright", legend = levels(cut(x, breaks)), fill = clr)
