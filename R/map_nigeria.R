@@ -20,7 +20,7 @@
 #' Map of Nigeria
 #'
 #' A basic map of the Federal Republic of Nigeria.
-#'
+#' 
 #' @details This function is essentially a wrapper to \code{maps::map}.
 #'
 #' @return An object of class \code{map}, invisibly; as a side-effect,
@@ -30,7 +30,6 @@
 #' neighbouring countries.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #'
-#' @import mapdata
 #' @importFrom maps map
 #'
 #' @examples
@@ -43,12 +42,11 @@
 #' @export
 map_ng <- function(show.neighbours = FALSE, ...)
 {
-  stopifnot(is.logical(show.neighbours), !is.na(show.neighbours))
-  db <- 'mapdata::worldHires'
-  m <- map(db, "Nigeria", ...)
+  stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
-    m <-
-    map(db, c("Cameroon", "Chad", "Niger", "Benin"), add = TRUE, ...)
+    warning("Display of neighbouring countries is no longer supported")
+  db <- .getMapData()
+  m <- map(db)
   invisible(m)
 }
 
@@ -71,10 +69,9 @@ map_ng <- function(show.neighbours = FALSE, ...)
 ## TODO: Change function name
 cmap <- function(x, breaks, base.col = character(), ...) {
   # TODO: Validate x and breaks
-  stopifnot(is.character(base.col))
-  if (missing(base.col))
-    base.col <- 'red'
-  scl <- c("red", "purple", "orange", "grey", "green", "blue")
+  stopifnot(is.character(base.col))  # TODO: Accept numeric input
+  base.col <- c("red", "purple", "orange", "grey", "green", "blue")
+  base.col <- match.arg(base.col)
   bc <- base.col[[1]]
   if (!tolower(bc) %in% scl)
     stop("The selected colour scale is not supported")
@@ -86,7 +83,7 @@ cmap <- function(x, breaks, base.col = character(), ...) {
     stop("The map data could not be found in 'inst/extdata'")
   m <-
     rgdal::readOGR(dsn = .dir,
-                   layer = "nga_admbnda_adm1_osgof_20161215",
+                   layer = .shpLayer,
                    verbose = FALSE)
   clr <- RColorBrewer::brewer.pal(length(breaks) - 1,
                                   paste0(tools::toTitleCase(bc), "s"))
@@ -94,3 +91,19 @@ cmap <- function(x, breaks, base.col = character(), ...) {
   plot(m, col = clr, ...)
   legend("bottomright", legend = levels(cut(x, breaks)), fill = clr)
 }
+
+
+#' @importFrom rgdal readOGR
+.getMapData <- function()
+{
+  dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+  if (identical(dsn, character(1)))
+    stop("The map data could not be found in 'extdata'")
+    rgdal::readOGR(dsn = dsn,
+                   layer = "nga_admbnda_adm1_osgof_20161215",
+                   verbose = FALSE)
+}
+
+# TODO: Document!
+#' @export
+.shpLayer <- "nga_admbnda_adm1_osgof_20161215"
