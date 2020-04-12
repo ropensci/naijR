@@ -67,14 +67,16 @@ states <- function(gpz = NULL, with.fct = FALSE)
     c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
     "Federal Capital Territory"
   )
-  names(l) <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', ''))
-  l
+  nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', ''))
+  setNames(l, nm)
 }
 
 
 # is_state <- function(x) {}
 # is_lga <- function(x) {}
 # is_ward <- function(x) {}
+
+# abbr_state <- function(x) {} # abbreviate State names
 
 # population <- function(x) {}
 # language <- function(x) {}
