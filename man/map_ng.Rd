@@ -4,11 +4,14 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(show.neighbours = FALSE, ...)
+map_ng(show.neighbours = FALSE, mar = c(2.1, 2.1, par("mar")[3], 0.1),
+  ...)
 }
 \arguments{
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
+
+\item{mar}{Plot margins as in \code{\link[graphics]{par}}}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
@@ -27,6 +30,5 @@ This function is essentially a wrapper to \code{maps::map}.
 }
 \examples{
 map_ng() # Draw a map with default settings
-map_ng(show = TRUE) # Display portions of neighbouring countries' borders
 
 }

@@ -28,82 +28,86 @@
 #'
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
+#' @param mar Plot margins as in \code{\link[graphics]{par}}
 #' @param ... Further arguments for function \code{\link[maps]{map}}
-#'
+#' 
+#' @import sp
+#' @importFrom graphics par
 #' @importFrom maps map
 #'
 #' @examples
 #' map_ng() # Draw a map with default settings
-#' map_ng(show = TRUE) # Display portions of neighbouring countries' borders
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}}.
 #'
 #' @export
-map_ng <- function(show.neighbours = FALSE, ...)
-{
-  stopifnot(is.logical(show.neighbours))
-  if (show.neighbours)
-    warning("Display of neighbouring countries is no longer supported")
-  db <- .getMapData()
-  m <- map(db)
-  invisible(m)
-}
+map_ng <-
+  function(show.neighbours = FALSE,
+           mar = c(2.1, 2.1, par('mar')[3], 0.1),
+           ...)
+  {
+    stopifnot(is.logical(show.neighbours))
+    if (show.neighbours)
+      warning("Display of neighbouring countries is disabled")
+    dt <- .getMapData()
+    map(dt, mar = mar, ...)
+  }
 
 
-#' Choropleth Maps of Nigeria
-#'
-#' @import graphics
-#' @import sp
-#' @importFrom RColorBrewer brewer.pal
-#' @importFrom rgdal readOGR
-#' @importFrom tools toTitleCase
-#'
-#' @param x A variable to be mapped
-#' @param breaks Numeric vector > 3 and < 10 representing the limits of the
-#' categories for variable \code{x}.
-#' @param base.col The base colour upon which the colour scale is based
-#' @param ... Arguments to be passed to \code{\link[graphics]{plot}}
-#'
-#' @export
-## TODO: Change function name
-cmap <- function(x, breaks, base.col = character(), ...) {
-  # TODO: Validate x and breaks
-  stopifnot(is.character(base.col))  # TODO: Accept numeric input
-  base.col <- c("red", "purple", "orange", "grey", "green", "blue")
-  base.col <- match.arg(base.col)
-  bc <- base.col[[1]]
-  if (!tolower(bc) %in% scl)
-    stop("The selected colour scale is not supported")
-  op <- par()
-  par(mar = c(1, 0.1, 2, 0.1))
-  on.exit(suppressWarnings(par(op)))  # TODO: Review approach to warnings
-  .dir <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
-  if (identical(.dir, character(1)))
-    stop("The map data could not be found in 'inst/extdata'")
-  m <-
-    rgdal::readOGR(dsn = .dir,
-                   layer = .shpLayer,
-                   verbose = FALSE)
-  clr <- RColorBrewer::brewer.pal(length(breaks) - 1,
-                                  paste0(tools::toTitleCase(bc), "s"))
-  clr <- clr[findInterval(x, breaks)]
-  plot(m, col = clr, ...)
-  legend("bottomright", legend = levels(cut(x, breaks)), fill = clr)
-}
 
-
+#' @importFrom maps SpatialPolygons2map
 #' @importFrom rgdal readOGR
 .getMapData <- function()
 {
-  dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+  dsn <-
+    system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
   if (identical(dsn, character(1)))
     stop("The map data could not be found in 'extdata'")
+  ob <-
     rgdal::readOGR(dsn = dsn,
                    layer = "nga_admbnda_adm1_osgof_20161215",
                    verbose = FALSE)
+  SpatialPolygons2map(ob, namefield = 'admin1Name')
 }
 
-# TODO: Document!
-#' @export
-.shpLayer <- "nga_admbnda_adm1_osgof_20161215"
+
+
+# Choropleth Maps of Nigeria
+
+# @import graphics
+# @import sp
+# @importFrom RColorBrewer brewer.pal
+# @importFrom rgdal readOGR
+# @importFrom tools toTitleCase
+
+# @param x A variable to be mapped
+# @param breaks Numeric vector > 3 and < 10 representing the limits of the
+# categories for variable \code{x}.
+# @param base.col The base colour upon which the colour scale is based
+# @param ... Arguments to be passed to \code{\link[graphics]{plot}}
+## TODO: Change function name
+# cmap <- function(x, breaks, base.col = character(), ...) {
+#   # TODO: Validate x and breaks
+#   stopifnot(is.character(base.col))  # TODO: Accept numeric input
+#   base.col <- c("red", "purple", "orange", "grey", "green", "blue")
+#   base.col <- match.arg(base.col)
+#   bc <- base.col[[1]]
+#   if (!tolower(bc) %in% scl)
+#     stop("The selected colour scale is not supported")
+#   op <- par()
+#   par(mar = c(1, 0.1, 2, 0.1))
+#   on.exit(suppressWarnings(par(op)))  # TODO: Review approach to warnings
+#   .dir <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+#   if (identical(.dir, character(1)))
+#     stop("The map data could not be found in 'extdata'")
+#   m <-
+#     rgdal::readOGR(dsn = .dir,
+#                    layer = .shpLayer,
+#                    verbose = FALSE)
+#   clr <- RColorBrewer::brewer.pal(length(breaks) - 1,
+#                                   paste0(tools::toTitleCase(bc), "s"))
+#   clr <- clr[findInterval(x, breaks)]
+#   plot(m, col = clr, ...)
+#   legend("bottomright", legend = levels(cut(x, breaks)), fill = clr)
+# }
