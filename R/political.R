@@ -55,7 +55,7 @@ states <- function(gpz = NULL, with.fct = FALSE)
 
 
 
-
+#' @importFrom stats setNames
 .getStateList <- function()
 {
   l <- list(
