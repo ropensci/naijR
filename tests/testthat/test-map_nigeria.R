@@ -56,3 +56,27 @@ test_that("'map' object is properly created", {
   
   for (i in states()) expect_match(mp2$names, i, all = FALSE)
 })
+
+
+test_that("Data for mapping is retrieved properly", {
+  tryToGetMap <- quote(try(.getMapData()))
+  success <- eval(tryToGetMap)
+  threwErrExcept <- quote(inherits(success, "try-error"))
+  
+  if (eval(threwErrExcept)) {
+    expect_error(eval(tryToGetMap), 
+                 "The map data could not be found in 'extdata'")
+  }
+  expect_false(eval(threwErrExcept))
+  expect_is(success, 'map')
+})
+
+
+test_that("Choropleth map for Nigeria can be created", {
+  set.seed(123)
+  cases <- sample(1:100, 37, replace = T)
+  breaks <- seq(10, 100, 10)
+  res <- choropleth_ng(cases, breaks, plot = FALSE)
+  
+  expect_is(res, 'map')
+})
