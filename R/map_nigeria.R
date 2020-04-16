@@ -79,7 +79,8 @@ map_ng <-
 #' categories for variable \code{x}.
 #' @param base.col The base colour upon which the colour scale is based
 #' @param ... Arguments to be passed to \code{\link[maps]{map}}
-## TODO: Change function name
+#' 
+#' @export
 choropleth_ng <- function(x, 
                           breaks, 
                           base.col = c("red", "grey", "green", "blue"),
