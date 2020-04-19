@@ -25,10 +25,15 @@
 #'
 #' @return An object of class \code{map}, invisibly; as a side-effect,
 #' results in the drawing of a map of Nigeria.
-#'
+#' 
+#' @param style The type of map to be drawn. Current options are \code{basic}
+#' and \code{choropleth}.
+#' @param var A variable to be plotted in a map (applicable only to 
+#' \code{choropleth})
+#' @param breaks Categories to be plotted on a map (applicable only 
+#' to \code{choropleth}) 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
-#' @param mar Plot margins as in \code{\link[graphics]{par}}
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #' 
 #' @importFrom graphics par
@@ -41,17 +46,41 @@
 #' map and which can be used for additional calls to \code{\link[maps]{map}}.
 #'
 #' @export
-map_ng <-
-  function(show.neighbours = FALSE,
-           mar = c(2.1, 2.1, par('mar')[3], 0.1),
-           ...)
-  {
-    stopifnot(is.logical(show.neighbours))
-    if (show.neighbours)
-      warning("Display of neighbouring countries is disabled")
-    dt <- .getMapData()
-    map(dt, mar = mar, ...)
+map_ng <- function(style = c("basic", 'choropleth'),
+                   var = NULL,
+                   breaks = NULL, 
+                   show.neighbours = FALSE, ...)
+{
+  style <- match.arg(style)
+  stopifnot(is.logical(show.neighbours))
+  if (show.neighbours)
+    warning("Display of neighbouring countries is disabled")
+  dt <- .getMapData()
+  dots <- list(...)
+  plot <- TRUE
+  if ('plot' %in% names(dots))
+    plot <- dots[['plot']]
+  fill <- FALSE
+  col <- 1L 
+  if (style == 'choropleth') {
+    fill <- TRUE
+    colobj <- .prepareChoroplethColors(var, breaks, ...)
+    col <- colobj$colors
   }
+  else if (style == 'basic' && 'fill' %in% names(dots)) {
+    fill <- dots[['fill']]
+  }
+  m <- map(dt, plot = plot, fill = fill, col = col)
+  # if (plot && style == 'choropleth')
+  #   legend("bottomleft", legend = colobj$bins, fill = colobj$scheme)
+  invisible(m)
+}
+
+
+
+
+
+
 
 
 
@@ -59,57 +88,44 @@ map_ng <-
 #' @importFrom rgdal readOGR
 .getMapData <- function()
 {
-  dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+  dsn <-
+    system.file("extdata/ng_admin",
+                package = 'naijR',
+                mustWork = TRUE)
   if (identical(dsn, character(1)))
     stop("The map data could not be found in 'extdata'")
-  rgdal::readOGR(dsn = dsn, layer = .shpLayer, verbose = FALSE) %>%
+  rgdal::readOGR(dsn = dsn,
+                 layer = .shpLayer,
+                 verbose = FALSE) %>%
     SpatialPolygons2map(namefield = 'admin1Name')
 }
 
 
-#' Choropleth Maps of Nigeria
 
-#' @import graphics
+
+
+
+
+
 #' @import magrittr
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom tools toTitleCase
+.prepareChoroplethColors <- 
+  function(x, brk, col = c("grey", "red", "green", "blue"))
+  {
+    # TODO: Validate `x` and `brk`
+    stopifnot(is.atomic(x), is.atomic(brk))
+    # TODO: Set limits for variables and brk
+    col <- match.arg(col)  # TODO: Accept numeric input
+    pal <- col %>% toTitleCase %>% paste0("s")
+    bins <- length(brk - 1)
+    cr <- RColorBrewer::brewer.pal(bins, pal)
+    ind <- findInterval(x, brk, all.inside = TRUE)
+    list(colors = cr[ind], scheme = cr, bins = levels(cut(x, brk)))
+  }
 
-#' @param x A variable to be mapped
-#' @param breaks Numeric vector > 3 and < 10 representing the limits of the
-#' categories for variable \code{x}.
-#' @param base.col The base colour upon which the colour scale is based
-#' @param ... Arguments to be passed to \code{\link[maps]{map}}
-#' 
-#' @export
-choropleth_ng <- function(x, 
-                          breaks, 
-                          base.col = c("red", "grey", "green", "blue"),
-                          ...) 
-{
-  # TODO: Validate `x` and `breaks`
-  stopifnot(is.character(base.col))  # TODO: Accept numeric input
-  base.col <- match.arg(base.col)
-  bc <- base.col %>% 
-    extract(1) %>% 
-    toTitleCase %>% 
-    paste0("s")
-  clrs <- breaks %>%
-    length %>%
-    subtract(1) %>%
-    brewer.pal(bc) %>%
-    `[`(findInterval(x, breaks))
-  myMar <- c(mar = c(0.1, 1.1, 2.1, 4.1))
-  dots <- list(...)
-  plotting <- TRUE
-  if ('plot' %in% names(dots))
-    plotting <- dots[['plot']]
-  m <- map_ng(mar = myMar, plot = FALSE) %>% 
-    map(mar = myMar, col = clrs, fill = TRUE, ...)
-  if (plotting)
-    legend("bottomright", legend = levels(cut(x, breaks)), fill = clrs)
-  par(mar = myMar)
-  invisible(m)
-}
+
+
 
 
 

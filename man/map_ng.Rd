@@ -4,14 +4,21 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(show.neighbours = FALSE, mar = c(2.1, 2.1, par("mar")[3], 0.1),
-  ...)
+map_ng(style = c("basic", "choropleth"), var = NULL, breaks = NULL,
+  show.neighbours = FALSE, ...)
 }
 \arguments{
+\item{style}{The type of map to be drawn. Current options are \code{basic}
+and \code{choropleth}.}
+
+\item{var}{A variable to be plotted in a map (applicable only to 
+\code{choropleth})}
+
+\item{breaks}{Categories to be plotted on a map (applicable only 
+to \code{choropleth})}
+
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
-
-\item{mar}{Plot margins as in \code{\link[graphics]{par}}}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
