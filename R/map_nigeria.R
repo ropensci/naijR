@@ -51,6 +51,8 @@ map_ng <- function(style = c("basic", 'choropleth'),
                    breaks = NULL, 
                    show.neighbours = FALSE, ...)
 {
+  if (is.null(style))
+    stop("Invalid input for 'style'.")
   style <- match.arg(style)
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
