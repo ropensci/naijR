@@ -4,11 +4,14 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(style = c("basic", "choropleth"), var = NULL, breaks = NULL,
-  show.neighbours = FALSE, ...)
+map_ng(state = character(), style = c("plain", "choropleth"),
+  var = NULL, breaks = NULL, show.neighbours = FALSE, ...)
 }
 \arguments{
-\item{style}{The type of map to be drawn. Current options are \code{basic}
+\item{state}{A character vector of a list of Nigerian States to be displayed.
+The default value is to print all States.}
+
+\item{style}{The type of map to be drawn. Current options are \code{plain}
 and \code{choropleth}.}
 
 \item{var}{A variable to be plotted in a map (applicable only to 
@@ -27,15 +30,22 @@ An object of class \code{map}, invisibly; as a side-effect,
 results in the drawing of a map of Nigeria.
 
 An object of class \code{maps} containing the data used to draw the
-map and which can be used for additional calls to \code{\link[maps]{map}}.
+map and which can be used for additional calls to \code{\link[maps]{map}} or
+other similar functions (e.g. \code{\link[graphics]{plot}}).
 }
 \description{
-A basic map of the Federal Republic of Nigeria.
+A map of the Federal Republic of Nigeria.
 }
 \details{
 This function is essentially a wrapper to \code{maps::map}.
 }
 \examples{
 map_ng() # Draw a map with default settings
+
+## Choropleth
+set.seed(4)
+vals <- sample(0:6, 37, TRUE)
+brk <- seq(0, 6, 2)
+map_ng('choropleth', vals, brk)
 
 }
