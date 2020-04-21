@@ -20,14 +20,15 @@ library(testthat)
 library(naijR)
 
 test_that("Input is validated", {
-  myerr <- "'arg' must be NULL or a character vector"
+  myerr1 <- "One or more elements of 'state' is not a Nigerian state"
   
-  expect_error(map_ng(999), myerr)
-  expect_error(map_ng(NULL), "Invalid input for 'style'")
-  expect_error(map_ng(NA), myerr)
-  expect_error(map_ng('TRUE'), 
-               "'arg' should be one of \"basic\", \"choropleth\"")
-  expect_error(map_ng(pi), myerr)
+  expect_error(map_ng(999), myerr1)
+  expect_error(map_ng(NULL), myerr1)
+  expect_error(map_ng(NA), myerr1)
+  expect_error(map_ng('TRUE'), myerr1)
+  expect_error(map_ng(pi), myerr1)
+  expect_error(map_ng(style = 'choropleth'), 
+               "'var' and 'breaks' must be supplied to plot chropleth maps")
   expect_warning(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
 })
@@ -59,7 +60,7 @@ test_that("'map' object is properly created", {
 })
 
 
-test_that("Data for mapping is retrieved properly", {
+test_that("Data for mapping are retrieved properly", {
   tryToGetMap <- quote(try(.getMapData()))
   success <- eval(tryToGetMap)
   threwErrExcept <- quote(inherits(success, "try-error"))
@@ -73,11 +74,60 @@ test_that("Data for mapping is retrieved properly", {
 })
 
 
-# test_that("Choropleth map for Nigeria can be created", {
-#   set.seed(123)
-#   cases <- sample(1:100, 37, replace = T)
-#   breaks <- seq(10, 100, 10)
-#   res <- map_ng("choropleth", cases, breaks, plot = FALSE)
-#   
-#   expect_is(res, 'map')
-# })
+local({
+  set.seed(4)
+  vals <- sample(0:6, 37, TRUE)
+  brks <- seq(0, 6, 2)
+  
+  test_that("Internal function for preparing colours is validated", {
+    df <- data.frame(1)
+    mt <- matrix(1:3)
+    err1 <- "is\\.atomic\\(x\\) is not TRUE"
+    err2 <- "Expected dim\\(x\\) to evaluate to NULL"
+    
+    expect_error(.prepareChoroplethColors(),
+                 'argument "x" is missing, with no default')
+    expect_error(.prepareChoroplethColors(NULL),
+                 'argument "brk" is missing, with no default')
+    expect_error(.prepareChoroplethColors(df, brks), err1)
+    expect_error(.prepareChoroplethColors(vals, df), 
+                 "is\\.atomic\\(brk\\) is not TRUE")
+    expect_error(.prepareChoroplethColors(df, df), err1)
+    expect_error(.prepareChoroplethColors(mt, brks), err2)
+    expect_warning(.prepareChoroplethColors(vals, c(1:3)))
+    expect_warning(.prepareChoroplethColors(vals, mt))
+    expect_error(.prepareChoroplethColors(mt, mt), err2)
+  })
+  
+  
+  test_that("Expected colours and related data are prepared", {
+    cho <- .prepareChoroplethColors(vals, brks)
+    cols <-
+      c(
+        "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", "#BDBDBD", 
+        "#636363", "#636363", "#F0F0F0", "#BDBDBD", "#636363", "#636363",
+        "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#636363", "#BDBDBD",
+        "#BDBDBD", "#BDBDBD", "#636363", "#636363", "#636363", "#F0F0F0",
+        "#636363", "#BDBDBD", "#636363", "#636363", "#636363", "#636363",
+        "#636363", "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#636363",
+        "#636363"
+      )
+    
+    expect_is(cho, "list")
+    expect_type(cho, "list")
+    expect_length(cho, 3L)
+    expect_named(cho, c("colors", "scheme", "bins"))
+    expect_type(cho$colors, 'character')
+    expect_type(cho$scheme, 'character')
+    expect_type(cho$bins, 'character')
+    expect_identical(cho$colors, cols)
+    expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
+    expect_identical(cho$bins, c("(0,2]", "(2,4]", "(4,6]"))
+    expect_length(cho$scheme, 3L)
+    expect_length(cho$bins, 3L)
+    expect_identical(length(vals), length(cho$colors))
+  })
+})
+
+
+
