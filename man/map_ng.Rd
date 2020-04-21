@@ -46,6 +46,6 @@ map_ng() # Draw a map with default settings
 set.seed(4)
 vals <- sample(0:6, 37, TRUE)
 brk <- seq(0, 6, 2)
-map_ng('choropleth', vals, brk)
+map_ng(style = 'choropleth', var = vals, breaks = brk)
 
 }

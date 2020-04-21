@@ -23,6 +23,7 @@
 #' 
 #' @details This function is essentially a wrapper to \code{maps::map}.
 #'
+#' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom maps map
 #' 
@@ -48,7 +49,7 @@
 #' set.seed(4)
 #' vals <- sample(0:6, 37, TRUE)
 #' brk <- seq(0, 6, 2)
-#' map_ng('choropleth', vals, brk)
+#' map_ng(style = 'choropleth', var = vals, breaks = brk)
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}} or
@@ -94,7 +95,7 @@ map_ng <- function(state = character(),
   }
   m <- map(
     dt,
-    region = state,
+    regions = state,
     plot = plot,
     fill = fill,
     col = col
