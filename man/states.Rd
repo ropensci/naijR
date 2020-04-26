@@ -4,13 +4,13 @@
 \alias{states}
 \title{Display States of the Federal Republic of Nigeria}
 \usage{
-states(gpz = NULL, with.fct = FALSE)
+states(gpz = NULL, all = TRUE)
 }
 \arguments{
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).}
 
-\item{with.fct}{logical; whether to include FCT in the result}
+\item{all}{logical; whether to include FCT in the result}
 }
 \value{
 The States of Nigeria as a whole or by zones, as a character vector

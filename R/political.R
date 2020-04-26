@@ -19,7 +19,7 @@
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
-#' @param with.fct logical; whether to include FCT in the result
+#' @param all logical; whether to include FCT in the result
 #' 
 #' @return The States of Nigeria as a whole or by zones, as a character vector
 #' 
@@ -34,12 +34,12 @@
 #' states()  # lists names of all States
 #' states("se")  # lists States in South-East zone
 #' @export
-states <- function(gpz = NULL, with.fct = FALSE)
+states <- function(gpz = NULL, all = TRUE)
 {
-  stopifnot(is.logical(with.fct))
+  stopifnot(is.logical(all))
   stl <- .getStateList()
-  if (!with.fct)
-    stl$X <- NULL
+  if (!all)
+    stl$fct <- NULL
   if (!is.null(gpz)) {
     if (!is.character(gpz))
       stop("argument supplied 'gpz' is not of type 'character'")
@@ -58,21 +58,46 @@ states <- function(gpz = NULL, with.fct = FALSE)
 #' @importFrom stats setNames
 .getStateList <- function()
 {
-  l <- list(
-    c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
-    c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
-    c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
-    c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
-    c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
-    c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
-    "Federal Capital Territory"
-  )
-  nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', ''))
-  setNames(l, nm)
+  nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
+  setNames(..LL, nm)
 }
 
 
-# is_state <- function(x) {}
+..LL <- list(
+  c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
+  c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
+  c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
+  c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
+  c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
+  c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
+  "Federal Capital Territory"
+)
+
+
+
+
+#' @param x A character vector to be tested.
+#' 
+#' @return A logical vector.
+#' @export
+is_state <- function(x) 
+{
+  if (isFALSE(is.character(x)))
+    stop("A character vector was expected")
+  res <- x %in% unlist(..LL)
+  if (length(res) > 1) {
+    if (all(res)) {
+      message("All elements of 'x' are states")
+      return(TRUE)
+    }
+    else return(FALSE)
+  }
+  res
+}
+
+
+
+
 # is_lga <- function(x) {}
 # is_ward <- function(x) {}
 
