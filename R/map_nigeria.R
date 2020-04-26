@@ -26,18 +26,28 @@
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom maps map
+#' @importFrom maps map.text
 #' 
 #' @param state A character vector of a list of Nigerian States to be displayed.
 #' The default value is to print all States.
-#' @param style The type of map to be drawn. Current options are \code{plain}
+#' @param flavour The type of map to be drawn. Current options are \code{plain}
 #' and \code{choropleth}.
-#' @param var A variable to be plotted in a map (applicable only to 
-#' \code{choropleth})
+#' @param data An object containing data, principally the variables required to
+#' plotted in a map (applicable only to \code{choropleth})
+#' @param region The subdivision for choropleth mapping.
+#' @param value The value to be categorised for choropleth mapping.
 #' @param breaks Categories to be plotted on a map (applicable only 
 #' to \code{choropleth}) 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
+#' @param col A character vector of R \code{\link[grDevices]{colours()}} to be
+#' used in the map. If \code{fill == TRUE}, colours are applied to the mapped
+#' area; otherwise it is applied to the borders.
+#' @param fill Logical. Whether to fill the mapped area or not.
+#' @param label Logical. Apply labels to the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
+#' 
+#' @details ...
 #' 
 #' @return An object of class \code{map}, invisibly; as a side-effect,
 #' results in the drawing of a map of Nigeria.
@@ -49,7 +59,7 @@
 #' set.seed(4)
 #' vals <- sample(0:6, 37, TRUE)
 #' brk <- seq(0, 6, 2)
-#' map_ng(style = 'choropleth', var = vals, breaks = brk)
+#' map_ng(flavour = 'choropleth', var = vals, breaks = brk)
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}} or
@@ -57,58 +67,60 @@
 #'
 #' @export
 map_ng <- function(state = character(),
-                   style = c("plain", 'choropleth'),
-                   var = NULL,
+                   flavour = c("plain", 'choropleth'),
+                   data = NULL,
+                   region = NULL,
+                   value = NULL,
                    breaks = NULL,
                    show.neighbours = FALSE,
+                   col = if (flavour == 'plain') 1L else NULL,
+                   fill = FALSE,
+                   label = FALSE,
                    ...)
 {
   # TODO: Add an argument for labelling the States
-  all.st <- states(with.fct = TRUE)
+  all.st <- states(all = TRUE)
   if (length(state) == 0L && !is.null(state))
     state <- all.st
   if (!any(state %in% all.st))
     stop("One or more elements of 'state' is not a Nigerian state")
-  if (is.null(style))
-    stop("Invalid input for 'style'.")
-  style <- match.arg(style)
+  if (is.null(flavour))
+    stop("Invalid input for 'flavour'.")
+  flavour <- match.arg(flavour)
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
-    warning("Display of neighbouring countries is disabled")
+    message("Display of neighbouring countries is disabled")
   dt <- .getMapData()
-  
   dots <- list(...)
   plot <- TRUE
   if ('plot' %in% names(dots))
     plot <- dots[['plot']]
-  fill <- FALSE
-  col <- 1L
-  if (style == 'choropleth') {
+  if (flavour == 'choropleth') {
     if (is.null(var) || is.null(breaks))
       stop("'var' and 'breaks' must be supplied to plot chropleth maps")
     fill <- TRUE
-    colobj <- .prepareChoroplethColors(var, breaks, ...)
-    col <- colobj$colors
+    intMp <- map(dt, regions = state, plot = FALSE)
+    cOpts <- .prepareChoroplethOptions(intMp, data, region, value, breaks, col)
+    col <- cOpts$colors
   }
-  else if (style == 'plain' && 'fill' %in% names(dots)) {
-    fill <- dots[['fill']]
-  }
-  m <- map(
+  mp <- map(
     dt,
     regions = state,
     plot = plot,
     fill = fill,
     col = col
   )
-  if (plot && style == 'choropleth')
+  # if (label)
+  #   map.text(dt, regions = state, plot = plot, fill = fill, col = col)
+  if (plot && flavour == 'choropleth')
     legend(
       x = 12,
       y = 5,
-      legend = colobj$bins,
-      fill = colobj$scheme,
+      legend = cOpts$bins,
+      fill = cOpts$scheme,
       xpd = NA
     )
-  invisible(m)
+  invisible(mp)
 }
 
 
@@ -129,10 +141,8 @@ map_ng <- function(state = character(),
                 mustWork = TRUE)
   if (identical(dsn, character(1)))
     stop("The map data could not be found in 'extdata'")
-  rgdal::readOGR(dsn = dsn,
-                 layer = .shpLayer,
-                 verbose = FALSE) %>%
-    SpatialPolygons2map(namefield = 'admin1Name')
+  sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
+  SpatialPolygons2map(sp, namefield = 'admin1Name')
 }
 
 
@@ -142,27 +152,51 @@ map_ng <- function(state = character(),
 
 
 
+#' @import hellno
 #' @import magrittr
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom tools toTitleCase
-.prepareChoroplethColors <- 
-  function(x, brk, col = c("grey", "red", "green", "blue"))
+.prepareChoroplethOptions <-
+  function(map, dt, state.col, val.col, brk, col = NULL)
   {
-    stopifnot(is.atomic(x), is.atomic(brk))
-    if (is.array(x))
-      stop("Expected dim(x) to evaluate to NULL")
     # TODO: Set limits for variables and brk
-    col <- match.arg(col)  # TODO: Accept numeric input
-    pal <- col %>% toTitleCase %>% paste0("s")
+    # TODO: Accept numeric input for col
+    cols <- c("grey", "red", "green", "blue")
+    if (is.null(col))
+      col <- cols[1]
+    else if (!col %in% cols)
+      stop(sprintf(
+        "%s is not in supported colour range of %s",
+        col,
+        paste(cols, collapse = '-'),
+        cols[1]
+      ))
+    pal <- col %>%
+      toTitleCase %>%
+      paste0("s")
     bins <- length(brk) - 1
+    mapstates <- .getUniqueStateNames(map)
+    dt <- dt[c(state.col, val.col)]
+    dt$cats <- cut(dt[[val.col]], brk, include.lowest = TRUE)
+    dt$ind <- findInterval(dt[[val.col]], brk, all.inside = TRUE)
     cr <- RColorBrewer::brewer.pal(bins, pal)
-    ind <- findInterval(x, brk, all.inside = TRUE)
-    list(colors = cr[ind], scheme = cr, bins = levels(cut(x, brk)))
+    dt$color <- cr[dt$ind]
+    newind <- order(dt[[state.col]], mapstates)
+    dt <- dt[newind,]
+    list(colors = dt$color,
+         scheme = cr,
+         bins = levels(dt$cats))
   }
 
 
 
-
+.getUniqueStateNames <- function(map)
+{
+  stopifnot(inherits(map, 'map'))
+  map$names %>% 
+    sub("(^.+)(:.+$)", "\\1", .) %>% 
+    unique
+}
 
 
 #' @export

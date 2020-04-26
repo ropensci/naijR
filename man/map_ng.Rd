@@ -4,24 +4,38 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(state = character(), style = c("plain", "choropleth"),
-  var = NULL, breaks = NULL, show.neighbours = FALSE, ...)
+map_ng(state = character(), flavour = c("plain", "choropleth"),
+  data = NULL, region = NULL, value = NULL, breaks = NULL,
+  show.neighbours = FALSE, col = if (flavour == "plain") 1L else NULL,
+  fill = FALSE, label = FALSE, ...)
 }
 \arguments{
 \item{state}{A character vector of a list of Nigerian States to be displayed.
 The default value is to print all States.}
 
-\item{style}{The type of map to be drawn. Current options are \code{plain}
+\item{flavour}{The type of map to be drawn. Current options are \code{plain}
 and \code{choropleth}.}
 
-\item{var}{A variable to be plotted in a map (applicable only to 
-\code{choropleth})}
+\item{data}{An object containing data, principally the variables required to
+plotted in a map (applicable only to \code{choropleth})}
+
+\item{region}{The subdivision for choropleth mapping.}
+
+\item{value}{The value to be categorised for choropleth mapping.}
 
 \item{breaks}{Categories to be plotted on a map (applicable only 
 to \code{choropleth})}
 
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
+
+\item{col}{A character vector of R \code{\link[grDevices]{colours()}} to be
+used in the map. If \code{fill == TRUE}, colours are applied to the mapped
+area; otherwise it is applied to the borders.}
+
+\item{fill}{Logical. Whether to fill the mapped area or not.}
+
+\item{label}{Logical. Apply labels to the map.}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
@@ -38,6 +52,8 @@ A map of the Federal Republic of Nigeria.
 }
 \details{
 This function is essentially a wrapper to \code{maps::map}.
+
+...
 }
 \examples{
 map_ng() # Draw a map with default settings
@@ -46,6 +62,6 @@ map_ng() # Draw a map with default settings
 set.seed(4)
 vals <- sample(0:6, 37, TRUE)
 brk <- seq(0, 6, 2)
-map_ng(style = 'choropleth', var = vals, breaks = brk)
+map_ng(flavour = 'choropleth', var = vals, breaks = brk)
 
 }

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 library(testthat)
-library(naijR)
 
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'state' is not a Nigerian state"
@@ -27,11 +26,12 @@ test_that("Input is validated", {
   expect_error(map_ng(NA), myerr1)
   expect_error(map_ng('TRUE'), myerr1)
   expect_error(map_ng(pi), myerr1)
-  expect_error(map_ng(style = 'choropleth'), 
+  expect_error(map_ng(flavour = 'choropleth'), 
                "'var' and 'breaks' must be supplied to plot chropleth maps")
-  expect_warning(map_ng(plot = FALSE, show.neighbours = TRUE), 
+  expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
 })
+
 
 
 
@@ -60,6 +60,18 @@ test_that("'map' object is properly created", {
 })
 
 
+
+
+test_that("Subnational divisions are plotted", {
+  sw <- map_ng(state = states('sw'), plot = FALSE)
+  
+  expect_length(sw$names, 6L)
+  expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
+})
+
+
+
+
 test_that("Data for mapping are retrieved properly", {
   tryToGetMap <- quote(try(.getMapData()))
   success <- eval(tryToGetMap)
@@ -74,60 +86,85 @@ test_that("Data for mapping are retrieved properly", {
 })
 
 
-local({
-  set.seed(4)
-  vals <- sample(0:6, 37, TRUE)
-  brks <- seq(0, 6, 2)
-  
-  test_that("Internal function for preparing colours is validated", {
-    df <- data.frame(1)
-    mt <- matrix(1:3)
-    err1 <- "is\\.atomic\\(x\\) is not TRUE"
-    err2 <- "Expected dim\\(x\\) to evaluate to NULL"
-    
-    expect_error(.prepareChoroplethColors(),
-                 'argument "x" is missing, with no default')
-    expect_error(.prepareChoroplethColors(NULL),
-                 'argument "brk" is missing, with no default')
-    expect_error(.prepareChoroplethColors(df, brks), err1)
-    expect_error(.prepareChoroplethColors(vals, df), 
-                 "is\\.atomic\\(brk\\) is not TRUE")
-    expect_error(.prepareChoroplethColors(df, df), err1)
-    expect_error(.prepareChoroplethColors(mt, brks), err2)
-    expect_warning(.prepareChoroplethColors(vals, c(1:3)))
-    expect_warning(.prepareChoroplethColors(vals, mt))
-    expect_error(.prepareChoroplethColors(mt, mt), err2)
-  })
-  
-  
-  test_that("Expected colours and related data are prepared", {
-    cho <- .prepareChoroplethColors(vals, brks)
-    cols <-
-      c(
-        "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", "#BDBDBD", 
-        "#636363", "#636363", "#F0F0F0", "#BDBDBD", "#636363", "#636363",
-        "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#636363", "#BDBDBD",
-        "#BDBDBD", "#BDBDBD", "#636363", "#636363", "#636363", "#F0F0F0",
-        "#636363", "#BDBDBD", "#636363", "#636363", "#636363", "#636363",
-        "#636363", "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#636363",
-        "#636363"
-      )
-    
-    expect_is(cho, "list")
-    expect_type(cho, "list")
-    expect_length(cho, 3L)
-    expect_named(cho, c("colors", "scheme", "bins"))
-    expect_type(cho$colors, 'character')
-    expect_type(cho$scheme, 'character')
-    expect_type(cho$bins, 'character')
-    expect_identical(cho$colors, cols)
-    expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
-    expect_identical(cho$bins, c("(0,2]", "(2,4]", "(4,6]"))
-    expect_length(cho$scheme, 3L)
-    expect_length(cho$bins, 3L)
-    expect_identical(length(vals), length(cho$colors))
-  })
+
+
+set.seed(4)
+df <-
+  data.frame(state = states(all = TRUE), value = sample(0:6, 37, TRUE))
+mp <- map_ng(plot = FALSE)
+brks <- seq(0, 6, 2)
+
+test_that("Internal function for preparing colours is validated", {
+  mt <- matrix(1:3)
+  err1 <- "is\\.atomic\\(x\\) is not TRUE"
+  err2 <- "Expected dim\\(x\\) to evaluate to NULL"
+  err3 <- 'argument "brk" is missing, with no default'
+
+  expect_error(.prepareChoroplethOptions(), err3)
+  expect_error(.prepareChoroplethOptions(NULL),
+               'argument "brk" is missing, with no default')
+  expect_error(.prepareChoroplethOptions(df, brks), err3)
+  expect_error(.prepareChoroplethOptions(vals, df), err3)
+  expect_error(.prepareChoroplethOptions(df, df), err3)
+  expect_error(.prepareChoroplethOptions(mt, brks), err3)
+  expect_error(.prepareChoroplethOptions(vals, c(1:3)), err3)
+  expect_error(.prepareChoroplethOptions(vals, mt), err3)
+  expect_error(.prepareChoroplethOptions(mt, mt), err3)
 })
 
 
 
+
+test_that("Expected colours and related data are prepared", {
+  cho <- .prepareChoroplethOptions(mp, df, 'state', 'value', brks)
+  cols <-
+    c(
+      "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", "#BDBDBD",
+      "#636363", "#636363", "#F0F0F0", "#BDBDBD", "#636363", "#636363",
+      "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#636363", "#BDBDBD",
+      "#BDBDBD", "#BDBDBD", "#636363", "#636363", "#636363", "#F0F0F0",
+      "#636363", "#BDBDBD", "#636363", "#636363", "#636363", "#636363",
+      "#636363", "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#636363",
+      "#636363"
+    )
+
+  expect_is(cho, "list")
+  expect_type(cho, "list")
+  expect_length(cho, 3L)
+  expect_named(cho, c("colors", "scheme", "bins"))
+  expect_type(cho$colors, 'character')
+  expect_type(cho$scheme, 'character')
+  expect_type(cho$bins, 'character')
+  expect_identical(cho$colors, cols)
+  expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
+  expect_identical(cho$bins, c("[0,2]", "(2,4]", "(4,6]"))
+  expect_length(cho$scheme, 3L)
+  expect_length(cho$bins, 3L)
+})
+
+
+
+
+test_that("State polygon names are not repeated during computations", {
+  result <- .getUniqueStateNames(mp)
+  
+  expect_length(result, 37L)
+  expect_error(.getUniqueStateNames(states()))
+})
+
+
+test_that("Choropleth mapping succeeds", {
+  dat <- readRDS('data/pvc2015.rds')
+  pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
+  expect_is(
+    map_ng(
+      flavour = 'choropleth',
+      data = dat,
+      region = 'state',
+      value = 'total.pop',
+      breaks = pop.groups,
+      plot = FALSE
+    ),
+    'map')
+  
+})
