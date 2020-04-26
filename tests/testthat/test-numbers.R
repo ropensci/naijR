@@ -27,9 +27,7 @@
           ##   it removed from the source code.           ##
           ##################################################
           ##################################################
-
-library(naijR)
-
+          
 test_that("Input corner cases are checked", {
   err1 <- "Objects of type .+ are not supported"
   

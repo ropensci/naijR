@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-library(naijR)
-
 test_that("illegal input is caught early", {
   expect_error(lgas_ng("Maryland"),
                "One or more elements of 'ng.state' is not a State in Nigeria",

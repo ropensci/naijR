@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-library(naijR)
-
 test_that("Invalid input terminates the function", {
   expect_error(states(gpz = 99))
   expect_error(states(gpz = NA))
