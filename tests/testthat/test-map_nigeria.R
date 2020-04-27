@@ -117,17 +117,18 @@ test_that("Internal function for preparing colours is validated", {
 
 
 
+
 test_that("Expected colours and related data are prepared", {
   cho <- .prepareChoroplethOptions(mp, df, 'state', 'value', brks)
   cols <-
     c(
-      "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", "#BDBDBD",
-      "#636363", "#636363", "#F0F0F0", "#BDBDBD", "#636363", "#636363",
-      "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#636363", "#BDBDBD",
-      "#BDBDBD", "#BDBDBD", "#636363", "#636363", "#636363", "#F0F0F0",
-      "#636363", "#BDBDBD", "#636363", "#636363", "#636363", "#636363",
-      "#636363", "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#636363",
-      "#636363"
+      "#BDBDBD", "#BDBDBD", "#BDBDBD", "#F0F0F0", "#BDBDBD", "#BDBDBD",
+      "#F0F0F0", "#F0F0F0", "#636363", "#BDBDBD", "#F0F0F0", "#F0F0F0", 
+      "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#F0F0F0", "#BDBDBD", 
+      "#BDBDBD", "#BDBDBD", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#636363",
+      "#F0F0F0", "#BDBDBD", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#F0F0F0", 
+      "#F0F0F0", "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#F0F0F0", 
+      "#F0F0F0"
     )
 
   expect_is(cho, "list")
@@ -138,7 +139,7 @@ test_that("Expected colours and related data are prepared", {
   expect_type(cho$scheme, 'character')
   expect_type(cho$bins, 'character')
   expect_identical(cho$colors, cols)
-  expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
+  expect_identical(cho$scheme, c("#636363", "#BDBDBD", "#F0F0F0"))
   expect_identical(cho$bins, c("[0,2]", "(2,4]", "(4,6]"))
   expect_length(cho$scheme, 3L)
   expect_length(cho$bins, 3L)
@@ -153,6 +154,8 @@ test_that("State polygon names are not repeated during computations", {
   expect_length(result, 37L)
   expect_error(.getUniqueStateNames(states()))
 })
+
+
 
 
 test_that("Choropleth mapping succeeds", {

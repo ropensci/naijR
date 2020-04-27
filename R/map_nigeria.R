@@ -93,7 +93,7 @@ map_ng <- function(state = character(),
     plot <- dots[['plot']]
   if (flavour == 'choropleth') {
     if (is.null(data) || is.null(value) || is.null(breaks)) {
-      # We want this to fails when parameters are changed
+      # We want this to fail automatically once parameters are changed
       stop(
         sprintf(
           "'%s', '%s' and '%s' are required for choropleths.",
@@ -185,6 +185,7 @@ map_ng <- function(state = character(),
     dt$cats <- cut(dt[[val.col]], brk, include.lowest = TRUE)
     dt$ind <- findInterval(dt[[val.col]], brk, all.inside = TRUE)
     cr <- RColorBrewer::brewer.pal(bins, pal)
+    cr <- cr[order(cr)]
     dt$color <- cr[dt$ind]
     newind <- order(dt[[state.col]], mapstates)
     dt <- dt[newind,]
