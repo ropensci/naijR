@@ -20,14 +20,16 @@ library(testthat)
 
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'state' is not a Nigerian state"
+  myerr2 <- "'data', 'value' and 'breaks' are required for choropleths."
   
   expect_error(map_ng(999), myerr1)
   expect_error(map_ng(NULL), myerr1)
   expect_error(map_ng(NA), myerr1)
   expect_error(map_ng('TRUE'), myerr1)
   expect_error(map_ng(pi), myerr1)
-  expect_error(map_ng(flavour = 'choropleth'), 
-               "'var' and 'breaks' must be supplied to plot chropleth maps")
+  expect_error(map_ng(flavour = 'choropleth'), myerr2)
+  expect_error(map_ng(states('nw'), flavour = 'choropleth'), myerr2)
+  # TODO: Add test case for choropleths with too few states
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
 })
