@@ -40,7 +40,7 @@
 #' to \code{choropleth}) 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
-#' @param col A character vector of R \code{\link[grDevices]{colours()}} to be
+#' @param col A character vector of R \code{\link[grDevices]{colours}} to be
 #' used in the map. If \code{fill == TRUE}, colours are applied to the mapped
 #' area; otherwise it is applied to the borders.
 #' @param fill Logical. Whether to fill the mapped area or not.
@@ -54,12 +54,8 @@
 #'
 #' @examples
 #' map_ng() # Draw a map with default settings
-#' 
-#' ## Choropleth
-#' set.seed(4)
-#' vals <- sample(0:6, 37, TRUE)
-#' brk <- seq(0, 6, 2)
-#' map_ng(flavour = 'choropleth', var = vals, breaks = brk)
+#' map_ng(states("sw"))
+#' map_ng("Kano")
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}} or
@@ -96,8 +92,17 @@ map_ng <- function(state = character(),
   if ('plot' %in% names(dots))
     plot <- dots[['plot']]
   if (flavour == 'choropleth') {
-    if (is.null(var) || is.null(breaks))
-      stop("'var' and 'breaks' must be supplied to plot chropleth maps")
+    if (is.null(data) || is.null(value) || is.null(breaks)) {
+      # We want this to fails when parameters are changed
+      stop(
+        sprintf(
+          "'%s', '%s' and '%s' are required for choropleths.",
+          deparse(quote(data)),
+          deparse(quote(value)),
+          deparse(quote(breaks))
+        )
+      )
+    }
     fill <- TRUE
     intMp <- map(dt, regions = state, plot = FALSE)
     cOpts <- .prepareChoroplethOptions(intMp, data, region, value, breaks, col)
@@ -190,13 +195,15 @@ map_ng <- function(state = character(),
 
 
 
+
 .getUniqueStateNames <- function(map)
 {
   stopifnot(inherits(map, 'map'))
-  map$names %>% 
-    sub("(^.+)(:.+$)", "\\1", .) %>% 
-    unique
+  unique(sub("(^.+)(:.+$)", "\\1", map$names))
 }
+
+
+
 
 
 #' @export

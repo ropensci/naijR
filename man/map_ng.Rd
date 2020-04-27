@@ -29,7 +29,7 @@ to \code{choropleth})}
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
 
-\item{col}{A character vector of R \code{\link[grDevices]{colours()}} to be
+\item{col}{A character vector of R \code{\link[grDevices]{colours}} to be
 used in the map. If \code{fill == TRUE}, colours are applied to the mapped
 area; otherwise it is applied to the borders.}
 
@@ -57,11 +57,7 @@ This function is essentially a wrapper to \code{maps::map}.
 }
 \examples{
 map_ng() # Draw a map with default settings
-
-## Choropleth
-set.seed(4)
-vals <- sample(0:6, 37, TRUE)
-brk <- seq(0, 6, 2)
-map_ng(flavour = 'choropleth', var = vals, breaks = brk)
+map_ng(states("sw"))
+map_ng("Kano")
 
 }
