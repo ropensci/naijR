@@ -2,7 +2,6 @@
 
 export(.shpLayer)
 export(fix_mobile)
-export(is_state)
 export(lgas_ng)
 export(map_ng)
 export(states)
