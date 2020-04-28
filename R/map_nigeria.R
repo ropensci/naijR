@@ -40,7 +40,7 @@
 #' to \code{choropleth}) 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
-#' @param col A character vector of R \code{\link[grDevices]{colours}} to be
+#' @param col A character vector of R \code{\link[grDevices]{colors}} to be
 #' used in the map. If \code{fill == TRUE}, colours are applied to the mapped
 #' area; otherwise it is applied to the borders.
 #' @param fill Logical. Whether to fill the mapped area or not.

@@ -29,7 +29,7 @@ to \code{choropleth})}
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
 
-\item{col}{A character vector of R \code{\link[grDevices]{colours}} to be
+\item{col}{A character vector of R \code{\link[grDevices]{colors}} to be
 used in the map. If \code{fill == TRUE}, colours are applied to the mapped
 area; otherwise it is applied to the borders.}
 
