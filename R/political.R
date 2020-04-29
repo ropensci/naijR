@@ -76,24 +76,25 @@ states <- function(gpz = NULL, all = TRUE)
 
 
 
-# #' @param x A character vector to be tested.
-# #' 
-# #' @return A logical vector.
-# #' @export
-# is_state <- function(x) 
-# {
-#   if (isFALSE(is.character(x)))
-#     stop("A character vector was expected")
-#   res <- x %in% unlist(..LL)
-#   if (length(res) > 1) {
-#     if (all(res)) {
-#       message("All elements of 'x' are states")
-#       return(TRUE)
-#     }
-#     else return(FALSE)
-#   }
-#   res
-# }
+#' Test an Object for States
+#' 
+#' @param x A character vector to be tested.
+#' @param test The type of test to be carried out - on the vector as a whole 
+#' i.e. \code{all} (the default argument) or on the individual elements i.e.
+#' \code{selected}.
+#'
+#' @return A logical vector.
+#' @export
+is_state <- function(x, test = c("all", "selected"))
+{
+  if (!is.character(x))
+    stop("A character vector was expected", call. = FALSE)
+  test <- match.arg(test)
+  val <- x %in% unlist(..LL)
+  if (test == 'all')
+    return(all(val))
+  val
+}
 
 
 

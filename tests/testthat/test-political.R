@@ -27,3 +27,24 @@ test_that("Invalid input terminates the function", {
   expect_error(states(full.names = NA))
   expect_error(states(full.names = NULL))
 })
+
+
+
+
+test_that("States can be identified in an object", {
+  ss <- ss2 <- states()
+  ss2[c(5, 7, 19)] <- c("big", "bad", "wolf")
+  all <- is_state(ss)
+  all2 <- is_state(ss2)
+  sel <- is_state(ss, test = 'selected')
+  sel2 <- is_state(ss2, test = 'selected')
+  
+  expect_length(all, 1L)
+  expect_true(all)
+  expect_length(all2, 1L)
+  expect_false(all2)
+  expect_length(sel, 37L)
+  expect_equal(sum(sel), 37L)
+  expect_length(sel2, 37L)
+  expect_equal(sum(sel2), 34L)
+})
