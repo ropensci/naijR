@@ -74,7 +74,7 @@ map_ng <- function(state = character(),
                    label = FALSE,
                    ...)
 {
-  # TODO: Add an argument for labelling the States
+  # TODO: Intelligently search for states in a data frame
   all.st <- states(all = TRUE)
   if (length(state) == 0L && !is.null(state))
     state <- all.st
@@ -86,7 +86,7 @@ map_ng <- function(state = character(),
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
-  dt <- .getMapData()
+  mapdata <- .getMapData()
   dots <- list(...)
   plot <- TRUE
   if ('plot' %in% names(dots))
@@ -104,12 +104,12 @@ map_ng <- function(state = character(),
       )
     }
     fill <- TRUE
-    intMp <- map(dt, regions = state, plot = FALSE)
+    intMp <- map(mapdata, regions = state, plot = FALSE)
     cOpts <- .prepareChoroplethOptions(intMp, data, region, value, breaks, col)
     col <- cOpts$colors
   }
   mp <- map(
-    dt,
+    mapdata,
     regions = state,
     plot = plot,
     fill = fill,
@@ -128,6 +128,30 @@ map_ng <- function(state = character(),
   invisible(mp)
 }
 
+
+
+
+
+
+
+
+
+.stateColumnSearch <- function(dt, s)
+{
+  stopifnot(is.data.frame(dt))
+  n <- vapply(dt, function(x) {
+    if (is.factor(x))
+      x <- as.character(x)
+    if (is.character(x))
+      all(x %in% s)
+    else
+      FALSE
+  }, logical(1))
+  if (!sum(n))
+    stop(sprintf("No column with elements in %s.", deparse(substitute(s))))
+  c <- which(n)
+  dt[c]
+}
 
 
 
@@ -166,6 +190,7 @@ map_ng <- function(state = character(),
   {
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
+    # stopifnot(inherits(map, 'map'))
     cols <- c("grey", "red", "green", "blue")
     if (is.null(col))
       col <- cols[1]
@@ -185,14 +210,31 @@ map_ng <- function(state = character(),
     dt$cats <- cut(dt[[val.col]], brk, include.lowest = TRUE)
     dt$ind <- findInterval(dt[[val.col]], brk, all.inside = TRUE)
     cr <- RColorBrewer::brewer.pal(bins, pal)
-    cr <- cr[order(cr)]
     dt$color <- cr[dt$ind]
     newind <- order(dt[[state.col]], mapstates)
     dt <- dt[newind,]
-    list(colors = dt$color,
+    colors <- .reassignColours(map$names, dt[[state.col]], dt$color)
+    list(colors = colors,
          scheme = cr,
          bins = levels(dt$cats))
   }
+
+
+
+
+
+
+.reassignColours <- function(names, states, in.colours)
+{
+  out.colours <- rep(NA, length(names))
+  for (i in seq_along(states)) {
+    c <- states[i]
+    ind <- grep(c, names)
+    out.colours[ind] <- in.colours[i]
+  }
+  out.colours
+}
+
 
 
 

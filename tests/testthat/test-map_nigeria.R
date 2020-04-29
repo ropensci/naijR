@@ -101,6 +101,7 @@ test_that("Internal function for preparing colours is validated", {
   err1 <- "is\\.atomic\\(x\\) is not TRUE"
   err2 <- "Expected dim\\(x\\) to evaluate to NULL"
   err3 <- 'argument "brk" is missing, with no default'
+  err4 <- "inherits(map, 'map') is not TRUE"
 
   expect_error(.prepareChoroplethOptions(), err3)
   expect_error(.prepareChoroplethOptions(NULL),
@@ -122,13 +123,13 @@ test_that("Expected colours and related data are prepared", {
   cho <- .prepareChoroplethOptions(mp, df, 'state', 'value', brks)
   cols <-
     c(
-      "#BDBDBD", "#BDBDBD", "#BDBDBD", "#F0F0F0", "#BDBDBD", "#BDBDBD",
-      "#F0F0F0", "#F0F0F0", "#636363", "#BDBDBD", "#F0F0F0", "#F0F0F0", 
-      "#F0F0F0", "#636363", "#636363", "#BDBDBD", "#F0F0F0", "#BDBDBD", 
-      "#BDBDBD", "#BDBDBD", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#636363",
-      "#F0F0F0", "#BDBDBD", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#F0F0F0", 
-      "#F0F0F0", "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#F0F0F0", 
-      "#F0F0F0"
+      "#BDBDBD", "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", 
+      "#BDBDBD", "#636363", "#636363", "#F0F0F0", "#F0F0F0", "#F0F0F0", 
+      "#F0F0F0", "#BDBDBD", "#636363", "#636363", "#636363", "#F0F0F0", 
+      "#F0F0F0", "#BDBDBD", "#636363", "#BDBDBD", "#BDBDBD", "#BDBDBD", 
+      "#636363", "#636363", "#636363", "#F0F0F0", "#636363", "#BDBDBD", 
+      "#636363", "#636363", "#636363", "#636363", "#636363", "#F0F0F0", 
+      "#636363", "#636363", "#BDBDBD", "#636363", "#636363"
     )
 
   expect_is(cho, "list")
@@ -139,7 +140,7 @@ test_that("Expected colours and related data are prepared", {
   expect_type(cho$scheme, 'character')
   expect_type(cho$bins, 'character')
   expect_identical(cho$colors, cols)
-  expect_identical(cho$scheme, c("#636363", "#BDBDBD", "#F0F0F0"))
+  expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
   expect_identical(cho$bins, c("[0,2]", "(2,4]", "(4,6]"))
   expect_length(cho$scheme, 3L)
   expect_length(cho$bins, 3L)
@@ -171,5 +172,35 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE
     ),
     'map')
+  
+})
+
+
+
+
+test_that("Duplicated polygon names are assigned the same colour", {
+  ss <- states('ss')
+  nn <-
+    c("Akwa Ibom:1",
+      "Akwa Ibom:2",
+      "Bayelsa",
+      "Cross River:1",
+      "Cross River:2",
+      "Cross River:3",
+      "Cross River:4",
+      "Delta",
+      "Edo",
+      "Rivers")
+  set.seed(244)
+  col.in <- sample(palette(), length(ss), replace = T)
+  col.out <- .reassignColours(nn, ss, col.in)
+  
+  expect_length(col.out, length(nn))
+  expect_equal(col.in[1], col.out[1])
+  expect_equal(col.in[1], col.out[2])
+  expect_equal(col.in[3], col.out[4])
+  expect_equal(col.in[3], col.out[5])
+  expect_equal(col.in[3], col.out[6])
+  expect_equal(col.in[3], col.out[7])
   
 })
