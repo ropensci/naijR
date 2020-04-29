@@ -95,24 +95,25 @@ df <-
   data.frame(state = states(all = TRUE), value = sample(0:6, 37, TRUE))
 mp <- map_ng(plot = FALSE)
 brks <- seq(0, 6, 2)
+vals <- df$value
 
 test_that("Internal function for preparing colours is validated", {
   mt <- matrix(1:3)
   err1 <- "is\\.atomic\\(x\\) is not TRUE"
   err2 <- "Expected dim\\(x\\) to evaluate to NULL"
-  err3 <- 'argument "brk" is missing, with no default'
-  err4 <- "inherits(map, 'map') is not TRUE"
+  err3 <- 'argument "bins" is missing, with no default'
+  err4 <- 'inherits(map, "map") is not TRUE'
 
-  expect_error(.prepareChoroplethOptions(), err3)
-  expect_error(.prepareChoroplethOptions(NULL),
-               'argument "brk" is missing, with no default')
-  expect_error(.prepareChoroplethOptions(df, brks), err3)
-  expect_error(.prepareChoroplethOptions(vals, df), err3)
-  expect_error(.prepareChoroplethOptions(df, df), err3)
-  expect_error(.prepareChoroplethOptions(mt, brks), err3)
-  expect_error(.prepareChoroplethOptions(vals, c(1:3)), err3)
-  expect_error(.prepareChoroplethOptions(vals, mt), err3)
-  expect_error(.prepareChoroplethOptions(mt, mt), err3)
+  expect_error(.prepareChoroplethOptions(), 
+               "argument \"map\" is missing, with no default")
+  expect_error(.prepareChoroplethOptions(NULL), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(df, brks), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(vals, df), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(df, df), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(mt, brks), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(vals, c(1:3)), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(vals, mt), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions(mt, mt), err4, fixed = TRUE)
 })
 
 
@@ -120,7 +121,8 @@ test_that("Internal function for preparing colours is validated", {
 
 
 test_that("Expected colours and related data are prepared", {
-  cho <- .prepareChoroplethOptions(mp, df, 'state', 'value', brks)
+  st <- df$state
+  cho <- .prepareChoroplethOptions(mp, df, st, 'value', brks)
   cols <-
     c(
       "#BDBDBD", "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", 
@@ -158,24 +160,29 @@ test_that("State polygon names are not repeated during computations", {
 
 
 
-
+dat <- readRDS('data/pvc2015.rds')
+cmap_q <- quote(
+  map_ng(
+    flavour = 'choropleth',
+    data = dat,
+    value = 'total.pop',
+    breaks = pop.groups,
+    plot = FALSE
+  )
+)
+pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
 test_that("Choropleth mapping succeeds", {
-  dat <- readRDS('data/pvc2015.rds')
-  pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
-  expect_is(
-    map_ng(
-      flavour = 'choropleth',
-      data = dat,
-      region = 'state',
-      value = 'total.pop',
-      breaks = pop.groups,
-      plot = FALSE
-    ),
-    'map')
-  
+  expect_is(eval(cmap_q), 'map')
 })
 
-
+test_that("Chroropleth colours can be controlled at interface", {
+  cmap_q$col <- "black"
+  expect_error(eval(cmap_q),
+               "black is not in supported colour range of grey-red-green-blue")
+  
+  cmap_q$col <- "blue"
+  expect_is(eval(cmap_q), "map")
+})
 
 
 test_that("Duplicated polygon names are assigned the same colour", {
@@ -203,4 +210,28 @@ test_that("Duplicated polygon names are assigned the same colour", {
   expect_equal(col.in[3], col.out[6])
   expect_equal(col.in[3], col.out[7])
   
+})
+
+
+
+
+
+
+test_that("States are located in a data frame", {
+  states <- states()
+  ss <- .stateColumnIndex(dat, states)
+  err <- "is.data.frame\\(dt\\) is not TRUE"
+  
+  expect_is(ss, 'integer')
+  expect_length(ss, 1L)
+  expect_error(.stateColumnIndex(), 
+               "argument \"dt\" is missing, with no default")
+  expect_error(.stateColumnIndex(states, states), err)
+  expect_error(.stateColumnIndex(dat, letters), 
+               "is_state\\(s\\) is not TRUE")
+  expect_error(.stateColumnIndex(dat, NULL),
+               "A character vector was expected")
+  expect_error(.stateColumnIndex(NULL, states), err)
+  expect_error(.stateColumnIndex(mtcars, states), 
+               "No column with elements in states.")
 })

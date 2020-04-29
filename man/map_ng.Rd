@@ -5,7 +5,7 @@
 \title{Map of Nigeria}
 \usage{
 map_ng(state = character(), flavour = c("plain", "choropleth"),
-  data = NULL, region = NULL, value = NULL, breaks = NULL,
+  data = NULL, value = NULL, breaks = NULL,
   show.neighbours = FALSE, col = if (flavour == "plain") 1L else NULL,
   fill = FALSE, label = FALSE, ...)
 }
@@ -18,8 +18,6 @@ and \code{choropleth}.}
 
 \item{data}{An object containing data, principally the variables required to
 plotted in a map (applicable only to \code{choropleth})}
-
-\item{region}{The subdivision for choropleth mapping.}
 
 \item{value}{The value to be categorised for choropleth mapping.}
 

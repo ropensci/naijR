@@ -34,7 +34,6 @@
 #' and \code{choropleth}.
 #' @param data An object containing data, principally the variables required to
 #' plotted in a map (applicable only to \code{choropleth})
-#' @param region The subdivision for choropleth mapping.
 #' @param value The value to be categorised for choropleth mapping.
 #' @param breaks Categories to be plotted on a map (applicable only 
 #' to \code{choropleth}) 
@@ -65,7 +64,6 @@
 map_ng <- function(state = character(),
                    flavour = c("plain", 'choropleth'),
                    data = NULL,
-                   region = NULL,
                    value = NULL,
                    breaks = NULL,
                    show.neighbours = FALSE,
@@ -103,9 +101,12 @@ map_ng <- function(state = character(),
         )
       )
     }
+    ind <- .stateColumnIndex(data, state)
+    state.col <- data[[ind]]
     fill <- TRUE
     intMp <- map(mapdata, regions = state, plot = FALSE)
-    cOpts <- .prepareChoroplethOptions(intMp, data, region, value, breaks, col)
+    cOpts <- 
+      .prepareChoroplethOptions(intMp, data, state.col, value, breaks, col)
     col <- cOpts$colors
   }
   mp <- map(
@@ -136,9 +137,9 @@ map_ng <- function(state = character(),
 
 
 
-.stateColumnSearch <- function(dt, s)
+.stateColumnIndex <- function(dt, s)
 {
-  stopifnot(is.data.frame(dt))
+  stopifnot(is.data.frame(dt), is_state(s))
   n <- vapply(dt, function(x) {
     if (is.factor(x))
       x <- as.character(x)
@@ -149,8 +150,9 @@ map_ng <- function(state = character(),
   }, logical(1))
   if (!sum(n))
     stop(sprintf("No column with elements in %s.", deparse(substitute(s))))
-  c <- which(n)
-  dt[c]
+  if (sum(n) > 1)
+    warning("Multiple columns have States, so the first is used")
+  which(n)[1]
 }
 
 
@@ -186,7 +188,7 @@ map_ng <- function(state = character(),
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom tools toTitleCase
 .prepareChoroplethOptions <-
-  function(map, dt, state.col, val.col, brk, col = NULL)
+  function(map, dframe, state, val.name, bins, col = NULL)
   {
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
@@ -204,19 +206,18 @@ map_ng <- function(state = character(),
     pal <- col %>%
       toTitleCase %>%
       paste0("s")
-    bins <- length(brk) - 1
     mapstates <- .getUniqueStateNames(map)
-    dt <- dt[c(state.col, val.col)]
-    dt$cats <- cut(dt[[val.col]], brk, include.lowest = TRUE)
-    dt$ind <- findInterval(dt[[val.col]], brk, all.inside = TRUE)
-    cr <- RColorBrewer::brewer.pal(bins, pal)
-    dt$color <- cr[dt$ind]
-    newind <- order(dt[[state.col]], mapstates)
-    dt <- dt[newind,]
-    colors <- .reassignColours(map$names, dt[[state.col]], dt$color)
+    dframe <- data.frame(state = state, value = dframe[[val.name]])
+    dframe$cats <- cut(dframe$value, bins, include.lowest = TRUE)
+    dframe$ind <- findInterval(dframe$value, bins, all.inside = TRUE)
+    colrange <- RColorBrewer::brewer.pal(length(bins) - 1, pal)
+    dframe$color <- colrange[dframe$ind]
+    newind <- order(dframe$state, mapstates)
+    dframe <- dframe[newind,]
+    colors <- .reassignColours(map$names, dframe$state, dframe$color)
     list(colors = colors,
-         scheme = cr,
-         bins = levels(dt$cats))
+         scheme = colrange,
+         bins = levels(dframe$cats))
   }
 
 
