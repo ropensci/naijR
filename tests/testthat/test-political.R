@@ -32,12 +32,17 @@ test_that("Invalid input terminates the function", {
 
 
 test_that("States can be identified in an object", {
-  ss <- ss2 <- states()
-  ss2[c(5, 7, 19)] <- c("big", "bad", "wolf")
-  all <- is_state(ss)
-  all2 <- is_state(ss2)
-  sel <- is_state(ss, test = 'selected')
-  sel2 <- is_state(ss2, test = 'selected')
+  ss.good <- ss.bad <- ss.na <- states()
+  ind.bad <- c(5, 7, 19)
+  ind.nas <- c(6, 19, 33)
+  ss.bad[ind.bad] <- c("big", "bad", "wolf")
+  all <- is_state(ss.good)
+  all2 <- is_state(ss.bad)
+  sel <- is_state(ss.good, test = 'selected')
+  sel2 <- is_state(ss.bad, test = 'selected')
+  ss.na[ind.nas] <- NA
+  minus.nas <- is_state(ss.na, test = 'selected', allow.na = FALSE)
+  sel.na <- is_state(ss.na, 'selected')
   
   expect_length(all, 1L)
   expect_true(all)
@@ -47,4 +52,10 @@ test_that("States can be identified in an object", {
   expect_equal(sum(sel), 37L)
   expect_length(sel2, 37L)
   expect_equal(sum(sel2), 34L)
+  expect_true(is_state(ss.na))
+  expect_length(is_state(ss.na, test = 'selected'), 37L)
+  expect_equal(sum(minus.nas), 34L)
+  expect_false(anyNA(minus.nas))
+  expect_equal(sum(sel.na), NA_integer_)
+  expect_equal(sum(is.na(sel.na)), length(ind.nas))
 })
