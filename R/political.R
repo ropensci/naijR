@@ -82,17 +82,30 @@ states <- function(gpz = NULL, all = TRUE)
 #' @param test The type of test to be carried out - on the vector as a whole 
 #' i.e. \code{all} (the default argument) or on the individual elements i.e.
 #' \code{selected}.
+#' @param allow.na logical. If \code{TRUE}, all \code{NA}s are ignored in
+#' the result.
+#' 
+#' @import stats
 #'
 #' @return A logical vector.
 #' @export
-is_state <- function(x, test = c("all", "selected"))
+is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
 {
   if (!is.character(x))
     stop("A character vector was expected", call. = FALSE)
   test <- match.arg(test)
+  na.pos <- 0L
+  if (anyNA(x) && allow.na) {
+    exc <- stats::na.exclude(x)
+    if (test == 'selected')
+      na.pos <- stats::na.action(exc)
+    else
+      x <- exc
+  }
   val <- x %in% unlist(..LL)
   if (test == 'all')
     return(all(val))
+  val[na.pos] <- NA
   val
 }
 

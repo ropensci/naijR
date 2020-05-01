@@ -4,7 +4,7 @@
 \alias{is_state}
 \title{Test an Object for States}
 \usage{
-is_state(x, test = c("all", "selected"))
+is_state(x, test = c("all", "selected"), allow.na = TRUE)
 }
 \arguments{
 \item{x}{A character vector to be tested.}
@@ -12,6 +12,9 @@ is_state(x, test = c("all", "selected"))
 \item{test}{The type of test to be carried out - on the vector as a whole 
 i.e. \code{all} (the default argument) or on the individual elements i.e.
 \code{selected}.}
+
+\item{allow.na}{logical. If \code{TRUE}, all \code{NA}s are ignored in
+the result.}
 }
 \value{
 A logical vector.
