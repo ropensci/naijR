@@ -183,7 +183,6 @@ map_ng <- function(state = character(),
 
 
 
-#' @import hellno
 #' @import magrittr
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom tools toTitleCase
@@ -207,7 +206,10 @@ map_ng <- function(state = character(),
       toTitleCase %>%
       paste0("s")
     mapstates <- .getUniqueStateNames(map)
-    dframe <- data.frame(state = state, value = dframe[[val.name]])
+    dframe <-
+      data.frame(state = state,
+                 value = dframe[[val.name]],
+                 stringsAsFactors = FALSE)
     dframe$cats <- cut(dframe$value, bins, include.lowest = TRUE)
     dframe$ind <- findInterval(dframe$value, bins, all.inside = TRUE)
     colrange <- RColorBrewer::brewer.pal(length(bins) - 1, pal)
