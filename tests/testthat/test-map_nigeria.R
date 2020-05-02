@@ -114,6 +114,7 @@ test_that("Internal function for preparing colours is validated", {
   expect_error(.prepareChoroplethOptions(vals, c(1:3)), err4, fixed = TRUE)
   expect_error(.prepareChoroplethOptions(vals, mt), err4, fixed = TRUE)
   expect_error(.prepareChoroplethOptions(mt, mt), err4, fixed = TRUE)
+  expect_error(.prepareChoroplethOptions())
 })
 
 
@@ -122,7 +123,8 @@ test_that("Internal function for preparing colours is validated", {
 
 test_that("Expected colours and related data are prepared", {
   st <- df$state
-  cho <- .prepareChoroplethOptions(mp, df, st, 'value', brks)
+  func <- quote(.prepareChoroplethOptions(mp, df, st, 'value', brks))
+  cho <- eval(func)
   cols <-
     c(
       "#BDBDBD", "#BDBDBD", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", 
@@ -146,6 +148,10 @@ test_that("Expected colours and related data are prepared", {
   expect_identical(cho$bins, c("[0,2]", "(2,4]", "(4,6]"))
   expect_length(cho$scheme, 3L)
   expect_length(cho$bins, 3L)
+  
+  func$col <- "brown"
+  expect_error(eval(func), 
+               'brown is not in supported colour range of grey-red-green-blue')
 })
 
 
