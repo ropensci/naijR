@@ -72,19 +72,18 @@ map_ng <- function(state = character(),
                    label = FALSE,
                    ...)
 {
-  # TODO: Intelligently search for states in a data frame
   all.st <- states(all = TRUE)
   if (length(state) == 0L && !is.null(state))
     state <- all.st
   if (!any(state %in% all.st))
     stop("One or more elements of 'state' is not a Nigerian state")
   if (is.null(flavour))
-    stop("Invalid input for 'flavour'.")
+    stop("Invalid input for 'flavour'.")  ## TODO: Huh?
   flavour <- match.arg(flavour)
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
-  mapdata <- .getMapData()
+  database <- .getMapData()
   dots <- list(...)
   plot <- TRUE
   if ('plot' %in% names(dots))
@@ -104,28 +103,33 @@ map_ng <- function(state = character(),
     ind <- .stateColumnIndex(data, state)
     state.col <- data[[ind]]
     fill <- TRUE
-    intMp <- map(mapdata, regions = state, plot = FALSE)
+    intMp <- map(database, regions = state, plot = FALSE)
     cOpts <- 
       .prepareChoroplethOptions(intMp, data, state.col, value, breaks, col)
     col <- cOpts$colors
   }
-  mp <- map(
-    mapdata,
-    regions = state,
-    plot = plot,
-    fill = fill,
-    col = col
-  )
-  # if (label)
-  #   map.text(dt, regions = state, plot = plot, fill = fill, col = col)
-  if (plot && flavour == 'choropleth')
-    legend(
+  mp <- map(database, regions = state, plot = plot, fill = fill, col = col)
+  if (plot) {
+    if (label) {
+      ## NOTE: In the call to map.text, the name 'database' is actually 
+      ## required. This is because internally, there is a call to `eval()`
+      ## which uses its default argument for `envir` i.e. `parent.frame()`.
+      ## An object of any other name is not seen by the quoted call to 
+      ## maps::map used by the evaluator function. For more details, 
+      ## inspect the source code for `maps::map.text`. This is a bug in the
+      ## `maps` package, which I will try to report, given sufficient time.
+      
+      mp <- map.text(database, regions = state, plot = plot, add = TRUE)
+    }
+    if (flavour == 'choropleth')
+      legend(
       x = 12,
       y = 5,
       legend = cOpts$bins,
       fill = cOpts$scheme,
       xpd = NA
     )
+  }
   invisible(mp)
 }
 

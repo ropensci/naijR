@@ -40,8 +40,10 @@ test_that("Input is validated", {
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
   mp2 <- suppressWarnings(map_ng(show = TRUE, plot = FALSE))
+  mp.lb <- map_ng(plot = FALSE, label = TRUE)
   
   expect_is(mp1, 'map')
+  expect_is(mp.lb, 'map')
   expect_type(mp1, 'list')
   expect_s3_class(mp1, 'map')
   expect_length(mp1, 4L)

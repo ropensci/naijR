@@ -1,13 +1,14 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.0.7.9012
-Date: 2020-05-02
-Depends: R (>= 3.6)
+Version: 0.0.7.9013
+Date: 2020-05-04
+Depends: 
+    R (>= 3.6),
+    maps (>= 3.3.0)
 Imports:
     RColorBrewer (>= 1.1.2),
     magrittr (>= 1.5),
-    maps (>= 3.3.0),
     rgdal (>= 1.4.4),
     tools
 Suggests: 
