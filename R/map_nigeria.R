@@ -126,13 +126,7 @@ map_ng <- function(state = character(),
   if (flavour == 'choropleth') {
     if (dontPlot)
       return(invisible(mp))
-    legend(
-      x = 12,
-      y = 5,
-      legend = cOpts$bins,
-      fill = cOpts$scheme,
-      xpd = NA
-    )
+    legend(x = 12, y = 5, legend = cOpts$bins, fill = cOpts$scheme, xpd = NA)
   }
   invisible(mp)
 }
