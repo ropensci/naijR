@@ -39,11 +39,7 @@
 #' to \code{choropleth}) 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
-#' @param col A character vector of R \code{\link[grDevices]{colors}} to be
-#' used in the map. If \code{fill == TRUE}, colours are applied to the mapped
-#' area; otherwise it is applied to the borders.
-#' @param fill Logical. Whether to fill the mapped area or not.
-#' @param label Logical. Apply labels to the map.
+#' @param show.text Logical. Apply labels to the regions of the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #' 
 #' @details ...
@@ -67,9 +63,7 @@ map_ng <- function(state = character(),
                    value = NULL,
                    breaks = NULL,
                    show.neighbours = FALSE,
-                   col = if (flavour == 'plain') 1L else NULL,
-                   fill = FALSE,
-                   label = FALSE,
+                   show.text = FALSE,
                    ...)
 {
   all.st <- states(all = TRUE)
@@ -83,11 +77,9 @@ map_ng <- function(state = character(),
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
-  database <- .getMapData()
   dots <- list(...)
-  plot <- TRUE
-  if ('plot' %in% names(dots))
-    plot <- dots[['plot']]
+  params <- names(dots)
+  database <- .getMapData()
   if (flavour == 'choropleth') {
     if (is.null(data) || is.null(value) || is.null(breaks)) {
       # We want this to fail automatically once parameters are changed
@@ -100,29 +92,41 @@ map_ng <- function(state = character(),
         )
       )
     }
-    ind <- .stateColumnIndex(data, state)
-    state.col <- data[[ind]]
-    fill <- TRUE
+    if ('fill' %in% params) {
+      if (isFALSE(dots$fill))
+        stop("Choropleths cannot be drawn when 'fill == FALSE'")
+    }
+    st.ind <- .stateColumnIndex(data, state)
+    st.column <- data[[st.ind]]
     intMp <- map(database, regions = state, plot = FALSE)
+    col.pal <- NULL
+    if ('col' %in% params)
+      col.pal <- dots$col
     cOpts <- 
-      .prepareChoroplethOptions(intMp, data, state.col, value, breaks, col)
+      .prepareChoroplethOptions(intMp, data, st.column, value, breaks, col.pal)
     col <- cOpts$colors
   }
-  mp <- map(database, regions = state, plot = plot, fill = fill, col = col)
-  if (plot) {
-    if (label) {
-      ## NOTE: In the call to map.text, the name 'database' is actually 
-      ## required. This is because internally, there is a call to `eval()`
-      ## which uses its default argument for `envir` i.e. `parent.frame()`.
-      ## An object of any other name is not seen by the quoted call to 
-      ## maps::map used by the evaluator function. For more details, 
-      ## inspect the source code for `maps::map.text`. This is a bug in the
-      ## `maps` package, which I will try to report, given sufficient time.
-      
-      mp <- map.text(database, regions = state, plot = plot, add = TRUE)
-    }
-    if (flavour == 'choropleth')
-      legend(
+  
+  ## NOTE: In the call to map.text, the name 'database' is actually
+  ## required. This is because internally, there is a call to `eval()`
+  ## which uses its default argument for `envir` i.e. `parent.frame()`.
+  ## An object of any other name is not seen by the quoted call to
+  ## maps::map used by the evaluator function. For more details,
+  ## inspect the source code for `maps::map.text`. This is a bug in the
+  ## `maps` package.
+  mapq <- quote(map(database, regions = state, ...))
+  dontPlot <- FALSE
+  if ('plot' %in% params) {
+    if (dontPlot <- isFALSE(dots$plot))
+      show.text <- FALSE
+  }
+  if (show.text)
+    mapq[[1]] <- as.name('map.text')
+  mp <- eval(mapq)
+  if (flavour == 'choropleth') {
+    if (dontPlot)
+      return(invisible(mp))
+    legend(
       x = 12,
       y = 5,
       legend = cOpts$bins,

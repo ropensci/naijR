@@ -39,8 +39,8 @@ test_that("Input is validated", {
 
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
-  mp2 <- suppressWarnings(map_ng(show = TRUE, plot = FALSE))
-  mp.lb <- map_ng(plot = FALSE, label = TRUE)
+  mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
+  mp.lb <- map_ng(plot = FALSE)
   
   expect_is(mp1, 'map')
   expect_is(mp.lb, 'map')
@@ -169,27 +169,51 @@ test_that("State polygon names are not repeated during computations", {
 
 
 dat <- readRDS('data/pvc2015.rds')
-cmap_q <- quote(
-  map_ng(
-    flavour = 'choropleth',
-    data = dat,
-    value = 'total.pop',
-    breaks = pop.groups,
-    plot = FALSE
-  )
-)
 pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
 test_that("Choropleth mapping succeeds", {
-  expect_is(eval(cmap_q), 'map')
+  expect_is(
+    map_ng(
+      flavour = 'choropleth',
+      data = dat, 
+      value = 'total.pop', 
+      breaks = pop.groups,
+      plot = FALSE), 
+    'map')
+  
+  expect_error(
+    map_ng(
+      flavour = 'choropleth',
+      data = dat,
+      value = 'total.pop',
+      breaks = pop.groups,
+      plot = FALSE,
+      fill = FALSE
+    ), 
+    "Choropleths cannot be drawn when 'fill == FALSE'")
 })
 
-test_that("Chroropleth colours can be controlled at interface", {
-  cmap_q$col <- "black"
-  expect_error(eval(cmap_q),
-               "black is not in supported colour range of grey-red-green-blue")
+test_that("Choropleth colours can be controlled at interface", {
+  expect_error(
+    map_ng(
+      flavour = 'choropleth',
+      data = dat,
+      value = 'total.pop',
+      breaks = pop.groups,
+      plot = FALSE,
+      col = 'black'
+    ),
+    "black is not in supported colour range of grey-red-green-blue")
   
-  cmap_q$col <- "blue"
-  expect_is(eval(cmap_q), "map")
+  expect_is(
+    map_ng(
+      flavour = 'choropleth',
+      data = dat,
+      value = 'total.pop',
+      breaks = pop.groups,
+      plot = FALSE,
+      col = 'blue'
+    ),
+    "map")
 })
 
 

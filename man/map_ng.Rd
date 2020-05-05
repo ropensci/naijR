@@ -6,8 +6,7 @@
 \usage{
 map_ng(state = character(), flavour = c("plain", "choropleth"),
   data = NULL, value = NULL, breaks = NULL,
-  show.neighbours = FALSE, col = if (flavour == "plain") 1L else NULL,
-  fill = FALSE, label = FALSE, ...)
+  show.neighbours = FALSE, show.text = FALSE, ...)
 }
 \arguments{
 \item{state}{A character vector of a list of Nigerian States to be displayed.
@@ -27,13 +26,7 @@ to \code{choropleth})}
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
 
-\item{col}{A character vector of R \code{\link[grDevices]{colors}} to be
-used in the map. If \code{fill == TRUE}, colours are applied to the mapped
-area; otherwise it is applied to the borders.}
-
-\item{fill}{Logical. Whether to fill the mapped area or not.}
-
-\item{label}{Logical. Apply labels to the map.}
+\item{show.text}{Logical. Apply labels to the regions of the map.}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
