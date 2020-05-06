@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+globalVariables(".")
+
 #' Map of Nigeria
 #'
 #' A map of the Federal Republic of Nigeria.
@@ -36,13 +38,30 @@
 #' plotted in a map (applicable only to \code{choropleth})
 #' @param value The value to be categorised for choropleth mapping.
 #' @param breaks Categories to be plotted on a map (applicable only 
-#' to \code{choropleth}) 
+#' to \code{choropleth}).
+#' @param categories The name of the choropleth-plotted categories. If not 
+#' provided, a set of default labels created internally by 
+#' \code{\link[base]{cut}} is used.
+#' @param col Colour to be used for the plot. For plain plots, this works just
+#' as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
+#' provided represents a sequential colour palette based on 
+#' \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
+#' checked with \code{getOption("choropleth.colours")} and can indeed be 
+#' modified by the user.
+#' @param fill Logical. Whether to colour the plotted map region(s). When 
+#' drawing a choropleth map it is understood that colouring is intented, and
+#' thus, this parameter is overriden. 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
 #' @param show.text Logical. Apply labels to the regions of the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #' 
 #' @details ...
+#' 
+#' @note When adjusting the default colour choiced for choropleth maps, it is
+#' advisable to use one of the sequential palettes. For a list of of available
+#' palettes, especially for more advanced use, review 
+#' \code{\link[RColorBrewer]{display.brewer.all}}
 #' 
 #' @return An object of class \code{map}, invisibly; as a side-effect,
 #' results in the drawing of a map of Nigeria.
@@ -62,6 +81,9 @@ map_ng <- function(state = character(),
                    data = NULL,
                    value = NULL,
                    breaks = NULL,
+                   categories = NULL,
+                   col = NULL,
+                   fill = FALSE,
                    show.neighbours = FALSE,
                    show.text = FALSE,
                    ...)
@@ -74,38 +96,14 @@ map_ng <- function(state = character(),
   if (is.null(flavour))
     stop("Invalid input for 'flavour'.")  ## TODO: Huh?
   flavour <- match.arg(flavour)
+  if (is.null(col) && flavour == 'plain')
+    col <- 1L
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
   dots <- list(...)
   params <- names(dots)
   database <- .getMapData()
-  if (flavour == 'choropleth') {
-    if (is.null(data) || is.null(value) || is.null(breaks)) {
-      # We want this to fail automatically once parameters are changed
-      stop(
-        sprintf(
-          "'%s', '%s' and '%s' are required for choropleths.",
-          deparse(quote(data)),
-          deparse(quote(value)),
-          deparse(quote(breaks))
-        )
-      )
-    }
-    if ('fill' %in% params) {
-      if (isFALSE(dots$fill))
-        stop("Choropleths cannot be drawn when 'fill == FALSE'")
-    }
-    st.ind <- .stateColumnIndex(data, state)
-    st.column <- data[[st.ind]]
-    intMp <- map(database, regions = state, plot = FALSE)
-    col.pal <- NULL
-    if ('col' %in% params)
-      col.pal <- dots$col
-    cOpts <- 
-      .prepareChoroplethOptions(intMp, data, st.column, value, breaks, col.pal)
-    col <- cOpts$colors
-  }
   
   ## NOTE: In the call to map.text, the name 'database' is actually
   ## required. This is because internally, there is a call to `eval()`
@@ -114,7 +112,23 @@ map_ng <- function(state = character(),
   ## maps::map used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text`. This is a bug in the
   ## `maps` package.
-  mapq <- quote(map(database, regions = state, ...))
+  mapq <- quote(map(database, regions = state, col = col, fill = fill, ...))
+  if (isChoropleth <- flavour == 'choropleth') {
+    .validateChoroplethParams(data, value, breaks)
+    st.ind <- .stateColumnIndex(data, state)
+    st.column <- data[[st.ind]]
+    intMp <- map(database, regions = state, plot = FALSE)
+    inputList <-
+      list(
+        state = st.column,
+        value = data[[value]],
+        breaks = breaks,
+        categories = categories
+      )
+    cOpts <- .prepareChoroplethOptions(intMp, inputList, col)
+    col <- cOpts$colors
+    fill <- TRUE
+  }
   dontPlot <- FALSE
   if ('plot' %in% params) {
     if (dontPlot <- isFALSE(dots$plot))
@@ -123,16 +137,59 @@ map_ng <- function(state = character(),
   if (show.text)
     mapq[[1]] <- as.name('map.text')
   mp <- eval(mapq)
-  if (flavour == 'choropleth') {
+  if (isChoropleth) {
     if (dontPlot)
       return(invisible(mp))
-    legend(x = 12, y = 5, legend = cOpts$bins, fill = cOpts$scheme, xpd = NA)
+    if (is.null(categories))
+      categories <- cOpts$bins
+    legend(x = 12, y = 5, legend = categories, fill = cOpts$scheme, xpd = NA)
   }
   invisible(mp)
 }
 
 
 
+
+
+
+
+
+
+#' @importFrom maps SpatialPolygons2map
+#' @importFrom rgdal readOGR
+.getMapData <- function()
+{
+  dsn <-
+    system.file("extdata/ng_admin",
+                package = 'naijR',
+                mustWork = TRUE)
+  if (identical(dsn, character(1)))
+    stop("The map data could not be found in 'extdata'")
+  sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
+  SpatialPolygons2map(sp, namefield = 'admin1Name')
+}
+
+
+
+
+
+
+
+
+.validateChoroplethParams <- function(x, y, z)
+{
+  if (is.null(x) || is.null(y) || is.null(z)) {
+    # TODO: Rewrite
+    stop(
+      sprintf(
+        "'%s', '%s' and '%s' are required for choropleths.",
+        deparse(quote(data)),
+        deparse(quote(value)),
+        deparse(quote(breaks))
+      )
+    )
+  }
+}
 
 
 
@@ -164,18 +221,48 @@ map_ng <- function(state = character(),
 
 
 
-#' @importFrom maps SpatialPolygons2map
-#' @importFrom rgdal readOGR
-.getMapData <- function()
-{
-  dsn <-
-    system.file("extdata/ng_admin",
-                package = 'naijR',
-                mustWork = TRUE)
-  if (identical(dsn, character(1)))
-    stop("The map data could not be found in 'extdata'")
-  sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
-  SpatialPolygons2map(sp, namefield = 'admin1Name')
+
+.prepareChoroplethOptions <-
+  function(map, opts, col = NULL)
+  {
+    # TODO: Set limits for variables and brk
+    # TODO: Accept numeric input for col
+    stopifnot(inherits(map, 'map'))
+    if(!.assertListElements(opts))
+      stop("One or more inputs for generating choropleth options are invalid")
+    mapstates <- .getUniqueStateNames(map)
+    brks <- opts$breaks
+    colrange <- .processColouring(col, brks)
+    dframe <-
+      data.frame(
+        state = opts$state,
+        value = opts$value,
+        stringsAsFactors = FALSE
+      )
+    dframe$cats <- cut(dframe$value, brks, include.lowest = TRUE)
+    ind <- findInterval(dframe$value, brks, all.inside = TRUE)
+    dframe$color <- colrange[ind]
+    newind <- order(dframe$state, mapstates)
+    dframe <- dframe[newind, ]
+    colors <- .reassignColours(map$names, dframe$state, dframe$color)
+    list(colors = colors,
+         scheme = colrange,
+         bins = levels(dframe$cats))
+  }
+
+
+
+
+
+
+
+.assertListElements <- function(x) {
+  stopifnot(c('state', 'value', 'breaks') %in% names(x))
+  category.is.char <- 
+    if (!is.null(x$categories)) 
+      is.character(x$categories) 
+    else TRUE
+  all(is_state(x$state), is.numeric(x$value), category.is.char)
 }
 
 
@@ -183,46 +270,48 @@ map_ng <- function(state = character(),
 
 
 
+.getUniqueStateNames <- function(map)
+{
+  stopifnot(inherits(map, 'map'))
+  unique(sub("(^.+)(:.+$)", "\\1", map$names))
+}
 
 
-#' @import magrittr
+
+
+
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom RColorBrewer brewer.pal.info
+#' @importFrom grDevices palette
+#' @importFrom magrittr %>%
 #' @importFrom tools toTitleCase
-.prepareChoroplethOptions <-
-  function(map, dframe, state, val.name, bins, col = NULL)
-  {
-    # TODO: Set limits for variables and brk
-    # TODO: Accept numeric input for col
-    # stopifnot(inherits(map, 'map'))
-    cols <- c("grey", "red", "green", "blue")
-    if (is.null(col))
-      col <- cols[1]
-    else if (!col %in% cols)
-      stop(sprintf(
-        "%s is not in supported colour range of %s",
-        col,
-        paste(cols, collapse = '-'),
-        cols[1]
-      ))
-    pal <- col %>%
-      toTitleCase %>%
-      paste0("s")
-    mapstates <- .getUniqueStateNames(map)
-    dframe <-
-      data.frame(state = state,
-                 value = dframe[[val.name]],
-                 stringsAsFactors = FALSE)
-    dframe$cats <- cut(dframe$value, bins, include.lowest = TRUE)
-    dframe$ind <- findInterval(dframe$value, bins, all.inside = TRUE)
-    colrange <- RColorBrewer::brewer.pal(length(bins) - 1, pal)
-    dframe$color <- colrange[dframe$ind]
-    newind <- order(dframe$state, mapstates)
-    dframe <- dframe[newind,]
-    colors <- .reassignColours(map$names, dframe$state, dframe$color)
-    list(colors = colors,
-         scheme = colrange,
-         bins = levels(dframe$cats))
+.processColouring <- function(color = NULL, breaks)
+{
+  .DefaultChoroplethColours <- getOption('choropleth.colours')
+  if (is.null(color))
+    color <- .DefaultChoroplethColours[1]
+  if (is.numeric(color)) {
+    all.cols <- grDevices::palette() %>% 
+      sub("(green)(3)", "\\1", .) %>% 
+      sub("gray", "grey", .)
+    if (!color %in% seq_along(all.cols))
+      stop(sprintf("'color' must range between 1L and %iL", length(all.cols)))
+    color <- all.cols[color]
   }
+  among.def.cols <- color %in% .DefaultChoroplethColours
+  in.other.pal <- !among.def.cols && color %in% rownames(brewer.pal.info)
+  pal <-
+    if (!among.def.cols) {
+      if (!in.other.pal)
+        stop(
+          sprintf("'%s' is not one of the supported colours or palettes", color)
+        )
+      color
+    }
+    else
+      paste0(tools::toTitleCase(color), "s")
+  RColorBrewer::brewer.pal(length(breaks) - 1, pal)
+}
 
 
 
@@ -244,15 +333,10 @@ map_ng <- function(state = character(),
 
 
 
-.getUniqueStateNames <- function(map)
-{
-  stopifnot(inherits(map, 'map'))
-  unique(sub("(^.+)(:.+$)", "\\1", map$names))
-}
 
 
 
 
 
-#' @export
+# For possible export later
 .shpLayer <- "nga_admbnda_adm1_osgof_20161215"

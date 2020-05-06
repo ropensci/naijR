@@ -90,14 +90,21 @@ test_that("Data for mapping are retrieved properly", {
 })
 
 
-
-
+  
 set.seed(4)
 df <-
-  data.frame(state = states(all = TRUE), value = sample(0:6, 37, TRUE))
+  data.frame(state = states(all = TRUE), value = sample(0:6, 37, TRUE),
+             stringsAsFactors = FALSE)
 mp <- map_ng(plot = FALSE)
 brks <- seq(0, 6, 2)
 vals <- df$value
+lso <-
+  list(
+    state = df$state,
+    value = df[, 'value'],
+    breaks = brks,
+    category = LETTERS[seq_len(length(brks))]
+  )
 
 test_that("Internal function for preparing colours is validated", {
   mt <- matrix(1:3)
@@ -123,9 +130,22 @@ test_that("Internal function for preparing colours is validated", {
 
 
 
+
+
+
+
+
+
+test_that("List of choropleth inputs is properly checked", {
+  expect_true(.assertListElements(lso))
+  
+})
+
+
+
+
 test_that("Expected colours and related data are prepared", {
-  st <- df$state
-  func <- quote(.prepareChoroplethOptions(mp, df, st, 'value', brks))
+  func <- quote(.prepareChoroplethOptions(mp, lso))
   cho <- eval(func)
   cols <-
     c(
@@ -153,7 +173,7 @@ test_that("Expected colours and related data are prepared", {
   
   func$col <- "brown"
   expect_error(eval(func), 
-               'brown is not in supported colour range of grey-red-green-blue')
+               "'brown' is not one of the supported colours or palettes")
 })
 
 
@@ -169,27 +189,41 @@ test_that("State polygon names are not repeated during computations", {
 
 
 dat <- readRDS('data/pvc2015.rds')
+val <- 'total.pop'
 pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
+cat <- c("Small", "Moderate", "Large", "Mega")
 test_that("Choropleth mapping succeeds", {
   expect_is(
     map_ng(
       flavour = 'choropleth',
       data = dat, 
-      value = 'total.pop', 
+      value = val, 
       breaks = pop.groups,
+      category = cat,
       plot = FALSE), 
     'map')
   
-  expect_error(
-    map_ng(
-      flavour = 'choropleth',
-      data = dat,
-      value = 'total.pop',
-      breaks = pop.groups,
-      plot = FALSE,
-      fill = FALSE
-    ), 
-    "Choropleths cannot be drawn when 'fill == FALSE'")
+  # expect_error(
+  #   map_ng(
+  #     flavour = 'choropleth',
+  #     data = dat, 
+  #     value = val, 
+  #     breaks = pop.groups,
+  #     category = cat,
+  #     col = 99L,
+  #     plot = FALSE),
+  #   'error')
+  
+  # expect_error(
+  #   map_ng(
+  #     flavour = 'choropleth',
+  #     data = dat,
+  #     value = val,
+  #     breaks = pop.groups,
+  #     plot = FALSE,
+  #     fill = FALSE
+  #   ), 
+  #   "Choropleths cannot be drawn when 'fill == FALSE'")
 })
 
 test_that("Choropleth colours can be controlled at interface", {
@@ -197,19 +231,21 @@ test_that("Choropleth colours can be controlled at interface", {
     map_ng(
       flavour = 'choropleth',
       data = dat,
-      value = 'total.pop',
+      value = val,
       breaks = pop.groups,
+      category = cat,
       plot = FALSE,
       col = 'black'
     ),
-    "black is not in supported colour range of grey-red-green-blue")
+    "'black' is not one of the supported colours or palettes")
   
   expect_is(
     map_ng(
       flavour = 'choropleth',
       data = dat,
-      value = 'total.pop',
+      value = val,
       breaks = pop.groups,
+      category = cat,
       plot = FALSE,
       col = 'blue'
     ),
@@ -267,3 +303,6 @@ test_that("States are located in a data frame", {
   expect_error(.stateColumnIndex(mtcars, states), 
                "No column with elements in states.")
 })
+
+
+

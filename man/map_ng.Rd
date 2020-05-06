@@ -5,8 +5,9 @@
 \title{Map of Nigeria}
 \usage{
 map_ng(state = character(), flavour = c("plain", "choropleth"),
-  data = NULL, value = NULL, breaks = NULL,
-  show.neighbours = FALSE, show.text = FALSE, ...)
+  data = NULL, value = NULL, breaks = NULL, categories = NULL,
+  col = NULL, fill = FALSE, show.neighbours = FALSE,
+  show.text = FALSE, ...)
 }
 \arguments{
 \item{state}{A character vector of a list of Nigerian States to be displayed.
@@ -21,7 +22,22 @@ plotted in a map (applicable only to \code{choropleth})}
 \item{value}{The value to be categorised for choropleth mapping.}
 
 \item{breaks}{Categories to be plotted on a map (applicable only 
-to \code{choropleth})}
+to \code{choropleth}).}
+
+\item{categories}{The name of the choropleth-plotted categories. If not 
+provided, a set of default labels created internally by 
+\code{\link[base]{cut}} is used.}
+
+\item{col}{Colour to be used for the plot. For plain plots, this works just
+as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
+provided represents a sequential colour palette based on 
+\code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
+checked with \code{getOption("choropleth.colours")} and can indeed be 
+modified by the user.}
+
+\item{fill}{Logical. Whether to colour the plotted map region(s). When 
+drawing a choropleth map it is understood that colouring is intented, and
+thus, this parameter is overriden.}
 
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}
@@ -45,6 +61,12 @@ A map of the Federal Republic of Nigeria.
 This function is essentially a wrapper to \code{maps::map}.
 
 ...
+}
+\note{
+When adjusting the default colour choiced for choropleth maps, it is
+advisable to use one of the sequential palettes. For a list of of available
+palettes, especially for more advanced use, review 
+\code{\link[RColorBrewer]{display.brewer.all}}
 }
 \examples{
 map_ng() # Draw a map with default settings
