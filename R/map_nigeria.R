@@ -320,15 +320,31 @@ map_ng <- function(state = character(),
 
 .reassignColours <- function(names, states, in.colours)
 {
-  out.colours <- rep(NA, length(names))
+  stopifnot(is.character(names), is_state(states), .assertHexColor(in.colours))
+  out.colours <- new.names <- rep(NA, length(names))
   for (i in seq_along(states)) {
-    c <- states[i]
-    ind <- grep(c, names)
+    regx <- paste0("^(", states[i],")(.?|\\:\\d*)$")
+    ind <- grep(regx, names)
     out.colours[ind] <- in.colours[i]
+    new.names[ind] <- sub(regx, "\\1", names[ind])[1]
   }
-  out.colours
+  structure(out.colours, names = new.names)
 }
 
+
+
+
+
+
+
+
+
+
+.assertHexColor <- function(x) 
+{
+  stopifnot(is.character(x))
+  all(grepl("^#", x), nchar(x) == 7L)
+}
 
 
 
