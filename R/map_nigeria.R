@@ -25,6 +25,7 @@ globalVariables(".")
 #' 
 #' @details This function is essentially a wrapper to \code{maps::map}.
 #'
+#' @import rlang
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom maps map
@@ -112,7 +113,8 @@ map_ng <- function(state = character(),
   ## maps::map used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text`. This is a bug in the
   ## `maps` package.
-  mapq <- quote(map(database, regions = state, col = col, fill = fill, ...))
+  mapq <- 
+    call2('map', database, regions = state, col = col, fill = fill, ...)
   if (isChoropleth <- flavour == 'choropleth') {
     .validateChoroplethParams(data, value, breaks)
     st.ind <- .stateColumnIndex(data, state)
@@ -135,8 +137,8 @@ map_ng <- function(state = character(),
       show.text <- FALSE
   }
   if (show.text)
-    mapq[[1]] <- as.name('map.text')
-  mp <- eval(mapq)
+    mapq[[1]] <- sym('map.text')
+  mp <- eval_tidy(mapq)
   if (isChoropleth) {
     if (dontPlot)
       return(invisible(mp))
