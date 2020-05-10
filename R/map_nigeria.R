@@ -33,26 +33,25 @@ globalVariables(".")
 #' @importFrom maps map.text
 #' 
 #' @param state A character vector of a list of Nigerian States to be displayed.
-#' The default value is to print all States.
-#' @param flavour The type of map to be drawn. Current options are \code{plain}
-#' and \code{choropleth}.
+#' The default value is to print all States. \code{NULL} will print an outline
+#' map, where internal boundaries are not drawn.
 #' @param data An object containing data, principally the variables required to
-#' plotted in a map (applicable only to \code{choropleth})
-#' @param value The value to be categorised for choropleth mapping.
+#' plotted in a map.
+#' @param value The value to be presented for choropleth mapping, usually a
+#' \code{factor}. If numerical, depending on the size of \code{range(value)},
+#' will be appropriately sized categories, or as defined by \code{breaks}.
 #' @param breaks Categories to be plotted on a map (applicable only 
-#' to \code{choropleth}).
+#' to choropleth maps).
 #' @param categories The name of the choropleth-plotted categories. If not 
-#' provided, a set of default labels created internally by 
-#' \code{\link[base]{cut}} is used.
+#' defined, internally created labels are used.
 #' @param col Colour to be used for the plot. For plain plots, this works just
 #' as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
-#' provided represents a sequential colour palette based on 
+#' provided represents a (sequential) colour palette based on 
 #' \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
 #' checked with \code{getOption("choropleth.colours")} and can indeed be 
 #' modified by the user.
 #' @param fill Logical. Whether to colour the plotted map region(s). When 
-#' drawing a choropleth map it is understood that colouring is intented, and
-#' thus, this parameter is overriden. 
+#' drawing a choropleth map \code{fill == TRUE} is implied. 
 #' @param show.neighbours logical; \code{TRUE} to display borders of
 #' neighbouring countries.
 #' @param show.text Logical. Apply labels to the regions of the map.
@@ -79,7 +78,6 @@ globalVariables(".")
 #'
 #' @export
 map_ng <- function(state = character(),
-                   flavour = c("plain", 'choropleth'),
                    data = NULL,
                    value = NULL,
                    breaks = NULL,
@@ -90,23 +88,6 @@ map_ng <- function(state = character(),
                    show.text = FALSE,
                    ...)
 {
-  all.st <- states(all = TRUE)
-  if (length(state) == 0L && !is.null(state))
-    state <- all.st
-  if (!any(state %in% all.st))
-    stop("One or more elements of 'state' is not a Nigerian state")
-  if (is.null(flavour))
-    stop("Invalid input for 'flavour'.")  ## TODO: Huh?
-  flavour <- match.arg(flavour)
-  if (is.null(col) && flavour == 'plain')
-    col <- 1L
-  stopifnot(is.logical(show.neighbours))
-  if (show.neighbours)
-    message("Display of neighbouring countries is disabled")
-  dots <- list(...)
-  params <- names(dots)
-  database <- .getMapData()
-  
   ## NOTE: In the call to map.text, the name 'database' is actually
   ## required. This is because internally, there is a call to `eval()`
   ## which uses its default argument for `envir` i.e. `parent.frame()`.
@@ -114,45 +95,51 @@ map_ng <- function(state = character(),
   ## maps::map used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text`. This is a bug in the
   ## `maps` package.
-  mapq <- 
-    call2('map', database, regions = state, col = col, fill = fill, ...)
-  if (isChoropleth <- flavour == 'choropleth') {
-    .validateChoroplethParams(data, value, breaks)
+  state <- .processStateParam(state)
+  stopifnot(is.logical(show.neighbours))
+  if (show.neighbours)
+    message("Display of neighbouring countries is disabled")
+  value <- enexpr(value)
+  make.chrplth <- .validateChoroplethParams(state, data, !!value)
+  if (is.null(col) && is_false(make.chrplth))
+    col <- 1L
+  database <- .getMapData(state)
+  mapq <- expr(map(database, regions = state, col = col, fill = fill, ...))
+  if (make.chrplth) {
     st.ind <- .stateColumnIndex(data, state)
     st.column <- data[[st.ind]]
-    intMp <- map(database, regions = state, plot = FALSE)
     inputList <-
       list(
         state = st.column,
-        value = data[[value]],
+        value = data[, as_name(value)],
         breaks = breaks,
         categories = categories
       )
-    cOpts <- .prepareChoroplethOptions(intMp, inputList, col)
+    cOpts <- .prepareChoroplethOptions(database, inputList, col)
     col <- cOpts$colors
     fill <- TRUE
   }
-  dontPlot <- FALSE
-  if ('plot' %in% params) {
-    if (dontPlot <- isFALSE(dots$plot))
-      show.text <- FALSE
-  }
   mp <- if (show.text) {
-    txt <- database$name %>%
-      {
-        is <- lapply(state, grep, x = .)
-        ind <- unlist(is)
-        .[ind]
-      } %>%
-      .adjustLabels()
+    if (!identical(state, 'Nigeria')) {
+      txt <- database$name %>%
+        {
+          is <- lapply(state, grep, x = .)
+          ind <- unlist(is)
+          .[ind]
+        } %>%
+        .adjustLabels()
+    }
     map.text(database, regions = state, labels = txt, col = col, fill = fill, ...)
     # mapq[[1]] <- sym('map.text')  TODO: put off for now
   }
   else
     eval_tidy(mapq)
-  if (isChoropleth) {
-    if (dontPlot)
-      return(invisible(mp))
+  if (make.chrplth) {
+    dots <- list(...)
+    params <- names(dots)
+    if ('plot' %in% params)
+      if (is_false(dots$plot))
+        return(invisible(mp))
     if (is.null(categories))
       categories <- cOpts$bins
     legend(x = 12, y = 5, legend = categories, fill = cOpts$scheme, xpd = NA)
@@ -168,40 +155,73 @@ map_ng <- function(state = character(),
 
 
 
+.processStateParam <- function(s)
+{
+  if (!identical(s, character()))
+    if (!is.character(s) && !is.null(s))
+      stop("Type of argument supplied to 'state' is invalid.")
+  all.st <- states(all = TRUE)
+  if (is.character(s)) {
+    if (length(s) == 0L)
+      s <- all.st
+    if (!all(s %in% all.st))
+      stop("One or more elements of 'state' is not a Nigerian state")
+  }
+  if (is.null(s))
+    s <- "Nigeria"
+  s
+}
+
+
+
+
+
+#' @importFrom rlang as_name
+#' @importFrom rlang enexpr
+#' @importFrom rlang is_symbol
+.validateChoroplethParams <- function(state = NULL, data = NULL, val = NULL)
+{
+  # TODO: Add some verbosity.
+  no.state <- is.null(state) || identical(state, "Nigeria")
+  if (no.state && is.null(data))
+    return(FALSE)
+  arg <- enexpr(val)
+  if (!no.state &&
+      is.character(state) && is_state(state) && !is.null(arg))
+    return(TRUE)
+  if (!is.data.frame(data))
+    return(FALSE)
+  ind <- try(.stateColumnIndex(data), silent = TRUE)
+  if (inherits(ind, 'try-error'))
+    return(FALSE)
+  if (is_symbol(arg))
+    return(as_name(arg) %in% names(data))
+  if (is.null(arg))
+    if (ncol(data) < 2L)
+      return(FALSE)
+  TRUE
+}
+
+
+
+
+
+
 #' @importFrom maps SpatialPolygons2map
 #' @importFrom rgdal readOGR
-.getMapData <- function()
+.getMapData <- function(state)
 {
-  dsn <-
-    system.file("extdata/ng_admin",
-                package = 'naijR',
-                mustWork = TRUE)
-  if (identical(dsn, character(1)))
-    stop("The map data could not be found in 'extdata'")
-  sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
-  SpatialPolygons2map(sp, namefield = 'admin1Name')
-}
-
-
-
-
-
-
-
-
-.validateChoroplethParams <- function(x, y, z)
-{
-  if (is.null(x) || is.null(y) || is.null(z)) {
-    # TODO: Rewrite
-    stop(
-      sprintf(
-        "'%s', '%s' and '%s' are required for choropleths.",
-        deparse(quote(data)),
-        deparse(quote(value)),
-        deparse(quote(breaks))
-      )
-    )
+  if (identical(state, 'Nigeria'))
+    return("mapdata::worldHires")
+  else if (is_state(state)) {
+    dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+    if (identical(dsn, character(1)))
+      stop("The map data could not be found in 'extdata'")
+    sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
+    return(SpatialPolygons2map(sp, namefield = 'admin1Name'))
   }
+  ss <- paste(state, collapse = ', ')
+  stop("Invalid region(s) for the map: ", ss)
 }
 
 
@@ -209,14 +229,18 @@ map_ng <- function(state = character(),
 
 
 
-.stateColumnIndex <- function(dt, s)
+
+
+.stateColumnIndex <- function(dt, s = NULL)
 {
-  stopifnot(is.data.frame(dt), is_state(s))
+  stopifnot(is.data.frame(dt))
+  if (is.null(s))
+    s <- states()
   n <- vapply(dt, function(x) {
     if (is.factor(x))
       x <- as.character(x)
     if (is.character(x))
-      all(x %in% s)
+      is_state(x)
     else
       FALSE
   }, logical(1))

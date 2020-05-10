@@ -4,40 +4,37 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(state = character(), flavour = c("plain", "choropleth"),
-  data = NULL, value = NULL, breaks = NULL, categories = NULL,
-  col = NULL, fill = FALSE, show.neighbours = FALSE,
-  show.text = FALSE, ...)
+map_ng(state = character(), data = NULL, value = NULL,
+  breaks = NULL, categories = NULL, col = NULL, fill = FALSE,
+  show.neighbours = FALSE, show.text = FALSE, ...)
 }
 \arguments{
 \item{state}{A character vector of a list of Nigerian States to be displayed.
-The default value is to print all States.}
-
-\item{flavour}{The type of map to be drawn. Current options are \code{plain}
-and \code{choropleth}.}
+The default value is to print all States. \code{NULL} will print an outline
+map, where internal boundaries are not drawn.}
 
 \item{data}{An object containing data, principally the variables required to
-plotted in a map (applicable only to \code{choropleth})}
+plotted in a map.}
 
-\item{value}{The value to be categorised for choropleth mapping.}
+\item{value}{The value to be presented for choropleth mapping, usually a
+\code{factor}. If numerical, depending on the size of \code{range(value)},
+will be appropriately sized categories, or as defined by \code{breaks}.}
 
 \item{breaks}{Categories to be plotted on a map (applicable only 
-to \code{choropleth}).}
+to choropleth maps).}
 
 \item{categories}{The name of the choropleth-plotted categories. If not 
-provided, a set of default labels created internally by 
-\code{\link[base]{cut}} is used.}
+defined, internally created labels are used.}
 
 \item{col}{Colour to be used for the plot. For plain plots, this works just
 as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
-provided represents a sequential colour palette based on 
+provided represents a (sequential) colour palette based on 
 \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
 checked with \code{getOption("choropleth.colours")} and can indeed be 
 modified by the user.}
 
 \item{fill}{Logical. Whether to colour the plotted map region(s). When 
-drawing a choropleth map it is understood that colouring is intented, and
-thus, this parameter is overriden.}
+drawing a choropleth map \code{fill == TRUE} is implied.}
 
 \item{show.neighbours}{logical; \code{TRUE} to display borders of
 neighbouring countries.}

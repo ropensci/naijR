@@ -26,19 +26,50 @@ library(rlang)
 
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'state' is not a Nigerian state"
-  myerr2 <- "'data', 'value' and 'breaks' are required for choropleths."
-  
-  expect_error(map_ng(999), myerr1)
-  expect_error(map_ng(NULL), myerr1)
-  expect_error(map_ng(NA), myerr1)
+  myerr2 <- "Type of argument supplied to 'state' is invalid."
+  expect_error(map_ng(999), myerr2)
+  expect_is(map_ng(NULL, plot = FALSE), 'map')
+  expect_error(map_ng(NA), myerr2)
   expect_error(map_ng('TRUE'), myerr1)
-  expect_error(map_ng(pi), myerr1)
-  expect_error(map_ng(flavour = 'choropleth'), myerr2)
-  expect_error(map_ng(states('nw'), flavour = 'choropleth'), myerr2)
-  # TODO: Add test case for choropleths with too few states
+  expect_error(map_ng(pi), myerr2)
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
+  # TODO: Add test case for choropleths with too few states
 })
+
+
+
+
+
+test_that("Check on 'state' parameter works", {
+  
+  expect_equal(.processStateParam(NULL), "Nigeria")
+  expect_error(.processStateParam(), 
+               "argument \"s\" is missing, with no default")
+  expect_length(.processStateParam(states('se')), 5L)
+  expect_length(.processStateParam(character()), 37L)
+  expect_error(.processStateParam(c("Abia", "Kano", "Lifebuoy")),
+               "One or more elements of 'state' is not a Nigerian state")
+})
+
+
+
+
+
+test_that("Decision is made on drawing choropleths", {
+  all.states <- states()
+  nc.states <- states('nc')
+  set.seed(23)
+  vals <- lapply(list(all = all.states, nc = nc.states), function(x)
+    factor(sample(LETTERS[1:5], length(x), replace = TRUE)))
+  all.ints <- sample(1:5, 37L, replace = T)
+  
+  expect_true(.validateChoroplethParams(state = all.states, val = vals$all))
+  expect_true(.validateChoroplethParams(data = data.frame(nc.states, vals$nc)))
+  expect_true(.validateChoroplethParams(state = all.states, val = all.ints))
+  expect_false(.validateChoroplethParams(state = '.'))
+})
+
 
 
 
@@ -83,17 +114,22 @@ test_that("Subnational divisions are plotted", {
 
 
 test_that("Data for mapping are retrieved properly", {
-  tryToGetMap <- quote(try(.getMapData()))
-  success <- eval_tidy(tryToGetMap)
-  threwErrExcept <- quote(inherits(success, "try-error"))
+  s <- "Nigeria"
+  res <- try(.getMapData(s))
+  exceptionThrown <- inherits(res, "try-error")
   
-  if (eval_tidy(threwErrExcept)) {
-    expect_error(eval_tidy(tryToGetMap), 
-                 "The map data could not be found in 'extdata'")
-  }
-  expect_false(eval_tidy(threwErrExcept))
-  expect_is(success, 'map')
+  expect_false(exceptionThrown)
+  expect_is(res, 'character')
+  expect_is(.getMapData("Abia"), 'map')
+  expect_error(.getMapData("Alaska"), 
+               "Invalid region(s) for the map: Alaska",
+               fixed = TRUE)
+  expect_error(.getMapData(c("Unreal", "Imaginary")), 
+               "Invalid region(s) for the map: Unreal, Imaginary",
+               fixed = TRUE)
 })
+
+
 
 
   
@@ -244,17 +280,15 @@ test_that("State polygon names are not repeated during computations", {
 
 
 dat <- readRDS('data/pvc2015.rds')
-val <- 'total.pop'
 pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
 cat <- c("Small", "Moderate", "Large", "Mega")
 test_that("Choropleth mapping succeeds", {
   expect_is(
     map_ng(
-      flavour = 'choropleth',
       data = dat, 
-      value = val, 
+      value = total.pop, 
       breaks = pop.groups,
-      category = cat,
+      categories = cat,
       plot = FALSE), 
     'map')
   
@@ -284,11 +318,10 @@ test_that("Choropleth mapping succeeds", {
 test_that("Choropleth colours can be controlled at interface", {
   expect_error(
     map_ng(
-      flavour = 'choropleth',
       data = dat,
-      value = val,
+      value = total.pop,
       breaks = pop.groups,
-      category = cat,
+      categories = cat,
       plot = FALSE,
       col = 'black'
     ),
@@ -296,39 +329,15 @@ test_that("Choropleth colours can be controlled at interface", {
   
   expect_is(
     map_ng(
-      flavour = 'choropleth',
       data = dat,
-      value = val,
+      value = total.pop,
       breaks = pop.groups,
-      category = cat,
+      categories = cat,
       plot = FALSE,
       col = 'blue'
     ),
     "map")
 })
-
-
-
-
-
-# test_that("Strings are switched with empties", {
-#   v1 <- c("Akwa Ibom", "", "Abia")
-#   v2 <- c("Cross River", "", "", "", "Imo")
-#   v3 <- c("This", 'is', 'a', 'string')
-#   obj1 <- .toggleEmpties(v1, 2)
-#   obj2 <- .toggleEmpties(v2, 4)
-#   obj3 <- .toggleEmpties(v3, 4)
-#   empty <- ""
-#   
-#   expect_equal(obj1[1], empty)
-#   expect_equal(obj1[2], "Akwa Ibom")
-#   expect_equal(obj2[1], empty)
-#   expect_equal(obj2[2], empty)
-#   expect_equal(obj2[3], empty)
-#   expect_equal(obj2[4], "Cross River")
-#   # expect_false(nchar(obj3) == 0L)
-#   
-# })
 
 
 
@@ -366,10 +375,8 @@ test_that("States' columns are searchable within a data frame", {
   expect_error(.stateColumnIndex(), 
                "argument \"dt\" is missing, with no default")
   expect_error(.stateColumnIndex(states, states), err)
-  expect_error(.stateColumnIndex(dat, letters), 
-               "is_state\\(s\\) is not TRUE")
-  expect_error(.stateColumnIndex(dat, NULL),
-               "A character vector was expected")
+  expect_equivalent(.stateColumnIndex(dat, letters), 1L)
+  expect_equivalent(.stateColumnIndex(dat, NULL), 1L)
   expect_error(.stateColumnIndex(NULL, states), err)
   expect_error(.stateColumnIndex(mtcars, states), 
                "No column with elements in states.")
