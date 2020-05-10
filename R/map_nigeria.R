@@ -28,6 +28,7 @@ globalVariables(".")
 #' @import rlang
 #' @importFrom graphics legend
 #' @importFrom graphics par
+#' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
@@ -136,9 +137,19 @@ map_ng <- function(state = character(),
     if (dontPlot <- isFALSE(dots$plot))
       show.text <- FALSE
   }
-  if (show.text)
-    mapq[[1]] <- sym('map.text')
-  mp <- eval_tidy(mapq)
+  mp <- if (show.text) {
+    txt <- database$name %>%
+      {
+        is <- lapply(state, grep, x = .)
+        ind <- unlist(is)
+        .[ind]
+      } %>%
+      .adjustLabels()
+    map.text(database, regions = state, labels = txt, col = col, fill = fill, ...)
+    # mapq[[1]] <- sym('map.text')  TODO: put off for now
+  }
+  else
+    eval_tidy(mapq)
   if (isChoropleth) {
     if (dontPlot)
       return(invisible(mp))
@@ -325,7 +336,7 @@ map_ng <- function(state = character(),
   stopifnot(is.character(names), is_state(states), .assertHexColor(in.colours))
   out.colours <- new.names <- rep(NA, length(names))
   for (i in seq_along(states)) {
-    regx <- paste0("^(", states[i],")(.?|\\:\\d*)$")
+    regx <- .regexDuplicatedPolygons(states[i])
     ind <- grep(regx, names)
     out.colours[ind] <- in.colours[i]
     new.names[ind] <- sub(regx, "\\1", names[ind])[1]
@@ -333,6 +344,18 @@ map_ng <- function(state = character(),
   structure(out.colours, names = new.names)
 }
 
+
+
+
+
+
+# Provided a regex pattern for checking polygons for jurisdictions that
+# are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
+.regexDuplicatedPolygons <- function(x)
+{
+  stopifnot(is.character(x))
+  paste0("^(", x,")(.?|\\:\\d*)$")
+}
 
 
 
@@ -350,6 +373,49 @@ map_ng <- function(state = character(),
 
 
 
+
+
+
+#' @importFrom magrittr %>%
+.adjustLabels <- function(x) 
+{
+  stopifnot(is.character(x))
+  .fadj <- function(x, state, pos) {
+    ind <- grep(state, x)
+    finalPos <- ind[pos]
+    x[ind] <- ""
+    x[finalPos] <- state
+    x
+  }
+  
+  x <- vapply(
+    x,
+    FUN.VALUE = character(1L),
+    FUN = function(l)
+      sub("\\:\\d*$", "", l)
+  )
+  
+  ss <- c("Akwa Ibom", "Cross River")
+  cent <- c(2, 4)
+  for (i in seq_len(2))
+    x <- .fadj(x, ss[i], cent[i])
+  
+  dups <- which(duplicated(x))
+  x[dups] <- character(1L)
+  x
+}
+
+
+
+
+# # TODO: Review this approach
+# .toggleEmpties <- function(vec, start, pos) {
+#   stopifnot(is.character(vec), is.numeric(pos))
+#   pos <- pos - start
+#   vec[pos] <- vec[start]
+#   vec[start] <- character(1L)
+#   vec
+# }
 
 
 

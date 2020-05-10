@@ -19,6 +19,11 @@
 library(testthat)
 library(rlang)
 
+
+
+
+
+
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'state' is not a Nigerian state"
   myerr2 <- "'data', 'value' and 'breaks' are required for choropleths."
@@ -139,6 +144,25 @@ test_that("Hexadecimal colour format is detected internally", {
   expect_false(.assertHexColor("Hex"))
   expect_true(.assertHexColor(trio))
   expect_false(.assertHexColor(trio_na))
+})
+
+
+
+
+
+test_that("Regular expression for checking polygons is built", {
+  result <- .regexDuplicatedPolygons("WORD")
+  err.char <- "is.character\\(x\\) is not TRUE"
+  
+  expect_error(.regexDuplicatedPolygons(), 
+               "argument \"x\" is missing, with no default")
+  expect_error(.regexDuplicatedPolygons(NULL), err.char)
+  expect_error(.regexDuplicatedPolygons(numeric()), err.char)
+  expect_error(.regexDuplicatedPolygons(logical()), err.char)
+  expect_error(.regexDuplicatedPolygons(NA), err.char)
+  expect_type(result, "character")
+  expect_is(result, "character")
+  expect_equal(result, "^(WORD)(.?|\\:\\d*)$")
 })
 
 
@@ -287,10 +311,52 @@ test_that("Choropleth colours can be controlled at interface", {
 
 
 
+# test_that("Strings are switched with empties", {
+#   v1 <- c("Akwa Ibom", "", "Abia")
+#   v2 <- c("Cross River", "", "", "", "Imo")
+#   v3 <- c("This", 'is', 'a', 'string')
+#   obj1 <- .toggleEmpties(v1, 2)
+#   obj2 <- .toggleEmpties(v2, 4)
+#   obj3 <- .toggleEmpties(v3, 4)
+#   empty <- ""
+#   
+#   expect_equal(obj1[1], empty)
+#   expect_equal(obj1[2], "Akwa Ibom")
+#   expect_equal(obj2[1], empty)
+#   expect_equal(obj2[2], empty)
+#   expect_equal(obj2[3], empty)
+#   expect_equal(obj2[4], "Cross River")
+#   # expect_false(nchar(obj3) == 0L)
+#   
+# })
 
 
 
-test_that("States are located in a data frame", {
+
+
+test_that("Duplicated polygon names are made empty", {
+  label <- c("A:1", 'A:2', 'A:3', 'B', 'C:1', 'C:2')
+  result <- .adjustLabels(label)
+  err <- "is.character\\(x\\) is not TRUE"
+  
+  expect_error(.adjustLabels(NA), err)
+  expect_error(.adjustLabels(numeric()), err)
+  expect_error(.adjustLabels(logical()), err)
+  expect_error(.adjustLabels(NULL), err)
+  expect_type(result, 'character')
+  expect_is(result, 'character')
+  expect_length(result, 6L)
+  expect_length(grep("^$", result), 3L)
+  expect_false(any(grepl("\\:\\d$", result)))
+})
+
+
+
+
+
+
+
+test_that("States' columns are searchable within a data frame", {
   states <- states()
   ss <- .stateColumnIndex(dat, states)
   err <- "is.data.frame\\(dt\\) is not TRUE"
@@ -308,6 +374,3 @@ test_that("States are located in a data frame", {
   expect_error(.stateColumnIndex(mtcars, states), 
                "No column with elements in states.")
 })
-
-
-
