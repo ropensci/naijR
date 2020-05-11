@@ -24,8 +24,16 @@ globalVariables(".")
 #' A map of the Federal Republic of Nigeria.
 #' 
 #' @details This function is essentially a wrapper to \code{maps::map}.
-#'
-#' @import rlang
+#' 
+#' @importFrom rlang !!
+#' @importFrom rlang as_name
+#' @importFrom rlang enexpr
+#' @importFrom rlang enquo
+#' @importFrom rlang eval_tidy
+#' @importFrom rlang expr
+#' @importFrom rlang is_false
+#' @importFrom rlang is_null
+#' @importFrom rlang is_symbol
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom magrittr %>%
@@ -37,12 +45,16 @@ globalVariables(".")
 #' map, where internal boundaries are not drawn.
 #' @param data An object containing data, principally the variables required to
 #' plotted in a map.
-#' @param value The value to be presented for choropleth mapping, usually a
-#' \code{factor}. If numerical, depending on the size of \code{range(value)},
-#' will be appropriately sized categories, or as defined by \code{breaks}.
-#' @param breaks Categories to be plotted on a map (applicable only 
-#' to choropleth maps).
-#' @param categories The name of the choropleth-plotted categories. If not 
+#' @param value Factor (or an object coercible to one) or numeric. If numerical, 
+#' and depending on the size of \code{range(value)}, it will segregated into 
+#' appropriately sized categories, or as defined by \code{breaks}.
+#' @param breaks Numeric. A vector of length >= 1. If a single value i.e.
+#' scalar, it denote the expected number of breaks. Internally, the function
+#' will attempt to compute approprate category sizes or fail if out-of bounds. 
+#' Where length is >= 3L, it is expected to be an arithmetic sequence that 
+#' represents category bounds as for \code{\link[base]{cut}} (applicable 
+#' only to choropleth maps).
+#' @param categories The legend for the choropleth-plotted categories. If not 
 #' defined, internally created labels are used.
 #' @param col Colour to be used for the plot. For plain plots, this works just
 #' as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
@@ -99,23 +111,39 @@ map_ng <- function(state = character(),
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
-  value <- enexpr(value)
-  make.chrplth <- .validateChoroplethParams(state, data, !!value)
-  if (is.null(col) && is_false(make.chrplth))
+  value <- if (is.null(data) && !is_null(value))
+    enquo(value) 
+  else 
+    enexpr(value)
+  chrplth <- if (is_null(value) || is_symbol(value)) {
+    .validateChoroplethParams(state, data, !!value)  # TODO: Refactor
+  } else {
+    value <- eval_tidy(value)
+    .validateChoroplethParams(state, data, value)
+  }
+  if (is.null(col) && is_false(chrplth))
     col <- 1L
   database <- .getMapData(state)
   mapq <- expr(map(database, regions = state, col = col, fill = fill, ...))
-  if (make.chrplth) {
-    st.ind <- .stateColumnIndex(data, state)
-    st.column <- data[[st.ind]]
-    inputList <-
+  if (chrplth) {
+    if (!is.null(data)) {
+      vl.col <- as_name(value)
+      st.col <- .stateColumnIndex(data, state)
+      cValue <-  data[[vl.col]]
+      cStates <- data[[st.col]]
+    }
+    else {
+      cStates <- state
+      cValue <- value
+    }
+    cParams <-
       list(
-        state = st.column,
-        value = data[, as_name(value)],
+        state = cStates,
+        value = cValue,   
         breaks = breaks,
         categories = categories
       )
-    cOpts <- .prepareChoroplethOptions(database, inputList, col)
+    cOpts <- .prepareChoroplethOptions(database, cParams, col)
     col <- cOpts$colors
     fill <- TRUE
   }
@@ -134,12 +162,16 @@ map_ng <- function(state = character(),
   }
   else
     eval_tidy(mapq)
-  if (make.chrplth) {
-    dots <- list(...)
-    params <- names(dots)
-    if ('plot' %in% params)
-      if (is_false(dots$plot))
-        return(invisible(mp))
+  
+  # Capture 'dots' and return visible 
+  # 'map' object if `plot == FALSE`
+  dots <- list(...)
+  params <- names(dots)
+  if ('plot' %in% params)
+    if (is_false(dots$plot))
+      return(mp)
+  
+  if (chrplth) {
     if (is.null(categories))
       categories <- cOpts$bins
     legend(x = 12, y = 5, legend = categories, fill = cOpts$scheme, xpd = NA)
@@ -154,18 +186,18 @@ map_ng <- function(state = character(),
 
 
 
-
+#' @importFrom rlang abort
 .processStateParam <- function(s)
 {
   if (!identical(s, character()))
     if (!is.character(s) && !is.null(s))
-      stop("Type of argument supplied to 'state' is invalid.")
+      abort("Type of argument supplied to 'state' is invalid.")
   all.st <- states(all = TRUE)
   if (is.character(s)) {
     if (length(s) == 0L)
       s <- all.st
     if (!all(s %in% all.st))
-      stop("One or more elements of 'state' is not a Nigerian state")
+      abort("One or more elements of 'state' is not a Nigerian state")
   }
   if (is.null(s))
     s <- "Nigeria"
@@ -178,6 +210,7 @@ map_ng <- function(state = character(),
 
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
+#' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
 .validateChoroplethParams <- function(state = NULL, data = NULL, val = NULL)
 {
@@ -187,7 +220,7 @@ map_ng <- function(state = character(),
     return(FALSE)
   arg <- enexpr(val)
   if (!no.state &&
-      is.character(state) && is_state(state) && !is.null(arg))
+      is.character(state) && is_state(state) && !is_null(arg))
     return(TRUE)
   if (!is.data.frame(data))
     return(FALSE)
@@ -231,6 +264,16 @@ map_ng <- function(state = character(),
 
 
 
+# For possible export later
+.shpLayer <- "nga_admbnda_adm1_osgof_20161215"
+
+
+
+
+
+
+#' @importFrom rlang abort
+#' @importFrom rlang warn
 .stateColumnIndex <- function(dt, s = NULL)
 {
   stopifnot(is.data.frame(dt))
@@ -245,7 +288,7 @@ map_ng <- function(state = character(),
       FALSE
   }, logical(1))
   if (!sum(n))
-    stop(sprintf("No column with elements in %s.", deparse(substitute(s))))
+    abort(sprintf("No column with elements in %s.", deparse(substitute(s))))
   if (sum(n) > 1)
     warning("Multiple columns have States, so the first is used")
   which(n)[1]
@@ -258,7 +301,7 @@ map_ng <- function(state = character(),
 
 
 
-
+#' @importFrom rlang abort
 .prepareChoroplethOptions <-
   function(map, opts, col = NULL)
   {
@@ -266,25 +309,29 @@ map_ng <- function(state = character(),
     # TODO: Accept numeric input for col
     stopifnot(inherits(map, 'map'))
     if(!.assertListElements(opts))
-      stop("One or more inputs for generating choropleth options are invalid")
-    mapstates <- .getUniqueStateNames(map)
+      abort("One or more inputs for generating choropleth options are invalid")
     brks <- opts$breaks
-    colrange <- .processColouring(col, brks)
-    dframe <-
+    df <-
       data.frame(
         state = opts$state,
         value = opts$value,
         stringsAsFactors = FALSE
       )
-    dframe$cats <- cut(dframe$value, brks, include.lowest = TRUE)
-    ind <- findInterval(dframe$value, brks, all.inside = TRUE)
-    dframe$color <- colrange[ind]
-    newind <- order(dframe$state, mapstates)
-    dframe <- dframe[newind, ]
-    colors <- .reassignColours(map$names, dframe$state, dframe$color)
+    df$cat <- .createCategorized(df$value, brks)
+    cats <- levels(df$cat)
+    colrange <- .processColouring(col, length(cats))
+    
+    # At this point, our value of 
+    # interest is definitely a factor
+    df$ind <- as.integer(df$cat)
+    df$color <- colrange[df$ind]
+    mapstates <- .getUniqueStateNames(map)
+    new.ind <- order(df$state, mapstates)
+    ord.df <- df[new.ind, ]    # This is why a data frame was made
+    colors <- .reassignColours(map$names, ord.df$state, ord.df$color)
     list(colors = colors,
          scheme = colrange,
-         bins = levels(dframe$cats))
+         bins = cats)
   }
 
 
@@ -292,14 +339,25 @@ map_ng <- function(state = character(),
 
 
 
-
+#' @import magrittr
 .assertListElements <- function(x) {
   stopifnot(c('state', 'value', 'breaks') %in% names(x))
-  category.is.char <- 
-    if (!is.null(x$categories)) 
-      is.character(x$categories) 
-    else TRUE
-  all(is_state(x$state), is.numeric(x$value), category.is.char)
+  state.valid <- is_state(x$state)
+  value.valid <- 
+    x$value %>% 
+    {
+      is.numeric(.) || is.factor(.) || is.character(.)
+    }
+  cat.valid <-
+    x$categories %>%
+    {
+      if (!is.null(.))
+        is.character(.) || is.factor(.)
+      else
+        TRUE
+    }
+  
+  all(state.valid, value.valid, cat.valid)
 }
 
 
@@ -317,12 +375,47 @@ map_ng <- function(state = character(),
 
 
 
+
+# Creates a  categorised variable from its inputs if not already a factor
+# and is to be used in generating choropleth maps
+#' @importFrom rlang abort
+#' @importFrom rlang is_scalar_integer
+.createCategorized <- function(val, brks = NULL, ...)
+{
+  if (is.character(val))
+    val <- as.factor(val)
+  if (is.factor(val)) {
+    if (length(levels(val)) >= 10L)
+      abort("Too many categories")
+    return(val)
+  }
+  if (is.numeric(val)) {
+    if (is.null(brks))
+      abort("Breaks were not provided for the categorization of a numeric type")
+    rr <- range(val)
+    if (is_scalar_integer(brks))
+      brks <- seq(rr[1], rr[2], diff(rr) / brks)
+    if (rr[1] < min(brks) || rr[2] > max(brks))
+      abort("Values are out of range of breaks")
+    return(cut(val, brks, include.lowest = TRUE))
+  }
+  msg <- paste(sQuote(typeof(val)), "is not a supported type")
+  abort(msg)
+}
+
+
+
+
+
+
+
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom RColorBrewer brewer.pal.info
 #' @importFrom grDevices palette
 #' @importFrom magrittr %>%
+#' @importFrom rlang abort
 #' @importFrom tools toTitleCase
-.processColouring <- function(color = NULL, breaks)
+.processColouring <- function(color = NULL, n)
 {
   .DefaultChoroplethColours <- getOption('choropleth.colours')
   if (is.null(color))
@@ -332,7 +425,7 @@ map_ng <- function(state = character(),
       sub("(green)(3)", "\\1", .) %>% 
       sub("gray", "grey", .)
     if (!color %in% seq_along(all.cols))
-      stop(sprintf("'color' must range between 1L and %iL", length(all.cols)))
+      abort(sprintf("'color' must range between 1L and %iL", length(all.cols)))
     color <- all.cols[color]
   }
   among.def.cols <- color %in% .DefaultChoroplethColours
@@ -340,24 +433,41 @@ map_ng <- function(state = character(),
   pal <-
     if (!among.def.cols) {
       if (!in.other.pal)
-        stop(
-          sprintf("'%s' is not one of the supported colours or palettes", color)
+        abort(
+          sprintf("'%s' is not a supported colour or palette", color)
         )
       color
     }
     else
       paste0(tools::toTitleCase(color), "s")
-  RColorBrewer::brewer.pal(length(breaks) - 1, pal)
+  RColorBrewer::brewer.pal(n, pal)
 }
 
 
 
 
 
+# .generateCatIndices <- function(val, brks = NULL)
+# {
+#   i <- if (is.factor(val))
+#     as.integer(val)
+#   else if (is.numeric(val))
+#     findInterval(val, brks, all.inside = TRUE)
+#   else
+#     stop(sprintf("'%s' is not supported.", typeof(val)))
+#   invisible(i)
+# }
 
+
+
+
+
+# Reassigns colours to polygons that refer to similar regions i.e. duplicated
+# polygon, ensuring that when the choropleth is drawn, the colours are 
+# properly applied to the respective regions and not recycled.
 .reassignColours <- function(names, states, in.colours)
 {
-  stopifnot(is.character(names), is_state(states), .assertHexColor(in.colours))
+  stopifnot(is.character(names), is_state(states), .isHexColor(in.colours))
   out.colours <- new.names <- rep(NA, length(names))
   for (i in seq_along(states)) {
     regx <- .regexDuplicatedPolygons(states[i])
@@ -373,8 +483,9 @@ map_ng <- function(state = character(),
 
 
 
-# Provided a regex pattern for checking polygons for jurisdictions that
+# Provides a regex pattern for checking polygons for jurisdictions that
 # are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
+# TODO: DEPRECATE.
 .regexDuplicatedPolygons <- function(x)
 {
   stopifnot(is.character(x))
@@ -389,9 +500,9 @@ map_ng <- function(state = character(),
 
 
 
-.assertHexColor <- function(x) 
+.isHexColor <- function(x) 
 {
-  stopifnot(is.character(x))
+  if (!is.character(x)) return(FALSE)
   all(grepl("^#", x), nchar(x) == 7L)
 }
 
@@ -399,7 +510,8 @@ map_ng <- function(state = character(),
 
 
 
-
+# Rejigs text that is used for labeling a region that has more than 1 polygon
+# NOTE: Quite a bit of hard-coding was used (v. 0.1.0) and should be reviewed
 #' @importFrom magrittr %>%
 .adjustLabels <- function(x) 
 {
@@ -440,11 +552,3 @@ map_ng <- function(state = character(),
 #   vec[start] <- character(1L)
 #   vec
 # }
-
-
-
-
-
-
-# For possible export later
-.shpLayer <- "nga_admbnda_adm1_osgof_20161215"

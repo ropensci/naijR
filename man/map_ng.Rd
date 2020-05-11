@@ -16,14 +16,18 @@ map, where internal boundaries are not drawn.}
 \item{data}{An object containing data, principally the variables required to
 plotted in a map.}
 
-\item{value}{The value to be presented for choropleth mapping, usually a
-\code{factor}. If numerical, depending on the size of \code{range(value)},
-will be appropriately sized categories, or as defined by \code{breaks}.}
+\item{value}{Factor (or an object coercible to one) or numeric. If numerical, 
+and depending on the size of \code{range(value)}, it will segregated into 
+appropriately sized categories, or as defined by \code{breaks}.}
 
-\item{breaks}{Categories to be plotted on a map (applicable only 
-to choropleth maps).}
+\item{breaks}{Numeric. A vector of length >= 1. If a single value i.e.
+scalar, it denote the expected number of breaks. Internally, the function
+will attempt to compute approprate category sizes or fail if out-of bounds. 
+Where length is >= 3L, it is expected to be an arithmetic sequence that 
+represents category bounds as for \code{\link[base]{cut}} (applicable 
+only to choropleth maps).}
 
-\item{categories}{The name of the choropleth-plotted categories. If not 
+\item{categories}{The legend for the choropleth-plotted categories. If not 
 defined, internally created labels are used.}
 
 \item{col}{Colour to be used for the plot. For plain plots, this works just
