@@ -6,7 +6,9 @@
 \usage{
 map_ng(state = character(), data = NULL, value = NULL,
   breaks = NULL, categories = NULL, col = NULL, fill = FALSE,
-  show.neighbours = FALSE, show.text = FALSE, ...)
+  title = NULL, caption = NULL, show.neighbours = FALSE,
+  show.text = FALSE, leg.x = 13L, leg.y = 7L, leg.title,
+  leg.orient = c("vertical", "horizontal"), ...)
 }
 \arguments{
 \item{state}{A character vector of a list of Nigerian States to be displayed.
@@ -40,10 +42,23 @@ modified by the user.}
 \item{fill}{Logical. Whether to colour the plotted map region(s). When 
 drawing a choropleth map \code{fill == TRUE} is implied.}
 
-\item{show.neighbours}{logical; \code{TRUE} to display borders of
+\item{title}{Character vector of length 1.}
+
+\item{caption}{Character vector of length 1.}
+
+\item{show.neighbours}{Logical; \code{TRUE} to display borders of
 neighbouring countries.}
 
 \item{show.text}{Logical. Apply labels to the regions of the map.}
+
+\item{leg.x}{Numeric. Position of the legend.}
+
+\item{leg.y}{Numeric. Position of the legend.}
+
+\item{leg.title}{Character. The legend Title}
+
+\item{leg.orient}{The orientation of the legend i.e. whether horizontal or
+vertical.}
 
 \item{...}{Further arguments for function \code{\link[maps]{map}}}
 }
@@ -56,11 +71,10 @@ map and which can be used for additional calls to \code{\link[maps]{map}} or
 other similar functions (e.g. \code{\link[graphics]{plot}}).
 }
 \description{
-A map of the Federal Republic of Nigeria.
+Maps of the Federal Republic of Nigeria that are based on the basic
+plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
 }
 \details{
-This function is essentially a wrapper to \code{maps::map}.
-
 ...
 }
 \note{

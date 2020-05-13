@@ -21,9 +21,8 @@ globalVariables(".")
 
 #' Map of Nigeria
 #'
-#' A map of the Federal Republic of Nigeria.
-#' 
-#' @details This function is essentially a wrapper to \code{maps::map}.
+#' Maps of the Federal Republic of Nigeria that are based on the basic
+#' plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
 #' 
 #' @importFrom rlang !!
 #' @importFrom rlang as_name
@@ -63,8 +62,15 @@ globalVariables(".")
 #' checked with \code{getOption("choropleth.colours")} and can indeed be 
 #' modified by the user.
 #' @param fill Logical. Whether to colour the plotted map region(s). When 
-#' drawing a choropleth map \code{fill == TRUE} is implied. 
-#' @param show.neighbours logical; \code{TRUE} to display borders of
+#' drawing a choropleth map \code{fill == TRUE} is implied.
+#' @param title Character vector of length 1.
+#' @param caption Character vector of length 1.
+#' @param leg.x Numeric. Position of the legend.
+#' @param leg.y Numeric. Position of the legend.
+#' @param leg.title Character. The legend Title
+#' @param leg.orient The orientation of the legend i.e. whether horizontal or
+#' vertical.
+#' @param show.neighbours Logical; \code{TRUE} to display borders of
 #' neighbouring countries.
 #' @param show.text Logical. Apply labels to the regions of the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
@@ -96,8 +102,14 @@ map_ng <- function(state = character(),
                    categories = NULL,
                    col = NULL,
                    fill = FALSE,
+                   title = NULL,
+                   caption = NULL,
                    show.neighbours = FALSE,
                    show.text = FALSE,
+                   leg.x = 13L,
+                   leg.y = 7L,
+                   leg.title,
+                   leg.orient = c('vertical', 'horizontal'),
                    ...)
 {
   ## NOTE: In the call to map.text, the name 'database' is actually
@@ -146,6 +158,9 @@ map_ng <- function(state = character(),
     cOpts <- .prepareChoroplethOptions(database, cParams, col)
     col <- cOpts$colors
     fill <- TRUE
+    lego <- match.arg(leg.orient)
+    horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
+    leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
   mp <- if (show.text) {
     if (!identical(state, 'Nigeria')) {
@@ -174,8 +189,17 @@ map_ng <- function(state = character(),
   if (chrplth) {
     if (is.null(categories))
       categories <- cOpts$bins
-    legend(x = 12, y = 5, legend = categories, fill = cOpts$scheme, xpd = NA)
+    legend(
+      x = leg.x,
+      y = leg.y,
+      legend = categories,
+      fill = cOpts$scheme,
+      xpd = NA,
+      horiz = horiz,
+      title = leg.tit
+    )
   }
+  title(title, caption)
   invisible(mp)
 }
 
