@@ -76,32 +76,6 @@ test_that("Decision is made on drawing choropleths", {
   expect_false(.validateChoroplethParams(state = '.'))
 })
 
-test_that("'map' object is properly created", {
-  mp1 <- map_ng(plot = FALSE)
-  mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
-  mp.lb <- map_ng(plot = FALSE)
-  
-  expect_is(mp1, 'map')
-  expect_is(mp.lb, 'map')
-  expect_type(mp1, 'list')
-  expect_s3_class(mp1, 'map')
-  expect_length(mp1, 4L)
-  expect_identical(names(mp1), c("x", "y", 'range', 'names'))
-  expect_length(mp1$names, 41)
-  expect_true(identical(mp1$x, mp2$x))
-  expect_true(identical(mp1$y, mp2$y))
-  expect_false(length(mp1$x) < length(mp2$x))
-  expect_false(length(mp1$y) < length(mp2$y))
-  expect_true(all(mp1$x %in% mp2$x))
-  expect_true(all(mp1$y %in% mp2$y))
-  
-  rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
-  expect_equal(signif(mp1$range, 7), rng)
-  expect_equal(signif(mp2$range, 7), rng)
-  
-  for (i in states()) expect_match(mp2$names, i, all = FALSE)
-})
-
 test_that("Subnational divisions are plotted", {
   sw <- map_ng(state = states('sw'), plot = FALSE)
   
@@ -362,4 +336,38 @@ test_that("States' columns are searchable within a data frame", {
   expect_error(.stateColumnIndex(NULL, states), err)
   expect_error(.stateColumnIndex(mtcars, states), 
                "No column with elements in states.")
+})
+
+test_that("'map' object is properly created", {
+  mp1 <- map_ng(plot = FALSE)
+  mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
+  mp.lb <- map_ng(plot = FALSE)
+  mm <- 'map'
+  rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
+  
+  expect_is(mp1, mm)
+  expect_is(mp.lb, mm)
+  expect_type(mp1, 'list')
+  expect_s3_class(mp1, mm)
+  expect_length(mp1, 4L)
+  expect_identical(names(mp1), c("x", "y", 'range', 'names'))
+  expect_length(mp1$names, 41)
+  expect_true(identical(mp1$x, mp2$x))
+  expect_true(identical(mp1$y, mp2$y))
+  expect_false(length(mp1$x) < length(mp2$x))
+  expect_false(length(mp1$y) < length(mp2$y))
+  expect_true(all(mp1$x %in% mp2$x))
+  expect_true(all(mp1$y %in% mp2$y))
+  expect_equal(signif(mp1$range, 7), rng)
+  expect_equal(signif(mp2$range, 7), rng)
+  for (i in states()) 
+    expect_match(mp2$names, i, all = FALSE)
+})
+
+test_that("Parameters passed via ellipsis work seamlessly", {
+  mm <- 'map'
+  
+  expect_is(map_ng(lwd = 2, plot = FALSE), mm)
+  expect_is(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
+  expect_is(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), mm)
 })
