@@ -7,12 +7,13 @@
 lgas_ng(ng.state = NA_character_)
 }
 \arguments{
-\item{ng.state}{Character vector of length 1, whose value is the name of a
-State in the Federation of Nigeria. Default is \code{NA_character_}, in 
-which case all the countrys '774 Local Government Areas will be returned.}
+\item{ng.state}{Character; State(s) in the Federation of Nigeria. Default is
+\code{NA_character_}.}
 }
 \value{
-A character vector containing the names of Local Government Areas.
+If length of \code{ng.state} == 1L, a character vector containing 
+the names of Local Government Areas; otherwise a named list whose elements 
+are character vectors of the LGAs in each state.
 }
 \description{
 List Local Government Areas
@@ -27,4 +28,5 @@ how_many_lgas <- function(state) {
 }
 how_many_lgas("Sokoto")
 how_many_lgas("Ekiti")
+
 }
