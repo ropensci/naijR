@@ -4,23 +4,21 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(state = character(), data = NULL, value = NULL,
+map_ng(state = character(), data = NULL, x = NULL, y = NULL,
   breaks = NULL, categories = NULL, col = NULL, fill = FALSE,
   title = NULL, caption = NULL, show.neighbours = FALSE,
   show.text = FALSE, leg.x = 13L, leg.y = 7L, leg.title,
   leg.orient = c("vertical", "horizontal"), ...)
 }
 \arguments{
-\item{state}{A character vector of a list of Nigerian States to be displayed.
-The default value is to print all States. \code{NULL} will print an outline
-map, where internal boundaries are not drawn.}
+\item{state}{A character vector of a list of Nigerian States to be displayed.}
 
 \item{data}{An object containing data, principally the variables required to
 plotted in a map.}
 
-\item{value}{Factor (or an object coercible to one) or numeric. If numerical, 
-and depending on the size of \code{range(value)}, it will segregated into 
-appropriately sized categories, or as defined by \code{breaks}.}
+\item{x}{Numeric object or factor (or coercible to one). See \emph{Details}.}
+
+\item{y}{Numeric. See \emph{Details}}
 
 \item{breaks}{Numeric. A vector of length >= 1. If a single value i.e.
 scalar, it denote the expected number of breaks. Internally, the function
@@ -32,12 +30,7 @@ only to choropleth maps).}
 \item{categories}{The legend for the choropleth-plotted categories. If not 
 defined, internally created labels are used.}
 
-\item{col}{Colour to be used for the plot. For plain plots, this works just
-as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
-provided represents a (sequential) colour palette based on 
-\code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
-checked with \code{getOption("choropleth.colours")} and can indeed be 
-modified by the user.}
+\item{col}{Colour to be used for the plot.}
 
 \item{fill}{Logical. Whether to colour the plotted map region(s). When 
 drawing a choropleth map \code{fill == TRUE} is implied.}
@@ -75,7 +68,23 @@ Maps of the Federal Republic of Nigeria that are based on the basic
 plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
 }
 \details{
-...
+The default value for \code{state} is to print all States. 
+\code{NULL} will print an outline map, i.e. without internal boundaries.
+\code{data} enables the extraction of data for plotting from an object
+of class \code{data.frame}. Columns containing States are identified. The
+argument also provided context for quasiquotation when providing the 
+\code{x} and {y} arguments.
+For \code{x} and \code{y}, when both arguments are supplied, they are taken
+to be point coordinates and are plotted as such. If only \code{x} is supplied,
+it is presumed that the intention is to make a choropleth map, and thus, 
+numeric vector arguments are converted into factors i.e. number classes. 
+Otherwise factors or any object that can be coerced to a factor should be used.
+For plain plots, the \code{col} argument works the same as with
+\code{\link[maps]{map}} and variants. For choropleth maps, the colour
+provided represents a (sequential) colour palette based on 
+\code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
+checked with \code{getOption("choropleth.colours")} and this can also be 
+modified by the user.
 }
 \note{
 When adjusting the default colour choiced for choropleth maps, it is

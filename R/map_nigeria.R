@@ -35,18 +35,16 @@ globalVariables(".")
 #' @importFrom rlang is_symbol
 #' @importFrom graphics legend
 #' @importFrom graphics par
+#' @importFrom graphics points
 #' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
 #' @param state A character vector of a list of Nigerian States to be displayed.
-#' The default value is to print all States. \code{NULL} will print an outline
-#' map, where internal boundaries are not drawn.
 #' @param data An object containing data, principally the variables required to
 #' plotted in a map.
-#' @param value Factor (or an object coercible to one) or numeric. If numerical, 
-#' and depending on the size of \code{range(value)}, it will segregated into 
-#' appropriately sized categories, or as defined by \code{breaks}.
+#' @param x Numeric object or factor (or coercible to one). See \emph{Details}.
+#' @param y Numeric. See \emph{Details}
 #' @param breaks Numeric. A vector of length >= 1. If a single value i.e.
 #' scalar, it denote the expected number of breaks. Internally, the function
 #' will attempt to compute approprate category sizes or fail if out-of bounds. 
@@ -55,12 +53,7 @@ globalVariables(".")
 #' only to choropleth maps).
 #' @param categories The legend for the choropleth-plotted categories. If not 
 #' defined, internally created labels are used.
-#' @param col Colour to be used for the plot. For plain plots, this works just
-#' as in \code{\link[maps]{map}} and variants. For choropleth maps, the colour
-#' provided represents a (sequential) colour palette based on 
-#' \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
-#' checked with \code{getOption("choropleth.colours")} and can indeed be 
-#' modified by the user.
+#' @param col Colour to be used for the plot. 
 #' @param fill Logical. Whether to colour the plotted map region(s). When 
 #' drawing a choropleth map \code{fill == TRUE} is implied.
 #' @param title Character vector of length 1.
@@ -75,7 +68,23 @@ globalVariables(".")
 #' @param show.text Logical. Apply labels to the regions of the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #' 
-#' @details ...
+#' @details The default value for \code{state} is to print all States. 
+#' \code{NULL} will print an outline map, i.e. without internal boundaries.
+#' \code{data} enables the extraction of data for plotting from an object
+#' of class \code{data.frame}. Columns containing States are identified. The
+#' argument also provided context for quasiquotation when providing the 
+#' \code{x} and {y} arguments.
+#' For \code{x} and \code{y}, when both arguments are supplied, they are taken
+#' to be point coordinates and are plotted as such. If only \code{x} is supplied,
+#' it is presumed that the intention is to make a choropleth map, and thus, 
+#' numeric vector arguments are converted into factors i.e. number classes. 
+#' Otherwise factors or any object that can be coerced to a factor should be used.
+#' For plain plots, the \code{col} argument works the same as with
+#' \code{\link[maps]{map}} and variants. For choropleth maps, the colour
+#' provided represents a (sequential) colour palette based on 
+#' \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
+#' checked with \code{getOption("choropleth.colours")} and this can also be 
+#' modified by the user.
 #' 
 #' @note When adjusting the default colour choiced for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
@@ -97,7 +106,8 @@ globalVariables(".")
 #' @export
 map_ng <- function(state = character(),
                    data = NULL,
-                   value = NULL,
+                   x = NULL,
+                   y = NULL,
                    breaks = NULL,
                    categories = NULL,
                    col = NULL,
@@ -123,30 +133,32 @@ map_ng <- function(state = character(),
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
-  value <- if (is.null(data) && !is_null(value))
-    enquo(value) 
+  value.x <- if (is_null(data) && !is_null(x))
+    enquo(x) 
   else 
-    enexpr(value)
-  chrplth <- if (is_null(value) || is_symbol(value)) {
-    .validateChoroplethParams(state, data, !!value)  # TODO: Refactor
+    enexpr(x)
+  chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
+    .validateChoroplethParams(state, data, !!value.x)  # TODO: Refactor
   } else {
-    value <- eval_tidy(value)
-    .validateChoroplethParams(state, data, value)
+    value.x <- eval_tidy(value.x)
+    .validateChoroplethParams(state, data, value.x)
   }
+  if (!is_null(y))
+    chrplth <- FALSE
   if (is.null(col) && is_false(chrplth))
     col <- 1L
   database <- .getMapData(state)
   mapq <- expr(map(database, regions = state, col = col, fill = fill, ...))
   if (chrplth) {
     if (!is.null(data)) {
-      vl.col <- as_name(value)
+      vl.col <- as_name(value.x)
       st.col <- .stateColumnIndex(data, state)
       cValue <-  data[[vl.col]]
       cStates <- data[[st.col]]
     }
     else {
       cStates <- state
-      cValue <- value
+      cValue <- value.x
     }
     cParams <-
       list(
@@ -170,13 +182,15 @@ map_ng <- function(state = character(),
           ind <- unlist(is)
           .[ind]
         } %>%
-        .adjustLabels()
+        .adjustLabels
     }
-    map.text(database, regions = state, labels = txt, col = col, fill = fill, ...)
-    # mapq[[1]] <- sym('map.text')  TODO: put off for now
+    map.text(database, state, labels = txt, col = col, fill = fill, ...)
   }
   else
     eval_tidy(mapq)
+  if(!is_null(y))
+    if (!.xyWithinBounds(mp, x, y))
+      stop("Coordinates are out of bounds of the map")
   
   # Capture 'dots' and return visible 
   # 'map' object if `plot == FALSE`
@@ -199,6 +213,8 @@ map_ng <- function(state = character(),
       title = leg.tit
     )
   }
+  else if(!is_null(y))
+    points(x, y, pch = "+") 
   title(title, caption)
   invisible(mp)
 }
@@ -471,20 +487,6 @@ map_ng <- function(state = character(),
 
 
 
-# .generateCatIndices <- function(val, brks = NULL)
-# {
-#   i <- if (is.factor(val))
-#     as.integer(val)
-#   else if (is.numeric(val))
-#     findInterval(val, brks, all.inside = TRUE)
-#   else
-#     stop(sprintf("'%s' is not supported.", typeof(val)))
-#   invisible(i)
-# }
-
-
-
-
 
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
@@ -568,11 +570,16 @@ map_ng <- function(state = character(),
 
 
 
-# # TODO: Review this approach
-# .toggleEmpties <- function(vec, start, pos) {
-#   stopifnot(is.character(vec), is.numeric(pos))
-#   pos <- pos - start
-#   vec[pos] <- vec[start]
-#   vec[start] <- character(1L)
-#   vec
-# }
+
+# Checks that x and y coordinates are withing the bounds of given map
+# Note: This check is probably too expensive. Conider passing just the range
+# though the loss of typing may make this less reliable down the line
+#' @importFrom rlang is_double
+.xyWithinBounds <- function(map, x, y)
+{ 
+  stopifnot(inherits(map, 'map'), is_double(x), is_double(y))
+  rr <- map$range
+  xx <- x >= rr[1] & x <= rr[2]
+  yy <- y >= rr[3] & y <= rr[4]
+  all(xx, yy)
+}

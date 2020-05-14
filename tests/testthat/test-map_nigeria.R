@@ -240,7 +240,7 @@ test_that("Choropleth mapping succeeds", {
   expect_is(
     map_ng(
       data = dat, 
-      value = total.pop, 
+      x = total.pop, 
       breaks = pop.groups,
       categories = cat,
       plot = FALSE), 
@@ -248,7 +248,7 @@ test_that("Choropleth mapping succeeds", {
   
   expect_is(map_ng(
     state = dat$state,
-    value = dat$total.pop,
+    x = dat$total.pop,
     breaks = pop.groups,
     plot = FALSE
   ),
@@ -256,7 +256,7 @@ test_that("Choropleth mapping succeeds", {
   
   expect_error(
     map_ng(state = dat$state,
-           value = dat$total.pop,
+           x = dat$total.pop,
            plot = FALSE),
     "Breaks were not provided for the categorization of a numeric type"
   )
@@ -264,7 +264,7 @@ test_that("Choropleth mapping succeeds", {
   expect_error(
     map_ng(
       data = dat,
-      value = val,         # no such name in data frame
+      x = val,         # no such name in data frame
       breaks = pop.groups,
       category = cat,
       col = 2L,
@@ -274,7 +274,7 @@ test_that("Choropleth mapping succeeds", {
   expect_is(
     map_ng(
       data = dat,
-      value = total.pop,
+      x = total.pop,
       breaks = pop.groups,
       plot = FALSE,
       fill = FALSE
@@ -282,7 +282,7 @@ test_that("Choropleth mapping succeeds", {
     "Choropleths should be deductively drawn even when `fill == FALSE`")
   
   expect_is(map_ng(data = dat,
-                   value = alpha,
+                   x = alpha,
                    plot = FALSE),
             'map')
 })
@@ -291,7 +291,7 @@ test_that("Choropleth colours can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
   func <- expr(map_ng(
     data = dat,
-    value = total.pop,
+    x = total.pop,
     breaks = c(1000000, 2500000, 5000000, 7500000, 10000000),
     categories = c("Small", "Moderate", "Large", "Mega"),
     plot = FALSE,
@@ -338,6 +338,17 @@ test_that("States' columns are searchable within a data frame", {
                "No column with elements in states.")
 })
 
+test_that("Bounds for plotting points are checked", {
+  x <- c(3.000, 4.000, 6.000)
+  y <- c(6.000, 9.000, 4.300)
+  m <- map_ng(NULL, plot = FALSE)
+  
+  expect_true(.xyWithinBounds(m, x, y))
+  x[4] <- -3; y[4] <- 1000
+  expect_false(.xyWithinBounds(m, x, y))
+  
+})
+
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
   mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
@@ -362,6 +373,17 @@ test_that("'map' object is properly created", {
   expect_equal(signif(mp2$range, 7), rng)
   for (i in states()) 
     expect_match(mp2$names, i, all = FALSE)
+})
+
+test_that("Points are mapped", {
+  x <- c(3.000, 4.000, 6.000)
+  y <- c(6.000, 9.000, 4.300)
+  
+  expect_is(map_ng(NULL, x = x, y = y, plot = FALSE), 'map')
+  
+  x[4] <- -3; y[4] <- 1000
+  expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
+               "Coordinates are out of bounds of the map")
 })
 
 test_that("Parameters passed via ellipsis work seamlessly", {
