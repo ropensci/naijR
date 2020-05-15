@@ -2,3 +2,4 @@
 .Rhistory
 .Rbuildignore
 sandbox
+inst/doc

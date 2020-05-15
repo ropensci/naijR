@@ -1,0 +1,43 @@
+---
+title: "nigeria-maps"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nigeria-maps}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(naijR)
+```
+The need for relatively easy-to-use tools for mapping data on Nigeria was one of the motivations behind the development of this package. Not so much of low-level programming was done; rather a collection of pre-existing packages and idioms from the R ecosystem were employed and brought together to enable the user focus more on the actual visualization of data on the country map instead of the programming.
+
+The key function for drawing Nigeria maps is called `map_ng()`. This uses data from the CIA World Database provided by the `mapdata` package to draw a simple outline map of Nigeria. This functionality was used in the initial release of this package and has been maintained as the default map.
+
+```{r original-map}
+map_ng()
+```
+
+
+At the time of writing this, there are 3 broad categories of maps had been enabled. They are:
+
+1. Plain maps of the entire country and or states.
+2. Plain maps with sub-national boundaries shown.
+3. Coloured maps, notably choropleths
+
+The flavour of geo-spatial data used in the package is of the vector type--and of these, it uses *point* and *polygon* data (the use *line* data is planned for future releases).
+
+## Plain maps
+```{r}
+
+```
+
+## Plain maps with boundaries
+## Choropleth maps
