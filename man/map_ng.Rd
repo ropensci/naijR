@@ -4,14 +4,14 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(state = character(), data = NULL, x = NULL, y = NULL,
+map_ng(region = character(), data = NULL, x = NULL, y = NULL,
   breaks = NULL, categories = NULL, col = NULL, fill = FALSE,
   title = NULL, caption = NULL, show.neighbours = FALSE,
   show.text = FALSE, leg.x = 13L, leg.y = 7L, leg.title,
   leg.orient = c("vertical", "horizontal"), ...)
 }
 \arguments{
-\item{state}{A character vector of a list of Nigerian States to be displayed.}
+\item{region}{A character vector of a list of Nigerian States to be displayed.}
 
 \item{data}{An object containing data, principally the variables required to
 plotted in a map.}
@@ -68,7 +68,7 @@ Maps of the Federal Republic of Nigeria that are based on the basic
 plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
 }
 \details{
-The default value for \code{state} is to print all States. 
+The default value for \code{region} is to print all States. 
 \code{NULL} will print an outline map, i.e. without internal boundaries.
 \code{data} enables the extraction of data for plotting from an object
 of class \code{data.frame}. Columns containing States are identified. The

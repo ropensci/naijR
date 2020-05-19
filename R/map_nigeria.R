@@ -40,7 +40,7 @@ globalVariables(".")
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
-#' @param state A character vector of a list of Nigerian States to be displayed.
+#' @param region A character vector of a list of Nigerian States to be displayed.
 #' @param data An object containing data, principally the variables required to
 #' plotted in a map.
 #' @param x Numeric object or factor (or coercible to one). See \emph{Details}.
@@ -68,7 +68,7 @@ globalVariables(".")
 #' @param show.text Logical. Apply labels to the regions of the map.
 #' @param ... Further arguments for function \code{\link[maps]{map}}
 #' 
-#' @details The default value for \code{state} is to print all States. 
+#' @details The default value for \code{region} is to print all States. 
 #' \code{NULL} will print an outline map, i.e. without internal boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
 #' of class \code{data.frame}. Columns containing States are identified. The
@@ -104,7 +104,7 @@ globalVariables(".")
 #' other similar functions (e.g. \code{\link[graphics]{plot}}).
 #'
 #' @export
-map_ng <- function(state = character(),
+map_ng <- function(region = character(),
                    data = NULL,
                    x = NULL,
                    y = NULL,
@@ -129,7 +129,7 @@ map_ng <- function(state = character(),
   ## maps::map used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text`. This is a bug in the
   ## `maps` package.
-  state <- .processStateParam(state)
+  region <- .processStateParam(region)
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
@@ -138,31 +138,31 @@ map_ng <- function(state = character(),
   else 
     enexpr(x)
   chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
-    .validateChoroplethParams(state, data, !!value.x)  # TODO: Refactor
+    .validateChoroplethParams(region, data, !!value.x)  # TODO: Refactor
   } else {
     value.x <- eval_tidy(value.x)
-    .validateChoroplethParams(state, data, value.x)
+    .validateChoroplethParams(region, data, value.x)
   }
   if (!is_null(y))
     chrplth <- FALSE
   if (is.null(col) && is_false(chrplth))
     col <- 1L
-  database <- .getMapData(state)
-  mapq <- expr(map(database, regions = state, col = col, fill = fill, ...))
+  database <- .getMapData(region)
+  mapq <- expr(map(database, regions = region, col = col, fill = fill, ...))
   if (chrplth) {
     if (!is.null(data)) {
       vl.col <- as_name(value.x)
-      st.col <- .stateColumnIndex(data, state)
+      st.col <- .regionColumnIndex(data, region)
       cValue <-  data[[vl.col]]
       cStates <- data[[st.col]]
     }
     else {
-      cStates <- state
+      cStates <- region
       cValue <- value.x
     }
     cParams <-
       list(
-        state = cStates,
+        region = cStates,
         value = cValue,   
         breaks = breaks,
         categories = categories
@@ -175,16 +175,16 @@ map_ng <- function(state = character(),
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
   mp <- if (show.text) {
-    if (!identical(state, 'Nigeria')) {
+    if (!identical(region, 'Nigeria')) {
       txt <- database$name %>%
         {
-          is <- lapply(state, grep, x = .)
+          is <- lapply(region, grep, x = .)
           ind <- unlist(is)
           .[ind]
         } %>%
         .adjustLabels
     }
-    map.text(database, state, labels = txt, col = col, fill = fill, ...)
+    map.text(database, region, labels = txt, col = col, fill = fill, ...)
   }
   else
     eval_tidy(mapq)
@@ -231,13 +231,13 @@ map_ng <- function(state = character(),
 {
   if (!identical(s, character()))
     if (!is.character(s) && !is.null(s))
-      abort("Type of argument supplied to 'state' is invalid.")
+      abort("Type of argument supplied to 'region' is invalid.")
   all.st <- states(all = TRUE)
   if (is.character(s)) {
     if (length(s) == 0L)
       s <- all.st
     if (!all(s %in% all.st))
-      abort("One or more elements of 'state' is not a Nigerian state")
+      abort("One or more elements of 'region' is not a Nigerian region")
   }
   if (is.null(s))
     s <- "Nigeria"
@@ -252,19 +252,19 @@ map_ng <- function(state = character(),
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
-.validateChoroplethParams <- function(state = NULL, data = NULL, val = NULL)
+.validateChoroplethParams <- function(region = NULL, data = NULL, val = NULL)
 {
   # TODO: Add some verbosity.
-  no.state <- is.null(state) || identical(state, "Nigeria")
-  if (no.state && is.null(data))
+  no.region <- is.null(region) || identical(region, "Nigeria")
+  if (no.region && is.null(data))
     return(FALSE)
   arg <- enexpr(val)
-  if (!no.state &&
-      is.character(state) && is_state(state) && !is_null(arg))
+  if (!no.region &&
+      is.character(region) && is_state(region) && !is_null(arg))
     return(TRUE)
   if (!is.data.frame(data))
     return(FALSE)
-  ind <- try(.stateColumnIndex(data), silent = TRUE)
+  ind <- try(.regionColumnIndex(data), silent = TRUE)
   if (inherits(ind, 'try-error'))
     return(FALSE)
   if (is_symbol(arg))
@@ -282,18 +282,18 @@ map_ng <- function(state = character(),
 
 #' @importFrom maps SpatialPolygons2map
 #' @importFrom rgdal readOGR
-.getMapData <- function(state)
+.getMapData <- function(region)
 {
-  if (identical(state, 'Nigeria'))
+  if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  else if (is_state(state)) {
+  else if (is_state(region)) {
     dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
     if (identical(dsn, character(1)))
       stop("The map data could not be found in 'extdata'")
     sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
     return(SpatialPolygons2map(sp, namefield = 'admin1Name'))
   }
-  ss <- paste(state, collapse = ', ')
+  ss <- paste(region, collapse = ', ')
   stop("Invalid region(s) for the map: ", ss)
 }
 
@@ -314,7 +314,7 @@ map_ng <- function(state = character(),
 
 #' @importFrom rlang abort
 #' @importFrom rlang warn
-.stateColumnIndex <- function(dt, s = NULL)
+.regionColumnIndex <- function(dt, s = NULL)
 {
   stopifnot(is.data.frame(dt))
   if (is.null(s))
@@ -353,7 +353,7 @@ map_ng <- function(state = character(),
     brks <- opts$breaks
     df <-
       data.frame(
-        state = opts$state,
+        region = opts$region,
         value = opts$value,
         stringsAsFactors = FALSE
       )
@@ -365,10 +365,10 @@ map_ng <- function(state = character(),
     # interest is definitely a factor
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
-    mapstates <- .getUniqueStateNames(map)
-    new.ind <- order(df$state, mapstates)
+    mapregions <- .getUniqueStateNames(map)
+    new.ind <- order(df$region, mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
-    colors <- .reassignColours(map$names, ord.df$state, ord.df$color)
+    colors <- .reassignColours(map$names, ord.df$region, ord.df$color)
     list(colors = colors,
          scheme = colrange,
          bins = cats)
@@ -381,8 +381,8 @@ map_ng <- function(state = character(),
 
 #' @import magrittr
 .assertListElements <- function(x) {
-  stopifnot(c('state', 'value', 'breaks') %in% names(x))
-  state.valid <- is_state(x$state)
+  stopifnot(c('region', 'value', 'breaks') %in% names(x))
+  region.valid <- is_state(x$region)
   value.valid <- 
     x$value %>% 
     {
@@ -397,7 +397,7 @@ map_ng <- function(state = character(),
         TRUE
     }
   
-  all(state.valid, value.valid, cat.valid)
+  all(region.valid, value.valid, cat.valid)
 }
 
 
@@ -491,12 +491,12 @@ map_ng <- function(state = character(),
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
 # properly applied to the respective regions and not recycled.
-.reassignColours <- function(names, states, in.colours)
+.reassignColours <- function(names, regions, in.colours)
 {
-  stopifnot(is.character(names), is_state(states), .isHexColor(in.colours))
+  stopifnot(is.character(names), is_state(regions), .isHexColor(in.colours))
   out.colours <- new.names <- rep(NA, length(names))
-  for (i in seq_along(states)) {
-    regx <- .regexDuplicatedPolygons(states[i])
+  for (i in seq_along(regions)) {
+    regx <- .regexDuplicatedPolygons(regions[i])
     ind <- grep(regx, names)
     out.colours[ind] <- in.colours[i]
     new.names[ind] <- sub(regx, "\\1", names[ind])[1]
@@ -542,11 +542,11 @@ map_ng <- function(state = character(),
 .adjustLabels <- function(x) 
 {
   stopifnot(is.character(x))
-  .fadj <- function(x, state, pos) {
-    ind <- grep(state, x)
+  .fadj <- function(x, region, pos) {
+    ind <- grep(region, x)
     finalPos <- ind[pos]
     x[ind] <- ""
-    x[finalPos] <- state
+    x[finalPos] <- region
     x
   }
   
