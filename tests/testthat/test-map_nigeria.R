@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 test_that("Input is validated", {
-  myerr1 <- "One or more elements of 'state' is not a Nigerian state"
-  myerr2 <- "Type of argument supplied to 'state' is invalid."
+  myerr1 <- "One or more elements of 'region' is not a Nigerian region"
+  myerr2 <- "Type of argument supplied to 'region' is invalid."
   expect_error(map_ng(999), myerr2)
   expect_is(map_ng(NULL, plot = FALSE), 'map')
   expect_error(map_ng(NA), myerr2)
@@ -27,10 +27,10 @@ test_that("Input is validated", {
   expect_error(map_ng(pi), myerr2)
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
-  # TODO: Add test case for choropleths with too few states
+  # TODO: Add test case for choropleths with too few regions
 })
 
-test_that("Check on 'state' parameter works", {
+test_that("Check on 'region' parameter works", {
   
   expect_equal(.processStateParam(NULL), "Nigeria")
   expect_error(.processStateParam(), 
@@ -38,7 +38,7 @@ test_that("Check on 'state' parameter works", {
   expect_length(.processStateParam(states('se')), 5L)
   expect_length(.processStateParam(character()), 37L)
   expect_error(.processStateParam(c("Abia", "Kano", "Lifebuoy")),
-               "One or more elements of 'state' is not a Nigerian state")
+               "One or more elements of 'region' is not a Nigerian region")
 })
 
 test_that("Choropleth categories are created", {
@@ -70,14 +70,14 @@ test_that("Decision is made on drawing choropleths", {
     factor(sample(LETTERS[1:5], length(x), replace = TRUE)))
   all.ints <- sample(1:5, 37L, replace = T)
   
-  expect_true(.validateChoroplethParams(state = all.states, val = vals$all))
+  expect_true(.validateChoroplethParams(region = all.states, val = vals$all))
   expect_true(.validateChoroplethParams(data = data.frame(nc.states, vals$nc)))
-  expect_true(.validateChoroplethParams(state = all.states, val = all.ints))
-  expect_false(.validateChoroplethParams(state = '.'))
+  expect_true(.validateChoroplethParams(region = all.states, val = all.ints))
+  expect_false(.validateChoroplethParams(region = '.'))
 })
 
 test_that("Subnational divisions are plotted", {
-  sw <- map_ng(state = states('sw'), plot = FALSE)
+  sw <- map_ng(region = states('sw'), plot = FALSE)
   
   expect_length(sw$names, 6L)
   expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
@@ -102,14 +102,14 @@ test_that("Data for mapping are retrieved properly", {
 
 set.seed(4)
 df <-
-  data.frame(state = states(all = TRUE), value = sample(0:6, 37, TRUE),
+  data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE),
              stringsAsFactors = FALSE)
 mp <- map_ng(plot = FALSE)
 brks <- seq(0, 6, 2)
 vals <- df$value
 lso <-
   list(
-    state = df$state,
+    region = df$region,
     value = df[, 'value'],
     breaks = brks,
     category = LETTERS[seq_len(length(brks))]
@@ -172,7 +172,7 @@ test_that("Colours are reassigned when duplicate polygons exist", {
   expect_true(any(duplicated(names(fin.color))))
   expect_equal(sum(duplicated(names(fin.color))), 3L)
   expect_error(.reassignColours(mapnames, not.ng, init.color), 
-               "is_state\\(states\\) is not TRUE")
+               "is_state\\(regions\\) is not TRUE")
   expect_error(
     .reassignColours(mapnames, statenames, rep("NoHexs", length(statenames))),
     ".isHexColor\\(in.colours\\) is not TRUE")
@@ -192,7 +192,7 @@ test_that("Expected colours and related data are prepared", {
   brks <- seq(0, 6, 2)
   obj <-
     list(
-      state = states(),
+      region = states(),
       value = sample(0:6, 37, TRUE),
       breaks = brks,
       categories = LETTERS[seq_len(length(brks))]
@@ -247,7 +247,7 @@ test_that("Choropleth mapping succeeds", {
     'map')
   
   expect_is(map_ng(
-    state = dat$state,
+    region = dat$region,
     x = dat$total.pop,
     breaks = pop.groups,
     plot = FALSE
@@ -255,7 +255,7 @@ test_that("Choropleth mapping succeeds", {
   'map')
   
   expect_error(
-    map_ng(state = dat$state,
+    map_ng(region = dat$state,
            x = dat$total.pop,
            plot = FALSE),
     "Breaks were not provided for the categorization of a numeric type"
@@ -322,20 +322,20 @@ test_that("Duplicated polygon names are made empty", {
 
 test_that("States' columns are searchable within a data frame", {
   dat <- readRDS('data/pvc2015.rds')
-  states <- states()
-  ss <- .stateColumnIndex(dat, states)
+  regions <- states()
+  ss <- .regionColumnIndex(dat, regions)
   err <- "is.data.frame\\(dt\\) is not TRUE"
   
   expect_is(ss, 'integer')
   expect_length(ss, 1L)
-  expect_error(.stateColumnIndex(), 
+  expect_error(.regionColumnIndex(), 
                "argument \"dt\" is missing, with no default")
-  expect_error(.stateColumnIndex(states, states), err)
-  expect_equivalent(.stateColumnIndex(dat, letters), 1L)
-  expect_equivalent(.stateColumnIndex(dat, NULL), 1L)
-  expect_error(.stateColumnIndex(NULL, states), err)
-  expect_error(.stateColumnIndex(mtcars, states), 
-               "No column with elements in states.")
+  expect_error(.regionColumnIndex(regions, regions), err)
+  expect_equivalent(.regionColumnIndex(dat, letters), 1L)
+  expect_equivalent(.regionColumnIndex(dat, NULL), 1L)
+  expect_error(.regionColumnIndex(NULL, regions), err)
+  expect_error(.regionColumnIndex(mtcars, regions), 
+               "No column with elements in regions.")
 })
 
 test_that("Bounds for plotting points are checked", {
@@ -384,6 +384,43 @@ test_that("Points are mapped", {
   x[4] <- -3; y[4] <- 1000
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Coordinates are out of bounds of the map")
+})
+
+test_that("Factors can draw choropleth", {
+  getSmpl <- function(seed) { set.seed(seed); sample(letters[1:5], 37, T) }
+  
+  getDblSmpl <- function(seed = round(runif(100, max = 500))) {
+    set.seed(seed)
+    runif(37, max = 100)
+  }
+  mapClass <- 'map'
+  Fac <- ordered(getSmpl(2))
+  expect_is(map_ng(x = Fac, plot = FALSE), mapClass)
+  
+  Char <- getSmpl(5)
+  expect_is(map_ng(x = Char, plot = FALSE), mapClass)
+  
+  dd <- data.frame(region = states(), Col = Fac, stringsAsFactors = FALSE)
+  expect_is(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
+  
+  expect_is(map_ng(states(), x = Fac, plot = FALSE), mapClass)
+  expect_is(map_ng(states(), x = Char, plot = FALSE), mapClass)
+  
+  Int <- sample(1L:5L, 37, TRUE)
+  expect_error(map_ng(states(), x = Int, plot = FALSE),
+               'Breaks were not provided for the categorization of a numeric type')
+  expect_is(map_ng(states(), x = as.factor(Int), plot = FALSE), mapClass)
+  
+  brks <- c(0, 40, 60, 100)
+  expect_is(map_ng(states(), x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
+  
+  dd$dblCol <- getDblSmpl()
+  qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
+  expect_is(eval(qq), mapClass)
+  qq$categories <- c("Low", "Medium", "High")
+  expect_is(eval(qq), mapClass)
+  qq$col <- "green"
+  expect_is(eval(qq), mapClass)
 })
 
 test_that("Parameters passed via ellipsis work seamlessly", {
