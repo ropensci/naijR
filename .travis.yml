@@ -7,5 +7,5 @@ after_success:
 addons:
   apt:
     packages:
-      - libgdal1h
+      - libgdal1i
       - libgdal-dev
