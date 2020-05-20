@@ -14,69 +14,120 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(naijR)
-```
-The need for relatively easy-to-use tools for mapping data on Nigeria was one of the motivations behind the development of this package. Not so much of low-level programming was done; rather a collection of pre-existing packages and idioms from the R ecosystem were employed and brought together to enable the user focus more on the actual visualization of data on the country map instead of the programming.
+The need for relatively easy-to-use tools in the R statistical environment for mapping data on Nigeria was a motivation for the development of this package. Not so much of low-level programming needs to be done by the user; rather a collection of pre-existing packages and idioms are brought together to enable a focus on actual data visualization.
 
-The key function for drawing Nigeria maps is called `map_ng()`. This uses data from the CIA World Database provided by the `mapdata` package to draw a simple map of Nigeria showing state boundaries.
+The main function for drawing Nigeria maps is `map_ng`. It uses data from the CIA World Database provided by the `mapdata` package as well as ESRI shapefiles from the World Bank to draw a simple maps of Nigeria.
 
 ```{r original-map}
+library(naijR)
+
 map_ng()
 ```
 
-To show a simple outline map without the state borders, set the `region` argument to `NULL`. Thus with all other arguments set to default values, that would be
+To show the map without the state borders, set the first argument (`region`) to `NULL`. Thus, with all other arguments set to default values, that would be
 
 ```{r outline-map}
 map_ng(NULL)
 ```
 
+It is possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
+
+```{r south-west, warning=FALSE}
+map_ng(states("sw"), show.text = TRUE, col = 4)
+```
+
+A single state can also be drawn:
+
+```{r, singleton, warning=FALSE}
+kk <- "Kebbi"
+map_ng(kk, col = 6, fill = TRUE, title = paste(kk, "State"))
+```
+
 ## Choropleth maps
-Choropleth maps, to display regional differences can also be created with `map_ng()`. There are a number of ways through which this can be done,depending on the kind of arguments supplied to the function:
+Choropleth maps that display differences among regions can also be created with `map_ng`. There are a number of ways this can be done, depending on the kind of arguments supplied to the function:
 
 - A data frame containing a column for the regions and at least one other for the data to be displayed, or
-- A vector for the regions and another for the data to be displayed.
+- An atomic vector for the regions and another for the data to be displayed.
 
-This map is built on categorical data (i.e. `factor`s) and atomic vectors that are coercible to this class are accepted. In the case of numeric data, notable those of type `double`, they can be coaxed into categories if class boundaries are provided via the `breaks` argument.
+This map is built on categorical data (i.e. `factor`s); atomic vectors that are coercible to this class are also accepted. In the case of numeric data, notably those of type `double`, they can be coaxed into categories only if class boundaries are provided via the `breaks` argument.
 
-To demonstrate this feature, we will create a data frame with fake data:
+To demonstrate this, we will create a data frame with some meaningless data:
+
 ```{r dud-dataframe}
+# Create variables
 ss <- states()
 numStates <- length(ss)
 vv <- sample(LETTERS[1:5], numStates, TRUE)
-dd <-
-  data.frame(
-    state = ss,
-    var = vv,
-    stringsAsFactors = FALSE
-  )
+
+# Create a data frame and view top rows
+dd <- data.frame(state = ss, var = vv, stringsAsFactors = FALSE)
 head(dd)
 ```
 
 ### Using a data frame
 To draw this choropleth, we will use the data frame approach first:
+
 ```{r df-approach}
 map_ng(data = dd, x = var)
 ```
 
 Note the following:
 
-- The argument `var` is the name of the chosen column of our data frame and is found using quasiquotation. To explore this further see `?rlang::quasiquotation`.
-- The colours darken sequentially from A through E. This follows the natural (alphabetical) ordering of the level of the factor. To determine this order upfront, create an __ordered factor__ through in any the various ways available in R. (See below for example)
+- The argument `var` is the name of the column of our data frame that has the variable to be mapped. It is found via the mechanism called _quasiquotation_; to explore this further see `?rlang::quasiquotation`.
+- The colours darken sequentially from A through E and it follows the natural (alphabetical) ordering of the factor levels (i.e. category labels). To control this order upfront, create an __ordered factor__ using any the various ways available in R. (See `?ordered`)
 - Our variable `var` is actually a character vector, but internally is converted to a factor.
 
-The flavour of geo-spatial data used in the package is of the vector type--and of these, it uses *point* and *polygon* data (incorporation of *line* layers is planned for a future release).
-
-### Using vectors
+### Using atomic vectors
 We can use the same data to make the same map, but with a different coding approach:
 ```{r vec-approach}
-map_ng()
+map_ng(region = ss, x = vv, col = "red")
 ```
 
-## Plain maps
-```{r}
+It's exactly same map as before, but this time, we used 2 vectors to provide the data -- one for the regions (in this case the 36 States and FCT) and another for the categorization. We have also introduced some colouring with the `col` argument. Although it has the same data, if we try to use the column name from `dd`, we have an error.
 
+```{r error-map, error=TRUE}
+map_ng(region = ss, x = var)
 ```
 
-## Plain maps with boundaries
-## Choropleth maps
+### Numerical values
+When the data to be categorized are numeric vectors, the categories have to be defined. To achieve this, the `breaks` argument has to be supplied. This is a numeric vector that describes class limits for grouping the values. The number of classes is `length(breaks) - 1`.
+
+```{r numeric-choropleth} 
+nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100
+bb <- c(0, 40, 60, 100)
+
+map_ng(region = ss, x = nn, breaks = bb, col = 'YlOrRd')
+```
+
+To get a more meaningful and interpretable legend, use the `categories` argument.
+
+```{r good-legend} 
+map_ng(
+  region = ss,
+  x = nn,
+  breaks = bb,
+  categories = c("Low", "Medium", "High"),
+  col = 3L
+)
+```
+
+Note that various colour arguments have been used, some of them kind of cryptic. More details on how to use the colouring schemes, check the help page of `?map_ng`.
+
+## Mapping of point data
+To show the distribution of point data on any the maps such as GIS location data, a different set of arguments is employed. Since point data requires a pair of coordinates to be accurate, both the `x` and `y` arguments MUST be provided. Once the function receives both coordinates, either as separate atomic vectors or as columns from a data frame, `map_ng` defaults to the mapping of points only in within the boundaries indicated by `region`. It looks like this:
+
+```{r pointmap}
+x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
+y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
+
+map_ng(NULL, x = x, y = y)
+```
+
+The function `map_ng` carried out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates care beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
+
+```{r out-of-bounds, error=TRUE}
+map_ng("Kwara", x = x, y = y)
+```
+
+## Conclusion
+This vignette provided an initial look at the mapping facilities currently available in the `naijR` package. Additional development is going on to provide the user with more granular control. This is an open source project, and contributions are welcome.

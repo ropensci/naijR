@@ -339,11 +339,14 @@ test_that("States' columns are searchable within a data frame", {
 })
 
 test_that("Bounds for plotting points are checked", {
-  x <- c(3.000, 4.000, 6.000)
-  y <- c(6.000, 9.000, 4.300)
+  x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
+  y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
   m <- map_ng(NULL, plot = FALSE)
+  mk <- map_ng("Kwara", plot = FALSE)
   
   expect_true(.xyWithinBounds(m, x, y))
+  expect_false(.xyWithinBounds(mk, x, y))
+  
   x[4] <- -3; y[4] <- 1000
   expect_false(.xyWithinBounds(m, x, y))
   
