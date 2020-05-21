@@ -52,7 +52,6 @@ vignette with this
 
 ``` r
 vignette('nigeria-maps', 'naijR')
-#> Warning: vignette 'nigeria-maps' not found
 ```
 
 #### States
@@ -122,24 +121,21 @@ Want to create a function to check how many LGAs a particular State has?
 
 ``` r
 how_many_lgas <- function(state) {
-  require(naijR)
-  stopifnot(state %in% states())
-  cat(sprintf("No. of LGAs in %s State:", state),
-      length(lgas_ng(state)),
-      fill = TRUE)
+  n <- length(naijR::lgas_ng(state))
+  cat(state, "State has", n, "LGAs\n")
 }
 
 how_many_lgas("Sokoto")
-#> No. of LGAs in Sokoto State: 23
+#> Sokoto State has 23 LGAs
 how_many_lgas("Ekiti")
-#> No. of LGAs in Ekiti State: 16
+#> Ekiti State has 16 LGAs
 ```
 
 #### Working with phone numbers
 
 It is common to come across datasets where phone numbers are wrongly
-entered or misinterpreted by regular software like MS Excel. The
-function `fix_mobile()` helps with this.
+entered or misinterpreted by software like MS Excel. The function
+`fix_mobile()` helps with this.
 
 ``` r
 fix_mobile("8032000000")
@@ -183,7 +179,7 @@ fix_mobile(dat$phone)
 
 ## Future Work
 
-Some features to expect in the next minor update:
+Some enhancements to expect in future updates:
 
   - Manipulation of phone numbers will provide options for the
     introduction of separators. Also the function will become more

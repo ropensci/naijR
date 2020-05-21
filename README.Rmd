@@ -45,7 +45,7 @@ remotes::install_github("BroVic/naijR")
 #### Maps
 A major feature of this version of the packages is the introduction of various map drawing capabilities. To read more about this, read the vignette with this
 
-```{r, vignette}
+```{r vignette, eval=FALSE}
 vignette('nigeria-maps', 'naijR')
 ```
 
@@ -83,11 +83,8 @@ Want to create a function to check how many LGAs a particular State has?
 
 ```{r}
 how_many_lgas <- function(state) {
-  require(naijR)
-  stopifnot(state %in% states())
-  cat(sprintf("No. of LGAs in %s State:", state),
-      length(lgas_ng(state)),
-      fill = TRUE)
+  n <- length(naijR::lgas_ng(state))
+  cat(state, "State has", n, "LGAs\n")
 }
 
 how_many_lgas("Sokoto")
@@ -95,7 +92,7 @@ how_many_lgas("Ekiti")
 ```
 
 #### Working with phone numbers
-It is common to come across datasets where phone numbers are wrongly entered or misinterpreted by regular software like MS Excel. The function `fix_mobile()` helps with this.
+It is common to come across datasets where phone numbers are wrongly entered or misinterpreted by software like MS Excel. The function `fix_mobile()` helps with this.
 
 ```{r mobile}
 fix_mobile("8032000000")
@@ -124,7 +121,7 @@ fix_mobile(dat$phone)
 ```
 
 ## Future Work
-Some features to expect in the next minor update:
+Some enhancements to expect in future updates:
 
 - Manipulation of phone numbers will provide options for the introduction of separators. Also the function will become more intelligent, pre-empting errors in data entry e.g. accepting the letter 'O' as a presumed zero (`0`).
 - `fix_mobile()` currently works with character vectors. It will be allowed to work with numeric vectors, converting these to character vectors internally.
