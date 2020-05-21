@@ -123,7 +123,7 @@ y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
 map_ng(NULL, x = x, y = y)
 ```
 
-The function `map_ng` carried out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates care beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
+The function `map_ng` carried out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
 
 ```{r out-of-bounds, error=TRUE}
 map_ng("Kwara", x = x, y = y)
