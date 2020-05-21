@@ -120,7 +120,6 @@ fix_mobile(dat$phone)
 ## Future Work
 Some features to expect in the next minor update:
 
-- The function `map_ng()` can draw a very basic map of Nigeria. Expected features will include sub national divisions and capacity to draw choropleth maps for plotting data.
 - Manipulation of phone numbers will provide options for the introduction of separators. Also the function will become more intelligent, pre-empting errors in data entry e.g. accepting the letter 'O' as a presumed zero (`0`).
 - `fix_mobile()` currently works with character vectors. It will be allowed to work with numeric vectors, converting these to character vectors internally.
 - Misspelling of Local Government Areas is very common and it is common to find so many variants, especially where compound names are involved. Functionality to address this problem will be introduced.

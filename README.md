@@ -52,14 +52,25 @@ call `states()`
 ``` r
 library(naijR, quietly = TRUE)
 states()
-#>  [1] "Abia"        "Adamawa"     "Akwa Ibom"   "Anambra"     "Bauchi"     
-#>  [6] "Bayelsa"     "Benue"       "Borno"       "Cross River" "Delta"      
-#> [11] "Ebonyi"      "Edo"         "Ekiti"       "Enugu"       "Gombe"      
-#> [16] "Imo"         "Jigawa"      "Kaduna"      "Kano"        "Katsina"    
-#> [21] "Kebbi"       "Kogi"        "Kwara"       "Lagos"       "Nasarawa"   
-#> [26] "Niger"       "Ogun"        "Ondo"        "Osun"        "Oyo"        
-#> [31] "Plateau"     "Rivers"      "Sokoto"      "Taraba"      "Yobe"       
-#> [36] "Zamfara"
+#>  [1] "Abia"                      "Adamawa"                  
+#>  [3] "Akwa Ibom"                 "Anambra"                  
+#>  [5] "Bauchi"                    "Bayelsa"                  
+#>  [7] "Benue"                     "Borno"                    
+#>  [9] "Cross River"               "Delta"                    
+#> [11] "Ebonyi"                    "Edo"                      
+#> [13] "Ekiti"                     "Enugu"                    
+#> [15] "Federal Capital Territory" "Gombe"                    
+#> [17] "Imo"                       "Jigawa"                   
+#> [19] "Kaduna"                    "Kano"                     
+#> [21] "Katsina"                   "Kebbi"                    
+#> [23] "Kogi"                      "Kwara"                    
+#> [25] "Lagos"                     "Nasarawa"                 
+#> [27] "Niger"                     "Ogun"                     
+#> [29] "Ondo"                      "Osun"                     
+#> [31] "Oyo"                       "Plateau"                  
+#> [33] "Rivers"                    "Sokoto"                   
+#> [35] "Taraba"                    "Yobe"                     
+#> [37] "Zamfara"
 ```
 
 States from a given geo-political zone can also be selected
@@ -164,9 +175,6 @@ fix_mobile(dat$phone)
 
 Some features to expect in the next minor update:
 
-  - The function `map_ng()` can draw a very basic map of Nigeria.
-    Expected features will include sub national divisions and capacity
-    to draw choropleth maps for plotting data.
   - Manipulation of phone numbers will provide options for the
     introduction of separators. Also the function will become more
     intelligent, pre-empting errors in data entry e.g. accepting the
