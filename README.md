@@ -42,7 +42,18 @@ The development version can be obtained from
 remotes::install_github("BroVic/naijR")
 ```
 
-### Examples
+### Some simple operations
+
+#### Maps
+
+A major feature of this version of the packages is the introduction of
+various map drawing capabilities. To read more about this, read the
+vignette with this
+
+``` r
+vignette('nigeria-maps', 'naijR')
+#> Warning: vignette 'nigeria-maps' not found
+```
 
 #### States
 
@@ -151,8 +162,7 @@ are turned into missing values, e.g.
     "08123456789",
     "09064321987",
     "O8055577889"
-  ),
-  stringsAsFactors = FALSE
+  )
 ))
 #>   serialno       phone
 #> 1        1   123456789

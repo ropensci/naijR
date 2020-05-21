@@ -178,6 +178,13 @@ test_that("Colours are reassigned when duplicate polygons exist", {
     ".isHexColor\\(in.colours\\) is not TRUE")
 })
 
+test_that("Appropriate palette is used", {
+  p3 <- c("black", "red", "green3", "blue", "cyan", "magenta", "yellow", "gray")
+  pal <- .get_R_palette()
+  
+  expect_equivalent(pal, p3)
+})
+
 test_that("Colours are prepared for plotting", {
   expect_error(.processColouring(col = 'brown', 5L), 
                "'brown' is not a supported colour or palette")

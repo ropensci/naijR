@@ -4,11 +4,13 @@
 \name{lgas_nigeria}
 \alias{lgas_nigeria}
 \title{Local Government Areas of Nigeria}
-\format{A dataframe with 774 rows and 2 columns
+\format{
+A dataframe with 774 rows and 2 columns
 \describe{
    \item{lga}{Local Government Area}
    \item{state}{State of the Federation}
-   }}
+   }
+}
 \usage{
 lgas_nigeria
 }

@@ -4,11 +4,25 @@
 \alias{map_ng}
 \title{Map of Nigeria}
 \usage{
-map_ng(region = character(), data = NULL, x = NULL, y = NULL,
-  breaks = NULL, categories = NULL, col = NULL, fill = FALSE,
-  title = NULL, caption = NULL, show.neighbours = FALSE,
-  show.text = FALSE, leg.x = 13L, leg.y = 7L, leg.title,
-  leg.orient = c("vertical", "horizontal"), ...)
+map_ng(
+  region = character(),
+  data = NULL,
+  x = NULL,
+  y = NULL,
+  breaks = NULL,
+  categories = NULL,
+  col = NULL,
+  fill = FALSE,
+  title = NULL,
+  caption = NULL,
+  show.neighbours = FALSE,
+  show.text = FALSE,
+  leg.x = 13L,
+  leg.y = 7L,
+  leg.title,
+  leg.orient = c("vertical", "horizontal"),
+  ...
+)
 }
 \arguments{
 \item{region}{A character vector of a list of Nigerian States to be displayed.}

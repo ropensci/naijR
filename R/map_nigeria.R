@@ -451,7 +451,6 @@ map_ng <- function(region = character(),
 
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom RColorBrewer brewer.pal.info
-#' @importFrom grDevices palette
 #' @importFrom magrittr %>%
 #' @importFrom rlang abort
 #' @importFrom tools toTitleCase
@@ -461,7 +460,8 @@ map_ng <- function(region = character(),
   if (is.null(color))
     color <- .DefaultChoroplethColours[1]
   if (is.numeric(color)) {
-    all.cols <- grDevices::palette() %>% 
+    default.pal <- .get_R_palette()
+    all.cols <- default.pal %>% 
       sub("(green)(3)", "\\1", .) %>% 
       sub("gray", "grey", .)
     if (!color %in% seq_along(all.cols))
@@ -482,6 +482,24 @@ map_ng <- function(region = character(),
       paste0(tools::toTitleCase(color), "s")
   RColorBrewer::brewer.pal(n, pal)
 }
+
+
+
+
+
+
+
+#' @importFrom grDevices palette
+.get_R_palette <- function()
+{
+  if (getRversion() < as.numeric_version('4.0.0'))
+    return(palette())
+  palette('R3')
+  pp <- palette()
+  palette('R4')
+  pp
+}
+
 
 
 

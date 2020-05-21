@@ -41,7 +41,14 @@ The development version can be obtained from [GitHub](https://github.com/BroVic/
 remotes::install_github("BroVic/naijR")
 ```
 
-### Examples
+### Some simple operations
+#### Maps
+A major feature of this version of the packages is the introduction of various map drawing capabilities. To read more about this, read the vignette with this
+
+```{r, vignette}
+vignette('nigeria-maps', 'naijR')
+```
+
 #### States
 To create a list of all the States of the Nigerian Federation, simply call `states()`
 
@@ -108,8 +115,7 @@ The function works on vectors; thus an entire column of a table with phone numbe
     "08123456789",
     "09064321987",
     "O8055577889"
-  ),
-  stringsAsFactors = FALSE
+  )
 ))
 ```
 
