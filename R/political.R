@@ -102,6 +102,7 @@ is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
     else
       x <- exc
   }
+  x <- sub("^FCT$", "Federal Capital Territory", x)
   val <- x %in% unlist(..LL)
   if (test == 'all')
     return(all(val))

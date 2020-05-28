@@ -12,6 +12,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+library(naijR)
 
 test_that("Invalid input terminates the function", {
   expect_error(states(gpz = 99))
@@ -58,4 +59,6 @@ test_that("States can be identified in an object", {
   expect_false(anyNA(minus.nas))
   expect_equal(sum(sel.na), NA_integer_)
   expect_equal(sum(is.na(sel.na)), length(ind.nas))
+  expect_true(is_state("FCT"))
+  expect_true(is_state("Federal Capital Territory"))
 })
