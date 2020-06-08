@@ -61,4 +61,7 @@ test_that("States can be identified in an object", {
   expect_equal(sum(is.na(sel.na)), length(ind.nas))
   expect_true(is_state("FCT"))
   expect_true(is_state("Federal Capital Territory"))
+  expect_false(is_state(pi))
+  expect_false(is_state(NULL))
+  expect_length(is_state(pi), 1L)
 })

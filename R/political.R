@@ -92,7 +92,7 @@ states <- function(gpz = NULL, all = TRUE)
 is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
 {
   if (!is.character(x))
-    stop("A character vector was expected", call. = FALSE)
+    return(FALSE)
   test <- match.arg(test)
   na.pos <- 0L
   if (anyNA(x) && allow.na) {
