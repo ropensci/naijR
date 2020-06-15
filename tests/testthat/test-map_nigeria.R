@@ -445,3 +445,5 @@ test_that("Parameters passed via ellipsis work seamlessly", {
   expect_is(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), mm)
 })
 
+test_that("Shapefile data is retrievable",
+          expect_is(.getSpatialPolygonsData(), 'SpatialPolygonsDataFrame'))

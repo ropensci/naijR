@@ -281,22 +281,34 @@ map_ng <- function(region = character(),
 
 
 #' @importFrom maps SpatialPolygons2map
-#' @importFrom rgdal readOGR
 .getMapData <- function(region)
 {
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
   else if (is_state(region)) {
-    dsn <- system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
-    if (identical(dsn, character(1)))
-      stop("The map data could not be found in 'extdata'")
-    sp <- readOGR(dsn, .shpLayer, verbose = FALSE)
+    sp <- .getSpatialPolygonsData()
     return(SpatialPolygons2map(sp, namefield = 'admin1Name'))
   }
   ss <- paste(region, collapse = ', ')
   stop("Invalid region(s) for the map: ", ss)
 }
 
+
+
+
+
+
+
+
+## Read the data from an internal shapefile
+#' @importFrom rgdal readOGR
+.getSpatialPolygonsData <- function() {
+  dsn <-
+    system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+  if (identical(dsn, character(1)))
+    stop("The map data could not be found in 'extdata'")
+  readOGR(dsn, .shpLayer, verbose = FALSE)
+}
 
 
 
