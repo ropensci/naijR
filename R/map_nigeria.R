@@ -129,6 +129,8 @@ map_ng <- function(region = character(),
   ## maps::map used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text`. This is a bug in the
   ## `maps` package.
+  
+  ## TODO: Allow this function to accept a matrix e.g. for plotting points
   region <- .processStateParam(region)
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
@@ -283,14 +285,15 @@ map_ng <- function(region = character(),
 #' @importFrom maps SpatialPolygons2map
 .getMapData <- function(region)
 {
+  stopifnot(is.character(region))
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  else if (is_state(region)) {
-    sp <- .getSpatialPolygonsData()
-    return(SpatialPolygons2map(sp, namefield = 'admin1Name'))
+  if (!is_state(region)) {
+    ss <- paste(region, collapse = ', ')
+    stop("Invalid region(s) for the map: ", ss)
   }
-  ss <- paste(region, collapse = ', ')
-  stop("Invalid region(s) for the map: ", ss)
+  sp <- .getSpatialPolygonsDataFrame()
+  SpatialPolygons2map(sp, namefield = 'admin1Name')
 }
 
 
@@ -302,7 +305,7 @@ map_ng <- function(region = character(),
 
 ## Read the data from an internal shapefile
 #' @importFrom rgdal readOGR
-.getSpatialPolygonsData <- function() {
+.getSpatialPolygonsDataFrame <- function() {
   dsn <-
     system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
   if (identical(dsn, character(1)))
