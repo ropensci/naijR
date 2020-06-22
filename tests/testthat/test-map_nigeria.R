@@ -84,12 +84,14 @@ test_that("Subnational divisions are plotted", {
 })
 
 test_that("Data for mapping are retrieved properly", {
-  s <- "Nigeria"
-  res <- try(.getMapData(s))
-  exceptionThrown <- inherits(res, "try-error")
+  db <- .getMapData("Nigeria")
   
-  expect_false(exceptionThrown)
-  expect_is(res, 'character')
+  expect_error(.getMapData(NULL))
+  expect_error(.getMapData(42L))
+  expect_error(.getMapData(pi))
+  expect_error(.getMapData(TRUE))
+  expect_is(db, 'character')
+  expect_identical(db, "mapdata::worldHires")
   expect_is(.getMapData("Abia"), 'map')
   expect_error(.getMapData("Alaska"), 
                "Invalid region(s) for the map: Alaska",
@@ -99,6 +101,8 @@ test_that("Data for mapping are retrieved properly", {
                fixed = TRUE)
 })
 
+test_that("Shapefile data is retrievable",
+          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))
 
 set.seed(4)
 df <-
@@ -441,5 +445,3 @@ test_that("Parameters passed via ellipsis work seamlessly", {
   expect_is(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), mm)
 })
 
-test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsData(), 'SpatialPolygonsDataFrame'))
