@@ -82,14 +82,14 @@ globalVariables(".")
 #' For plain plots, the \code{col} argument works the same as with
 #' \code{\link[maps]{map}} and variants. For choropleth maps, the colour
 #' provided represents a (sequential) colour palette based on 
-#' \code{\link[RColorBrewer]{brewer.pal}}. The possible colour options can be
+#' \code{\link[RColorBrewer:RColorBrewer]{brewer.pal}}. The possible colour options can be
 #' checked with \code{getOption("choropleth.colours")} and this can also be 
 #' modified by the user.
 #' 
 #' @note When adjusting the default colour choiced for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
-#' \code{\link[RColorBrewer]{display.brewer.all}}
+#' \code{\link[RColorBrewer:RColorBrewer]{display.brewer.all}}
 #' 
 #' @return An object of class \code{map}, invisibly; as a side-effect,
 #' results in the drawing of a map of Nigeria.
@@ -101,7 +101,7 @@ globalVariables(".")
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}} or
-#' other similar functions (e.g. \code{\link[graphics]{plot}}).
+#' other similar functions (e.g. \code{\link[graphics:plot.default]{plot}}).
 #'
 #' @export
 map_ng <- function(region = character(),
