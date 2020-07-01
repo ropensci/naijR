@@ -113,7 +113,7 @@ is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
 
 
 
-# is_lga <- function(x) {}
+is_lga <- function(x) {}
 # is_ward <- function(x) {}
 
 # abbr_state <- function(x) {} # abbreviate State names

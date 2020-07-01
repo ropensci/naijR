@@ -65,3 +65,12 @@ test_that("States can be identified in an object", {
   expect_false(is_state(NULL))
   expect_length(is_state(pi), 1L)
 })
+
+test_that("is_lga recognises LGAs", {
+  anlga <- "Amuwo-Odofin"
+  veclga <- c("Akira-Uba", "Hawul", NA)
+  
+  
+  expect_true(is_lga(anlga))
+  expect_false
+})
