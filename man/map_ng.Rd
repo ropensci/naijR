@@ -79,7 +79,7 @@ other similar functions (e.g. \code{\link[graphics:plot.default]{plot}}).
 }
 \description{
 Maps of the Federal Republic of Nigeria that are based on the basic
-plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
+plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 }
 \details{
 The default value for \code{region} is to print all States. 
@@ -96,7 +96,7 @@ Otherwise factors or any object that can be coerced to a factor should be used.
 For plain plots, the \code{col} argument works the same as with
 \code{\link[maps]{map}} and variants. For choropleth maps, the colour
 provided represents a (sequential) colour palette based on 
-\code{\link[RColorBrewer:RColorBrewer]{brewer.pal}}. The possible colour options can be
+\link[RColorBrewer:RColorBrewer]{brewer.pal}. The possible colour options can be
 checked with \code{getOption("choropleth.colours")} and this can also be 
 modified by the user.
 }
@@ -104,7 +104,7 @@ modified by the user.
 When adjusting the default colour choiced for choropleth maps, it is
 advisable to use one of the sequential palettes. For a list of of available
 palettes, especially for more advanced use, review 
-\code{\link[RColorBrewer:RColorBrewer]{display.brewer.all}}
+\link[RColorBrewer:RColorBrewer]{display.brewer.all}
 }
 \examples{
 map_ng() # Draw a map with default settings
