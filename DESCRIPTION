@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.1.2
+Version: 0.1.2.9007
 Date: 2020-07-02
 Depends: 
     R (>= 3.6)
@@ -14,11 +14,12 @@ Imports:
     rlang (>= 0.4.0),
     tools (>= 3.6.3)
 Suggests: 
-    testthat,
     covr,
-    readxl,
     knitr,
-    rmarkdown
+    lifecycle,
+    readxl,
+    rmarkdown,
+    testthat
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
               role = c("aut", "cre"),
