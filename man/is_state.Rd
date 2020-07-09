@@ -4,21 +4,24 @@
 \alias{is_state}
 \title{Test an Object for States}
 \usage{
-is_state(x, test = c("all", "selected"), allow.na = TRUE)
+is_state(x)
 }
 \arguments{
-\item{x}{A character vector to be tested.}
-
-\item{test}{The type of test to be carried out - on the vector as a whole 
-i.e. \code{all} (the default argument) or on the individual elements i.e.
-\code{selected}.}
-
-\item{allow.na}{logical. If \code{TRUE}, all \code{NA}s are ignored in
-the result.}
+\item{x}{A vector to be tested.}
 }
 \value{
-A logical vector.
+A logical vector.of same length as the input.
 }
 \description{
 Test an Object for States
+}
+\details{
+An element-wise check of a supplied vector is carried out. To
+test and entire vector and return a single boolean value, functions 
+such as \code{base::all} or \code{base::any} should be used.
+}
+\note{
+The function throws a warning, when a missing value is among the 
+elements. It works only for atomic vectors, throwing an error when this 
+is not the case or when \code{NULL} is passed to it.
 }

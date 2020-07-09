@@ -55,11 +55,11 @@ states <- function(gpz = NULL, all = TRUE)
 
 
 
-#' @importFrom stats setNames
+#' @import stats
 .getStateList <- function()
 {
   nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
-  setNames(..LL, nm)
+  stats::setNames(..LL, nm)
 }
 
 
@@ -78,36 +78,44 @@ states <- function(gpz = NULL, all = TRUE)
 
 #' Test an Object for States
 #' 
-#' @param x A character vector to be tested.
-#' @param test The type of test to be carried out - on the vector as a whole 
-#' i.e. \code{all} (the default argument) or on the individual elements i.e.
-#' \code{selected}.
-#' @param allow.na logical. If \code{TRUE}, all \code{NA}s are ignored in
-#' the result.
+#' @param x A vector to be tested.
 #' 
+#' @importFrom magrittr %>%
+#' @importFrom magrittr %<>%
 #' @import stats
+#' 
+#' @details An element-wise check of a supplied vector is carried out. To
+#' test and entire vector and return a single boolean value, functions 
+#' such as \code{base::all} or \code{base::any} should be used.
+#' 
+#' @note The function throws a warning, when a missing value is among the 
+#' elements. It works only for atomic vectors, throwing an error when this 
+#' is not the case or when \code{NULL} is passed to it.
 #'
-#' @return A logical vector.
+#' @return A logical vector.of same length as the input.
+#' 
 #' @export
-is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
+is_state <- function(x)
 {
+  if (!is.atomic(x) || is.null(x))
+    # NB: is.atomic(NULL) == TRUE
+    stop("'x' is not a non-null atomic object")
   if (!is.character(x))
     return(FALSE)
-  test <- match.arg(test)
   na.pos <- 0L
-  if (anyNA(x) && allow.na) {
+  if (anyNA(x)) {
+    warning("'x' contains missing values, NA")
     exc <- stats::na.exclude(x)
-    if (test == 'selected')
-      na.pos <- stats::na.action(exc)
-    else
-      x <- exc
+    na.pos <- stats::na.action(exc)
   }
-  x <- sub("^FCT$", "Federal Capital Territory", x)
-  val <- x %in% unlist(..LL)
-  if (test == 'all')
-    return(all(val))
-  val[na.pos] <- NA
-  val
+  
+  x %<>%
+    sub("^FCT$", "Federal Capital Territory", .) %>%
+    `%in%`(unlist(..LL)) %>%
+    {
+      .[na.pos] <- NA
+      .
+    }
 }
 
 

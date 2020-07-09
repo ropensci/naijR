@@ -50,7 +50,7 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 lgas_ng <- function(ng.state = NA_character_) {
   stopifnot(is.character(ng.state))
   if (!all(is.na(ng.state))) {
-    if (!is_state(ng.state))
+    if (!all(is_state(ng.state)))
       stop("One or more elements of 'ng.state' is not a State in Nigeria")
     lst <- lapply(
       ng.state,
