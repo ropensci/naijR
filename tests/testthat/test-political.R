@@ -66,58 +66,58 @@ test_that("States can be identified in an object", {
   expect_length(is_state(pi), 1L)
 })
 
-test_that("is_lga recognises LGAs", {
-  anlga <- "Amuwo-Odofin"
-  veclga <- c("Akira-Uba", "Hawul", NA)
-  
-  
-  expect_true(is_lga(anlga))
-  expect_false
-})
+# test_that("is_lga recognises LGAs", {
+#   anlga <- "Amuwo-Odofin"
+#   veclga <- c("Akira-Uba", "Hawul", NA)
+#   
+#   
+#   expect_true(is_lga(anlga))
+#   expect_false
+# })
 
-test_that("'FCT' and 'Fct' are handled", {
-  ss <- c(
-    "Zamfara",
-    "Niger",
-    "Borno",
-    "Kaduna",
-    "Jigawa",
-    "Taraba",
-    "Benue",
-    "Ogun",
-    "Ekiti",
-    "Rivers",
-    "Lagos",
-    "Delta",
-    "Cross River",
-    "Sokoto",
-    "Kano",
-    "Fct",
-    "Oyo",
-    "Edo",
-    "Osun",
-    "Plateau",
-    "Abia",
-    "Akwa Ibom",
-    "Bauchi",
-    "Ondo",
-    "Gombe",
-    "Kogi",
-    "Adamawa",
-    "Katsina",
-    "Enugu",
-    "Yobe",
-    "Ebonyi",
-    "Imo",
-    "Kwara",
-    "Anambra",
-    "Nasarawa",
-    "Bayelsa",
-    "Kebbi"
-  )
-  
-  expect_true(is_state(ss))
-  expect_true(is_state("Fct"))
-  expect_warning(is_state(ss))
-  expect_warning(is_state("Fct"))
-})
+# test_that("'FCT' and 'Fct' are handled", {
+#   ss <- c(
+#     "Zamfara",
+#     "Niger",
+#     "Borno",
+#     "Kaduna",
+#     "Jigawa",
+#     "Taraba",
+#     "Benue",
+#     "Ogun",
+#     "Ekiti",
+#     "Rivers",
+#     "Lagos",
+#     "Delta",
+#     "Cross River",
+#     "Sokoto",
+#     "Kano",
+#     "Fct",
+#     "Oyo",
+#     "Edo",
+#     "Osun",
+#     "Plateau",
+#     "Abia",
+#     "Akwa Ibom",
+#     "Bauchi",
+#     "Ondo",
+#     "Gombe",
+#     "Kogi",
+#     "Adamawa",
+#     "Katsina",
+#     "Enugu",
+#     "Yobe",
+#     "Ebonyi",
+#     "Imo",
+#     "Kwara",
+#     "Anambra",
+#     "Nasarawa",
+#     "Bayelsa",
+#     "Kebbi"
+#   )
+  #
+  # expect_true(is_state(ss))
+  # expect_true(is_state("Fct"))
+  # expect_warning(is_state(ss))
+  # expect_warning(is_state("Fct"))
+# })
