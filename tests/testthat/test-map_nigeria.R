@@ -446,4 +446,4 @@ test_that("Parameters passed via ellipsis work seamlessly", {
 })
 
 test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsData(), 'SpatialPolygonsDataFrame'))
+          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))
