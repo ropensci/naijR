@@ -86,11 +86,20 @@ states <- function(gpz = NULL, all = TRUE)
 #' the result.
 #' 
 #' @import stats
+#' @import lifecycle
 #'
 #' @return A logical vector.
+#' 
 #' @export
 is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
 {
+  invisible(sapply(c('test', 'allow.na'), function(x)
+    deprecate_warn(
+      "0.1.3", 
+      sprintf("is_state(%s = )", x)
+    )
+  ))
+  
   if (!is.character(x))
     return(FALSE)
   test <- match.arg(test)
@@ -113,7 +122,7 @@ is_state <- function(x, test = c("all", "selected"), allow.na = TRUE)
 
 
 
-# is_lga <- function(x) {}
+is_lga <- function(x) {}
 # is_ward <- function(x) {}
 
 # abbr_state <- function(x) {} # abbreviate State names
