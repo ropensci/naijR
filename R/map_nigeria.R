@@ -95,9 +95,11 @@ globalVariables(".")
 #' results in the drawing of a map of Nigeria.
 #'
 #' @examples
+#' \dontrun{
 #' map_ng() # Draw a map with default settings
 #' map_ng(states("sw"))
 #' map_ng("Kano")
+#' }
 #'
 #' @return An object of class \code{maps} containing the data used to draw the
 #' map and which can be used for additional calls to \code{\link[maps]{map}} or

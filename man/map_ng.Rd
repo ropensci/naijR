@@ -107,8 +107,10 @@ palettes, especially for more advanced use, review
 \code{RColorBrewer::display.brewer.all}
 }
 \examples{
+\dontrun{
 map_ng() # Draw a map with default settings
 map_ng(states("sw"))
 map_ng("Kano")
+}
 
 }
