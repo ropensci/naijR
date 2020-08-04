@@ -39,3 +39,12 @@ test_that("LGAs are returned correctly", {
   expect_named(res2, nam)
   expect_length(res2, 2L)
 })
+
+# test_that("is_lga recognises LGAs", {
+#   anlga <- "Amuwo-Odofin"
+#   veclga <- c("Akira-Uba", "Hawul", NA)
+#   
+#   
+#   expect_true(is_lga(anlga))
+#   expect_false
+# })

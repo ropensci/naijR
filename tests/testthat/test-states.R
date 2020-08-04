@@ -119,11 +119,29 @@ test_that("Different representations of the FCT are handled", {
   expect_false(is_state("Fct"))
 })
 
-# test_that("is_lga recognises LGAs", {
-#   anlga <- "Amuwo-Odofin"
-#   veclga <- c("Akira-Uba", "Hawul", NA)
-#   
-#   
-#   expect_true(is_lga(anlga))
-#   expect_false
-# })
+
+test_that("States can be fixed", {
+  expect_error(fix_state(99), "error")
+  expect_error(fix_state(NA), "error")
+  expect_error(fix_state(c(NA, NA, NA)), 'error')
+  expect_error(fix_state(NA_character_), "different error")
+  expect_error(fix_state(NULL), 'error')
+  expect_error(fix_state(TRUE), 'error')
+  
+  ss <- states()
+  expect_identical(fix_state(ss), ss)
+  expect_identical(fix_state('Fct'), "FCT")
+  expect_identical(fix_state('Kane'), "Kano")
+  expect_identical(fix_state('plateau'), 'Plateau')
+  expect_identical(fix_state(c("oyo", "Legos")), c("Oyo", "Lagos"))
+  expect_identical(fix_state("xxx", "Benue"), c(NA, "Benue"))
+  expect_identical(fix_state(c("kentucky", "Bornu", "Abia")), 
+                   c(NA, "Borno", "Abia"))
+})
+
+
+test_that("FCT abbreviations are well handled", {
+  fct_full <- 'Federal Capital Territory'
+  expect_identical(use_fct(fct_full), 'FCT')
+  expect_identical(use_fct('FCT', abbrev = 'reverse'), fct_full)
+})

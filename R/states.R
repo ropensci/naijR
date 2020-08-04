@@ -55,12 +55,17 @@ states <- function(gpz = NULL, all = TRUE)
 
 
 
+
+
 #' @import stats
 .getStateList <- function()
 {
   nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
   stats::setNames(..LL, nm)
 }
+
+
+
 
 
 ..LL <- list(
@@ -76,6 +81,8 @@ states <- function(gpz = NULL, all = TRUE)
 
 
 
+
+
 #' Test an Object for States
 #' 
 #' @param x A vector to be tested.
@@ -85,7 +92,7 @@ states <- function(gpz = NULL, all = TRUE)
 #' @import stats
 #' 
 #' @details An element-wise check of a supplied vector is carried out. To
-#' test and entire vector and return a single boolean value, functions 
+#' test an entire vector and return a single boolean value, functions 
 #' such as \code{base::all} or \code{base::any} should be used.
 #' 
 #' @note The function throws a warning, when a missing value is among the 
@@ -93,6 +100,10 @@ states <- function(gpz = NULL, all = TRUE)
 #' is not the case or when \code{NULL} is passed to it.
 #'
 #' @return A logical vector.of same length as the input.
+#' 
+#' @examples 
+#' all(is_state(naijR::states()))
+#' is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
 #' 
 #' @export
 is_state <- function(x)
@@ -108,7 +119,7 @@ is_state <- function(x)
     na.pos <- stats::na.action(exc)
   }
   
-  x %<>%
+  x %>%
     sub("^FCT$", "Federal Capital Territory", .) %>%
     `%in%`(unlist(..LL)) %>%
     {
@@ -120,10 +131,30 @@ is_state <- function(x)
 
 
 
-is_lga <- function(x) {}
-# is_ward <- function(x) {}
 
-# abbr_state <- function(x) {} # abbreviate State names
 
-# population <- function(x) {}
-# language <- function(x) {}
+#' Fix State Names
+#' 
+#' @param x A character vector
+#' 
+#' @export
+fix_state <- function(x)
+{
+  
+}
+
+
+
+
+
+#' Use Abbreviation or Not?
+#' 
+#' @param x A character vector likely to contain the term
+#' @param abbrev Whether to abbreviate the full term or to do the reverse,
+#' the former being the default.
+#' 
+#' @export
+use_fct <- function(x, abbrev = c('yes', 'reverse'))
+{
+  
+}
