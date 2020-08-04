@@ -127,4 +127,3 @@ test_that("Different representations of the FCT are handled", {
 #   expect_true(is_lga(anlga))
 #   expect_false
 # })
-

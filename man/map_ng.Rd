@@ -79,7 +79,7 @@ other similar functions (e.g. \code{graphics::plot.default}).
 }
 \description{
 Maps of the Federal Republic of Nigeria that are based on the basic
-plotting idiom utilised by \code{\link[maps:map]{maps:map}} and its variants.
+plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 }
 \details{
 The default value for \code{region} is to print all States. 
@@ -107,8 +107,10 @@ palettes, especially for more advanced use, review
 \code{RColorBrewer::display.brewer.all}
 }
 \examples{
+\dontrun{
 map_ng() # Draw a map with default settings
 map_ng(states("sw"))
 map_ng("Kano")
+}
 
 }

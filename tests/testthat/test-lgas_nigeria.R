@@ -15,6 +15,7 @@
 
 
 test_that("illegal input is caught early", {
+  expect_is(try(lgas_ng("Saarland"), silent = TRUE), 'try-error')
   expect_error(lgas_ng("Maryland"),
                "One or more elements of 'ng.state' is not a State in Nigeria",
                fixed = TRUE)
