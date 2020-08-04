@@ -97,8 +97,7 @@ states <- function(gpz = NULL, all = TRUE)
 #' @export
 is_state <- function(x)
 {
-  if (!is.atomic(x) || is.null(x))
-    # NB: is.atomic(NULL) == TRUE
+  if (!is.atomic(x) || is.null(x)) # is.atomic(NULL) == TRUE
     stop("'x' is not a non-null atomic object")
   if (!is.character(x))
     return(FALSE)
