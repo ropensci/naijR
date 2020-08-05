@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.1.3.9002
+Version: 0.1.3
 Date: 2020-08-03
 Depends: 
     R (>= 3.6)
