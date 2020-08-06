@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# naijR <img src="man/figures/edo-sticker-with-border.png" width=100px align="right" />
+# naijR <img src="man/figures/logo.png" width=120px align="right" />
 
 An R package on Nigeria and for Nigeria
 

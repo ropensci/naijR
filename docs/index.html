@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>An R package with functions to ease data analyses specific to Nigeria • naijR</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -14,14 +20,21 @@
 <script src="pkgdown.js"></script><meta property="og:title" content="An R package with functions to ease data analyses specific to Nigeria">
 <meta property="og:description" content="A set of convenience functions as well as geographical/political  data about Nigeria, aimed at simplifying work with data and information  that are specific to the country.
 ">
+<meta property="og:image" content="http://brovic.github.io/naijR/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<![endif]--><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-174769638-1"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-174769638-1');
+</script>
 </head>
 <body data-spy="scroll" data-target="#toc">
     <div class="container template-home">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -82,18 +95,42 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="naijr-" class="section level1">
+<div id="naijr-an-r-package-on-nigeria-and-for-nigeria-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#naijr-" class="anchor"></a>naijR <img src="reference/figures/edo-sticker-with-border.png" width="100px" align="right">
+<a href="#naijr-an-r-package-on-nigeria-and-for-nigeria-" class="anchor"></a>naijR: An R package on Nigeria and for Nigeria <img src="reference/figures/logo.png" width="100px" align="right">
 </h1></div>
-<p>naijR is an R package that contains a suite of functions that make it easier to deal with data and datasets about the country Nigeria and its constituent parts.</p>
+<p>naijR is an R package that contains a suite of functions that make it easier to deal with data and datasets about the country Nigeria and its constituent parts. <br></p>
 <p>Inspiration for the project is drawn from experience within real data science projects wherein peculiar problems were encountered. Some of these include:</p>
 <ul>
 <li>Data cleaning: When dealing with data specific to the county, there are data entry issues that seem to occur quite frequently. Rather applying repetitious data cleaning tasks, it is better to encapsulate them in a way to automate them.</li>
 <li>Data point ambiguity: Although key data are standardized by relevant authorities e.g. names of administrative divisions like Local Government Areas, it is still common to find bodies of data where these points are used arbitrarily and incorrectly.</li>
-<li>Dependence on proprietary tools: Many organisations in Nigeria defer to the use of tools that add their own layer of complexity to data management without due cognisance being taken of the peculiarities associated with local data sets.</li>
+<li>Dependence on proprietary tools: Many organisations in Nigeria defer to the use of tools that add their own layer of complexity to data management without due cognisance being taken of the peculiarities associated with local data sets. <br>
+</li>
 </ul>
-<p>naijR brings an approach to data analysis that is tailored towards enhance the productivity of anyone working with any data that has to do with Nigeria.</p>
+<p>naijR brings an approach to data analysis that is tailored towards enhance the productivity of anyone working with any data that has to do with Nigeria. <br></p>
+<div id="things-that-naijr-can-do" class="section level2">
+<h2 class="hasAnchor">
+<a href="#things-that-naijr-can-do" class="anchor"></a>Things that naijR can do</h2>
+<p>There are a number of things that one can to with this package. These include:</p>
+<ul>
+<li>List all the States of the Nigerian Federation or group them by geo-political zones.</li>
+<li>List the Local Government Areas, either as a whole or by their States.</li>
+<li>Check if a data structure contains an administrative division. As of this version, only States are supported.</li>
+<li>Fix incorrectly entered mobile numbers</li>
+<li>Draw maps of Nigeria using vector graphics, including choropleth maps at State level.</li>
+</ul>
+<p>Additional functionality is being added and will be available in future releases.</p>
+</div>
+<div id="getting-started" class="section level2">
+<h2 class="hasAnchor">
+<a href="#getting-started" class="anchor"></a>Getting Started</h2>
+<p>The easiest way to start using this package is within an active R session by running</p>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">'naijR'</span>)</pre></div>
+<p>This will install the stable version from <a href="https://cran.r-project.org/package=naijR">CRAN</a>. To work with the development version of the package, it can be installed from GitHub with</p>
+<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages('remotes')</span>
+<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"BroVic/naijR"</span>)</pre></div>
+<p>For an introduction to the package’s ability to draw Nigeria country maps, visit this <a href="articles/nigeria-maps.html">article</a></p>
+</div>
 </div>
   </div>
 

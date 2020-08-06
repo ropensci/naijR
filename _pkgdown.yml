@@ -1,4 +1,5 @@
 title: naijR
+url: http://brovic.github.io/naijR
 home:
   title: An R package with functions to ease data analyses specific to Nigeria
   description: >
@@ -8,3 +9,6 @@ home:
 template:
   params:
     bootswatch: sandstone
+    ganalytics: UA-174769638-1
+navbar:
+  type: inverse
