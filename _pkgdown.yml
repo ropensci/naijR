@@ -1,4 +1,10 @@
 title: naijR
+home:
+  title: An R package with functions to ease data analyses specific to Nigeria
+  description: >
+    A set of convenience functions as well as geographical/political 
+    data about Nigeria, aimed at simplifying work with data and information 
+    that are specific to the country.
 template:
   params:
     bootswatch: sandstone

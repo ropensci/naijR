@@ -264,7 +264,10 @@ map_ng <- function(region = character(),
     return(FALSE)
   arg <- enexpr(val)
   if (!no.region &&
-      is.character(region) && is_state(region) && !is_null(arg))
+      is.character(region) &&
+      suppressWarnings(is_state(region)) &&
+      !is_null(arg)
+  )
     return(TRUE)
   if (!is.data.frame(data))
     return(FALSE)
