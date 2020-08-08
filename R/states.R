@@ -109,12 +109,12 @@ states <- function(gpz = NULL, all = TRUE)
 is_state <- function(x)
 {
   if (!is.atomic(x) || is.null(x)) # is.atomic(NULL) == TRUE
-    stop("'x' is not a non-null atomic object")
+    stop("'x' is not a non-null atomic object", call. = FALSE)
   if (!is.character(x))
     return(FALSE)
   na.pos <- 0L
   if (anyNA(x)) {
-    warning("'x' contains missing values, NA")
+    warning("'x' contains missing values, NA", call. = FALSE)
     exc <- stats::na.exclude(x)
     na.pos <- stats::na.action(exc)
   }
@@ -137,24 +137,77 @@ is_state <- function(x)
 #' 
 #' @param x A character vector
 #' 
+#' @importFrom rlang abort
+#' 
 #' @export
 fix_state <- function(x)
 {
+  if(!is.character(x))
+    abort("'x' is not an object of class 'character'")
+  if (all(is.na(x))) {
+    warning("'x' has only missing values")
+    return(x)
+  }
   
+  ## Approximately matches regex on list of states
+  .getProperVal <- function(str, states) {
+    if (!is.na(match(str, states)))
+      return(str)
+    if (agrepl(str, abbr, max.distance = 2) && 
+        identical(toupper(str), abbr))
+      return(abbr)
+    
+    # First check for matching pattern
+    mtchd <-
+      grep(paste0('^', str, '$'),
+           states,
+           value = TRUE,
+           ignore.case = TRUE)
+    if (length(mtchd) == 0L) {
+      # Then check for approximate matches
+      mtchd <- agrep(str, states, value = TRUE, max.distance = 1)
+      if (length(mtchd) != 1L)
+        return(NA_character_)
+    }
+    mtchd
+  }
+  
+  ## Process possible FCT values
+  abbr = "FCT"
+  full = "Federal Capital Territory"
+  hasFct <- c(abbr, full) %in% x
+  if (sum(hasFct) == 2)
+    x <- sub(abbr, full, x)
+  if (sum(hasFct) == 1) {
+    i_abbr <- grep(abbr, x)
+    i_full <- grep(full, x)
+  }
+  i <- grep(paste0("^", abbr, "$"), x, ignore.case = TRUE)
+  ss <- states()
+  if (length(i) != 0) 
+    ss <- sub(full, abbr, states())
+  
+  x <- vapply(x, .getProperVal, character(1), states = ss, USE.NAMES = FALSE)
+  x[i] <- full
+  x
 }
 
 
 
 
 
-#' Use Abbreviation or Not?
-#' 
-#' @param x A character vector likely to contain the term
-#' @param abbrev Whether to abbreviate the full term or to do the reverse,
-#' the former being the default.
-#' 
-#' @export
-use_fct <- function(x, abbrev = c('yes', 'reverse'))
+
+#' @importFrom rlang abort
+toggleFct <- function(x)
 {
+  if (length(x) != 1L)
+    abort("Expected a vector of length == 1L")
+  if (!is.character(x))
+    abort("'x' is not a character vector",)
   
+  opts <- c("FCT", "Federal Capital Territory")
+  if (!x %in% opts)
+    abort("Invalid input")
+  ind <- ifelse(match(x, opts) == 1L, 2L, 1L)
+  opts[ind]
 }

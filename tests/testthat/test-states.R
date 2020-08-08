@@ -120,28 +120,38 @@ test_that("Different representations of the FCT are handled", {
 })
 
 
-test_that("States can be fixed", {
-  expect_error(fix_state(99), "error")
-  expect_error(fix_state(NA), "error")
-  expect_error(fix_state(c(NA, NA, NA)), 'error')
-  expect_error(fix_state(NA_character_), "different error")
-  expect_error(fix_state(NULL), 'error')
-  expect_error(fix_state(TRUE), 'error')
-  
+test_that("input is validated before fixing state names", {
+  errchr <- "'x' is not an object of class 'character'"
+  expect_error(fix_state(99), errchr)
+  expect_error(fix_state(NA), errchr)
+  expect_error(fix_state(c(NA, NA, NA)), errchr)
+  expect_warning(fix_state(NA_character_), "'x' has only missing values")
+  expect_error(fix_state(NULL), errchr)
+  expect_error(fix_state(TRUE), errchr)
+})
+
+
+test_that("various cases for fixing state names", {
   ss <- states()
+  ss2 <- c("oyo", "Legos")
+  ssx <- c("xxx", "Benue")
+  ss.us <- c("kentucky", "Bornu", "Abia")
+  
   expect_identical(fix_state(ss), ss)
-  expect_identical(fix_state('Fct'), "FCT")
+  expect_identical(fix_state('Fct'), "Federal Capital Territory")
   expect_identical(fix_state('Kane'), "Kano")
   expect_identical(fix_state('plateau'), 'Plateau')
-  expect_identical(fix_state(c("oyo", "Legos")), c("Oyo", "Lagos"))
-  expect_identical(fix_state("xxx", "Benue"), c(NA, "Benue"))
-  expect_identical(fix_state(c("kentucky", "Bornu", "Abia")), 
-                   c(NA, "Borno", "Abia"))
+  expect_identical(fix_state(ss2), c("Oyo", "Lagos"))
+  expect_length(fix_state(ss2), 2L)
+  expect_identical(fix_state(ssx), c(NA_character_, "Benue"))
+  expect_length(fix_state(ssx), 2L)
+  expect_identical(fix_state(ss.us), c(NA_character_, "Borno", "Abia"))
+  expect_length(fix_state(ss.us), 3L)
 })
 
 
 test_that("FCT abbreviations are well handled", {
   fct_full <- 'Federal Capital Territory'
-  expect_identical(use_fct(fct_full), 'FCT')
-  expect_identical(use_fct('FCT', abbrev = 'reverse'), fct_full)
+  expect_identical(toggleFct(fct_full), 'FCT')
+  expect_identical(toggleFct('FCT'), fct_full)
 })
