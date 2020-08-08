@@ -15,7 +15,7 @@
 
 
 test_that("illegal input is caught early", {
-  expect_warning(try(lgas_ng("Saarland"), silent = TRUE))    # Deprecation!
+  expect_is(try(lgas_ng("Saarland"), silent = TRUE), 'try-error')
   expect_error(lgas_ng("Maryland"),
                "One or more elements of 'ng.state' is not a State in Nigeria",
                fixed = TRUE)
@@ -39,3 +39,12 @@ test_that("LGAs are returned correctly", {
   expect_named(res2, nam)
   expect_length(res2, 2L)
 })
+
+# test_that("is_lga recognises LGAs", {
+#   anlga <- "Amuwo-Odofin"
+#   veclga <- c("Akira-Uba", "Hawul", NA)
+#   
+#   
+#   expect_true(is_lga(anlga))
+#   expect_false
+# })
