@@ -4,11 +4,24 @@
 \alias{fix_state}
 \title{Fix State Names}
 \usage{
-fix_state(x)
+fix_state(x, ...)
 }
 \arguments{
-\item{x}{A character vector}
+\item{x}{A character vector.}
+
+\item{...}{This argument is placed for possible use in the near future.}
 }
 \description{
-Fix State Names
+Correct any misspelt names of States.
+}
+\details{
+The function will look through a character vector and try to 
+determine if State names have been wrongly entered. This presupposes that
+the atomic vector is of type \code{character}. It does not test any missing
+values in the vector, leaving them untouched.
+}
+\note{
+An updated version would include the ability to adjust the 
+\href{https://en.wikipedia.org/wiki/Levenshtein_distance}{Levenshtein 
+distance}, which will empower users to tune the function's sensitivity.
 }

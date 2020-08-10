@@ -15,7 +15,7 @@
 
 
 
-#' Display States of the Federal Republic of Nigeria
+#' States of the Federal Republic of Nigeria
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
@@ -37,7 +37,7 @@
 states <- function(gpz = NULL, all = TRUE)
 {
   stopifnot(is.logical(all))
-  stl <- .getStateList()
+  stl <- .getAllStates()
   if (!all)
     stl$fct <- NULL
   if (!is.null(gpz)) {
@@ -56,27 +56,24 @@ states <- function(gpz = NULL, all = TRUE)
 
 
 
-
-#' @import stats
-.getStateList <- function()
+.getAllStates <- function(named = TRUE)
 {
-  nm <- make.names(c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
-  stats::setNames(..LL, nm)
+  names <- if (named)
+    c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct')
+  ss <- structure(list(
+    c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
+    c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
+    c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
+    c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
+    c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
+    c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
+    c("Federal Capital Territory")
+  ),
+  names = names)
+  if (!named)
+    return(unlist(ss))
+  ss
 }
-
-
-
-
-
-..LL <- list(
-  c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
-  c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
-  c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
-  c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
-  c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
-  c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
-  "Federal Capital Territory"
-)
 
 
 
@@ -121,7 +118,7 @@ is_state <- function(x)
   
   x %>%
     sub("^FCT$", "Federal Capital Territory", .) %>%
-    `%in%`(unlist(..LL)) %>%
+    `%in%`(.getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
       .
@@ -135,17 +132,30 @@ is_state <- function(x)
 
 #' Fix State Names
 #' 
-#' @param x A character vector
+#' Correct any misspelt names of States.
+#' 
+#' @details The function will look through a character vector and try to 
+#' determine if State names have been wrongly entered. This presupposes that
+#' the atomic vector is of type \code{character}. It does not test any missing
+#' values in the vector, leaving them untouched.
+#' 
+#' @param x A character vector.
+#' @param ... This argument is placed for possible use in the near future.
+#' 
+#' @note An updated version would include the ability to adjust the 
+#' \href{https://en.wikipedia.org/wiki/Levenshtein_distance}{Levenshtein 
+#' distance}, which will empower users to tune the function's sensitivity.
 #' 
 #' @importFrom rlang abort
+#' @importFrom rlang warn
 #' 
 #' @export
-fix_state <- function(x)
+fix_state <- function(x, ...)
 {
-  if(!is.character(x))
+  if(!inherits(x, 'character'))
     abort("'x' is not an object of class 'character'")
   if (all(is.na(x))) {
-    warning("'x' has only missing values")
+    warn("'x' has only missing values")
     return(x)
   }
   
@@ -173,8 +183,8 @@ fix_state <- function(x)
   }
   
   ## Process possible FCT values
-  abbr = "FCT"
-  full = "Federal Capital Territory"
+  abbr <- "FCT"
+  full <- "Federal Capital Territory"
   hasFct <- c(abbr, full) %in% x
   if (sum(hasFct) == 2)
     x <- sub(abbr, full, x)
@@ -196,9 +206,9 @@ fix_state <- function(x)
 
 
 
-
+# Toggle between full and abbreviated FCT name
 #' @importFrom rlang abort
-toggleFct <- function(x)
+.toggleFct <- function(x)
 {
   if (length(x) != 1L)
     abort("Expected a vector of length == 1L")

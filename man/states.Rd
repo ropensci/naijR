@@ -2,7 +2,7 @@
 % Please edit documentation in R/states.R
 \name{states}
 \alias{states}
-\title{Display States of the Federal Republic of Nigeria}
+\title{States of the Federal Republic of Nigeria}
 \usage{
 states(gpz = NULL, all = TRUE)
 }
@@ -16,7 +16,7 @@ states(gpz = NULL, all = TRUE)
 The States of Nigeria as a whole or by zones, as a character vector
 }
 \description{
-Display States of the Federal Republic of Nigeria
+States of the Federal Republic of Nigeria
 }
 \details{
 gpz A geo-political zone, in the Nigerian 
