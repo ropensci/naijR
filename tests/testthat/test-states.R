@@ -29,6 +29,18 @@ test_that("input is validated", {
   expect_error(states(full.names = NULL))
 })
 
+test_that("Internal object listing states is created and retrievable", {
+  default <- .getAllStates()
+  notDefault <- .getAllStates(FALSE)
+  
+  expect_type(default, 'list')
+  expect_named(default)
+  expect_identical(names(default), c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
+  expect_type(notDefault, 'character')
+  expect_null(names(notDefault))
+})
+
+
 # Test an object for States
 test_that("input is validated", {
   expect_false(is_state(pi))
@@ -122,12 +134,14 @@ test_that("Different representations of the FCT are handled", {
 
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not an object of class 'character'"
+  
   expect_error(fix_state(99), errchr)
   expect_error(fix_state(NA), errchr)
   expect_error(fix_state(c(NA, NA, NA)), errchr)
   expect_warning(fix_state(NA_character_), "'x' has only missing values")
   expect_error(fix_state(NULL), errchr)
   expect_error(fix_state(TRUE), errchr)
+  expect_error(fix_state(matrix(states())), errchr)
 })
 
 
@@ -152,6 +166,6 @@ test_that("various cases for fixing state names", {
 
 test_that("FCT abbreviations are well handled", {
   fct_full <- 'Federal Capital Territory'
-  expect_identical(toggleFct(fct_full), 'FCT')
-  expect_identical(toggleFct('FCT'), fct_full)
+  expect_identical(.toggleFct(fct_full), 'FCT')
+  expect_identical(.toggleFct('FCT'), fct_full)
 })
