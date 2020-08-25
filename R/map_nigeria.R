@@ -264,9 +264,7 @@ map_ng <- function(region = character(),
     return(FALSE)
   arg <- enexpr(val)
   if (!no.region &&
-      is.character(region) && 
-      suppressWarnings(is_state(region)) && 
-      !is_null(arg))
+      is.character(region) && all(is_state(region)) && !is_null(arg))
     return(TRUE)
   if (!is.data.frame(data))
     return(FALSE)
@@ -292,7 +290,7 @@ map_ng <- function(region = character(),
   stopifnot(is.character(region))
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  if (!suppressWarnings(is_state(region))) {
+  if (!all(is_state(region))) {
     ss <- paste(region, collapse = ', ')
     stop("Invalid region(s) for the map: ", ss)
   }
@@ -342,7 +340,7 @@ map_ng <- function(region = character(),
     if (is.factor(x))
       x <- as.character(x)
     if (is.character(x))
-      suppressWarnings(is_state(x))
+      all(is_state(x))
     else
       FALSE
   }, logical(1))
@@ -401,7 +399,7 @@ map_ng <- function(region = character(),
 #' @import magrittr
 .assertListElements <- function(x) {
   stopifnot(c('region', 'value', 'breaks') %in% names(x))
-  region.valid <- suppressWarnings(is_state(x$region))
+  region.valid <- all(is_state(x$region))
   value.valid <- 
     x$value %>% 
     {
@@ -530,9 +528,7 @@ map_ng <- function(region = character(),
 # properly applied to the respective regions and not recycled.
 .reassignColours <- function(names, regions, in.colours)
 {
-  stopifnot(is.character(names), 
-            suppressWarnings(is_state(regions)),
-            .isHexColor(in.colours))
+  stopifnot(is.character(names), all(is_state(regions)), .isHexColor(in.colours))
   out.colours <- new.names <- rep(NA, length(names))
   for (i in seq_along(regions)) {
     regx <- .regexDuplicatedPolygons(regions[i])

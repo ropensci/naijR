@@ -1,0 +1,10 @@
+pandoc: 2.7.2
+pkgdown: 1.5.1
+pkgdown_sha: ~
+articles:
+  nigeria-maps: nigeria-maps.html
+last_built: 2020-08-06T23:22Z
+urls:
+  reference: http://brovic.github.io/naijR/reference
+  article: http://brovic.github.io/naijR/articles
+

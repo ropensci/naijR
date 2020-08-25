@@ -176,7 +176,7 @@ test_that("Colours are reassigned when duplicate polygons exist", {
   expect_true(any(duplicated(names(fin.color))))
   expect_equal(sum(duplicated(names(fin.color))), 3L)
   expect_error(.reassignColours(mapnames, not.ng, init.color), 
-               "suppressWarnings(is_state(regions)) is not TRUE",
+               "all(is_state(regions)) is not TRUE",
                fixed = TRUE)
   expect_error(
     .reassignColours(mapnames, statenames, rep("NoHexs", length(statenames))),

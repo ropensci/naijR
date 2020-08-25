@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# naijR
+# naijR <img src="man/figures/logo.png" width=120px align="right" />
 
 An R package on Nigeria and for Nigeria
 
@@ -101,6 +101,12 @@ of Local Government Areas within a given State:
 
 ``` r
 lgas_ng("Imo")
+#> Warning: The `test` argument of `is_state()` is deprecated as of naijR 0.1.3.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_warnings()` to see where this warning was generated.
+#> Warning: The `allow.na` argument of `is_state()` is deprecated as of naijR 0.1.3.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_warnings()` to see where this warning was generated.
 #>  [1] "Aboh Mbaise"      "Ahiazu Mbaise"    "Ehime Mbano"      "Ezinihitte"      
 #>  [5] "Ideato North"     "Ideato South"     "Ihitte/Uboma"     "Ikeduru"         
 #>  [9] "Isiala Mbano"     "Isu"              "Mbaitoli"         "Ngor Okpala"     
