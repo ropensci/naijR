@@ -7,3 +7,7 @@
 # v0.1.4
 
 * Suppress deprecation warning for `is_state()` when it is called internally by package function; displayed only when function is called directly.
+
+# v0.1.5
+
+* Built new package website.
