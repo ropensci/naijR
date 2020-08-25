@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR • naijR</title>
+<title>Fix State Names — fix_state • naijR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR" />
-<meta property="og:description" content="The naijR package is essentially an R package about Nigeria and for Nigeria." />
+<meta property="og:title" content="Fix State Names — fix_state" />
+<meta property="og:description" content="Correct any misspelt names of States." />
 <meta property="og:image" content="http://brovic.github.io/naijR/logo.png" />
 
 
@@ -141,23 +141,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>naijR: Operations to Ease Data Analyses Specific to Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/naijR-package.R'><code>R/naijR-package.R</code></a></small>
-    <div class="hidden name"><code>naijR.Rd</code></div>
+    <h1>Fix State Names</h1>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/states.R'><code>R/states.R</code></a></small>
+    <div class="hidden name"><code>fix_state.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The naijR package is essentially an R package about Nigeria and for Nigeria.</p>
+    <p>Correct any misspelt names of States.</p>
     </div>
 
+    <pre class="usage"><span class='fu'>fix_state</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A character vector.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>This argument is placed for possible use in the near future.</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>naijR contains a number of functions that facilitate the
-management of data sets of interest including data cleaning and wrangling,
-as well as making available a number of facilities for geo-spatial data
-visuatlisation.</p>
+    <p>The function will look through a character vector and try to 
+determine if State names have been wrongly entered. This presupposes that
+the atomic vector is of type <code>character</code>. It does not test any missing
+values in the vector, leaving them untouched.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>An updated version would include the ability to adjust the 
+<a href='https://en.wikipedia.org/wiki/Levenshtein_distance'>Levenshtein 
+distance</a>, which will empower users to tune the function's sensitivity.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
