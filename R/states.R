@@ -85,7 +85,6 @@ states <- function(gpz = NULL, all = TRUE)
 #' @param x A vector to be tested.
 #' 
 #' @importFrom magrittr %>%
-#' @importFrom magrittr %<>%
 #' @import stats
 #' 
 #' @details An element-wise check of a supplied vector is carried out. To
@@ -106,12 +105,17 @@ states <- function(gpz = NULL, all = TRUE)
 is_state <- function(x)
 {
   if (!is.atomic(x) || is.null(x)) # is.atomic(NULL) == TRUE
-    stop("'x' is not a non-null atomic object", call. = FALSE)
+    stop("Expected a non-null atomic vector as input", call. = FALSE)
+  
+  ## Return FALSE rather than stop execution for this condition.
+  ## This is to enable unhindered traversal when this function
+  ## is applied across an object.
   if (!is.character(x))
     return(FALSE)
+  
   na.pos <- 0L
   if (anyNA(x)) {
-    warning("'x' contains missing values, NA", call. = FALSE)
+    warning("Invalid entries were replaced with NAs", call. = FALSE)
     exc <- stats::na.exclude(x)
     na.pos <- stats::na.action(exc)
   }

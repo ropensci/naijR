@@ -44,12 +44,13 @@ test_that("Internal object listing states is created and retrievable", {
 # Test an object for States
 test_that("input is validated", {
   expect_false(is_state(pi))
-  expect_error(is_state(NULL), "'x' is not a non-null atomic object")
+  expect_error(is_state(NULL), "Expected a non-null atomic vector as input")
   expect_length(is_state(pi), 1L)
 })
 
 test_that("States can be identified in an object", {
   ss.good <- ss.bad <- ss.na <- states()
+  
   ss.bad[c(5, 7, 19)] <- c("big", "bad", "wolf")
   ind.nas <- c(6, 19, 33)
   ss.na[ind.nas] <- NA
@@ -74,8 +75,8 @@ test_that("States can be identified in an object", {
   expect_length(bad, 37L)
   expect_equal(sum(bad), 34L)
   expect_true(nas.but.good)
-  expect_warning(is_state(ss.na), "'x' contains missing values, NA")
-  expect_length(has.na, 37L)
+  expect_warning(is_state(ss.na), "Invalid entries were replaced with NAs")
+  expect_length(has.na, 37)
   expect_equal(sum(has.na), NA_integer_)
   expect_equal(sum(has.na, na.rm = TRUE), 34L)
   expect_true(anyNA(has.na))
