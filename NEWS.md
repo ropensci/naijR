@@ -11,3 +11,7 @@
 # v0.1.5
 
 * Built new package website.
+
+# v0.1.5.9001
+
+* Added a new function `is_lga`, which checks an object for Local Government Areas.

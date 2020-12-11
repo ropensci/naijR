@@ -26,6 +26,8 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #'    }
 "lgas_nigeria"
 
+
+
 #' List Local Government Areas
 #'
 #' @param ng.state Character; State(s) in the Federation of Nigeria. Default is
@@ -64,4 +66,25 @@ lgas_ng <- function(ng.state = NA_character_) {
     return(lst)
   }
   lgas_nigeria$lga
+}
+
+
+#' Test for Local Government Areas
+#' 
+#' Checks a given object for Local Government Areas, represented as
+#' strings.
+#' 
+#' @param x An object of type \code{character}. This includes higher
+#' dimension objects like matrices and arrays. 
+#' 
+#' @return A logical vector the same length as the input object. Each
+#' element that is not a valid Local Government Area will evaluate to
+#' \code{FALSE}.
+#' 
+#' @export
+is_lga <- function(x)
+{
+  if (!is.character(x))
+    stop("x should be of type 'character'")
+  x %in% lgas_ng()
 }

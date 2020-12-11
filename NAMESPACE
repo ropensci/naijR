@@ -2,6 +2,7 @@
 
 export(fix_mobile)
 export(fix_state)
+export(is_lga)
 export(is_state)
 export(lgas_ng)
 export(map_ng)

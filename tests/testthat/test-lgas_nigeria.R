@@ -40,6 +40,34 @@ test_that("LGAs are returned correctly", {
   expect_length(res2, 2L)
 })
 
+ibd <- c(
+  'Akinyele',
+  'Egbeda',
+  'Ibadan North',
+  'Ibadan North East',         # misspelt
+  'Ibadan North West',         # misspelt
+  'Ibadan South East',         # misspelt
+  'Ibadan South West',         # misspelt
+  'Iddo',                      # misspelt
+  'Lagelu',
+  'Oluyole',
+  'Onu-Ara'                    # misspelt
+)
+
+test_that("Mispelt LGA are discovered", {
+  xx <- is_lga(ibd)
+  err <- "x should be of type 'character'"
+  expect_false(all(xx))
+  expect_error(is_lga(NULL), err)
+  expect_error(is_lga(42), err)
+  expect_error(is_lga(cars), err)
+  expect_error(is_lga(c(TRUE, FALSE)), err)
+  expect_type(xx, 'logical')
+  expect_is(matrix(is_lga(lgas_ng())), 'matrix')
+  
+})
+
+
 # test_that("is_lga recognises LGAs", {
 #   anlga <- "Amuwo-Odofin"
 #   veclga <- c("Akira-Uba", "Hawul", NA)
