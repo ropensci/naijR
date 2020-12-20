@@ -43,9 +43,9 @@ test_that("Internal object listing states is created and retrievable", {
 
 # Test an object for States
 test_that("input is validated", {
-  expect_false(is_state(pi))
+  expect_warning(is_state(pi))
   expect_error(is_state(NULL), "Expected a non-null atomic vector as input")
-  expect_length(is_state(pi), 1L)
+  expect_length(suppressWarnings(is_state(pi)), 1L)
 })
 
 test_that("States can be identified in an object", {
@@ -128,7 +128,7 @@ test_that("Different representations of the FCT are handled", {
   
   expect_true(is_state("FCT"))
   expect_true(is_state("Federal Capital Territory"))
-  expect_equal(sum(is_state(ss)), 36L)
+  expect_false(sum(is_state(ss)) == length(ss))
   expect_false(is_state("Fct"))
 })
 

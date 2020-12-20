@@ -10,7 +10,9 @@ is_state(x)
 \item{x}{A vector to be tested.}
 }
 \value{
-A logical vector.of same length as the input.
+A logical vector.of same length as the input. If the input object is
+not even of type \code{character}, return the object unaltered, with a
+warning.
 }
 \description{
 Test an Object for States

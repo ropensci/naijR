@@ -54,12 +54,8 @@ lgas_ng <- function(ng.state = NA_character_) {
   if (!all(is.na(ng.state))) {
     if (!all(is_state(ng.state)))
       stop("One or more elements of 'ng.state' is not a State in Nigeria")
-    lst <- lapply(
-      ng.state,
-      FUN = function(s) {
-        subset(lgas_nigeria, state %in% s, lga, TRUE)
-      }
-    )
+    lst <- lapply(ng.state, function(s)
+      subset(lgas_nigeria, state %in% s, lga, TRUE))
     names(lst) <- ng.state
     if (length(ng.state) == 1L)
       lst <- unname(unlist(lst))

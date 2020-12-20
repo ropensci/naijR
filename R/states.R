@@ -95,7 +95,9 @@ states <- function(gpz = NULL, all = TRUE)
 #' elements. It works only for atomic vectors, throwing an error when this 
 #' is not the case or when \code{NULL} is passed to it.
 #'
-#' @return A logical vector.of same length as the input.
+#' @return A logical vector.of same length as the input. If the input object is
+#' not even of type \code{character}, return the object unaltered, with a
+#' warning.
 #' 
 #' @examples 
 #' all(is_state(naijR::states()))
@@ -104,24 +106,25 @@ states <- function(gpz = NULL, all = TRUE)
 #' @export
 is_state <- function(x)
 {
-  if (!is.atomic(x) || is.null(x)) # is.atomic(NULL) == TRUE
+  if (!is.atomic(x) || is.null(x)) # as is.atomic(NULL) == TRUE
     stop("Expected a non-null atomic vector as input", call. = FALSE)
   
-  ## Return FALSE rather than stop execution for this condition.
+  ## Return the object rather than stop execution for this condition.
   ## This is to enable unhindered traversal when this function
   ## is applied across an object.
-  if (!is.character(x))
-    return(FALSE)
+  if (!is.character(x)) {
+    warning(sQuote(x), " is not a character vector. Nothing done")
+    return(x)
+  }
   
   na.pos <- 0L
   if (anyNA(x)) {
     warning("Invalid entries were replaced with NAs", call. = FALSE)
-    exc <- stats::na.exclude(x)
-    na.pos <- stats::na.action(exc)
+    excl <- stats::na.exclude(x)
+    na.pos <- stats::na.action(excl)
   }
   
-  x %>%
-    sub("^FCT$", "Federal Capital Territory", .) %>%
+  sub("^FCT$", "Federal Capital Territory", x) %>%
     `%in%`(.getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
@@ -172,18 +175,18 @@ fix_state <- function(x, ...)
       return(abbr)
     
     # First check for matching pattern
-    mtchd <-
+    matched <-
       grep(paste0('^', str, '$'),
            states,
            value = TRUE,
            ignore.case = TRUE)
-    if (length(mtchd) == 0L) {
+    if (length(matched) == 0L) {
       # Then check for approximate matches
-      mtchd <- agrep(str, states, value = TRUE, max.distance = 1)
-      if (length(mtchd) != 1L)
+      matched <- agrep(str, states, value = TRUE, max.distance = 1)
+      if (length(matched) != 1L)
         return(NA_character_)
     }
-    mtchd
+    matched
   }
   
   ## Process possible FCT values
@@ -193,7 +196,7 @@ fix_state <- function(x, ...)
   if (sum(hasFct) == 2)
     x <- sub(abbr, full, x)
   if (sum(hasFct) == 1) {
-    i_abbr <- grep(abbr, x)
+    i_abbr <- grep(abbr, x)   # Huh?
     i_full <- grep(full, x)
   }
   i <- grep(paste0("^", abbr, "$"), x, ignore.case = TRUE)

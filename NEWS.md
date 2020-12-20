@@ -12,6 +12,7 @@
 
 * Built new package website.
 
-# v0.1.5.9001
+# v0.1.6 [upcoming]
 
 * Added a new function `is_lga`, which checks an object for Local Government Areas.
+* Ignore, with a warning, the check for `is_state` when the object checked is not of type `character`.
