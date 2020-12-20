@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+	<idinfo>
+		<citation>
+			<citeinfo>
+				<origin>Nigerian National Population Commission,, digitized and mapped by International Institute of Tropical Agriculture (IITA)</origin>
+				<pubdate>May 2007</pubdate>
+				<title Sync="TRUE">Nigeria_census_2006_WGS84</title>
+				<geoform Sync="TRUE">vector digital data</geoform>
+				<onlink>\\Iita-geospatial\gis\Regional_info\Countries\Nigeria\Demographic\Nigeria_census_2007.shp</onlink>
+				<ftname Sync="TRUE">Nigeria_census_2006_WGS84</ftname><othercit>National Population Commission, source: Legal Notice on publication of the details of the breakdown of the National and State provisional totals 2006 Census. Federal Republic of Nigeria Official Gazette. Government Notice Nr 21. Nr. 24. Vol. 94. Lagos 15th May 2007.
+Digitized and mapped by IITA Geospatial Lab, IITA, Ibadan</othercit></citeinfo>
+		</citation>
+		<descript>
+			<abstract>Nigeria 2006 Population Census</abstract>
+			<purpose>GIS set of results from 2006 National Population Census</purpose>
+			<langdata Sync="TRUE">en</langdata></descript>
+		<timeperd>
+			<timeinfo>
+				<sngdate>
+					<caldate>REQUIRED: The year (and optionally month, or month and day) for which the data set corresponds to the ground.</caldate>
+				</sngdate>
+			</timeinfo>
+			<current>March 2006</current>
+		</timeperd>
+		<status>
+			<progress>Complete</progress>
+			<update>As needed</update>
+		</status>
+		<spdom>
+			<bounding>
+				<westbc Sync="TRUE">2.667705</westbc>
+				<eastbc Sync="TRUE">14.679512</eastbc>
+				<northbc Sync="TRUE">13.891743</northbc>
+				<southbc Sync="TRUE">4.277773</southbc>
+			</bounding>
+			<lboundng><leftbc Sync="TRUE">2.667705</leftbc><rightbc Sync="TRUE">14.679512</rightbc><bottombc Sync="TRUE">4.277773</bottombc><topbc Sync="TRUE">13.891743</topbc></lboundng></spdom>
+		<keywords>
+			<theme>
+				<themekt>REQUIRED: Reference to a formally registered thesaurus or a similar authoritative source of theme keywords.</themekt>
+				<themekey>Population census</themekey>
+			</theme>
+			<place>
+				<placekey>Republic of Nigeria</placekey>
+			</place>
+		</keywords>
+		<accconst>REQUIRED: Restrictions and legal prerequisites for accessing the data set.</accconst>
+		<useconst>REQUIRED: Restrictions and legal prerequisites for using the data set after access is granted.</useconst>
+		<ptcontac>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>International Institute of Tropical Agriculture (IITA)</cntorg>
+				</cntorgp>
+				<cntpos>Geospatial lab</cntpos>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<address>IITA, Oyo Road</address>
+					<city>Ibadan</city>
+					<state>Oyo State</state>
+					<postal>PMB 5320</postal>
+					<country>Nigeria</country>
+				</cntaddr>
+				<cntvoice>--234-2-2412626</cntvoice><cntfax>--234-2-2412221</cntfax><cntemail>iita@cgiar.org</cntemail></cntinfo>
+		</ptcontac>
+		<datacred>
+National Population Commission, source: Legal Notice on publication of the details of the breakdown of the National and State provisional totals 2006 Census. Federal Republic of Nigeria Official Gazette. Government Notice Nr 21. Nr. 24. Vol. 94. Lagos 15th May 2007.
+Digitized and mapped by IITA Geospatial Lab, IITA, Ibadan
+</datacred>
+		<native Sync="TRUE">Microsoft Windows Vista Version 6.1 (Build 7601) Service Pack 1; ESRI ArcCatalog 9.3.0.1770</native>
+		<natvform Sync="TRUE">Shapefile</natvform></idinfo>
+	<spdoinfo>
+		<direct Sync="TRUE">Vector</direct>
+		<ptvctinf>
+			<sdtsterm Name="Nigeria_census_2006_WGS84">
+				<sdtstype Sync="TRUE">G-polygon</sdtstype>
+				<ptvctcnt Sync="TRUE">775</ptvctcnt>
+			</sdtsterm>
+			<esriterm Name="Nigeria_census_2006_WGS84"><efeatyp Sync="TRUE">Simple</efeatyp><efeageom Sync="TRUE">Polygon</efeageom><esritopo Sync="TRUE">FALSE</esritopo><efeacnt Sync="TRUE">775</efeacnt><spindex Sync="TRUE">FALSE</spindex><linrefer Sync="TRUE">FALSE</linrefer></esriterm></ptvctinf>
+	</spdoinfo>
+	<spref>
+		<horizsys>
+			<geodetic>
+				<horizdn Sync="TRUE">D_WGS_1984</horizdn>
+				<ellips Sync="TRUE">WGS_1984</ellips>
+				<semiaxis Sync="TRUE">6378137.000000</semiaxis>
+				<denflat Sync="TRUE">298.257224</denflat>
+			</geodetic>
+			<cordsysn><geogcsn Sync="TRUE">GCS_WGS_1984</geogcsn></cordsysn><geograph><geogunit Sync="TRUE">Decimal degrees</geogunit><latres Sync="TRUE">0.000000</latres><longres Sync="TRUE">0.000000</longres></geograph></horizsys>
+	</spref>
+	<eainfo>
+		<detailed Name="Nigeria_census_2006_WGS84">
+			<enttyp>
+				<enttypl Sync="TRUE">Nigeria_census_2006_WGS84</enttypl>
+				<enttypt Sync="TRUE">Feature Class</enttypt><enttypc Sync="TRUE">775</enttypc></enttyp>
+			<attr>
+				<attrlabl>FID</attrlabl>
+				<attrdef>Internal feature number.</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>Sequential unique whole numbers that are automatically generated.</udom>
+				</attrdomv>
+				<attalias Sync="TRUE">FID</attalias><attrtype Sync="TRUE">OID</attrtype><attwidth Sync="TRUE">4</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>Shape</attrlabl>
+				<attrdef>Feature geometry.</attrdef>
+				<attrdefs>ESRI</attrdefs>
+				<attrdomv>
+					<udom>Coordinates defining the features.</udom>
+				</attrdomv>
+				<attalias Sync="TRUE">Shape</attalias><attrtype Sync="TRUE">Geometry</attrtype><attwidth Sync="TRUE">0</attwidth><atprecis Sync="TRUE">0</atprecis><attscale Sync="TRUE">0</attscale></attr>
+			<attr>
+				<attrlabl>OBJECTID</attrlabl>
+				<attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">9</attwidth><attalias Sync="TRUE">OBJECTID</attalias></attr>
+			<attr>
+				<attrlabl>STATE</attrlabl>
+				<attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">30</attwidth><attalias Sync="TRUE">STATE</attalias></attr>
+			<attr>
+				<attrlabl>LGA</attrlabl>
+				<attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">32</attwidth><attalias Sync="TRUE">LGA</attalias></attr>
+			<attr>
+				<attrlabl>H_QUARTERS</attrlabl>
+				<attrtype Sync="TRUE">String</attrtype><attwidth Sync="TRUE">16</attwidth><attrdef>LGA Head Quarters</attrdef><attalias Sync="TRUE">H_QUARTERS</attalias></attr>
+			<attr><attrlabl Sync="TRUE">NoHshld91</attrlabl><attalias Sync="TRUE">NoHshld91</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Number of Households 1991 Census</attrdef><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">M_pop_1991</attrlabl><attalias Sync="TRUE">M_pop_1991</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Male Population 1991</attrdef><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">F_POP_1991</attrlabl><attalias Sync="TRUE">F_POP_1991</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Female Population 1991</attrdef><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">TOT_POP91</attrlabl><attalias Sync="TRUE">TOT_POP91</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Total Population 1991</attrdef><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">PopDens91</attrlabl><attalias Sync="TRUE">PopDens91</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Population density LGA 1991 (people per sqkm)</attrdef><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">Areasqkm</attrlabl><attalias Sync="TRUE">Areasqkm</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><atnumdec Sync="TRUE">6</atnumdec></attr><attr><attrlabl Sync="TRUE">F_POP_2006</attrlabl><attalias Sync="TRUE">F_POP_2006</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Female Population 2006</attrdef></attr><attr><attrlabl Sync="TRUE">M_POP_2006</attrlabl><attalias Sync="TRUE">M_POP_2006</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Male Population 2006</attrdef></attr><attr><attrlabl Sync="TRUE">TOT_POP_06</attrlabl><attalias Sync="TRUE">TOT_POP_06</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">19</attwidth><attrdef>Total Population 2006</attrdef></attr><attr><attrlabl Sync="TRUE">POPDen_06</attrlabl><attalias Sync="TRUE">POPDen_06</attalias><attrtype Sync="TRUE">Number</attrtype><attwidth Sync="TRUE">11</attwidth><attrdef>Population Density LGA 2006 (people per sqkm)</attrdef><atnumdec Sync="TRUE">1</atnumdec></attr></detailed>
+	</eainfo>
+	<distinfo>
+		<resdesc>Downloadable Data</resdesc>
+		<stdorder>
+			<digform>
+				<digtinfo>
+					<transize>1.529</transize>
+					<dssize Sync="TRUE">1.529</dssize></digtinfo>
+			</digform>
+		</stdorder>
+	</distinfo>
+	<metainfo>
+		<metd Sync="TRUE">20121026</metd>
+		<metc>
+			<cntinfo>
+				<cntorgp>
+					<cntorg>IITA Geospatial lab</cntorg>
+					<cntper>IITA</cntper>
+				</cntorgp>
+				<cntaddr>
+					<addrtype>mailing and physical address</addrtype>
+					<city>Ibadan</city>
+					<state>Oyo State</state>
+					<postal>PMB 5320</postal>
+					<address>IITA c/o Lambourn (UK) Limited, Carolyn House,</address><country>Nigeria</country><address>26 Dingwall Road, Croydon CR9 3EE, UK</address></cntaddr>
+				<cntvoice>--234-2-241-2626</cntvoice>
+				<cntfax>-234-2-241-2221</cntfax><cntemail>iita@cgiar.org</cntemail></cntinfo>
+		</metc>
+		<metstdn Sync="TRUE">FGDC Content Standards for Digital Geospatial Metadata</metstdn>
+		<metstdv Sync="TRUE">FGDC-STD-001-1998</metstdv>
+		<mettc Sync="TRUE">local time</mettc>
+		<metextns>
+			<onlink>http://www.esri.com/metadata/esriprof80.html</onlink>
+			<metprof>ESRI Metadata Profile</metprof>
+		</metextns>
+		<langmeta Sync="TRUE">en</langmeta><metextns><onlink Sync="TRUE">http://www.esri.com/metadata/esriprof80.html</onlink><metprof Sync="TRUE">ESRI Metadata Profile</metprof></metextns></metainfo>
+	<Esri><CreaDate>20070622</CreaDate><CreaTime>15514800</CreaTime><SyncOnce>FALSE</SyncOnce><SyncDate>20121026</SyncDate><SyncTime>06445500</SyncTime><ModDate>20121026</ModDate><ModTime>06445500</ModTime><MetaID>{4EBB4CA1-ED57-429A-8A78-D2AA1BB3A43C}</MetaID><DataProperties><lineage><Process Name="Project_1" ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Data Management Tools.tbx\Project" Date="20070622" Time="155149">Project Nigeria_census_2006 Z:\Regional_info\Countries\Nigeria\Demographic\Nigeria_census_2006_WGS84.shp GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]] Minna_To_WGS_1984_1</Process></lineage></DataProperties></Esri><dataqual><lineage><procstep><procdesc Sync="TRUE">Metadata imported.</procdesc><srcused Sync="TRUE">C:\DOCUME~1\talabi\LOCALS~1\Temp\xml222.tmp</srcused><date Sync="TRUE">20070620</date><time Sync="TRUE">17191200</time></procstep><procstep><procdesc Sync="TRUE">Dataset copied.</procdesc><srcused Sync="TRUE"></srcused><date Sync="TRUE">20070622</date><time Sync="TRUE">15514800</time></procstep></lineage></dataqual><dataIdInfo><envirDesc Sync="TRUE">Microsoft Windows Vista Version 6.1 (Build 7601) Service Pack 1; ESRI ArcCatalog 9.3.0.1770</envirDesc><dataLang><languageCode Sync="TRUE" value="en"></languageCode></dataLang><idCitation><resTitle Sync="TRUE">Nigeria_census_2006_WGS84</resTitle><presForm><PresFormCd Sync="TRUE" value="005"></PresFormCd></presForm></idCitation><spatRpType><SpatRepTypCd Sync="TRUE" value="001"></SpatRepTypCd></spatRpType><dataExt><geoEle><GeoBndBox esriExtentType="native"><westBL Sync="TRUE">2.667705</westBL><eastBL Sync="TRUE">14.679512</eastBL><northBL Sync="TRUE">13.891743</northBL><southBL Sync="TRUE">4.277773</southBL><exTypeCode Sync="TRUE">1</exTypeCode></GeoBndBox></geoEle></dataExt><geoBox esriExtentType="decdegrees"><westBL Sync="TRUE">2.667705</westBL><eastBL Sync="TRUE">14.679512</eastBL><northBL Sync="TRUE">13.891743</northBL><southBL Sync="TRUE">4.277773</southBL><exTypeCode Sync="TRUE">1</exTypeCode></geoBox></dataIdInfo><mdLang><languageCode Sync="TRUE" value="en"></languageCode></mdLang><mdStanName Sync="TRUE">ISO 19115 Geographic Information - Metadata</mdStanName><mdStanVer Sync="TRUE">DIS_ESRI1.0</mdStanVer><mdChar><CharSetCd Sync="TRUE" value="004"></CharSetCd></mdChar><mdHrLv><ScopeCd Sync="TRUE" value="005"></ScopeCd></mdHrLv><mdHrLvName Sync="TRUE">dataset</mdHrLvName><distInfo><distributor><distorTran><onLineSrc><orDesc Sync="TRUE">002</orDesc><linkage Sync="TRUE">file://\\PRINCEWILL\C$\New folder\nigeria data\niger census\niger census\Nigeria_census_2006_WGS84.shp</linkage><protocol Sync="TRUE">Local Area Network</protocol></onLineSrc><transSize Sync="TRUE">1.529</transSize></distorTran><distorFormat><formatName Sync="TRUE">Shapefile</formatName></distorFormat></distributor></distInfo><refSysInfo><RefSystem><refSysID><identCode Sync="TRUE">GCS_WGS_1984</identCode></refSysID></RefSystem></refSysInfo><spatRepInfo><VectSpatRep><topLvl><TopoLevCd Sync="TRUE" value="001"></TopoLevCd></topLvl><geometObjs Name="Nigeria_census_2006_WGS84"><geoObjTyp><GeoObjTypCd Sync="TRUE" value="001"></GeoObjTypCd></geoObjTyp><geoObjCnt Sync="TRUE">775</geoObjCnt></geometObjs></VectSpatRep></spatRepInfo><mdDateSt Sync="TRUE">20121026</mdDateSt></metadata>
