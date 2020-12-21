@@ -133,7 +133,12 @@ map_ng <- function(region = character(),
   ## `maps` package.
   
   ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  region <- .processStateParam(region)
+  if (is.null(region))
+    stop("Cannot pass NULL as a region")
+  else {
+    if (identical(region, character()) || is_state(region))
+      region <- .processStateParam(region)
+  }
   stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
     message("Display of neighbouring countries is disabled")
@@ -290,15 +295,55 @@ map_ng <- function(region = character(),
   stopifnot(is.character(region))
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  if (!all(is_state(region))) {
-    ss <- paste(region, collapse = ', ')
-    stop("Invalid region(s) for the map: ", ss)
+  if (identical(region, character()))
+    region <- states()
+  hasStates <- is_state(region)
+  hasLgas <- is_lga(region)
+  isStateMap <- any(hasStates)
+  isLgaMap <- any(hasLgas)
+  if (isStateMap && isLgaMap) {
+    if (any(region %in% .LgaStates()))
+      isStateMap <- FALSE
+    else
+      stop("Map must be based on either States or LGAs, not both.")
   }
-  sp <- .getSpatialPolygonsDataFrame()
-  SpatialPolygons2map(sp, namefield = 'admin1Name')
+  if (!isStateMap && !isLgaMap)
+    stop("Neither States nor LGAs could be properly mapped.")
+  
+  if (isStateMap) {
+    invalid <- region[!hasStates]
+    regtyp <- "state"
+    namefield <- 'admin1Name'
+  }
+  else if (isLgaMap) {
+    invalid <- region[!hasLgas]
+    regtyp <- "lga"
+    namefield <- "LGA"
+  }
+  
+  if (length(invalid) > 0L) {
+    invalid <- paste(invalid, collapse = ', ')
+    stop("Invalid region(s) for the map: ", invalid)
+  }
+
+  sp <- .getSpatialPolygonsDataFrame(regtyp)
+  SpatialPolygons2map(sp, namefield = namefield)
 }
 
 
+
+
+# States that are also the names of LGAs
+.LgaStates <-
+  function()
+    c("Bauchi",
+      "Ebonyi",
+      "Ekiti",
+      "Gombe",
+      "Katsina",
+      "Kogi",
+      "Nasarawa",
+      "Oyo")
 
 
 
@@ -307,12 +352,19 @@ map_ng <- function(region = character(),
 
 ## Read the data from an internal shapefile
 #' @importFrom rgdal readOGR
-.getSpatialPolygonsDataFrame <- function() {
+.getSpatialPolygonsDataFrame <- function(region.type) {
+  src <-
+    if (region.type == 'state')
+      'ng_admin'
+  else if (region.type == 'lga')
+    'lg_ng'
   dsn <-
-    system.file("extdata/ng_admin", package = 'naijR', mustWork = TRUE)
+    system.file(file.path("extdata", src),
+                package = 'naijR',
+                mustWork = TRUE)
   if (identical(dsn, character(1)))
     stop("The map data could not be found in 'extdata'")
-  readOGR(dsn, .shpLayer, verbose = FALSE)
+  readOGR(dsn, .shpLayer(region.type), verbose = FALSE)
 }
 
 
@@ -322,7 +374,15 @@ map_ng <- function(region = character(),
 
 
 # For possible export later
-.shpLayer <- "nga_admbnda_adm1_osgof_20161215"
+.shpLayer <- function(level) {
+  if (level == 'state')
+    "nga_admbnda_adm1_osgof_20161215"
+  else if (level == 'lga')
+    "Nigeria_census_2006_WGS84"
+  else
+    stop("An appropriate layer is not avaiable")
+}
+    
 
 
 

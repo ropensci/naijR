@@ -21,9 +21,10 @@ test_that("Input is validated", {
   myerr1 <- "One or more elements of 'region' is not a Nigerian region"
   myerr2 <- "Type of argument supplied to 'region' is invalid."
   expect_error(map_ng(999), myerr2)
-  expect_is(map_ng(NULL, plot = FALSE), 'map')
-  expect_error(map_ng(NA), myerr2)
-  expect_error(map_ng('TRUE'), myerr1)
+  expect_error(map_ng(NULL, plot = FALSE), 'Cannot pass NULL as a region')
+  expect_error(map_ng(NA), "missing value where TRUE/FALSE needed")
+  expect_error(map_ng('TRUE'), 
+               "Neither States nor LGAs could be properly mapped.")
   expect_error(map_ng(pi), myerr2)
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring countries is disabled")
@@ -83,26 +84,6 @@ test_that("Subnational divisions are plotted", {
   expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
 })
 
-test_that("Data for mapping are retrieved properly", {
-  db <- .getMapData("Nigeria")
-  
-  expect_error(.getMapData(NULL))
-  expect_error(.getMapData(42L))
-  expect_error(.getMapData(pi))
-  expect_error(.getMapData(TRUE))
-  expect_is(db, 'character')
-  expect_identical(db, "mapdata::worldHires")
-  expect_is(.getMapData("Abia"), 'map')
-  expect_error(.getMapData("Alaska"), 
-               "Invalid region(s) for the map: Alaska",
-               fixed = TRUE)
-  expect_error(.getMapData(c("Unreal", "Imaginary")), 
-               "Invalid region(s) for the map: Unreal, Imaginary",
-               fixed = TRUE)
-})
-
-test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))
 
 set.seed(4)
 df <-
@@ -258,13 +239,13 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE), 
     'map')
   
-  expect_is(map_ng(
+  expect_error(map_ng(
     region = dat$region,
     x = dat$total.pop,
     breaks = pop.groups,
     plot = FALSE
   ),
-  'map')
+  "Cannot pass NULL as a region")
   
   expect_error(
     map_ng(region = dat$state,
@@ -316,53 +297,8 @@ test_that("Choropleth colours can be controlled at interface", {
   func$col <- 'blue'; expect_is(eval_tidy(func), mm)
 })
 
-test_that("Duplicated polygon names are made empty", {
-  label <- c("A:1", 'A:2', 'A:3', 'B', 'C:1', 'C:2')
-  result <- .adjustLabels(label)
-  err <- "is.character\\(x\\) is not TRUE"
-  
-  expect_error(.adjustLabels(NA), err)
-  expect_error(.adjustLabels(numeric()), err)
-  expect_error(.adjustLabels(logical()), err)
-  expect_error(.adjustLabels(NULL), err)
-  expect_type(result, 'character')
-  expect_is(result, 'character')
-  expect_length(result, 6L)
-  expect_length(grep("^$", result), 3L)
-  expect_false(any(grepl("\\:\\d$", result)))
-})
 
-test_that("States' columns are searchable within a data frame", {
-  dat <- readRDS('data/pvc2015.rds')
-  regions <- states()
-  ss <- .regionColumnIndex(dat, regions)
-  err <- "is.data.frame\\(dt\\) is not TRUE"
-  
-  expect_is(ss, 'integer')
-  expect_length(ss, 1L)
-  expect_error(.regionColumnIndex(), 
-               "argument \"dt\" is missing, with no default")
-  expect_error(.regionColumnIndex(regions, regions), err)
-  expect_equivalent(.regionColumnIndex(dat, letters), 1L)
-  expect_equivalent(.regionColumnIndex(dat, NULL), 1L)
-  expect_error(.regionColumnIndex(NULL, regions), err)
-  expect_error(.regionColumnIndex(mtcars, regions), 
-               "No column with elements in regions.")
-})
 
-test_that("Bounds for plotting points are checked", {
-  x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
-  y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
-  m <- map_ng(NULL, plot = FALSE)
-  mk <- map_ng("Kwara", plot = FALSE)
-  
-  expect_true(.xyWithinBounds(m, x, y))
-  expect_false(.xyWithinBounds(mk, x, y))
-  
-  x[4] <- -3; y[4] <- 1000
-  expect_false(.xyWithinBounds(m, x, y))
-  
-})
 
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
@@ -394,11 +330,12 @@ test_that("Points are mapped", {
   x <- c(3.000, 4.000, 6.000)
   y <- c(6.000, 9.000, 4.300)
   
-  expect_is(map_ng(NULL, x = x, y = y, plot = FALSE), 'map')
+  expect_error(map_ng(NULL, x = x, y = y, plot = FALSE),
+            'Cannot pass NULL as a region')
   
   x[4] <- -3; y[4] <- 1000
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
-               "Coordinates are out of bounds of the map")
+               "Cannot pass NULL as a region")
 })
 
 test_that("Factors can draw choropleth", {
@@ -443,8 +380,6 @@ test_that("Parameters passed via ellipsis work seamlessly", {
   
   expect_is(map_ng(lwd = 2, plot = FALSE), mm)
   expect_is(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
-  expect_is(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), mm)
+  expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
+               "Cannot pass NULL as a region")
 })
-
-test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))

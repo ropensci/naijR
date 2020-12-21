@@ -124,6 +124,9 @@ is_state <- function(x)
     na.pos <- stats::na.action(excl)
   }
   
+  if (length(x) == 0L)
+    return(FALSE)
+  
   sub("^FCT$", "Federal Capital Territory", x) %>%
     `%in%`(.getAllStates(named = FALSE)) %>%
     {
