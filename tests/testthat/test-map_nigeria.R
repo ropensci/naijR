@@ -19,28 +19,21 @@
 
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'region' is not a Nigerian region"
-  myerr2 <- "Type of argument supplied to 'region' is invalid."
+  myerr2 <- "Expected a character vector as 'region'"
+  
   expect_error(map_ng(999), myerr2)
-  expect_error(map_ng(NULL, plot = FALSE), 'Cannot pass NULL as a region')
-  expect_error(map_ng(NA), "missing value where TRUE/FALSE needed")
+  expect_error(map_ng(NULL, plot = FALSE), myerr2)
+  expect_error(map_ng(NA), myerr2)
   expect_error(map_ng('TRUE'), 
-               "Neither States nor LGAs could be properly mapped.")
+               "One or more elements of 'region' is not a Nigerian region")
   expect_error(map_ng(pi), myerr2)
+  expect_warning(map_ng(plot = FALSE, show.neighbours = c(TRUE, TRUE)),
+                 "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
-                 "Display of neighbouring countries is disabled")
+                 "Display of neighbouring countries is temporarily disabled")
   # TODO: Add test case for choropleths with too few regions
 })
 
-test_that("Check on 'region' parameter works", {
-  
-  expect_equal(.processStateParam(NULL), "Nigeria")
-  expect_error(.processStateParam(), 
-               "argument \"s\" is missing, with no default")
-  expect_length(.processStateParam(states('se')), 5L)
-  expect_length(.processStateParam(character()), 37L)
-  expect_error(.processStateParam(c("Abia", "Kano", "Lifebuoy")),
-               "One or more elements of 'region' is not a Nigerian region")
-})
 
 test_that("Choropleth categories are created", {
   set.seed(50)
@@ -75,6 +68,10 @@ test_that("Decision is made on drawing choropleths", {
   expect_true(.validateChoroplethParams(data = data.frame(nc.states, vals$nc)))
   expect_true(.validateChoroplethParams(region = all.states, val = all.ints))
   expect_false(.validateChoroplethParams(region = '.'))
+})
+
+test_that("National outline map is plotted", {
+  expect_is(map_ng("Nigeria", plot = FALSE), "map")
 })
 
 test_that("Subnational divisions are plotted", {
@@ -245,7 +242,7 @@ test_that("Choropleth mapping succeeds", {
     breaks = pop.groups,
     plot = FALSE
   ),
-  "Cannot pass NULL as a region")
+  "Expected a character vector as 'region'")
   
   expect_error(
     map_ng(region = dat$state,
@@ -331,15 +328,18 @@ test_that("Points are mapped", {
   y <- c(6.000, 9.000, 4.300)
   
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE),
-            'Cannot pass NULL as a region')
+               "Expected a character vector as 'region'")
   
   x[4] <- -3; y[4] <- 1000
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
-               "Cannot pass NULL as a region")
+               "Expected a character vector as 'region'")
 })
 
 test_that("Factors can draw choropleth", {
-  getSmpl <- function(seed) { set.seed(seed); sample(letters[1:5], 37, T) }
+  getSmpl <- function(seed) { 
+    set.seed(seed)
+    sample(letters[1:5], 37, T) 
+  }
   
   getDblSmpl <- function(seed = round(runif(100, max = 500))) {
     set.seed(seed)
@@ -381,5 +381,5 @@ test_that("Parameters passed via ellipsis work seamlessly", {
   expect_is(map_ng(lwd = 2, plot = FALSE), mm)
   expect_is(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
   expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
-               "Cannot pass NULL as a region")
+               "Expected a character vector as 'region'")
 })

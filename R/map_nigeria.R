@@ -124,24 +124,18 @@ map_ng <- function(region = character(),
                    leg.orient = c('vertical', 'horizontal'),
                    ...)
 {
-  ## NOTE: In the call to map.text, the name 'database' is actually
-  ## required. This is because internally, there is a call to `eval()`
-  ## which uses its default argument for `envir` i.e. `parent.frame()`.
-  ## An object of any other name is not seen by the quoted call to
-  ## maps::map used by the evaluator function. For more details,
-  ## inspect the source code for `maps::map.text`. This is a bug in the
-  ## `maps` package.
-  
   ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  if (is.null(region))
-    stop("Cannot pass NULL as a region")
-  else {
-    if (identical(region, character()) || is_state(region))
-      region <- .processStateParam(region)
+  if (!is.character(region))
+    stop("Expected a character vector as 'region'")
+  region <- .processRegionParam(region)
+  if (!is.logical(show.neighbours))
+    stop("'show.neighbours' should be a boolean")
+  if (length(show.neighbours) > 1L) {
+    warning("Only the first element of 'show.neighbours' was used")
+    show.neighbours <- show.neighbours[1]
   }
-  stopifnot(is.logical(show.neighbours))
   if (show.neighbours)
-    message("Display of neighbouring countries is disabled")
+    message("Display of neighbouring countries is temporarily disabled")
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
   else 
@@ -193,16 +187,24 @@ map_ng <- function(region = character(),
         } %>%
         .adjustLabels
     }
+    
+    ## NOTE: In the call to map.text, the name 'database' is actually
+    ## required. This is because internally, there is a call to `eval()`
+    ## which uses its default argument for `envir` i.e. `parent.frame()`.
+    ## An object of any other name is not seen by the quoted call to
+    ## maps::map used by the evaluator function. For more details,
+    ## inspect the source code for `maps::map.text`. This is a bug in the
+    ## `maps` package.
     map.text(database, region, labels = txt, col = col, fill = fill, ...)
   }
   else
     eval_tidy(mapq)
+  
   if(!is_null(y))
     if (!.xyWithinBounds(mp, x, y))
       stop("Coordinates are out of bounds of the map")
   
-  # Capture 'dots' and return visible 
-  # 'map' object if `plot == FALSE`
+  ## Capture 'dots' and return visible 'map' object if `plot == FALSE`
   dots <- list(...)
   params <- names(dots)
   if ('plot' %in% params)
@@ -234,22 +236,22 @@ map_ng <- function(region = character(),
 
 
 
-
+## MARK FOR DEPRECATION
+## Processes character input, presumably States, and when empty
+## character vector, provide all the States as a default value.
+## This function's use will be overtaken by the introduction 
+## of LGA level mapping.
 #' @importFrom rlang abort
-.processStateParam <- function(s)
+.processRegionParam <- function(s)
 {
-  if (!identical(s, character()))
-    if (!is.character(s) && !is.null(s))
-      abort("Type of argument supplied to 'region' is invalid.")
+  stopifnot(is.character(s))
+  if (identical(s, "Nigeria"))
+    return(s)
   all.st <- states(all = TRUE)
-  if (is.character(s)) {
-    if (length(s) == 0L)
-      s <- all.st
-    if (!all(s %in% all.st))
-      abort("One or more elements of 'region' is not a Nigerian region")
-  }
-  if (is.null(s))
-    s <- "Nigeria"
+  if (length(s) == 0L)
+    s <- all.st
+  if (!all(s %in% all.st))
+    abort("One or more elements of 'region' is not a Nigerian region")
   s
 }
 
@@ -302,8 +304,8 @@ map_ng <- function(region = character(),
   isStateMap <- any(hasStates)
   isLgaMap <- any(hasLgas)
   if (isStateMap && isLgaMap) {
-    if (any(region %in% .LgaStates()))
-      isStateMap <- FALSE
+    if (sum(.LgaStates() %in% region) > 1L)
+      isLgaMap <- FALSE
     else
       stop("Map must be based on either States or LGAs, not both.")
   }

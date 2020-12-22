@@ -27,7 +27,7 @@ map_ng()
 To show the map without the state borders, set the first argument (`region`) to `NULL`. Thus, with all other arguments set to default values, that would be
 
 ```{r outline-map}
-map_ng(NULL)
+map_ng("Nigeria")
 ```
 
 It is possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
@@ -120,10 +120,10 @@ To show the distribution of point data on any the maps such as GIS location data
 x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
 y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
 
-map_ng(NULL, x = x, y = y)
+map_ng("Nigeria", x = x, y = y)
 ```
 
-The function `map_ng` carried out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
+The function `map_ng` carries out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
 
 ```{r out-of-bounds, error=TRUE}
 map_ng("Kwara", x = x, y = y)
