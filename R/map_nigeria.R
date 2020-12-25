@@ -250,7 +250,7 @@ map_ng <- function(region = character(),
   all.st <- states(all = TRUE)
   if (length(s) == 0L)
     s <- all.st
-  if (!all(s %in% all.st))
+  if (!all(s %in% all.st) && !all(s %in% lgas_ng()))
     abort("One or more elements of 'region' is not a Nigerian region")
   s
 }
@@ -289,16 +289,17 @@ map_ng <- function(region = character(),
 
 
 
+.getMapData <- function(region)
+  UseMethod(".getMapData")
+
+
 
 #' @import mapdata
-#' @importFrom maps SpatialPolygons2map
-.getMapData <- function(region)
+.getMapData.default <- function(region)
 {
   stopifnot(is.character(region))
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  if (identical(region, character()))
-    region <- states()
   hasStates <- is_state(region)
   hasLgas <- is_lga(region)
   isStateMap <- any(hasStates)
@@ -314,24 +315,61 @@ map_ng <- function(region = character(),
   
   if (isStateMap) {
     invalid <- region[!hasStates]
-    regtyp <- "state"
-    namefield <- 'admin1Name'
+    params <- stateSpatialParams()
   }
   else if (isLgaMap) {
     invalid <- region[!hasLgas]
-    regtyp <- "lga"
-    namefield <- "LGA"
+    params <- lgaSpatialParams()
   }
   
   if (length(invalid) > 0L) {
     invalid <- paste(invalid, collapse = ', ')
     stop("Invalid region(s) for the map: ", invalid)
   }
-
-  sp <- .getSpatialPolygonsDataFrame(regtyp)
-  SpatialPolygons2map(sp, namefield = namefield)
+  
+  getMapFromSpatialDataFiles(params)
 }
 
+
+.getMapData.lgas_ng <- function(region)
+{
+  getMapFromSpatialDataFiles(lgaSpatialParams())
+}
+
+
+# Takes a list with 2 elements - regtyp ('state' or 'lga') and
+# namefield (the field in the shapefile the contains the regions' names)
+# Returns an object of class 'map' via SpatialPolygons2map()
+#' @importFrom maps SpatialPolygons2map
+getMapFromSpatialDataFiles <- function(param)
+{
+  sp <- .getSpatialPolygonsDataFrame(param$regtyp)
+  SpatialPolygons2map(sp, namefield = param$namefield)
+}
+
+
+
+
+
+# Parameters used for determining the region-specific elements 
+# for the sp S4 objects, namely the region type (State/LGA) and
+# the field containing the names (This is determined by inspecting
+# the S4 object returned from the shapefiles.)
+regionSpatialParams <- function(...) {
+  list(...)
+}
+
+
+stateSpatialParams <- function()
+{
+  regionSpatialParams(regtyp = 'state', namefield = 'admin1Name')
+}
+
+
+lgaSpatialParams <- function()
+{
+  regionSpatialParams(regtyp = 'lga', namefield = 'LGA')
+}
 
 
 

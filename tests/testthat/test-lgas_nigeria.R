@@ -15,14 +15,17 @@
 
 
 test_that("illegal input is caught early", {
+  chErr <- "Expected an object of type 'character'"
+  
   expect_error(lgas_ng("Saarland"))
   expect_error(lgas_ng("Maryland"),
                "One or more elements of 'ng.state' is not a State in Nigeria",
                fixed = TRUE)
+  expect_error(lgas_ng(888), chErr)
+  expect_error(lgas_ng(NULL), chErr)
+  expect_error(lgas_ng(TRUE), chErr)
+  expect_error(lgas_ng(3.14), chErr)
 })
-
-
-
 
 
 test_that("LGAs are returned correctly", {
@@ -54,6 +57,7 @@ ibd <- c(
   'Onu-Ara'                    # misspelt
 )
 
+
 test_that("Mispelt LGA are discovered", {
   xx <- is_lga(ibd)
   err <- "x should be of type 'character'"
@@ -68,11 +72,11 @@ test_that("Mispelt LGA are discovered", {
 })
 
 
-# test_that("is_lga recognises LGAs", {
-#   anlga <- "Amuwo-Odofin"
-#   veclga <- c("Akira-Uba", "Hawul", NA)
-#   
-#   
-#   expect_true(is_lga(anlga))
-#   expect_false
-# })
+test_that("is_lga recognises LGAs", {
+  anlga <- "Amuwo-Odofin"
+  veclga <- c("Akira-Uba", "Hawul", NA)
+
+
+  expect_true(is_lga(anlga))
+  expect_false(all(is_lga(veclga)))
+})

@@ -81,7 +81,14 @@ test_that("Subnational divisions are plotted", {
   expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
 })
 
+test_that("LGAs are plotted", {
+  expect_is(map_ng("Akinyele", plot = FALSE), "map")
+  expect_is(map_ng("Owerri North", plot = FALSE), "map")
+})
 
+test_that("LGAs can be plotted where a State and LGA share name", {
+  expect_is(map_ng(lgas_ng("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
+})
 set.seed(4)
 df <-
   data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE),
