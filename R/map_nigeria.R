@@ -117,7 +117,7 @@ map_ng <- function(region = character(),
                    title = NULL,
                    caption = NULL,
                    show.neighbours = FALSE,
-                   show.text = FALSE,
+                   show.text = NA,
                    leg.x = 13L,
                    leg.y = 7L,
                    leg.title,
@@ -151,6 +151,14 @@ map_ng <- function(region = character(),
   if (is.null(col) && is_false(chrplth))
     col <- 1L
   database <- .getMapData(region)
+  
+  ## Capture 'dots' and return visible 'map' object if `plot == FALSE`
+  dots <- list(...)
+  params <- names(dots)
+  dontPlot <- FALSE
+  if ('plot' %in% params)
+    if (is_false(dots$plot))
+      dontPlot <- TRUE
   mapq <- expr(map(database, regions = region, col = col, fill = fill, ...))
   if (chrplth) {
     if (!is.null(data)) {
@@ -177,9 +185,11 @@ map_ng <- function(region = character(),
     horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
-  if (all(is_state(region)))
+  if (all(is_state(region)) && is.na(show.text))
     show.text <- TRUE  # Quick and dirty fix. To be refactored.
-  mp <- if (show.text) {
+  mp <- if (!show.text || dontPlot)
+    eval_tidy(mapq)
+  else {
     if (!identical(region, 'Nigeria')) {
       txt <- database$name %>%
         {
@@ -197,22 +207,19 @@ map_ng <- function(region = character(),
     ## maps::map used by the evaluator function. For more details,
     ## inspect the source code for `maps::map.text`. This is a bug in the
     ## `maps` package.
-    map.text(database, region, labels = txt, col = col, fill = fill, ...)
+    map.text(
+      database,
+      region,
+      labels = txt,
+      col = col,
+      fill = fill
+    )
   }
-  else
-    eval_tidy(mapq)
-  
   if(!is_null(y))
     if (!.xyWithinBounds(mp, x, y))
       stop("Coordinates are out of bounds of the map")
-  
-  ## Capture 'dots' and return visible 'map' object if `plot == FALSE`
-  dots <- list(...)
-  params <- names(dots)
-  if ('plot' %in% params)
-    if (is_false(dots$plot))
-      return(mp)
-  
+  if (dontPlot)
+    return(mp)
   if (chrplth) {
     if (is.null(categories))
       categories <- cOpts$bins

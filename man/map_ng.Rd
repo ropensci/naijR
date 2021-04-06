@@ -16,7 +16,7 @@ map_ng(
   title = NULL,
   caption = NULL,
   show.neighbours = FALSE,
-  show.text = FALSE,
+  show.text = NA,
   leg.x = 13L,
   leg.y = 7L,
   leg.title,
