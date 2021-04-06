@@ -186,8 +186,9 @@ map_ng <- function(region = character(),
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
   ngOutlineMap <- identical(region, 'Nigeria')
-  if ((all(is_state(region)) || ngOutlineMap) && is.na(show.text))
-    show.text <- TRUE  # Quick and dirty fix. To be refactored.
+  show.text <- if ((all(is_state(region)) || ngOutlineMap) && is.na(show.text))
+    TRUE  # Quick and dirty fix. To be refactored.
+  else FALSE
   mp <- if (!show.text || dontPlot)
     eval_tidy(mapq)
   else {
@@ -407,7 +408,7 @@ lgaSpatialParams <- function()
   if (region.type == 'state')
     return('ng_admin')
   
-  'lg_ng2'
+  'nigeria-lgas'
 }
 
 
@@ -439,8 +440,9 @@ lgaSpatialParams <- function()
   if (level == 'state')
     "nga_admbnda_adm1_osgof_20161215"
   else if (level == 'lga')
+    "new_lga_nigeria_2003"
     # "NIGERIA_LGA"
-    "Nigeria_census_2006_WGS84"
+    # "Nigeria_census_2006_WGS84"
   else
     stop("An appropriate layer is not avaiable")
 }
@@ -743,18 +745,25 @@ lgaSpatialParams <- function()
 
 
 
-## ---- Utility function(s) - for maintenance use only ----
 
-## Inspects the data object of a shapefile.
-## This function could be useful, for example, when trying to 
-## determine the value for the 'namefield' parameter for
-## for the function 'maps::SpatialPolygons2map'
-.__inspectShapefileData <- function(region.type)
+
+## Get the properties of shape files
+ShapefileProperties <- function(shp, nmfld, ...)
 {
-  dt <- .getSpatialPolygonsDataFrame(region.type)
-  warning("'namefield' change is made in 'regionSpatialParams()'", call. = FALSE)
-  head(dt@data, 3)
+  stopifnot(dir.exists(shp), !missing(nmfld), is.character(nmfld))
+  pat <- "\\.shp$"
+  shpfl <- list.files(shp, pat)
+  lyr <- sub(pattern = paste0("(.)(", pat, ")"), "", shpfl)
+  new_ShapefileProperties(lyr, nmfld, ...)
 }
 
 
 
+
+new_ShapefileProperties <- function(layer, namefield, ...)
+{
+  structure(list(layer,namefield),
+            names = c("layer", "namefield"), 
+            class = "ShapefileProperties",
+            ...)
+}
