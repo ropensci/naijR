@@ -177,6 +177,8 @@ map_ng <- function(region = character(),
     horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
+  if (all(is_state(region)))
+    show.text <- TRUE  # Quick and dirty fix. To be refactored.
   mp <- if (show.text) {
     if (!identical(region, 'Nigeria')) {
       txt <- database$name %>%
@@ -359,7 +361,8 @@ regionSpatialParams <- function(...) {
   list(...)
 }
 
-
+# TODO: Improve this construct please!!! This is nonsense - 
+# use polymorphism instead.
 stateSpatialParams <- function()
 {
   regionSpatialParams(regtyp = 'state', namefield = 'admin1Name')
@@ -387,17 +390,24 @@ lgaSpatialParams <- function()
 
 
 
+## Returns the name currently used by the directory containing the
+## shapefile assets. This is found in inst/extdata.
+.getShapefileDir <- function(region.type = c('state', 'lga'))
+{
+  region.type <- match.arg(region.type)
+  if (region.type == 'state')
+    return('ng_admin')
+  
+  'lg_ng2'
+}
+
 
 
 
 ## Read the data from an internal shapefile
 #' @importFrom rgdal readOGR
 .getSpatialPolygonsDataFrame <- function(region.type) {
-  src <-
-    if (region.type == 'state')
-      'ng_admin'
-  else if (region.type == 'lga')
-    'lg_ng'
+  src <- .getShapefileDir(region.type)
   dsn <-
     system.file(file.path("extdata", src),
                 package = 'naijR',
@@ -413,11 +423,14 @@ lgaSpatialParams <- function()
 
 
 
+
+
 # For possible export later
 .shpLayer <- function(level) {
   if (level == 'state')
     "nga_admbnda_adm1_osgof_20161215"
   else if (level == 'lga')
+    # "NIGERIA_LGA"
     "Nigeria_census_2006_WGS84"
   else
     stop("An appropriate layer is not avaiable")
@@ -718,3 +731,21 @@ lgaSpatialParams <- function()
   yy <- y >= rr[3] & y <= rr[4]
   all(xx, yy)
 }
+
+
+
+## ---- Utility function(s) - for maintenance use only ----
+
+## Inspects the data object of a shapefile.
+## This function could be useful, for example, when trying to 
+## determine the value for the 'namefield' parameter for
+## for the function 'maps::SpatialPolygons2map'
+.__inspectShapefileData <- function(region.type)
+{
+  dt <- .getSpatialPolygonsDataFrame(region.type)
+  warning("'namefield' change is made in 'regionSpatialParams()'", call. = FALSE)
+  head(dt@data, 3)
+}
+
+
+
