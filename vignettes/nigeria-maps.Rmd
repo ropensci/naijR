@@ -68,7 +68,7 @@ head(dd)
 To draw this choropleth, we will use the data frame approach first:
 
 ```{r df-approach}
-map_ng(data = dd, x = var)
+map_ng(data = dd, x = var, show.text = FALSE)
 ```
 
 Note the following:
@@ -80,7 +80,7 @@ Note the following:
 ### Using atomic vectors
 We can use the same data to make the same map, but with a different coding approach:
 ```{r vec-approach}
-map_ng(region = ss, x = vv, col = "red")
+map_ng(region = ss, x = vv, col = "red", show.text = FALSE)
 ```
 
 It's exactly same map as before, but this time, we used 2 vectors to provide the data -- one for the regions (in this case the 36 States and FCT) and another for the categorization. We have also introduced some colouring with the `col` argument. Although it has the same data, if we try to use the column name from `dd`, we have an error.
@@ -96,7 +96,7 @@ When the data to be categorized are numeric vectors, the categories have to be d
 nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100
 bb <- c(0, 40, 60, 100)
 
-map_ng(region = ss, x = nn, breaks = bb, col = 'YlOrRd')
+map_ng(region = ss, x = nn, breaks = bb, col = 'YlOrRd', show.text = FALSE)
 ```
 
 To get a more meaningful and interpretable legend, use the `categories` argument.
@@ -107,7 +107,8 @@ map_ng(
   x = nn,
   breaks = bb,
   categories = c("Low", "Medium", "High"),
-  col = 3L
+  col = 3L, 
+  show.text = FALSE
 )
 ```
 

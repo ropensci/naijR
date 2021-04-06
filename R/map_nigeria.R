@@ -185,12 +185,14 @@ map_ng <- function(region = character(),
     horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
-  if (all(is_state(region)) && is.na(show.text))
+  ngOutlineMap <- identical(region, 'Nigeria')
+  if ((all(is_state(region)) || ngOutlineMap) && is.na(show.text))
     show.text <- TRUE  # Quick and dirty fix. To be refactored.
   mp <- if (!show.text || dontPlot)
     eval_tidy(mapq)
   else {
-    if (!identical(region, 'Nigeria')) {
+    txt <- "Nigeria"
+    if (!ngOutlineMap) {
       txt <- database$name %>%
         {
           is <- lapply(region, grep, x = .)
