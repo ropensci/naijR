@@ -14,3 +14,8 @@
 }
 
 
+## Display an array of maps for all the States
+.__displayStateMaps <- function()
+{
+  invisible(lapply(states(), function(s) { ret <- map_ng(lgas_ng(s)) }))
+}
