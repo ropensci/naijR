@@ -4,16 +4,19 @@
 \alias{states}
 \title{States of the Federal Republic of Nigeria}
 \usage{
-states(gpz = NULL, all = TRUE)
+states(states, gpz = NULL, all = TRUE)
 }
 \arguments{
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).}
 
 \item{all}{logical; whether to include FCT in the result}
+
+\item{state}{One or more States of the Federation}
 }
 \value{
-The States of Nigeria as a whole or by zones, as a character vector
+The States of Nigeria as a whole or by zones, as an S3 object 
+of class \code{states}.
 }
 \description{
 States of the Federal Republic of Nigeria
@@ -28,5 +31,5 @@ South-South and South-West.
 }
 \examples{
 states()  # lists names of all States
-states("se")  # lists States in South-East zone
+states(gpz = "se")  # lists States in South-East zone
 }

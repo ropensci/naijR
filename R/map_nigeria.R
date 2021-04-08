@@ -310,38 +310,29 @@ map_ng <- function(region = character(),
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
   
+  region <- if (all(is_state(region)))
+    states(region)
+  else if (all(is_lga(region)))
+    lgas_ng(region)
+  else
+    stop("One or more of the provided regions are not supported")
+  
   param <- ShapefileProps(region)
-  SpatialPolygons2map(param$spatialObject, namefield = param$namefield)
-  # hasStates <- is_state(region)
-  # hasLgas <- is_lga(region)
-  # isStateMap <- any(hasStates)
-  # isLgaMap <- any(hasLgas)
-  # if (isStateMap && isLgaMap) {
-  #   if (sum(.LgaLikeStates() %in% region) > 1L)
-  #     isLgaMap <- FALSE
-  #   else
-  #     stop("Map must be based on either States or LGAs, not both.")
-  # }
-  # if (!isStateMap && !isLgaMap)
-  #   stop("Neither States nor LGAs could be properly mapped.")
-  # 
-  # if (isStateMap) {
-  #   invalid <- region[!hasStates]
-  #   params <- stateSpatialParams()
-  # }
-  # else if (isLgaMap) {
-  #   invalid <- region[!hasLgas]
-  #   params <- lgaSpatialParams()
-  # }
-  # 
-  # if (length(invalid) > 0L) {
-  #   invalid <- paste(invalid, collapse = ', ')
-  #   stop("Invalid region(s) for the map: ", invalid)
-  # }
-  # 
-  # getMapFromSpatialDataFiles(params)
+  sp <- SpatialPolygons2map(param$spatialObject, namefield = param$namefield)
+  
+  .fixBadNames(sp)
+  
 }
 
+
+
+
+
+.fixBadNames <- function(map)
+{
+  map$names[map$names == "Nasarawa"] <- "Nassarawa"
+  map
+}
 
 
 
@@ -349,11 +340,11 @@ map_ng <- function(region = character(),
 # namefield (the field in the shapefile the contains the regions' names)
 # Returns an object of class 'map' via SpatialPolygons2map()
 #' @importFrom maps SpatialPolygons2map
-getMapFromSpatialDataFiles <- function(param)
-{
-  sp <- .getSpatialPolygonsDataFrame(param$regtyp)
-  SpatialPolygons2map(sp, namefield = param$namefield)
-}
+# getMapFromSpatialDataFiles <- function(param)
+# {
+#   sp <- .getSpatialPolygonsDataFrame(param$regtyp)
+#   SpatialPolygons2map(sp, namefield = param$namefield)
+# }
 
 
 
@@ -363,22 +354,22 @@ getMapFromSpatialDataFiles <- function(param)
 # for the sp S4 objects, namely the region type (State/LGA) and
 # the field containing the names (This is determined by inspecting
 # the S4 object returned from the shapefiles.)
-regionSpatialParams <- function(...) {
-  list(...)
-}
-
-# TODO: Improve this construct please!!! This is nonsense - 
-# use polymorphism instead.
-stateSpatialParams <- function()
-{
-  regionSpatialParams(regtyp = 'state', namefield = 'admin1Name')
-}
-
-
-lgaSpatialParams <- function()
-{
-  regionSpatialParams(regtyp = 'lga', namefield = 'LGA')
-}
+# regionSpatialParams <- function(...) {
+#   list(...)
+# }
+# 
+# # TODO: Improve this construct please!!! This is nonsense - 
+# # use polymorphism instead.
+# stateSpatialParams <- function()
+# {
+#   regionSpatialParams(regtyp = 'state', namefield = 'admin1Name')
+# }
+# 
+# 
+# lgaSpatialParams <- function()
+# {
+#   regionSpatialParams(regtyp = 'lga', namefield = 'LGA')
+# }
 
 
 

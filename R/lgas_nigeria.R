@@ -49,20 +49,31 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' how_many_lgas("Ekiti")
 #'
 #' @export
-lgas_ng <- function(ng.state = NA_character_) {
-  if (!is.character(ng.state))
+lgas_ng <- function(region = NA_character_) {
+  if (!is.character(region))
     stop("Expected an object of type 'character'")
-  if (!all(is.na(ng.state))) {
-    if (!all(is_state(ng.state)))
-      stop("One or more elements of 'ng.state' is not a State in Nigeria")
-    lst <- lapply(ng.state, function(s)
-      subset(lgas_nigeria, state %in% s, select = lga, drop = TRUE))
-    names(lst) <- ng.state
-    if (length(ng.state) == 1L)
-      lst <- unname(unlist(lst))
-    return(new_lgas_ng(lst))
+  if (length(region) == 1L && is.na(region))
+    return(new_lgas_ng(lgas_nigeria$lga))
+  lst <- if (all(is_state(region))) {
+    sl <- lapply(region, function(s)
+      subset(
+        lgas_nigeria,
+        state %in% s,
+        select = lga,
+        ## TODO: Refactor
+        drop = TRUE
+      ))
+    names(sl) <- region
+    if (length(region) == 1L)
+      sl <- unname(unlist(sl))
+    sl
   }
-  new_lgas_ng(lgas_nigeria$lga)
+  else if (all(is_lga(region)))
+    region
+  else
+    stop("One or more elements is not a valid region in Nigeria")
+    
+  new_lgas_ng(lst)
 }
 
 

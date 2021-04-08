@@ -19,9 +19,11 @@
 #' 
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
+#' @param state One or more States of the Federation
 #' @param all logical; whether to include FCT in the result
 #' 
-#' @return The States of Nigeria as a whole or by zones, as a character vector
+#' @return The States of Nigeria as a whole or by zones, as an S3 object 
+#' of class \code{states}.
 #' 
 #' @details gpz A geo-political zone, in the Nigerian 
 #' context, is a national subdivision that groups contiguous states. 
@@ -32,15 +34,17 @@
 #' 
 #' @examples
 #' states()  # lists names of all States
-#' states("se")  # lists States in South-East zone
+#' states(gpz = "se")  # lists States in South-East zone
 #' @export
-states <- function(gpz = NULL, all = TRUE)
+states <- function(states, gpz = NULL, all = TRUE)
 {
   stopifnot(is.logical(all))
+  if (!missing(states))
+    return(new_states(states))
   stl <- .getAllStates()
   if (!all)
     stl$fct <- NULL
-  if (!is.null(gpz)) {
+  if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
       stop("argument supplied 'gpz' is not of type 'character'")
     gpz <- tolower(gsub("\\s+", "", gpz))
@@ -50,10 +54,14 @@ states <- function(gpz = NULL, all = TRUE)
   ss <- as.vector(unlist(stl), mode = 'character')
   if (is.null(gpz))
     ss <- sort(ss)
-  structure(ss, class = c("states", class(ss)))
+  new_states(ss)
 }
 
 
+new_states <- function(ss) 
+{
+  structure(ss, class = c("states", class(ss)))
+}
 
 
 .getAllStates <- function(named = TRUE)

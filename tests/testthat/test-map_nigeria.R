@@ -58,7 +58,7 @@ test_that("Choropleth categories are created", {
 
 test_that("Decision is made on drawing choropleths", {
   all.states <- states()
-  nc.states <- states('nc')
+  nc.states <- states(gpz = 'nc')
   set.seed(23)
   vals <- lapply(list(all = all.states, nc = nc.states), function(x)
     factor(sample(LETTERS[1:5], length(x), replace = TRUE)))
@@ -75,7 +75,7 @@ test_that("National outline map is plotted", {
 })
 
 test_that("Subnational divisions are plotted", {
-  sw <- map_ng(region = states('sw'), plot = FALSE)
+  sw <- map_ng(region = states(gpz = 'sw'), plot = FALSE)
   
   expect_length(sw$names, 6L)
   expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))

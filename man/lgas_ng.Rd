@@ -4,7 +4,7 @@
 \alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
-lgas_ng(ng.state = NA_character_)
+lgas_ng(region = NA_character_)
 }
 \arguments{
 \item{ng.state}{Character; State(s) in the Federation of Nigeria. Default is

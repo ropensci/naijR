@@ -33,7 +33,7 @@ map_ng("Nigeria")
 It is possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
 
 ```{r south-west, warning=FALSE}
-map_ng(states("sw"), show.text = TRUE, col = 4)
+map_ng(states(gpz = "sw"), show.text = TRUE, col = 4)
 ```
 
 A single state can also be drawn:
