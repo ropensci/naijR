@@ -61,7 +61,7 @@ states <- function(gpz = NULL, all = TRUE)
   names <- if (named)
     c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct')
   ss <- structure(list(
-    c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
+    c("Benue", "Kogi", "Kwara", "Nassarawa", "Niger", "Plateau"),
     c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
     c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
     c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
