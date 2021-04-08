@@ -185,15 +185,18 @@ map_ng <- function(region = character(),
     horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
-  ngOutlineMap <- identical(region, 'Nigeria')
-  show.text <- if ((all(is_state(region)) || ngOutlineMap) && is.na(show.text))
-    TRUE  # Quick and dirty fix. To be refactored.
-  else FALSE
+  outlineMap <- identical(region, 'Nigeria')
+  regionalMap <- all(is_state(region)) || all(is_lga(region))
+  if (is.na(show.text)) {
+    show.text <- FALSE
+    if (regionalMap || outlineMap)
+      show.text <- TRUE  # Quick and dirty fix. To be refactored.
+  }
   mp <- if (!show.text || dontPlot)
     eval_tidy(mapq)
   else {
     txt <- "Nigeria"
-    if (!ngOutlineMap) {
+    if (!outlineMap) {
       txt <- database$name %>%
         {
           is <- lapply(region, grep, x = .)
@@ -300,53 +303,46 @@ map_ng <- function(region = character(),
 
 
 
-
-.getMapData <- function(region)
-  UseMethod(".getMapData")
-
-
-
 #' @import mapdata
-.getMapData.default <- function(region)
+.getMapData <- function(region)
 {
   stopifnot(is.character(region))
   if (identical(region, 'Nigeria'))
     return("mapdata::worldHires")
-  hasStates <- is_state(region)
-  hasLgas <- is_lga(region)
-  isStateMap <- any(hasStates)
-  isLgaMap <- any(hasLgas)
-  if (isStateMap && isLgaMap) {
-    if (sum(.LgaStates() %in% region) > 1L)
-      isLgaMap <- FALSE
-    else
-      stop("Map must be based on either States or LGAs, not both.")
-  }
-  if (!isStateMap && !isLgaMap)
-    stop("Neither States nor LGAs could be properly mapped.")
   
-  if (isStateMap) {
-    invalid <- region[!hasStates]
-    params <- stateSpatialParams()
-  }
-  else if (isLgaMap) {
-    invalid <- region[!hasLgas]
-    params <- lgaSpatialParams()
-  }
-  
-  if (length(invalid) > 0L) {
-    invalid <- paste(invalid, collapse = ', ')
-    stop("Invalid region(s) for the map: ", invalid)
-  }
-  
-  getMapFromSpatialDataFiles(params)
+  param <- ShapefileProps(region)
+  SpatialPolygons2map(param$spatialObject, namefield = param$namefield)
+  # hasStates <- is_state(region)
+  # hasLgas <- is_lga(region)
+  # isStateMap <- any(hasStates)
+  # isLgaMap <- any(hasLgas)
+  # if (isStateMap && isLgaMap) {
+  #   if (sum(.LgaLikeStates() %in% region) > 1L)
+  #     isLgaMap <- FALSE
+  #   else
+  #     stop("Map must be based on either States or LGAs, not both.")
+  # }
+  # if (!isStateMap && !isLgaMap)
+  #   stop("Neither States nor LGAs could be properly mapped.")
+  # 
+  # if (isStateMap) {
+  #   invalid <- region[!hasStates]
+  #   params <- stateSpatialParams()
+  # }
+  # else if (isLgaMap) {
+  #   invalid <- region[!hasLgas]
+  #   params <- lgaSpatialParams()
+  # }
+  # 
+  # if (length(invalid) > 0L) {
+  #   invalid <- paste(invalid, collapse = ', ')
+  #   stop("Invalid region(s) for the map: ", invalid)
+  # }
+  # 
+  # getMapFromSpatialDataFiles(params)
 }
 
 
-.getMapData.lgas_ng <- function(region)
-{
-  getMapFromSpatialDataFiles(lgaSpatialParams())
-}
 
 
 # Takes a list with 2 elements - regtyp ('state' or 'lga') and
@@ -387,7 +383,7 @@ lgaSpatialParams <- function()
 
 
 # States that are also the names of LGAs
-.LgaStates <-
+.LgaLikeStates <-
   function()
     c("Bauchi",
       "Ebonyi",
@@ -402,12 +398,16 @@ lgaSpatialParams <- function()
 
 ## Returns the name currently used by the directory containing the
 ## shapefile assets. This is found in inst/extdata.
-.getShapefileDir <- function(region.type = c('state', 'lga'))
+.getShapefileDir <- function(region)
+  UseMethod(".getShapefileDir")
+
+.getShapefileDir.states <- function(region)
 {
-  region.type <- match.arg(region.type)
-  if (region.type == 'state')
-    return('ng_admin')
-  
+    'ng_admin'
+}
+
+.getShapefileDir.lgas_ng <- function(region)
+{
   'nigeria-lgas'
 }
 
@@ -417,6 +417,7 @@ lgaSpatialParams <- function()
 ## Read the data from an internal shapefile
 #' @importFrom rgdal readOGR
 .getSpatialPolygonsDataFrame <- function(region.type) {
+  .Deprecated(".getShapefileData")
   src <- .getShapefileDir(region.type)
   dsn <-
     system.file(file.path("extdata", src),
@@ -748,22 +749,87 @@ lgaSpatialParams <- function()
 
 
 ## Get the properties of shape files
-ShapefileProperties <- function(shp, nmfld, ...)
+## First collect the path to the shapfile project directory
+## Then, read the shapefile
+## Collect the namefield from the data, based on the region
+#' @importFrom rgdal readOGR
+ShapefileProps <- function(regions)
 {
-  stopifnot(dir.exists(shp), !missing(nmfld), is.character(nmfld))
+  shp <- .getShapefileDir(regions)
+  dsn <-
+    system.file(file.path("extdata", shp),
+                package = 'naijR',
+                mustWork = TRUE)
+  if (identical(dsn, character(1)))
+    stop("The map data could not be found in 'extdata'")
   pat <- "\\.shp$"
-  shpfl <- list.files(shp, pat)
-  lyr <- sub(pattern = paste0("(.)(", pat, ")"), "", shpfl)
-  new_ShapefileProperties(lyr, nmfld, ...)
+  shpfl <- list.files(dsn, pat)
+  lyr <- sub(pattern = paste0("(.+)(", pat, ")"), "\\1", shpfl)
+  sp <- readOGR(dsn, lyr, verbose = FALSE)
+  dt <- slot(sp, "data")
+  nmfld <- .fetchNamefield(regions, dt)
+  stopifnot(!is.na(nmfld))
+  new_ShapefileProps(shp, lyr, nmfld, sp)
 }
 
 
 
 
-new_ShapefileProperties <- function(layer, namefield, ...)
+## Low-level constructor
+new_ShapefileProps <- function(dir, layer, namefield, spObj)
 {
-  structure(list(layer,namefield),
-            names = c("layer", "namefield"), 
-            class = "ShapefileProperties",
-            ...)
+  structure(list(dir, layer, namefield, spObj),
+            names = c("shapefile", "layer", "namefield", "spatialObject"), 
+            class = "ShapefileProps")
+}
+
+
+
+
+
+
+## Fetch the namefield
+## This is a generic function. The methods we have are for distinguishing
+## how namefields are retrieved, since this varies depending on the kind 
+## of region passed. The interesting case in point is when getting this 
+## field for LGA regions, since the spatial data also contains data on 
+## States. To avoid confusion, when iterating through the data frame, when
+## a column with States is encountered it is skipped as can be seen in the
+## `.fetchNamefield.lgas_ng` method.
+.fetchNamefield <- function(x, ...)
+  UseMethod(".fetchNamefield")
+
+
+.fetchNamefield.lgas_ng <- function(x, dt) {
+  nmfld <- NA
+  
+  # apply quick fix to the 'nigeria-lga' shapefile
+  dt <- subset(dt, STATE != "Lake")
+  dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
+  
+  for (i in seq_len(ncol(dt))) {
+    if (all(unique(dt[[i]]) %in% states()))
+      next
+    if (any(x %in% dt[[i]])) {
+      nmfld <- colnames(dt)[i]
+      break
+    }
+  }
+  nmfld
+}
+
+
+.fetchNamefield.default <- function(x, dt) {
+  nmfld <- NA
+  
+  ## Apply fix for shapefile 'ng_admin'
+  dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa"
+  
+  for (i in seq_len(ncol(dt))) {
+    if (all(x %in% dt[[i]])) {
+      nmfld <- colnames(dt)[i]
+      break
+    }
+  }
+  nmfld
 }

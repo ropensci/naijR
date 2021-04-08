@@ -17,5 +17,9 @@
 ## Display an array of maps for all the States
 .__displayStateMaps <- function()
 {
-  invisible(lapply(states(), function(s) { ret <- map_ng(lgas_ng(s)) }))
+  doOneMap <- function(s) {
+    lgs <- lgas_ng(s)
+    ret <- map_ng(lgs, title = paste("Map of", s, "State"))
+  }
+  invisible(lapply(states(), doOneMap))
 }

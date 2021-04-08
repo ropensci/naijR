@@ -50,7 +50,7 @@ states <- function(gpz = NULL, all = TRUE)
   ss <- as.vector(unlist(stl), mode = 'character')
   if (is.null(gpz))
     ss <- sort(ss)
-  ss
+  structure(ss, class = c("states", class(ss)))
 }
 
 
