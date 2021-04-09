@@ -444,7 +444,8 @@ map_ng <- function(region = character(),
 
 
 
-
+## Find the index number for the column housing the region names
+## used for drawing a choropleth map
 #' @importFrom rlang abort
 #' @importFrom rlang warn
 .regionColumnIndex <- function(dt, s = NULL)
@@ -452,14 +453,25 @@ map_ng <- function(region = character(),
   stopifnot(is.data.frame(dt))
   if (is.null(s))
     s <- states()
-  n <- vapply(dt, function(x) {
-    if (is.factor(x))
+  
+  ## Checks if a column has the names of States, returning TRUE is so.
+  .fx <- function(x) {
+    if (is.factor(x))    # TODO: Earmark for removal
       x <- as.character(x)
-    if (is.character(x))
-      all(is_state(x))
-    else
-      FALSE
-  }, logical(1))
+    ret <- logical(1)
+    if (is.character(x)) {
+      areStates <- is_state(x)
+      ret <- all(areStates)
+      if (!ret && any(areStates)) {
+        misspelt <- which(!areStates)
+        msg <- sprintf("The following regions are misspelt: %s",
+                       paste(x[!areStates], collapse = ","))
+        warning(msg, call. = FALSE)
+      }
+    }
+    ret
+  }
+  n <- vapply(dt, .fx, logical(1))
   if (!sum(n))
     abort(sprintf("No column with elements in %s.", deparse(substitute(s))))
   if (sum(n) > 1)

@@ -2,7 +2,7 @@
 # 
 # GPL-3 License
 # 
-# Copyright (c) 2020 Victor Ordu
+# Copyright (c) 2020-2021 Victor Ordu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -228,20 +228,23 @@ test_that("State polygon names are not repeated during computations", {
 })
 
 test_that("Choropleth mapping succeeds", {
-  pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
+  pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
   dat <- readRDS('data/pvc2015.rds')
+  baddat <- readRDS('data/pvc2015_badcolumn.rds')
   val <- dat$total.pop    # use name to test quasiquotation
   dat$alpha <- sample(LETTERS[1:5], nrow(dat), TRUE)  
   cat <- c("Small", "Moderate", "Large", "Mega")
   
-  expect_is(
+  expect_error(suppressWarnings(
     map_ng(
-      data = dat, 
-      x = total.pop, 
+      data = baddat,
+      x = total.pop,
       breaks = pop.groups,
       categories = cat,
-      plot = FALSE), 
-    'map')
+      plot = FALSE
+    )
+  ),
+  'No column with elements in region')
   
   expect_error(map_ng(
     region = dat$region,
@@ -252,10 +255,10 @@ test_that("Choropleth mapping succeeds", {
   "Expected a character vector as 'region'")
   
   expect_error(
-    map_ng(region = dat$state,
+    map_ng(region = baddat$state,
            x = dat$total.pop,
            plot = FALSE),
-    "Breaks were not provided for the categorization of a numeric type"
+    "One or more elements of 'region' is not a Nigerian region"
   )
   
   expect_error(

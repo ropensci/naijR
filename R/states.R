@@ -135,7 +135,8 @@ is_state <- function(x)
   if (length(x) == 0L)
     return(FALSE)
   
-  sub("^FCT$", "Federal Capital Territory", x) %>%
+  x %>%
+    sub("^FCT$", "Federal Capital Territory", .) %>%
     `%in%`(.getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
@@ -179,13 +180,14 @@ fix_state <- function(x, ...)
   
   ## Approximately matches regex on list of states
   .getProperVal <- function(str, states) {
+    stopifnot(is.character(str), is.character(states))
     if (!is.na(match(str, states)))
       return(str)
-    if (agrepl(str, abbr, max.distance = 2) && 
-        identical(toupper(str), abbr))
-      return(abbr)
+    if (agrepl(str, abbrFCT, max.distance = 2) && 
+        identical(toupper(str), abbrFCT))
+      return(abbrFCT)
     
-    # First check for matching pattern
+    ## First check for matching pattern
     matched <-
       grep(paste0('^', str, '$'),
            states,
@@ -201,23 +203,26 @@ fix_state <- function(x, ...)
   }
   
   ## Process possible FCT values
-  abbr <- "FCT"
-  full <- "Federal Capital Territory"
-  hasFct <- c(abbr, full) %in% x
+  abbrFCT <- "FCT"
+  fullFCT <- "Federal Capital Territory"
+  hasFct <- c(abbrFCT, fullFCT) %in% x
   if (sum(hasFct) == 2)
-    x <- sub(abbr, full, x)
+    x <- sub(abbrFCT, fullFCT, x)
   if (sum(hasFct) == 1) {
-    i_abbr <- grep(abbr, x)   # Huh?
-    i_full <- grep(full, x)
+    i_abbr <- grep(abbrFCT, x)   # Huh?
+    i_full <- grep(fullFCT, x)
   }
-  i <- grep(paste0("^", abbr, "$"), x, ignore.case = TRUE)
+  i <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
   ss <- states()
   if (length(i) != 0) 
-    ss <- sub(full, abbr, states())
+    ss <- sub(fullFCT, abbrFCT, states())
   
-  x <- vapply(x, .getProperVal, character(1), states = ss, USE.NAMES = FALSE)
-  x[i] <- full
-  x
+  res <- vapply(x, .getProperVal, character(1), states = ss, USE.NAMES = FALSE)
+  res[i] <- fullFCT
+  stateType <- "states"
+  if (!inherits(res, stateType) && inherits(x, stateType))
+    res <- states(res)
+  res
 }
 
 
