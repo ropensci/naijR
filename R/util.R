@@ -9,7 +9,8 @@
 .__inspectShapefileData <- function(region.type)
 {
   dt <- .getSpatialPolygonsDataFrame(region.type)
-  warning("'namefield' change is made in 'regionSpatialParams()'", call. = FALSE)
+  warning("'namefield' change is made in 'regionSpatialParams()'", 
+          call. = FALSE)
   head(dt@data, 3)
 }
 
