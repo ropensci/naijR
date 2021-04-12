@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.1.5.9013
+Version: 0.1.5.9014
 Date: 2021-04-12
 Depends: 
     R (>= 3.6)
@@ -15,6 +15,7 @@ Imports:
     lifecycle (>= 0.2.0)
 Suggests: 
     covr,
+    here,
     knitr,
     readxl,
     rmarkdown,
