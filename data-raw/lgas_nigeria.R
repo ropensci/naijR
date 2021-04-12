@@ -1,8 +1,8 @@
 # Processing LGA dataset
 
-library(magrittr)
+library(magrittr, warn.conflicts = FALSE)
 
-dir <- here::here('sandbox', 'data-raw')
+dir <- here::here('data-raw')
 file <- file.path(dir, "list_of_local_government_areas_of_nigeria-1729j.csv")
 lgas_nigeria <- read.csv(file, stringsAsFactors = FALSE)
 str(lgas_nigeria)
