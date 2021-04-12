@@ -199,7 +199,7 @@ map_ng <- function(region = character(),
     if (!outlineMap) {
       txt <- database$name %>%
         {
-          is <- lapply(region, grep, x = .)
+          is <- lapply(region, function(x) grep(paste0("^", x, "$"), .))
           ind <- unlist(is)
           .[ind]
         } %>%
@@ -216,6 +216,7 @@ map_ng <- function(region = character(),
     map.text(
       database,
       region,
+      exact = TRUE,     # disallow partial matching
       labels = txt,
       col = col,
       fill = fill
