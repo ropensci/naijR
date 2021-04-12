@@ -167,6 +167,6 @@ test_that("various cases for fixing state names", {
 
 test_that("FCT abbreviations are well handled", {
   fct_full <- 'Federal Capital Territory'
-  expect_identical(.toggleFct(fct_full), 'FCT')
-  expect_identical(.toggleFct('FCT'), fct_full)
+  expect_equivalent(.toggleFct(fct_full), 'FCT')
+  expect_equivalent(.toggleFct('FCT'), fct_full)
 })
