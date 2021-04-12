@@ -134,9 +134,9 @@ is_state <- function(x)
   
   if (length(x) == 0L)
     return(FALSE)
-  
+  fctOpts <- .fctOptions()
   x %>%
-    sub("^FCT$", "Federal Capital Territory", .) %>%
+    sub(fctOpts["abbrev"], fctOpts["full"], .) %>%
     `%in%`(.getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
@@ -203,9 +203,10 @@ fix_state <- function(x, ...)
   }
   
   ## Process possible FCT values
-  abbrFCT <- "FCT"
-  fullFCT <- "Federal Capital Territory"
-  hasFct <- c(abbrFCT, fullFCT) %in% x
+  fctOpts <- .fctOptions()
+  abbrFCT <- fctOpts["abbrev"]
+  fullFCT <- fctOpts["full"]
+  hasFct <- fctOpts %in% x
   if (sum(hasFct) == 2)
     x <- sub(abbrFCT, fullFCT, x)
   if (sum(hasFct) == 1) {
@@ -238,9 +239,15 @@ fix_state <- function(x, ...)
   if (!is.character(x))
     abort("'x' is not a character vector",)
   
-  opts <- c("FCT", "Federal Capital Territory")
+  opts <- .fctOptions()
   if (!x %in% opts)
     abort("Invalid input")
   ind <- ifelse(match(x, opts) == 1L, 2L, 1L)
   opts[ind]
+}
+
+
+
+.fctOptions <- function() {
+  c(abbrev = "FCT", full = "Federal Capital Territory")
 }
