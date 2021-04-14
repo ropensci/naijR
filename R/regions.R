@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-
+globalVariables(c("lgas_nigeria", "state", "lga"))
 
 #' States of the Federal Republic of Nigeria
 #' 
@@ -149,68 +149,43 @@ is_state <- function(x)
 
 
 
-#' Fix State Names
+#' Fix Region Names
 #' 
-#' Correct any misspelt names of States.
+#' Correct any misspelt names of administrative regions i.e. States and LGAs
 #' 
 #' @details The function will look through a character vector and try to 
 #' determine if State names have been wrongly entered. This presupposes that
 #' the atomic vector is of type \code{character}. It does not test any missing
 #' values in the vector, leaving them untouched.
 #' 
-#' @param x A character vector.
+#' @param x An S3 object of class \code{states} or \code{lgas}
 #' @param ... This argument is placed for possible use in the near future.
 #' 
 #' @note An updated version would include the ability to adjust the 
 #' \href{https://en.wikipedia.org/wiki/Levenshtein_distance}{Levenshtein 
 #' distance}, which will empower users to tune the function's sensitivity.
 #' 
-#' @importFrom rlang abort
-#' @importFrom rlang warn
+#' @return The transformed object. If all names are correct, the object is
+#' returned unchanged.
 #' 
+fix_region <- function(x, ...)
+  UseMethod("fix_region")
+
+
+
+
+
 #' @export
-fix_state <- function(x, ...)
+fix_region.states <- function(x, ...)
 {
-  if(!inherits(x, 'character'))
-    abort("'x' is not an object of class 'character'")
-  if (all(is.na(x))) {
-    warn("'x' has only missing values")
-    return(x)
-  }
-  
-  ## Approximately matches regex on list of states
-  .getProperVal <- function(str, states) {
-    stopifnot(is.character(str), is.character(states))
-    if (!is.na(match(str, states)))
-      return(str)
-    if (agrepl(str, abbrFCT, max.distance = 2) && 
-        identical(toupper(str), abbrFCT))
-      return(abbrFCT)
-    
-    ## First check for matching pattern
-    matched <-
-      grep(paste0('^', str, '$'),
-           states,
-           value = TRUE,
-           ignore.case = TRUE)
-    if (length(matched) == 0L) {
-      # Then check for approximate matches
-      matched <- agrep(str, states, value = TRUE, max.distance = 1)
-      if (length(matched) != 1L)
-        return(NA_character_)
-    }
-    matched
-  }
-  
   ## Process possible FCT values
-  fctOpts <- .fctOptions()
-  abbrFCT <- fctOpts["abbrev"]
-  fullFCT <- fctOpts["full"]
+  abbrFCT <- .fctOptions("abbrev")
+  fullFCT <- .fctOptions("full")
   hasFct <- fctOpts %in% x
   if (sum(hasFct) == 2)
     x <- sub(abbrFCT, fullFCT, x)
   if (sum(hasFct) == 1) {
-    i_abbr <- grep(abbrFCT, x)   # Huh?
+    i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
     i_full <- grep(fullFCT, x)
   }
   i <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
@@ -218,19 +193,131 @@ fix_state <- function(x, ...)
   if (length(i) != 0) 
     ss <- sub(fullFCT, abbrFCT, states())
   
-  res <- vapply(x, .getProperVal, character(1), states = ss, USE.NAMES = FALSE)
-  res[i] <- fullFCT
-  stateType <- "states"
-  if (!inherits(res, stateType) && inherits(x, stateType))
-    res <- states(res)
-  res
+  x <- .fixRegionInternal(x, ss)
+  x[i] <- fullFCT
+  stateS3Class <- "states"
+  if (!inherits(x, stateS3Class) && inherits(x, stateS3Class))
+    x <- states(x)
+  invisible(x)
 }
 
 
 
 
 
-# Toggle between full and abbreviated FCT name
+#' @export
+fix_region.lgas <- function(x, ...)
+{
+  invisible(.fixRegionInternal(x, lgas(), ...))
+}
+
+
+
+
+
+
+
+#' @export
+fix_region.default <- function(x, ...)
+{
+  
+}
+
+
+.fixRegionInternal <- function(x, region, ...)
+{
+  ## Approximately matches a string on a list of regions i.e States or LGAs.
+  ## @param str A string to be matched
+  ## @param regions The values to be matched against, specifically from regions
+  ##
+  ## @return A vector of the same length as str with the approximetly
+  ## matched value, which in the case of misspelling should be the correct one.
+  ##
+  ## This function is mapped to a vector of states/LGAs
+  .getProperVal <- function(str, regions) {
+    if (!is.na(match(str, regions)))
+      return(str)
+    if (inherits(regions, "states")) {
+      if (agrepl(str, abbrFCT, max.distance = 2)
+          && identical(toupper(str), abbrFCT))
+        return(abbrFCT)
+    }
+    
+    ## First remove spaces around slashes
+    str <- str %>% 
+      gsub("\\s\\/", "/", .) %>% 
+      gsub("\\/\\s", "/", .) %>% 
+      sub("-\\s", "-", .) %>% 
+      sub("^Egbado/", "", .)
+      
+    
+    ## Now check for exact matching
+    matched <-
+      grep(paste0('^', str, '$'),
+           regions,
+           value = TRUE,
+           ignore.case = TRUE)
+    
+    
+    if (length(matched) == 1L) 
+      return(matched)
+    
+    ## Otherwise check for approximate matches
+    matched <- agrep(str, regions, value = TRUE, max.distance = 1)
+    
+    if (length(matched) == 1L)
+      return(matched)
+    
+    if (length(matched) > 1L) {
+      .warnOnMultipleMatches(str, matched)
+    }
+    else if (!length(matched))
+      notFound <<- c(notFound, str)
+    str
+  }
+  
+  notFound <- character()
+  v <-
+    vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
+  if (length(notFound)) {
+    message("Approximate match(es) not found for the following:")
+    sapply(notFound, function(x) message(paste("*", x)))
+    message("Consider repairing interactively.")
+    attr(v, "misspelt") <- notFound
+  }
+  v
+}
+
+
+
+
+
+.warnOnMultipleMatches <- function(x, matches)
+{
+  multimatch <- paste(matches, collapse = ", ")
+  warning(sprintf(
+    "'%s' approximately matched more than one region - %s",
+    x,
+    multimatch
+  ))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Toggle between full and abbreviated FCT name
 #' @importFrom rlang abort
 .toggleFct <- function(x)
 {
@@ -248,6 +335,139 @@ fix_state <- function(x, ...)
 
 
 
-.fctOptions <- function() {
-  c(abbrev = "FCT", full = "Federal Capital Territory")
+
+
+
+
+
+
+## Get a vector with both the abbreviated and full versions of the 
+## national capital's name, just return one of the two.
+.fctOptions <- function(opt = c("all", "abbrev", "full")) {
+  opt <- match.arg(opt)
+  vec <- c(abbrev = "FCT", full = "Federal Capital Territory")
+  if (opt != "all")
+    return(vec[opt])
+  vec
+}
+
+
+
+
+
+
+
+
+
+
+#' Local Government Areas of Nigeria
+#'
+#' A dataset containing the 774 Local Government Areas of Nigeria
+#'
+#' @format A dataframe with 774 rows and 2 columns
+#' \describe{
+#'    \item{lga}{Local Government Area}
+#'    \item{state}{State of the Federation}
+#'    }
+"lgas_nigeria"
+
+
+
+
+
+
+
+
+
+
+#' List Local Government Areas
+#'
+#' @param region Character; State(s) in the Federation of Nigeria. Default is
+#' \code{NA_character_}.
+#' 
+#' @return If length of \code{ng.state} == 1L, a character vector containing 
+#' the names of Local Government Areas; otherwise a named list whose elements 
+#' are character vectors of the LGAs in each state.
+#' 
+#' @examples
+#' how_many_lgas <- function(state) {
+#'   require(naijR)
+#'   stopifnot(state %in% states())
+#'   cat(sprintf("No. of LGAs in %s State:", state),
+#'     length(lgas(state)),
+#'     fill = TRUE)
+#' }
+#' how_many_lgas("Sokoto")
+#' how_many_lgas("Ekiti")
+#'
+#' @export
+lgas <- function(region = NA_character_) {
+  if (!is.character(region))
+    stop("Expected an object of type 'character'")
+  data("lgas_nigeria")
+  if (length(region) == 1L && is.na(region))
+    return(new_lgas(lgas_nigeria$lga))
+  lst <- if (all(is_state(region))) {
+    sl <- lapply(region, function(s)
+      subset(
+        lgas_nigeria,
+        state %in% s,
+        select = lga,
+        ## TODO: Refactor
+        drop = TRUE
+      ))
+    names(sl) <- region
+    if (length(region) == 1L)
+      sl <- unname(unlist(sl))
+    sl
+  }
+  else if (any(areLgas <- is_lga(region))) {
+    if (!all(areLgas))
+      warning("One or more elements is not an LGA")
+    region
+  }
+  else
+    stop("One or more elements is not a valid region in Nigeria")
+  
+  new_lgas(lst)
+}
+
+
+
+
+
+
+
+
+#' Test for Local Government Areas
+#' 
+#' Checks a given object for Local Government Areas, represented as
+#' strings.
+#' 
+#' @param x An object of type \code{character}. This includes higher
+#' dimension object classes like \code{matrix} and \code{array}. 
+#' 
+#' @return A logical vector the same length as the input object. Each
+#' element that is not a valid Local Government Area will evaluate to
+#' \code{FALSE}.
+#' 
+#' @export
+is_lga <- function(x)
+{
+  if (!is.character(x))
+    stop("x should be of type 'character'")
+  x %in% lgas()
+}
+
+
+
+
+
+
+
+
+# Low-level S3 constructor for lgas object
+new_lgas <- function(x)
+{
+  structure(x, class = c("lgas", class(x)))
 }

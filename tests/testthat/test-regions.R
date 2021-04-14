@@ -135,14 +135,14 @@ test_that("Different representations of the FCT are handled", {
 
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not an object of class 'character'"
-  
-  expect_error(fix_state(99), errchr)
-  expect_error(fix_state(NA), errchr)
-  expect_error(fix_state(c(NA, NA, NA)), errchr)
-  expect_warning(fix_state(NA_character_), "'x' has only missing values")
-  expect_error(fix_state(NULL), errchr)
-  expect_error(fix_state(TRUE), errchr)
-  expect_error(fix_state(matrix(states())), errchr)
+
+  expect_error(fix_region(99), errchr)
+  expect_error(fix_region(NA), errchr)
+  expect_error(fix_region(c(NA, NA, NA)), errchr)
+  expect_warning(fix_region(NA_character_), "'x' has only missing values")
+  expect_error(fix_region(NULL), errchr)
+  expect_error(fix_region(TRUE), errchr)
+  expect_error(fix_region(matrix(states())), errchr)
 })
 
 
@@ -152,16 +152,16 @@ test_that("various cases for fixing state names", {
   ssx <- c("xxx", "Benue")
   ss.us <- c("kentucky", "Bornu", "Abia")
   
-  expect_identical(fix_state(ss), ss)
-  expect_identical(fix_state('Fct'), "Federal Capital Territory")
-  expect_identical(fix_state('Kane'), "Kano")
-  expect_identical(fix_state('plateau'), 'Plateau')
-  expect_identical(fix_state(ss2), c("Oyo", "Lagos"))
-  expect_length(fix_state(ss2), 2L)
-  expect_identical(fix_state(ssx), c(NA_character_, "Benue"))
-  expect_length(fix_state(ssx), 2L)
-  expect_identical(fix_state(ss.us), c(NA_character_, "Borno", "Abia"))
-  expect_length(fix_state(ss.us), 3L)
+  expect_identical(fix_region(ss), ss)
+  expect_identical(fix_region('Fct'), "Federal Capital Territory")
+  expect_identical(fix_region('Kane'), "Kano")
+  expect_identical(fix_region('plateau'), 'Plateau')
+  expect_identical(fix_region(ss2), c("Oyo", "Lagos"))
+  expect_length(fix_region(ss2), 2L)
+  expect_identical(fix_region(ssx), c(NA_character_, "Benue"))
+  expect_length(fix_region(ssx), 2L)
+  expect_identical(fix_region(ss.us), c(NA_character_, "Borno", "Abia"))
+  expect_length(fix_region(ss.us), 3L)
 })
 
 
@@ -170,3 +170,87 @@ test_that("FCT abbreviations are well handled", {
   expect_equivalent(.toggleFct(fct_full), 'FCT')
   expect_equivalent(.toggleFct('FCT'), fct_full)
 })
+
+
+
+## ---- LGA related tests ---- 
+
+test_that("illegal input is caught early", {
+  chErr <- "Expected an object of type 'character'"
+  
+  expect_error(lgas("Saarland"))
+  expect_error(lgas("Maryland"),
+               "One or more elements is not a valid region in Nigeria",
+               fixed = TRUE)
+  expect_error(lgas(888), chErr)
+  expect_error(lgas(NULL), chErr)
+  expect_error(lgas(TRUE), chErr)
+  expect_error(lgas(3.14), chErr)
+})
+
+
+test_that("LGAs are returned correctly", {
+  res <- lgas("Plateau")
+  res2 <- lgas(nam <- c("Borno", "Abia"))
+  
+  expect_match(res, "Pankshin", all = FALSE)
+  expect_length(res, 17L)
+  expect_type(res, "character")
+  expect_is(res, "character")
+  expect_null(names(res))
+  expect_is(res2, "list")
+  expect_type(res2, "list")
+  expect_named(res2, nam)
+  expect_length(res2, 2L)
+  expect_warning(lgas(c("Oyo West", "Obomo Ngwa")), 
+                 "One or more elements is not an LGA")
+})
+
+ibd <- c(
+  'Akinyele',
+  'Egbeda',
+  'Ibadan North',
+  'Ibadan North East',         # misspelt
+  'Ibadan North West',         # misspelt
+  'Ibadan South East',         # misspelt
+  'Ibadan South West',         # misspelt
+  'Iddo',                      # misspelt
+  'Lagelu',
+  'Oluyole',
+  'Onu-Ara'                    # misspelt
+)
+
+
+test_that("Mispelt LGA are discovered", {
+  xx <- is_lga(ibd)
+  err <- "x should be of type 'character'"
+  expect_false(all(xx))
+  expect_error(is_lga(NULL), err)
+  expect_error(is_lga(42), err)
+  expect_error(is_lga(cars), err)
+  expect_error(is_lga(c(TRUE, FALSE)), err)
+  expect_type(xx, 'logical')
+  expect_is(matrix(is_lga(lgas())), 'matrix')
+  
+})
+
+
+test_that("is_lga recognises LGAs", {
+  anlga <- "Amuwo-Odofin"
+  veclga <- c("Akira-Uba", "Hawul", NA)
+  
+  
+  expect_true(is_lga(anlga))
+  expect_false(all(is_lga(veclga)))
+})
+
+
+
+
+test_that("Misspelt LGA can be fixed (limited)", {
+  result <- suppressWarnings(
+    fix_region(lgas(c("Amuwo Odofin", "Lagos Island"))))
+  
+  expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
+
+  })

@@ -6,12 +6,10 @@
 ## for the function 'maps::SpatialPolygons2map'
 ##
 #' @importFrom utils head
-.__inspectShapefileData <- function(region.type)
+.__getShapefileData <- function(region)
 {
-  dt <- .getSpatialPolygonsDataFrame(region.type)
-  warning("'namefield' change is made in 'regionSpatialParams()'", 
-          call. = FALSE)
-  head(dt@data, 3)
+  shp <- ShapefileProps(region)
+  shp$sp@data
 }
 
 

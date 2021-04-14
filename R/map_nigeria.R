@@ -266,7 +266,7 @@ map_ng <- function(region = character(),
   all.st <- states(all = TRUE)
   if (length(s) == 0L)
     s <- all.st
-  if (!all(s %in% all.st) && !all(s %in% lgas_ng()))
+  if (!all(s %in% all.st) && !all(s %in% lgas()))
     abort("One or more elements of 'region' is not a Nigerian region")
   s
 }
@@ -314,7 +314,7 @@ map_ng <- function(region = character(),
   region <- if (all(is_state(region)))
     states(region)
   else if (all(is_lga(region)))
-    lgas_ng(region)
+    lgas(region)
   else
     stop("One or more of the provided regions are not supported")
   
@@ -322,7 +322,6 @@ map_ng <- function(region = character(),
   sp <- SpatialPolygons2map(param$spatialObject, namefield = param$namefield)
   
   .fixBadNames(sp)
-  
 }
 
 
@@ -398,7 +397,7 @@ map_ng <- function(region = character(),
     'ng_admin'
 }
 
-.getShapefileDir.lgas_ng <- function(region)
+.getShapefileDir.lgas <- function(region)
 {
   'nigeria-lgas'
 }
@@ -799,17 +798,13 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 ## field for LGA regions, since the spatial data also contains data on 
 ## States. To avoid confusion, when iterating through the data frame, when
 ## a column with States is encountered it is skipped as can be seen in the
-## `.fetchNamefield.lgas_ng` method.
+## `.fetchNamefield.lgas` method.
 .fetchNamefield <- function(x, ...)
   UseMethod(".fetchNamefield")
 
 
-.fetchNamefield.lgas_ng <- function(x, dt) {
+.fetchNamefield.lgas <- function(x, dt) {
   nmfld <- NA
-  
-  # apply quick fix to the 'nigeria-lga' shapefile
-  dt <- subset(dt, STATE != "Lake")
-  dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
   
   for (i in seq_len(ncol(dt))) {
     if (all(unique(dt[[i]]) %in% states()))

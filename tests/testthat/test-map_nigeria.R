@@ -393,3 +393,28 @@ test_that("Parameters passed via ellipsis work seamlessly", {
   expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
                "Expected a character vector as 'region'")
 })
+
+
+test_that("All LGA maps can be drawn", {
+  lgas <- lgas_ng()
+  for (x in lgas)
+    expect_is(map_ng(x, plot = FALSE), "map")
+})
+
+
+
+test_that("Map LGAs together as individual blocs", {
+  abLga <- lgas_ng("Abia")
+  expect_s3_class(map_ng(abLga, plot = FALSE), "map")
+  
+  ## Do actual plot
+  testMap <- "data/test-map.png"
+  if (file.exists(testMap))
+    file.remove(testMap)
+  
+  png(testMap)
+  val <- try(map_ng(abLga), silent = TRUE)
+  dev.off()
+  expect_false(inherits(val, "try-error"))
+  expect_true(file.exists(testMap))
+})
