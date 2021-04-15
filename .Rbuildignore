@@ -12,3 +12,4 @@
 ^pkgdown$
 ^index\.R?md$
 ^\.github$
+^R/util\.R$

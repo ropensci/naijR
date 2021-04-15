@@ -318,10 +318,10 @@ map_ng <- function(region = character(),
   else
     stop("One or more of the provided regions are not supported")
   
-  param <- ShapefileProps(region)
-  sp <- SpatialPolygons2map(param$spatialObject, namefield = param$namefield)
+  # param <- ShapefileProps(region)
+  sp <- SpatialPolygons2map(sp.lga, namefield = "LGA")
   
-  .fixBadNames(sp)
+  # .fixBadNames(sp)
 }
 
 
