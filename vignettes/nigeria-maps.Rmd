@@ -30,7 +30,14 @@ To show the map without the state borders, set the first argument (`region`) to 
 map_ng("Nigeria")
 ```
 
-It is possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
+All the Local Government Areas can equally be displayed, using a map that, by default, does not display text, so as to avoid cluttering. This kind of map is useful for charting choropleth maps, as shown below for the States. To this, we pass the value produced by `lgas()`.
+
+```{r all-lga-map}
+map_ng(lgas())
+```
+
+
+It is also possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
 
 ```{r south-west, warning=FALSE}
 map_ng(states(gpz = "sw"), show.text = TRUE, col = 4)
