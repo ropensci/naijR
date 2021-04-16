@@ -25,7 +25,6 @@
     }, error = function(err) {
       message("Failed")
     })
-    
   }
   invisible(lapply(states(), doOneMap))
 }

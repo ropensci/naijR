@@ -186,11 +186,10 @@ map_ng <- function(region = character(),
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
   outlineMap <- identical(region, 'Nigeria')
-  regionalMap <- all(is_state(region)) || all(is_lga(region))
   if (is.na(show.text)) {
     show.text <- FALSE
-    if (regionalMap || outlineMap)
-      show.text <- TRUE  # Quick and dirty fix. To be refactored.
+    if (all(is_state(region)) || outlineMap)
+      show.text <- TRUE 
   }
   mp <- if (!show.text || dontPlot)
     eval_tidy(mapq)
@@ -199,11 +198,16 @@ map_ng <- function(region = character(),
     if (!outlineMap) {
       txt <- database$name %>%
         {
-          is <- lapply(region, function(x) grep(paste0("^", x, "$"), .))
-          ind <- unlist(is)
-          .[ind]
-        } %>%
-        .adjustLabels
+          # Account for multi-polygon regions
+          rgxRegions <- function(x, nms) {
+            rgx <- paste0("^", x, "(\\:\\d*)?$") 
+            grep(rgx, nms, value = TRUE)
+          }
+          is <- lapply(region, rgxRegions, nms = .)
+          unlist(is)
+        } 
+      # %>%
+      #   .adjustLabels
     }
     
     ## NOTE: In the call to map.text, the name 'database' is actually
@@ -215,9 +219,9 @@ map_ng <- function(region = character(),
     ## `maps` package.
     map.text(
       database,
-      region,
+      regions = txt,
       exact = TRUE,     # disallow partial matching
-      labels = txt,
+      labels = .adjustLabels(txt),
       col = col,
       fill = fill
     )
@@ -304,25 +308,48 @@ map_ng <- function(region = character(),
 
 
 
+
+
+
+
+## S3 Class and methods for internal use:
+.getMapData <- function(x)
+  UseMethod(".getMapData")
+
+
 #' @import mapdata
-.getMapData <- function(region)
+.getMapData.default <- function(x) 
 {
-  stopifnot(is.character(region))
-  if (identical(region, 'Nigeria'))
+  if (identical(x, 'Nigeria'))
     return("mapdata::worldHires")
-  
-  region <- if (all(is_state(region)))
-    states(region)
-  else if (all(is_lga(region)))
-    lgas(region)
-  else
-    stop("One or more of the provided regions are not supported")
-  
-  # param <- ShapefileProps(region)
-  sp <- SpatialPolygons2map(sp.lga, namefield = "LGA")
-  
-  # .fixBadNames(sp)
+  .getMapData(states())
 }
+
+
+.getMapData.lgas <- function(x)
+{
+    obj <- shp.lga
+    .getMapFromSpObject(obj)
+ }
+
+
+
+.getMapData.states <- function(x)
+{
+  obj <- shp.state
+  .getMapFromSpObject(obj)
+}
+
+
+
+#' @importFrom maps SpatialPolygons2map
+.getMapFromSpObject <- function(shp.data)
+{
+  stopifnot(inherits(shp.data, 'ShapefileProps'))
+  SpatialPolygons2map(shp.data[['spatialObject']],
+                      namefield = shp.data[['namefield']])
+}
+
 
 
 
@@ -334,42 +361,6 @@ map_ng <- function(region = character(),
   map
 }
 
-
-
-# Takes a list with 2 elements - regtyp ('state' or 'lga') and
-# namefield (the field in the shapefile the contains the regions' names)
-# Returns an object of class 'map' via SpatialPolygons2map()
-#' @importFrom maps SpatialPolygons2map
-# getMapFromSpatialDataFiles <- function(param)
-# {
-#   sp <- .getSpatialPolygonsDataFrame(param$regtyp)
-#   SpatialPolygons2map(sp, namefield = param$namefield)
-# }
-
-
-
-
-
-# Parameters used for determining the region-specific elements 
-# for the sp S4 objects, namely the region type (State/LGA) and
-# the field containing the names (This is determined by inspecting
-# the S4 object returned from the shapefiles.)
-# regionSpatialParams <- function(...) {
-#   list(...)
-# }
-# 
-# # TODO: Improve this construct please!!! This is nonsense - 
-# # use polymorphism instead.
-# stateSpatialParams <- function()
-# {
-#   regionSpatialParams(regtyp = 'state', namefield = 'admin1Name')
-# }
-# 
-# 
-# lgaSpatialParams <- function()
-# {
-#   regionSpatialParams(regtyp = 'lga', namefield = 'LGA')
-# }
 
 
 
@@ -406,18 +397,18 @@ map_ng <- function(region = character(),
 
 
 ## Read the data from an internal shapefile
-#' @importFrom rgdal readOGR
-.getSpatialPolygonsDataFrame <- function(region.type) {
-  .Deprecated(".getShapefileData")
-  src <- .getShapefileDir(region.type)
-  dsn <-
-    system.file(file.path("extdata", src),
-                package = 'naijR',
-                mustWork = TRUE)
-  if (identical(dsn, character(1)))
-    stop("The map data could not be found in 'extdata'")
-  readOGR(dsn, .shpLayer(region.type), verbose = FALSE)
-}
+# @importFrom rgdal readOGR
+# .getSpatialPolygonsDataFrame <- function(region.type) {
+#   .Deprecated(".getShapefileData")
+#   src <- .getShapefileDir(region.type)
+#   dsn <-
+#     system.file(file.path("extdata", src),
+#                 package = 'naijR',
+#                 mustWork = TRUE)
+#   if (identical(dsn, character(1)))
+#     stop("The map data could not be found in 'extdata'")
+#   readOGR(dsn, .shpLayer(region.type), verbose = FALSE)
+# }
 
 
 
@@ -700,19 +691,11 @@ map_ng <- function(region = character(),
 
 
 # Rejigs text that is used for labeling a region that has more than 1 polygon
-# NOTE: Quite a bit of hard-coding was used (v. 0.1.0) and should be reviewed
+# TODO: Quite a bit of hard-coding was used (v. 0.1.0) and should be reviewed
 #' @importFrom magrittr %>%
 .adjustLabels <- function(x) 
 {
   stopifnot(is.character(x))
-  .fadj <- function(x, region, pos) {
-    ind <- grep(region, x)
-    finalPos <- ind[pos]
-    x[ind] <- ""
-    x[finalPos] <- region
-    x
-  }
-  
   x <- vapply(
     x,
     FUN.VALUE = character(1L),
@@ -720,13 +703,25 @@ map_ng <- function(region = character(),
       sub("\\:\\d*$", "", l)
   )
   
-  ss <- c("Akwa Ibom", "Cross River")
-  cent <- c(2, 4)
-  for (i in seq_len(2))
-    x <- .fadj(x, ss[i], cent[i])
   
-  dups <- which(duplicated(x))
-  x[dups] <- character(1L)
+  dd <- data.frame(state = c("Akwa Ibom", "Cross River"),
+                   poly = c(2, 4))
+  ss <- dd[["state"]]
+  if (all(grepl(paste0(ss, collapse = "|"), x))) {
+    
+    .fadj <- function(a, reg, pos) {
+      ind <- grep(reg, a)
+      finalPos <- ind[pos]
+      a[ind] <- ""
+      a[finalPos] <- reg
+      a
+    }
+    for (i in seq_len(2))
+      x <- .fadj(x, ss[i], dd[["poly"]][i])
+  }
+  
+  dup <- which(duplicated(x))
+  x[dup] <- character(1L)
   x
 }
 
@@ -734,8 +729,8 @@ map_ng <- function(region = character(),
 
 
 
-# Checks that x and y coordinates are withing the bounds of given map
-# Note: This check is probably too expensive. Conider passing just the range
+# Checks that x and y coordinates are within the bounds of given map
+# Note: This check is probably too expensive. Consider passing just the range
 # though the loss of typing may make this less reliable down the line
 #' @importFrom rlang is_double
 .xyWithinBounds <- function(map, x, y)
@@ -759,17 +754,25 @@ map_ng <- function(region = character(),
 ShapefileProps <- function(regions)
 {
   shp <- .getShapefileDir(regions)
-  dsn <-
-    system.file(file.path("extdata", shp),
-                package = 'naijR',
-                mustWork = TRUE)
+  dsn <- system.file(file.path("extdata", shp),
+                     package = 'naijR',
+                     mustWork = TRUE)
   if (identical(dsn, character(1)))
     stop("The map data could not be found in 'extdata'")
   pat <- "\\.shp$"
   shpfl <- list.files(dsn, pat)
   lyr <- sub(pattern = paste0("(.+)(", pat, ")"), "\\1", shpfl)
   sp <- readOGR(dsn, lyr, verbose = FALSE)
+  
+  ## The following shapefile, has some unwanted data
+  if (shp == "nigeria-lgas") 
+    sp <- subset(sp, STATE != "Lake")
+
   dt <- slot(sp, "data")
+  
+  if (shp == "nigeria-lgas")
+    dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
+  
   nmfld <- .fetchNamefield(regions, dt)
   stopifnot(!is.na(nmfld))
   new_ShapefileProps(shp, lyr, nmfld, sp)
@@ -805,12 +808,11 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 
 .fetchNamefield.lgas <- function(x, dt) {
   nmfld <- NA
-  
   for (i in seq_len(ncol(dt))) {
-    if (all(unique(dt[[i]]) %in% states()))
+    if (all(unique(dt[[i]]) %in% states()))  # skip column with States
       next
-    if (any(x %in% dt[[i]])) {
-      nmfld <- colnames(dt)[i]
+    if (any(x %in% dt[[i]])) {   # just any LGAs will do, since some of them
+      nmfld <- colnames(dt)[i]   # also share names with their State
       break
     }
   }
@@ -818,14 +820,11 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 }
 
 
-.fetchNamefield.default <- function(x, dt) {
+.fetchNamefield.states <- function(x, dt) {
+  dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
   nmfld <- NA
-  
-  ## Apply fix for shapefile 'ng_admin'
-  dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa"
-  
   for (i in seq_len(ncol(dt))) {
-    if (all(x %in% dt[[i]])) {
+    if (all(x %in% dt[[i]])) {   # all MUST be states
       nmfld <- colnames(dt)[i]
       break
     }
