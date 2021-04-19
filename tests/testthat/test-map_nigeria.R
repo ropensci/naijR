@@ -82,12 +82,12 @@ test_that("Subnational divisions are plotted", {
 })
 
 test_that("LGAs are plotted", {
-  expect_is(map_ng("Akinyele", plot = FALSE), "map")
-  expect_is(map_ng("Owerri North", plot = FALSE), "map")
+  expect_is(map_ng(lgas("Akinyele"), plot = FALSE), "map")
+  expect_is(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
 test_that("LGAs can be plotted where a State and LGA share name", {
-  expect_is(map_ng(lgas_ng("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
+  expect_is(map_ng(lgas("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
 })
 set.seed(4)
 df <-
@@ -220,12 +220,12 @@ test_that("Expected colours and related data are prepared", {
   expect_length(cho$bins, 3L)
 })
 
-test_that("State polygon names are not repeated during computations", {
-  result <- .getUniqueStateNames(mp)
-  
-  expect_length(result, 37L)
-  expect_error(.getUniqueStateNames(states()))
-})
+# test_that("State polygon names are not repeated during computations", {
+#   result <- .getUniqueStateNames(mp)
+#   
+#   expect_length(result, 37L)
+#   expect_error(.getUniqueStateNames(states()))
+# })
 
 test_that("Choropleth mapping succeeds", {
   pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
@@ -310,12 +310,10 @@ test_that("Choropleth colours can be controlled at interface", {
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
   mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
-  mp.lb <- map_ng(plot = FALSE)
   mm <- 'map'
   rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
   
   expect_is(mp1, mm)
-  expect_is(mp.lb, mm)
   expect_type(mp1, 'list')
   expect_s3_class(mp1, mm)
   expect_length(mp1, 4L)
@@ -395,16 +393,25 @@ test_that("Parameters passed via ellipsis work seamlessly", {
 })
 
 
-test_that("All LGA maps can be drawn", {
-  lgas <- lgas_ng()
+
+
+test_that("All individual plain State maps can be drawn", {
+  for (s in states())
+    map_ng(s)
+})
+
+
+
+test_that("All individual LGA maps can be drawn", {
+  lgas <- lgas()
   for (x in lgas)
-    expect_is(map_ng(x, plot = FALSE), "map")
+    expect_is(map_ng(lgas(x), plot = FALSE), "map")
 })
 
 
 
 test_that("Map LGAs together as individual blocs", {
-  abLga <- lgas_ng("Abia")
+  abLga <- lgas("Abia")
   expect_s3_class(map_ng(abLga, plot = FALSE), "map")
   
   ## Do actual plot

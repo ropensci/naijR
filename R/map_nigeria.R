@@ -205,9 +205,7 @@ map_ng <- function(region = character(),
           }
           is <- lapply(region, rgxRegions, nms = .)
           unlist(is)
-        } 
-      # %>%
-      #   .adjustLabels
+        }
     }
     
     ## NOTE: In the call to map.text, the name 'database' is actually

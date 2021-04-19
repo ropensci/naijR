@@ -39,8 +39,12 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 states <- function(states, gpz = NULL, all = TRUE)
 {
   stopifnot(is.logical(all))
-  if (!missing(states))
+  if (!missing(states) && is.character(states)) {
+    if (!all(is_state(states)))
+      warning("One or more elements of 'states' is not an actual State",
+              call. = FALSE)
     return(new_states(states))
+  }
   stl <- .getAllStates()
   if (!all)
     stl$fct <- NULL
@@ -58,10 +62,14 @@ states <- function(states, gpz = NULL, all = TRUE)
 }
 
 
+## Low-level constructor
 new_states <- function(ss) 
 {
   structure(ss, class = c("states", class(ss)))
 }
+
+
+
 
 
 .getAllStates <- function(named = TRUE)
@@ -154,7 +162,7 @@ is_state <- function(x)
 #' Correct any misspelt names of administrative regions i.e. States and LGAs
 #' 
 #' @details The function will look through a character vector and try to 
-#' determine if State names have been wrongly entered. This presupposes that
+#' determine if State or LGA names have been wrongly entered. This presupposes that
 #' the atomic vector is of type \code{character}. It does not test any missing
 #' values in the vector, leaving them untouched.
 #' 
@@ -180,22 +188,21 @@ fix_region.states <- function(x, ...)
   ## Process possible FCT values
   abbrFCT <- .fctOptions("abbrev")
   fullFCT <- .fctOptions("full")
-  hasFct <- fctOpts %in% x
-  if (sum(hasFct) == 2)
+  sumFct <- sum(.fctOptions() %in% x)
+  if (sumFct == 2)
     x <- sub(abbrFCT, fullFCT, x)
-  if (sum(hasFct) == 1) {
+  if (sumFct == 1) {
     i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
     i_full <- grep(fullFCT, x)
   }
   i <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
   ss <- states()
-  if (length(i) != 0) 
-    ss <- sub(fullFCT, abbrFCT, states())
+  if (length(i)) 
+    ss <- sub(fullFCT, abbrFCT, ss)
   
   x <- .fixRegionInternal(x, ss)
   x[i] <- fullFCT
-  stateS3Class <- "states"
-  if (!inherits(x, stateS3Class) && inherits(x, stateS3Class))
+  if (!inherits(x, "states"))
     x <- states(x)
   invisible(x)
 }
@@ -205,7 +212,7 @@ fix_region.states <- function(x, ...)
 
 
 #' @export
-fix_region.lgas <- function(x, interactive = TRUE, ...)
+fix_region.lgas <- function(x, interactive = FALSE, ...)
 {
   vals <- .fixRegionInternal(x, lgas(), ...)
   if (interactive) {
@@ -222,11 +229,19 @@ fix_region.lgas <- function(x, interactive = TRUE, ...)
 
 
 
-
+#' @importFrom magrittr %>%
+#' 
 #' @export
 fix_region.default <- function(x, ...)
-{
-  
+{ ## TODO: Provide verbosity by reporting on fixed items?
+  if (!is.character(x))
+    stop("'x' is not a valid string")
+  # if (!any(is_state(x))) {
+  #   warning("Could not fix 'x' and vector was returned unchanged")
+  #   return(x)
+  # }
+  zz <- suppressWarnings(states(x)) %>% fix_region
+  as.character(zz)
 }
 
 
@@ -241,6 +256,7 @@ fix_region.default <- function(x, ...)
   ##
   ## This function is mapped to a vector of states/LGAs
   .getProperVal <- function(str, regions) {
+    abbrFCT <- .fctOptions("abbrev")
     if (!is.na(match(str, regions)))
       return(str)
     if (inherits(regions, "states")) {

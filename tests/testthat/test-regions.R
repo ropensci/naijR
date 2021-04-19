@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 library(naijR)
 
+## ---- State related tests ----
 test_that("input is validated", {
   expect_error(states(gpz = 99))
   expect_error(states(gpz = NA))
@@ -28,6 +29,17 @@ test_that("input is validated", {
   expect_error(states(full.names = NA))
   expect_error(states(full.names = NULL))
 })
+
+
+
+
+test_that("'states' object is constructed", {
+  expect_warning(states(c("Nasarawa", "Oyo")),
+                 "One or more elements of 'states' is not an actual State")
+})
+
+
+
 
 test_that("Internal object listing states is created and retrievable", {
   default <- .getAllStates()
@@ -136,40 +148,36 @@ test_that("Different representations of the FCT are handled", {
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not an object of class 'character'"
 
-  expect_error(fix_region(99), errchr)
-  expect_error(fix_region(NA), errchr)
-  expect_error(fix_region(c(NA, NA, NA)), errchr)
-  expect_warning(fix_region(NA_character_), "'x' has only missing values")
-  expect_error(fix_region(NULL), errchr)
-  expect_error(fix_region(TRUE), errchr)
-  expect_error(fix_region(matrix(states())), errchr)
+  # expect_error(fix_region(99), errchr)
+  # expect_error(fix_region(NA), errchr)
+  # expect_error(fix_region(c(NA, NA, NA)), errchr)
+  # expect_warning(fix_region(NA_character_), "'x' has only missing values")
+  # expect_error(fix_region(NULL), errchr)
+  # expect_error(fix_region(TRUE), errchr)
+  # expect_error(fix_region(matrix(states())), errchr)
 })
 
 
 test_that("various cases for fixing state names", {
   ss <- states()
-  ss2 <- c("oyo", "Legos")
-  ssx <- c("xxx", "Benue")
+  ss2 <- suppressWarnings(states(c("Oyo", "Legos")))
+  ssx <- states(c("xxx", "Benue"))
   ss.us <- c("kentucky", "Bornu", "Abia")
   
-  expect_identical(fix_region(ss), ss)
+  expect_equivalent(fix_region(ss), ss)
   expect_identical(fix_region('Fct'), "Federal Capital Territory")
   expect_identical(fix_region('Kane'), "Kano")
   expect_identical(fix_region('plateau'), 'Plateau')
-  expect_identical(fix_region(ss2), c("Oyo", "Lagos"))
+  expect_identical(fix_region(ss2), states(c("Oyo", "Lagos")))
   expect_length(fix_region(ss2), 2L)
-  expect_identical(fix_region(ssx), c(NA_character_, "Benue"))
+  expect_match(attr(fix_region(ssx), 'misspelt'), "xxx")
   expect_length(fix_region(ssx), 2L)
-  expect_identical(fix_region(ss.us), c(NA_character_, "Borno", "Abia"))
+  expect_identical(fix_region(ss.us), 
+                   c("kentucky", "Borno", "Abia"))
   expect_length(fix_region(ss.us), 3L)
 })
 
 
-test_that("FCT abbreviations are well handled", {
-  fct_full <- 'Federal Capital Territory'
-  expect_equivalent(.toggleFct(fct_full), 'FCT')
-  expect_equivalent(.toggleFct('FCT'), fct_full)
-})
 
 
 
