@@ -13,3 +13,4 @@
 ^index\.R?md$
 ^\.github$
 ^R/util\.R$
+^tests/testthat/data/test-map.png$
