@@ -11,12 +11,10 @@ map_ng(
   y = NULL,
   breaks = NULL,
   categories = NULL,
-  col = NULL,
-  fill = FALSE,
   title = NULL,
   caption = NULL,
   show.neighbours = FALSE,
-  show.text = NA,
+  show.text = FALSE,
   leg.x = 13L,
   leg.y = 7L,
   leg.title,
@@ -43,11 +41,6 @@ only to choropleth maps).}
 
 \item{categories}{The legend for the choropleth-plotted categories. If not 
 defined, internally created labels are used.}
-
-\item{col}{Colour to be used for the plot.}
-
-\item{fill}{Logical. Whether to colour the plotted map region(s). When 
-drawing a choropleth map \code{fill == TRUE} is implied.}
 
 \item{title}{Character vector of length 1.}
 
@@ -101,7 +94,7 @@ checked with \code{getOption("choropleth.colours")} and this can also be
 modified by the user.
 }
 \note{
-When adjusting the default colour choiced for choropleth maps, it is
+When adjusting the default colour choices for choropleth maps, it is
 advisable to use one of the sequential palettes. For a list of of available
 palettes, especially for more advanced use, review 
 \code{RColorBrewer::display.brewer.all}

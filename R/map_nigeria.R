@@ -53,9 +53,6 @@ globalVariables(".")
 #' only to choropleth maps).
 #' @param categories The legend for the choropleth-plotted categories. If not 
 #' defined, internally created labels are used.
-#' @param col Colour to be used for the plot. 
-#' @param fill Logical. Whether to colour the plotted map region(s). When 
-#' drawing a choropleth map \code{fill == TRUE} is implied.
 #' @param title Character vector of length 1.
 #' @param caption Character vector of length 1.
 #' @param leg.x Numeric. Position of the legend.
@@ -86,7 +83,7 @@ globalVariables(".")
 #' checked with \code{getOption("choropleth.colours")} and this can also be 
 #' modified by the user.
 #' 
-#' @note When adjusting the default colour choiced for choropleth maps, it is
+#' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
 #' \code{RColorBrewer::display.brewer.all}
@@ -112,12 +109,10 @@ map_ng <- function(region = character(),
                    y = NULL,
                    breaks = NULL,
                    categories = NULL,
-                   col = NULL,
-                   fill = FALSE,
                    title = NULL,
                    caption = NULL,
                    show.neighbours = FALSE,
-                   show.text = NA,
+                   show.text = FALSE,
                    leg.x = 13L,
                    leg.y = 7L,
                    leg.title,
@@ -140,6 +135,7 @@ map_ng <- function(region = character(),
     enquo(x) 
   else 
     enexpr(x)
+  
   chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
     .validateChoroplethParams(region, data, !!value.x)  # TODO: Refactor
   } else {
@@ -148,18 +144,15 @@ map_ng <- function(region = character(),
   }
   if (!is_null(y))
     chrplth <- FALSE
-  if (is.null(col) && is_false(chrplth))
-    col <- 1L
-  database <- .getMapData(region)
   
-  ## Capture 'dots' and return visible 'map' object if `plot == FALSE`
+  ## Capture 'dots'
   dots <- list(...)
-  params <- names(dots)
-  dontPlot <- FALSE
-  if ('plot' %in% params)
-    if (is_false(dots$plot))
-      dontPlot <- TRUE
-  mapq <- expr(map(database, regions = region, col = col, fill = fill, ...))
+  if (is.null(dots$col) && is_false(chrplth))
+    dots$col <- 1L
+  
+  database <- .getMapData(region)
+  mapq <- expr(map(database, regions = region, ...))
+  
   if (chrplth) {
     if (!is.null(data)) {
       vl.col <- as_name(value.x)
@@ -178,57 +171,60 @@ map_ng <- function(region = character(),
         breaks = breaks,
         categories = categories
       )
-    cOpts <- .prepareChoroplethOptions(database, cParams, col)
-    col <- cOpts$colors
-    fill <- TRUE
+    cOpts <- .prepareChoroplethOptions(database, cParams, dots$col)
+    if (!is.null(mapq$col) && !is.null(mapq$fill)) {
+      mapq$col <- cOpts$colors
+      mapq$fill <- TRUE
+    }
     lego <- match.arg(leg.orient)
     horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
     leg.tit <- if (!missing(leg.title)) as.character(leg.title)
   }
+  
   outlineMap <- identical(region, 'Nigeria')
-  if (is.na(show.text)) {
-    show.text <- FALSE
-    if (all(is_state(region)) || outlineMap)
-      show.text <- TRUE 
-  }
-  mp <- if (!show.text || dontPlot)
-    eval_tidy(mapq)
-  else {
+  
+  ## Draw a `maps::map()` (with or without labels) or capture the object.
+  ##
+  ## NOTE: In the call to map.text, the name 'database' is actually
+  ## required. This is because, internally, there is a call to `eval()`
+  ## which uses its default argument for `envir` i.e. `parent.frame()`.
+  ## An object of any other name is not seen by the quoted call to
+  ## `maps::map()` used by the evaluator function. For more details,
+  ## inspect the source code for `maps::map.text()`. This is actually a 
+  ## bug in the 'maps' package.
+  database <- eval_tidy(mapq)    # possibly, a new `database` is created
+  if (!is.null(dots$plot) && !dots$plot)
+    return(database)
+  if (show.text) {
     txt <- "Nigeria"
     if (!outlineMap) {
       txt <- database$name %>%
-        {
+        { 
           # Account for multi-polygon regions
-          rgxRegions <- function(x, nms) {
-            rgx <- paste0("^", x, "(\\:\\d*)?$") 
-            grep(rgx, nms, value = TRUE)
-          }
+          # TODO: Scope this to parent environment
+          rgxRegions <-
+            function(x, nms) {
+              rgx <- paste0("^", x, "(\\:\\d*)?$")
+              grep(rgx, nms, value = TRUE)
+            }
           is <- lapply(region, rgxRegions, nms = .)
           unlist(is)
         }
+      map.text(
+        database,
+        regions = txt,
+        exact = TRUE,                # disallow partial matching
+        labels = .adjustLabels(txt),
+        add = TRUE)
     }
-    
-    ## NOTE: In the call to map.text, the name 'database' is actually
-    ## required. This is because internally, there is a call to `eval()`
-    ## which uses its default argument for `envir` i.e. `parent.frame()`.
-    ## An object of any other name is not seen by the quoted call to
-    ## maps::map used by the evaluator function. For more details,
-    ## inspect the source code for `maps::map.text`. This is a bug in the
-    ## `maps` package.
-    map.text(
-      database,
-      regions = txt,
-      exact = TRUE,     # disallow partial matching
-      labels = .adjustLabels(txt),
-      col = col,
-      fill = fill
-    )
   }
-  if(!is_null(y))
-    if (!.xyWithinBounds(mp, x, y))
+  
+  ## Annotate
+  title(main = title, sub = caption)
+  if(!is_null(y)) {
+    if (!.xyWithinBounds(database, x, y))
       stop("Coordinates are out of bounds of the map")
-  if (dontPlot)
-    return(mp)
+  }
   if (chrplth) {
     if (is.null(categories))
       categories <- cOpts$bins
@@ -244,8 +240,8 @@ map_ng <- function(region = character(),
   }
   else if(!is_null(y))
     points(x, y, pch = "+") 
-  title(title, caption)
-  invisible(mp)
+  
+  invisible(database)
 }
 
 
@@ -588,32 +584,32 @@ map_ng <- function(region = character(),
 #' @importFrom magrittr %>%
 #' @importFrom rlang abort
 #' @importFrom tools toTitleCase
-.processColouring <- function(color = NULL, n)
+.processColouring <- function(col = NULL, n)
 {
-  .DefaultChoroplethColours <- getOption('choropleth.colours')
-  if (is.null(color))
-    color <- .DefaultChoroplethColours[1]
-  if (is.numeric(color)) {
+  .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
+  if (is.null(col))
+    col <- .DefaultChoroplethColours[1]
+  if (is.numeric(col)) {
     default.pal <- .get_R_palette()
     all.cols <- default.pal %>% 
       sub("(green)(3)", "\\1", .) %>% 
       sub("gray", "grey", .)
-    if (!color %in% seq_along(all.cols))
+    if (!col %in% seq_along(all.cols))
       abort(sprintf("'color' must range between 1L and %iL", length(all.cols)))
-    color <- all.cols[color]
+    col <- all.cols[col]
   }
-  among.def.cols <- color %in% .DefaultChoroplethColours
-  in.other.pal <- !among.def.cols && color %in% rownames(brewer.pal.info)
+  among.def.cols <- col %in% .DefaultChoroplethColours
+  in.other.pal <- !among.def.cols && col %in% rownames(brewer.pal.info)
   pal <-
     if (!among.def.cols) {
       if (!in.other.pal)
         abort(
-          sprintf("'%s' is not a supported colour or palette", color)
+          sprintf("'%s' is not a supported colour or palette", col)
         )
-      color
+      col
     }
     else
-      paste0(tools::toTitleCase(color), "s")
+      paste0(tools::toTitleCase(col), "s")
   RColorBrewer::brewer.pal(n, pal)
 }
 

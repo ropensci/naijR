@@ -203,7 +203,7 @@ fix_region.states <- function(x, ...)
   x <- .fixRegionInternal(x, ss)
   x[i] <- fullFCT
   if (!inherits(x, "states"))
-    x <- states(x)
+    x <- suppressWarnings(states(x))
   invisible(x)
 }
 
@@ -235,11 +235,16 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
 fix_region.default <- function(x, ...)
 { ## TODO: Provide verbosity by reporting on fixed items?
   if (!is.character(x))
-    stop("'x' is not a valid string")
-  # if (!any(is_state(x))) {
-  #   warning("Could not fix 'x' and vector was returned unchanged")
-  #   return(x)
-  # }
+    stop("'x' is not a character vector")
+  empty <- grepl("^$", x)
+  if (length(empty) > 0L && all(empty))  ## diff character(0) and character(1)
+    stop("'x' only has empty strings")
+  if (any(empty))
+    warning("Tried to fix empty strings - may produce errors")
+  if (all(is.na(x)) || !length(x)) {
+    warning("'x' has length 0L or only missing values", call. = FALSE)
+    return(x)
+  }
   zz <- suppressWarnings(states(x)) %>% fix_region
   as.character(zz)
 }

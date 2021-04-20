@@ -53,7 +53,8 @@ test_that("Choropleth categories are created", {
   expect_error(.createCategorized(int.val, br[-6]),
                "Values are out of range of breaks")
   expect_error(.createCategorized(sample(c(TRUE, FALSE), 30, TRUE)),
-               "'logical' is not a supported type")
+               "'logical' is not a supported type",
+               fixed = TRUE)
 })
 
 test_that("Decision is made on drawing choropleths", {
@@ -89,6 +90,7 @@ test_that("LGAs are plotted", {
 test_that("LGAs can be plotted where a State and LGA share name", {
   expect_is(map_ng(lgas("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
 })
+
 set.seed(4)
 df <-
   data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE),
@@ -184,6 +186,9 @@ test_that("List of choropleth inputs is properly checked", {
   expect_true(.assertListElements(lso))
 })
 
+
+
+
 test_that("Expected colours and related data are prepared", {
   set.seed(4)
   brks <- seq(0, 6, 2)
@@ -220,12 +225,8 @@ test_that("Expected colours and related data are prepared", {
   expect_length(cho$bins, 3L)
 })
 
-# test_that("State polygon names are not repeated during computations", {
-#   result <- .getUniqueStateNames(mp)
-#   
-#   expect_length(result, 37L)
-#   expect_error(.getUniqueStateNames(states()))
-# })
+
+
 
 test_that("Choropleth mapping succeeds", {
   pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
@@ -271,21 +272,23 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE),
     "One or more inputs for generating choropleth options are invalid")
 
-  expect_is(
+  expect_s3_class(
     map_ng(
       data = dat,
       x = total.pop,
       breaks = pop.groups,
       plot = FALSE,
       fill = FALSE
-    ), 'map',
-    "Choropleths should be deductively drawn even when `fill == FALSE`")
+    ), 'map')
   
   expect_is(map_ng(data = dat,
                    x = alpha,
                    plot = FALSE),
             'map')
 })
+
+
+
 
 test_that("Choropleth colours can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
@@ -331,6 +334,9 @@ test_that("'map' object is properly created", {
     expect_match(mp2$names, i, all = FALSE)
 })
 
+
+
+
 test_that("Points are mapped", {
   x <- c(3.000, 4.000, 6.000)
   y <- c(6.000, 9.000, 4.300)
@@ -342,6 +348,9 @@ test_that("Points are mapped", {
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Expected a character vector as 'region'")
 })
+
+
+
 
 test_that("Factors can draw choropleth", {
   getSmpl <- function(seed) { 
@@ -360,19 +369,20 @@ test_that("Factors can draw choropleth", {
   Char <- getSmpl(5)
   expect_is(map_ng(x = Char, plot = FALSE), mapClass)
   
-  dd <- data.frame(region = states(), Col = Fac, stringsAsFactors = FALSE)
+  sss <- states()
+  dd <- data.frame(region = sss, Col = Fac, stringsAsFactors = FALSE)
   expect_is(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
   
-  expect_is(map_ng(states(), x = Fac, plot = FALSE), mapClass)
-  expect_is(map_ng(states(), x = Char, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = Fac, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = Char, plot = FALSE), mapClass)
   
   Int <- sample(1L:5L, 37, TRUE)
-  expect_error(map_ng(states(), x = Int, plot = FALSE),
+  expect_error(map_ng(sss, x = Int, plot = FALSE),
                'Breaks were not provided for the categorization of a numeric type')
-  expect_is(map_ng(states(), x = as.factor(Int), plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = as.factor(Int), plot = FALSE), mapClass)
   
   brks <- c(0, 40, 60, 100)
-  expect_is(map_ng(states(), x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
   
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
@@ -382,6 +392,9 @@ test_that("Factors can draw choropleth", {
   qq$col <- "green"
   expect_is(eval(qq), mapClass)
 })
+
+
+
 
 test_that("Parameters passed via ellipsis work seamlessly", {
   mm <- 'map'
@@ -397,7 +410,7 @@ test_that("Parameters passed via ellipsis work seamlessly", {
 
 test_that("All individual plain State maps can be drawn", {
   for (s in states())
-    map_ng(s)
+    expect_s3_class(map_ng(s, plot = FALSE), "map")
 })
 
 
@@ -405,7 +418,7 @@ test_that("All individual plain State maps can be drawn", {
 test_that("All individual LGA maps can be drawn", {
   lgas <- lgas()
   for (x in lgas)
-    expect_is(map_ng(lgas(x), plot = FALSE), "map")
+    expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
 })
 
 
@@ -418,10 +431,10 @@ test_that("Map LGAs together as individual blocs", {
   testMap <- "data/test-map.png"
   if (file.exists(testMap))
     file.remove(testMap)
-  
   png(testMap)
   val <- try(map_ng(abLga), silent = TRUE)
   dev.off()
+  
   expect_false(inherits(val, "try-error"))
   expect_true(file.exists(testMap))
 })
