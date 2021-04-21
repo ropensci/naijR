@@ -137,23 +137,24 @@ map_ng <- function(region = character(),
     enexpr(x)
   
   chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
-    .validateChoroplethParams(region, data, !!value.x)  # TODO: Refactor
+    .validateChoroplethParams(!!value.x, region, data)  # TODO: Refactor
   } else {
     value.x <- eval_tidy(value.x)
-    .validateChoroplethParams(region, data, value.x)
+    .validateChoroplethParams(value.x, region, data)
   }
   if (!is_null(y))
     chrplth <- FALSE
   
-  ## Capture 'dots'
-  dots <- list(...)
-  if (is.null(dots$col) && is_false(chrplth))
-    dots$col <- 1L
-  
   database <- .getMapData(region)
   mapq <- expr(map(database, regions = region, ...))
   
+  ## Capture 'dots'
+  dots <- list(...)
+  
+  ## Prepare to draw choropleth 
   if (chrplth) {
+    mapq <- expr(map(database, region))  ## TODO: Consider rlang::call2
+    mapq$fill <- TRUE
     if (!is.null(data)) {
       vl.col <- as_name(value.x)
       st.col <- .regionColumnIndex(data, region)
@@ -172,13 +173,14 @@ map_ng <- function(region = character(),
         categories = categories
       )
     cOpts <- .prepareChoroplethOptions(database, cParams, dots$col)
-    if (!is.null(mapq$col) && !is.null(mapq$fill)) {
-      mapq$col <- cOpts$colors
-      mapq$fill <- TRUE
-    }
+    mapq$col <- cOpts$colors
     lego <- match.arg(leg.orient)
-    horiz <- if (identical(lego, 'vertical')) FALSE else TRUE
-    leg.tit <- if (!missing(leg.title)) as.character(leg.title)
+    horiz <- if (identical(lego, 'vertical')) 
+      FALSE 
+    else 
+      TRUE
+    leg.tit <- if (!missing(leg.title)) 
+      as.character(leg.title)
   }
   
   outlineMap <- identical(region, 'Nigeria')
@@ -277,7 +279,7 @@ map_ng <- function(region = character(),
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
-.validateChoroplethParams <- function(region = NULL, data = NULL, val = NULL)
+.validateChoroplethParams <- function(val = NULL, region = NULL, data = NULL)
 {
   # TODO: Add some verbosity.
   no.region <- is.null(region) || identical(region, "Nigeria")
@@ -599,7 +601,7 @@ map_ng <- function(region = character(),
     col <- all.cols[col]
   }
   among.def.cols <- col %in% .DefaultChoroplethColours
-  in.other.pal <- !among.def.cols && col %in% rownames(brewer.pal.info)
+  in.other.pal <- !among.def.cols && (col %in% rownames(brewer.pal.info))
   pal <-
     if (!among.def.cols) {
       if (!in.other.pal)

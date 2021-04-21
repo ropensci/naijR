@@ -281,10 +281,20 @@ test_that("Choropleth mapping succeeds", {
       fill = FALSE
     ), 'map')
   
-  expect_is(map_ng(data = dat,
-                   x = alpha,
-                   plot = FALSE),
-            'map')
+  expect_s3_class(map_ng(data = dat,
+                         x = alpha,
+                         plot = FALSE),
+                  'map')
+  
+  ss <- states()
+  expect_s3_class(map_ng(
+    region = ss,
+    x = runif(length(ss), max = 100),
+    breaks = c(0, 40, 60, 100),
+    col = 'YlOrRd',
+    show.text = FALSE
+  ),
+  'map')
 })
 
 

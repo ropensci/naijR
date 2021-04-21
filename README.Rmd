@@ -71,13 +71,13 @@ For other capabilities of this function, see `?states()`
 This is a basic example that shows how to very quickly fetch the names of Local Government Areas within a given State:
 
 ```{r example}
-lgas_ng("Imo")
+lgas("Imo")
 ```
 
 To list all the LGAs in Nigeria, call the same function without any parameters:
 
 ```{r}
-n <- length(lgas_ng())
+n <- length(lgas())
 sprintf("Nigeria has a total of %i Local Government Areas", n)
 ```
 
@@ -85,7 +85,7 @@ Want to create a function to check how many LGAs a particular State has?
 
 ```{r}
 how_many_lgas <- function(state) {
-  n <- length(naijR::lgas_ng(state))
+  n <- length(naijR::lgas(state))
   cat(state, "State has", n, "LGAs\n")
 }
 
@@ -127,7 +127,6 @@ Some enhancements to expect in future updates:
 
 - Manipulation of phone numbers will provide options for the introduction of separators. Also the function will become more intelligent, pre-empting errors in data entry e.g. accepting the letter 'O' as a presumed zero (`0`).
 - `fix_mobile()` currently works with character vectors. It will be allowed to work with numeric vectors, converting these to character vectors internally.
-- Misspelling of Local Government Areas is very common and it is common to find so many variants, especially where compound names are involved. Functionality to address this problem will be introduced.
 - A distance matrix for major locations in the country.
 
 ## Feedback/Contribution
