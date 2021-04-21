@@ -17,9 +17,9 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 
 #' States of the Federal Republic of Nigeria
 #' 
+#' @param states One or more States of the Federation
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
-#' @param state One or more States of the Federation
 #' @param all logical; whether to include FCT in the result
 #' 
 #' @return The States of Nigeria as a whole or by zones, as an S3 object 
@@ -490,7 +490,6 @@ fix_region.default <- function(x, ...)
 lgas <- function(region = NA_character_) {
   if (!is.character(region))
     stop("Expected an object of type 'character'")
-  data("lgas_nigeria")
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
   lst <- if (all(is_state(region))) {

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-globalVariables(".")
+globalVariables(c(".", "STATE"))
 
 #' Map of Nigeria
 #'
@@ -746,6 +746,7 @@ map_ng <- function(region = character(),
 ## First collect the path to the shapfile project directory
 ## Then, read the shapefile
 ## Collect the namefield from the data, based on the region
+#' @importFrom methods slot
 #' @importFrom rgdal readOGR
 ShapefileProps <- function(regions)
 {

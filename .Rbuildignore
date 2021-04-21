@@ -14,3 +14,5 @@
 ^\.github$
 ^R/util\.R$
 ^tests/testthat/data/test-map.png$
+^inst/extdata/ng_admin$
+^inst/extdata/nigeria-lgas$
