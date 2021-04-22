@@ -23,18 +23,17 @@ map_ng(
 )
 }
 \arguments{
-\item{region}{A character vector of a list of Nigerian States to be displayed.}
+\item{region}{A character vector of regions to be displayed. This could be 
+States or Local Government Areas.}
 
 \item{data}{An object containing data, principally the variables required to
-plotted in a map.}
+plot in a map.}
 
-\item{x}{Numeric object or factor (or coercible to one). See \emph{Details}.}
-
-\item{y}{Numeric. See \emph{Details}}
+\item{x, y}{Numeric object or factor (or coercible to one). See \emph{Details}.}
 
 \item{breaks}{Numeric. A vector of length >= 1. If a single value i.e.
-scalar, it denote the expected number of breaks. Internally, the function
-will attempt to compute approprate category sizes or fail if out-of bounds. 
+scalar, it denotes the expected number of breaks. Internally, the function
+will attempt to compute appropriate category sizes or fail if out-of bounds. 
 Where length is >= 3L, it is expected to be an arithmetic sequence that 
 represents category bounds as for \code{\link[base]{cut}} (applicable 
 only to choropleth maps).}
@@ -42,30 +41,23 @@ only to choropleth maps).}
 \item{categories}{The legend for the choropleth-plotted categories. If not 
 defined, internally created labels are used.}
 
-\item{title}{Character vector of length 1.}
+\item{title, caption}{An optional string for annotating the map.}
 
-\item{caption}{Character vector of length 1.}
-
-\item{show.neighbours}{Logical; \code{TRUE} to display borders of
-neighbouring countries.}
+\item{show.neighbours}{Logical; \code{TRUE} to display the immediate vicinity
+neighbouring regions/countries.}
 
 \item{show.text}{Logical. Apply labels to the regions of the map.}
 
-\item{leg.x}{Numeric. Position of the legend.}
+\item{leg.x, leg.y}{Numeric. Position of the legend.}
 
-\item{leg.y}{Numeric. Position of the legend.}
-
-\item{leg.title}{Character. The legend Title}
+\item{leg.title}{String. The legend Title}
 
 \item{leg.orient}{The orientation of the legend i.e. whether horizontal or
 vertical.}
 
-\item{...}{Further arguments for function \code{\link[maps]{map}}}
+\item{...}{Further arguments passed to \code{\link[maps]{map}}}
 }
 \value{
-An object of class \code{map}, invisibly; as a side-effect,
-results in the drawing of a map of Nigeria.
-
 An object of class \code{maps} containing the data used to draw the
 map and which can be used for additional calls to \code{\link[maps]{map}} or
 other similar functions (e.g. \code{graphics::plot.default}).
@@ -75,23 +67,23 @@ Maps of the Federal Republic of Nigeria that are based on the basic
 plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 }
 \details{
-The default value for \code{region} is to print all States. 
-\code{NULL} will print an outline map, i.e. without internal boundaries.
+The default value for \code{region} is to print all State boundaries.
 \code{data} enables the extraction of data for plotting from an object
 of class \code{data.frame}. Columns containing States are identified. The
-argument also provided context for quasiquotation when providing the 
-\code{x} and {y} arguments.
+argument also provides context for quasiquotation when providing the 
+\code{x} and \code{y} arguments.
+
 For \code{x} and \code{y}, when both arguments are supplied, they are taken
-to be point coordinates and are plotted as such. If only \code{x} is supplied,
-it is presumed that the intention is to make a choropleth map, and thus, 
-numeric vector arguments are converted into factors i.e. number classes. 
-Otherwise factors or any object that can be coerced to a factor should be used.
+to be point coordinates. If only \code{x} is supplied, it is presumed that the
+intention is to make a choropleth map, and thus, numeric vector arguments are
+converted into factors i.e. number classes. Otherwise factors or any object 
+that can be coerced to a factor should be used.
+
 For plain plots, the \code{col} argument works the same as with
-\code{\link[maps]{map}} and variants. For choropleth maps, the colour
-provided represents a (sequential) colour palette based on 
-\code{RColorBrewer::brewer.pal}. The possible colour options can be
-checked with \code{getOption("choropleth.colours")} and this can also be 
-modified by the user.
+\code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
+a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
+available colour options can be checked with 
+\code{getOption("choropleth.colours")} and this can also be modified by the user.
 }
 \note{
 When adjusting the default colour choices for choropleth maps, it is

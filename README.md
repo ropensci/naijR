@@ -20,35 +20,13 @@ related to Nigeria.
 
 ## Usage
 
-### Prerequisites
-
-This is a package for use in the R ecosystem. To install R, visit
-<https://cran.r-project.org>.
-
-### Installation
-
-To download and install the current stable version of this package from
-CRAN:
-
-``` r
-install.packages("naijR")
-```
-
-The development version can be obtained from
-[GitHub](https://github.com/BroVic/naijR) with:
-
-``` r
-# If necessary, 'install.packages("remotes")' first
-remotes::install_github("BroVic/naijR")
-```
-
 ### Some simple operations
 
 #### Maps
 
 A major feature of this version of the packages is the introduction of
-various map drawing capabilities. To read more about this, read the
-vignette with this
+various map drawing capabilities. To find out more about this, read the
+vignette. It can be accessed from within R with this line of code:
 
 ``` r
 vignette('nigeria-maps', 'naijR')
@@ -57,7 +35,7 @@ vignette('nigeria-maps', 'naijR')
 #### States
 
 To create a list of all the States of the Nigerian Federation, simply
-call `states()`
+call `states()`.
 
 ``` r
 library(naijR, quietly = TRUE)
@@ -85,7 +63,7 @@ states()
 #> [1] "states"    "character"
 ```
 
-States from a given geo-political zone can also be selected
+States from a given geo-political zone can also be selected:
 
 ``` r
 states(gpz = "ne")  # i.e. North-East
@@ -94,7 +72,7 @@ states(gpz = "ne")  # i.e. North-East
 #> [1] "states"    "character"
 ```
 
-For other capabilities of this function, see `?states()`
+For other capabilities of this function, see `?states()`.
 
 #### Local Government Areas
 
@@ -183,24 +161,25 @@ fix_mobile(dat$phone)
 #> [6] "08123456789" "09064321987" NA
 ```
 
-## Future Work
+## Installation
 
-Some enhancements to expect in future updates:
+To download and install the current stable version of this package from
+CRAN:
 
--   Manipulation of phone numbers will provide options for the
-    introduction of separators. Also the function will become more
-    intelligent, pre-empting errors in data entry e.g. accepting the
-    letter ‘O’ as a presumed zero (`0`).
--   `fix_mobile()` currently works with character vectors. It will be
-    allowed to work with numeric vectors, converting these to character
-    vectors internally.
--   A distance matrix for major locations in the country.
+``` r
+install.packages("naijR")
+```
+
+The development version can be obtained from
+[GitHub](https://github.com/BroVic/naijR) with:
+
+``` r
+# If necessary, 'install.packages("remotes")' first
+remotes::install_github("BroVic/naijR")
+```
 
 ## Feedback/Contribution
 
-This is an open source project and contributions are welcome. Pull
-requests for R code or documentation, and any suggestions for making
-this effort worthwhile will be gladly entertained.
-
-For bug reports or feature requests, kindly submit an
-[issue](https://github.com/BroVic/naijR/issues/new).
+Contributions are welcome and pull requests for R code or documentation
+will be gladly entertained. For bug reports or feature requests, kindly
+submit an [issue](https://github.com/BroVic/naijR/issues/new).

@@ -2,14 +2,29 @@
 % Please edit documentation in R/regions.R
 \name{fix_region}
 \alias{fix_region}
+\alias{fix_region.states}
+\alias{fix_region.lgas}
+\alias{fix_region.default}
 \title{Fix Region Names}
 \usage{
 fix_region(x, ...)
+
+\method{fix_region}{states}(x, ...)
+
+\method{fix_region}{lgas}(x, interactive = FALSE, ...)
+
+\method{fix_region}{default}(x, ...)
 }
 \arguments{
-\item{x}{An S3 object of class \code{states} or \code{lgas}}
+\item{x}{An S3 object of class \code{states} or \code{lgas}. For 
+\code{fix_region.default}, a character vector can be passed but only
+that for States will be interpretable.}
 
-\item{...}{This argument is placed for possible use in the near future.}
+\item{...}{Arguments passed to methods.}
+
+\item{interactive}{Logical. When \code{TRUE}, the function prompts the user
+to interactively select the correct LGA names from a list of available
+options.}
 }
 \value{
 The transformed object. If all names are correct, the object is
@@ -23,9 +38,4 @@ The function will look through a character vector and try to
 determine if State or LGA names have been wrongly entered. This presupposes that
 the atomic vector is of type \code{character}. It does not test any missing
 values in the vector, leaving them untouched.
-}
-\note{
-An updated version would include the ability to adjust the 
-\href{https://en.wikipedia.org/wiki/Levenshtein_distance}{Levenshtein 
-distance}, which will empower users to tune the function's sensitivity.
 }

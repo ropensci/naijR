@@ -19,8 +19,9 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' 
 #' @param states One or more States of the Federation
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
-#'  "ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).
-#' @param all logical; whether to include FCT in the result
+#'  "ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").
+#' @param all logical; whether to include the Federal Capital Territory in 
+#' the result
 #' 
 #' @return The States of Nigeria as a whole or by zones, as an S3 object 
 #' of class \code{states}.
@@ -166,12 +167,10 @@ is_state <- function(x)
 #' the atomic vector is of type \code{character}. It does not test any missing
 #' values in the vector, leaving them untouched.
 #' 
-#' @param x An S3 object of class \code{states} or \code{lgas}
-#' @param ... This argument is placed for possible use in the near future.
-#' 
-#' @note An updated version would include the ability to adjust the 
-#' \href{https://en.wikipedia.org/wiki/Levenshtein_distance}{Levenshtein 
-#' distance}, which will empower users to tune the function's sensitivity.
+#' @param x An S3 object of class \code{states} or \code{lgas}. For 
+#' \code{fix_region.default}, a character vector can be passed but only
+#' that for States will be interpretable.
+#' @param ... Arguments passed to methods.
 #' 
 #' @return The transformed object. If all names are correct, the object is
 #' returned unchanged.
@@ -181,7 +180,7 @@ fix_region <- function(x, ...)
 
 
 
-
+#' @rdname fix_region
 #' @export
 fix_region.states <- function(x, ...)
 {
@@ -211,6 +210,12 @@ fix_region.states <- function(x, ...)
 
 
 
+#' @rdname fix_region
+#' 
+#' @param interactive Logical. When \code{TRUE}, the function prompts the user
+#' to interactively select the correct LGA names from a list of available
+#' options.
+#' 
 #' @export
 fix_region.lgas <- function(x, interactive = FALSE, ...)
 {
@@ -229,6 +234,7 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
 
 
 
+#' @rdname fix_region
 #' @importFrom magrittr %>%
 #' 
 #' @export
@@ -248,6 +254,9 @@ fix_region.default <- function(x, ...)
   zz <- suppressWarnings(states(x)) %>% fix_region
   as.character(zz)
 }
+
+
+
 
 
 .fixRegionInternal <- function(x, region, ...)
@@ -478,7 +487,7 @@ fix_region.default <- function(x, ...)
 #' @examples
 #' how_many_lgas <- function(state) {
 #'   require(naijR)
-#'   stopifnot(state %in% states())
+#'   stopifnot(all(is_state(state)))
 #'   cat(sprintf("No. of LGAs in %s State:", state),
 #'     length(lgas(state)),
 #'     fill = TRUE)
@@ -555,4 +564,18 @@ is_lga <- function(x)
 new_lgas <- function(x)
 {
   structure(x, class = c("lgas", class(x)))
+}
+
+
+#' @rdname lgas
+#' @param state Character; State(s) in the Federation of Nigeria. Default is
+#' \code{NA_character_}.
+#' 
+#' @note \code{lga_ng} stands deprecated and will be removed in the next minor
+#' version. New code should use \code{lgas} instead.
+#' 
+#' @export
+lgas_ng <- function(state = NA_character_) {
+  .Deprecated("lgas")
+  as.character(lgas(region = state))
 }

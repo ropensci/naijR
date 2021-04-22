@@ -2,12 +2,18 @@
 % Please edit documentation in R/regions.R
 \name{lgas}
 \alias{lgas}
+\alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
 lgas(region = NA_character_)
+
+lgas_ng(state = NA_character_)
 }
 \arguments{
 \item{region}{Character; State(s) in the Federation of Nigeria. Default is
+\code{NA_character_}.}
+
+\item{state}{Character; State(s) in the Federation of Nigeria. Default is
 \code{NA_character_}.}
 }
 \value{
@@ -18,10 +24,14 @@ are character vectors of the LGAs in each state.
 \description{
 List Local Government Areas
 }
+\note{
+\code{lga_ng} stands deprecated and will be removed in the next minor
+version. New code should use \code{lgas} instead.
+}
 \examples{
 how_many_lgas <- function(state) {
   require(naijR)
-  stopifnot(state \%in\% states())
+  stopifnot(all(is_state(state)))
   cat(sprintf("No. of LGAs in \%s State:", state),
     length(lgas(state)),
     fill = TRUE)

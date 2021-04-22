@@ -10,9 +10,10 @@ states(states, gpz = NULL, all = TRUE)
 \item{states}{One or more States of the Federation}
 
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
-"ne", "nw", "se", "ss"} and \code{"sw"} (see \code{Details}).}
+"ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").}
 
-\item{all}{logical; whether to include FCT in the result}
+\item{all}{logical; whether to include the Federal Capital Territory in 
+the result}
 }
 \value{
 The States of Nigeria as a whole or by zones, as an S3 object 

@@ -40,56 +40,51 @@ globalVariables(c(".", "STATE"))
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
-#' @param region A character vector of a list of Nigerian States to be displayed.
+#' @param region A character vector of regions to be displayed. This could be 
+#' States or Local Government Areas.
 #' @param data An object containing data, principally the variables required to
-#' plotted in a map.
-#' @param x Numeric object or factor (or coercible to one). See \emph{Details}.
-#' @param y Numeric. See \emph{Details}
+#' plot in a map.
+#' @param x,y Numeric object or factor (or coercible to one). See \emph{Details}.
 #' @param breaks Numeric. A vector of length >= 1. If a single value i.e.
-#' scalar, it denote the expected number of breaks. Internally, the function
-#' will attempt to compute approprate category sizes or fail if out-of bounds. 
+#' scalar, it denotes the expected number of breaks. Internally, the function
+#' will attempt to compute appropriate category sizes or fail if out-of bounds. 
 #' Where length is >= 3L, it is expected to be an arithmetic sequence that 
 #' represents category bounds as for \code{\link[base]{cut}} (applicable 
 #' only to choropleth maps).
 #' @param categories The legend for the choropleth-plotted categories. If not 
 #' defined, internally created labels are used.
-#' @param title Character vector of length 1.
-#' @param caption Character vector of length 1.
-#' @param leg.x Numeric. Position of the legend.
-#' @param leg.y Numeric. Position of the legend.
-#' @param leg.title Character. The legend Title
+#' @param title,caption An optional string for annotating the map.
+#' @param leg.x,leg.y Numeric. Position of the legend.
+#' @param leg.title String. The legend Title
 #' @param leg.orient The orientation of the legend i.e. whether horizontal or
 #' vertical.
-#' @param show.neighbours Logical; \code{TRUE} to display borders of
-#' neighbouring countries.
+#' @param show.neighbours Logical; \code{TRUE} to display the immediate vicinity
+#' neighbouring regions/countries.
 #' @param show.text Logical. Apply labels to the regions of the map.
-#' @param ... Further arguments for function \code{\link[maps]{map}}
+#' @param ... Further arguments passed to \code{\link[maps]{map}}
 #' 
-#' @details The default value for \code{region} is to print all States. 
-#' \code{NULL} will print an outline map, i.e. without internal boundaries.
+#' @details The default value for \code{region} is to print all State boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
 #' of class \code{data.frame}. Columns containing States are identified. The
-#' argument also provided context for quasiquotation when providing the 
-#' \code{x} and {y} arguments.
+#' argument also provides context for quasiquotation when providing the 
+#' \code{x} and \code{y} arguments.
+#' 
 #' For \code{x} and \code{y}, when both arguments are supplied, they are taken
-#' to be point coordinates and are plotted as such. If only \code{x} is supplied,
-#' it is presumed that the intention is to make a choropleth map, and thus, 
-#' numeric vector arguments are converted into factors i.e. number classes. 
-#' Otherwise factors or any object that can be coerced to a factor should be used.
+#' to be point coordinates. If only \code{x} is supplied, it is presumed that the
+#' intention is to make a choropleth map, and thus, numeric vector arguments are
+#' converted into factors i.e. number classes. Otherwise factors or any object 
+#' that can be coerced to a factor should be used.
+#' 
 #' For plain plots, the \code{col} argument works the same as with
-#' \code{\link[maps]{map}} and variants. For choropleth maps, the colour
-#' provided represents a (sequential) colour palette based on 
-#' \code{RColorBrewer::brewer.pal}. The possible colour options can be
-#' checked with \code{getOption("choropleth.colours")} and this can also be 
-#' modified by the user.
+#' \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
+#' a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
+#' available colour options can be checked with 
+#' \code{getOption("choropleth.colours")} and this can also be modified by the user.
 #' 
 #' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
 #' \code{RColorBrewer::display.brewer.all}
-#' 
-#' @return An object of class \code{map}, invisibly; as a side-effect,
-#' results in the drawing of a map of Nigeria.
 #'
 #' @examples
 #' \dontrun{
@@ -388,23 +383,6 @@ map_ng <- function(region = character(),
 {
   'nigeria-lgas'
 }
-
-
-
-
-## Read the data from an internal shapefile
-# @importFrom rgdal readOGR
-# .getSpatialPolygonsDataFrame <- function(region.type) {
-#   .Deprecated(".getShapefileData")
-#   src <- .getShapefileDir(region.type)
-#   dsn <-
-#     system.file(file.path("extdata", src),
-#                 package = 'naijR',
-#                 mustWork = TRUE)
-#   if (identical(dsn, character(1)))
-#     stop("The map data could not be found in 'extdata'")
-#   readOGR(dsn, .shpLayer(region.type), verbose = FALSE)
-# }
 
 
 

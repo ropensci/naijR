@@ -25,46 +25,29 @@ An R package on Nigeria and for Nigeria
 The goal of **naijR** is to make it easier for R users to work with data related to Nigeria.
 
 ## Usage
-### Prerequisites
-This is a package for use in the R ecosystem. To install R, visit <https://cran.r-project.org>.
-
-### Installation
-To download and install the current stable version of this package from CRAN:
-
-```{r cran-install, eval=FALSE}
-install.packages("naijR")
-```
-
-The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
-
-``` {r install, eval = FALSE}
-# If necessary, 'install.packages("remotes")' first
-remotes::install_github("BroVic/naijR")
-```
-
 ### Some simple operations
 #### Maps
-A major feature of this version of the packages is the introduction of various map drawing capabilities. To read more about this, read the vignette with this
+A major feature of this version of the packages is the introduction of various map drawing capabilities. To find out more about this, read the vignette. It can be accessed from within R with this line of code:
 
 ```{r vignette, eval=FALSE}
 vignette('nigeria-maps', 'naijR')
 ```
 
 #### States
-To create a list of all the States of the Nigerian Federation, simply call `states()`
+To create a list of all the States of the Nigerian Federation, simply call `states()`.
 
 ```{r}
 library(naijR, quietly = TRUE)
 states()
 ```
 
-States from a given geo-political zone can also be selected
+States from a given geo-political zone can also be selected:
 
 ```{r}
 states(gpz = "ne")  # i.e. North-East
 ```
 
-For other capabilities of this function, see `?states()`
+For other capabilities of this function, see `?states()`.
 
 #### Local Government Areas
 This is a basic example that shows how to very quickly fetch the names of Local Government Areas within a given State:
@@ -121,14 +104,20 @@ The function works on vectors; thus an entire column of a table with phone numbe
 fix_mobile(dat$phone)
 ```
 
-## Future Work
-Some enhancements to expect in future updates:
 
-- Manipulation of phone numbers will provide options for the introduction of separators. Also the function will become more intelligent, pre-empting errors in data entry e.g. accepting the letter 'O' as a presumed zero (`0`).
-- `fix_mobile()` currently works with character vectors. It will be allowed to work with numeric vectors, converting these to character vectors internally.
-- A distance matrix for major locations in the country.
+## Installation
+To download and install the current stable version of this package from CRAN:
+
+```{r cran-install, eval=FALSE}
+install.packages("naijR")
+```
+
+The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
+
+``` {r install, eval = FALSE}
+# If necessary, 'install.packages("remotes")' first
+remotes::install_github("BroVic/naijR")
+```
 
 ## Feedback/Contribution
-This is an open source project and contributions are welcome. Pull requests for R code or documentation, and any suggestions for making this effort worthwhile will be gladly entertained.
-
-For bug reports or feature requests, kindly submit an [issue](https://github.com/BroVic/naijR/issues/new).
+Contributions are welcome and pull requests for R code or documentation will be gladly entertained. For bug reports or feature requests, kindly submit an [issue](https://github.com/BroVic/naijR/issues/new).

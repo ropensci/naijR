@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.1.5.9019
-Date: 2021-04-21
+Version: 0.1.5.9021
+Date: 2021-04-22
 Depends: 
     R (>= 3.6),
     methods (>= 3.6.3)
@@ -36,5 +36,5 @@ Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 RdMacros: lifecycle
-URL: https://github.com/BroVic/naijR
+URL: https://brovic.github.io/naijR
 BugReports: https://github.com/BroVic/naijR/issues

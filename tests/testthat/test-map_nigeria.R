@@ -292,7 +292,8 @@ test_that("Choropleth mapping succeeds", {
     x = runif(length(ss), max = 100),
     breaks = c(0, 40, 60, 100),
     col = 'YlOrRd',
-    show.text = FALSE
+    show.text = FALSE,
+    plot = FALSE
   ),
   'map')
 })
