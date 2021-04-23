@@ -13,6 +13,8 @@ status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/
 coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://codecov.io/gh/BroVic/naijR?branch=master)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![R build
+status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
 <!-- badges: end -->
 
 The goal of **naijR** is to make it easier for R users to work with data
