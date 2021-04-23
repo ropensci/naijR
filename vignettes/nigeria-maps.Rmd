@@ -27,13 +27,20 @@ map_ng()
 To show the map without the state borders, set the first argument (`region`) to `NULL`. Thus, with all other arguments set to default values, that would be
 
 ```{r outline-map}
-map_ng(NULL)
+map_ng("Nigeria")
 ```
 
-It is possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
+All the Local Government Areas can equally be displayed, using a map that, by default, does not display text, so as to avoid cluttering. This kind of map is useful for charting choropleth maps, as shown below for the States. To this, we pass the value produced by `lgas()`.
+
+```{r all-lga-map}
+map_ng(lgas())
+```
+
+
+It is also possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
 
 ```{r south-west, warning=FALSE}
-map_ng(states("sw"), show.text = TRUE, col = 4)
+map_ng(states(gpz = "sw"), show.text = TRUE, col = 4)
 ```
 
 A single state can also be drawn:
@@ -68,7 +75,7 @@ head(dd)
 To draw this choropleth, we will use the data frame approach first:
 
 ```{r df-approach}
-map_ng(data = dd, x = var)
+map_ng(data = dd, x = var, show.text = FALSE)
 ```
 
 Note the following:
@@ -80,7 +87,7 @@ Note the following:
 ### Using atomic vectors
 We can use the same data to make the same map, but with a different coding approach:
 ```{r vec-approach}
-map_ng(region = ss, x = vv, col = "red")
+map_ng(region = ss, x = vv, col = "red", show.text = FALSE)
 ```
 
 It's exactly same map as before, but this time, we used 2 vectors to provide the data -- one for the regions (in this case the 36 States and FCT) and another for the categorization. We have also introduced some colouring with the `col` argument. Although it has the same data, if we try to use the column name from `dd`, we have an error.
@@ -96,7 +103,7 @@ When the data to be categorized are numeric vectors, the categories have to be d
 nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100
 bb <- c(0, 40, 60, 100)
 
-map_ng(region = ss, x = nn, breaks = bb, col = 'YlOrRd')
+map_ng(region = ss, x = nn, breaks = bb, col = 'YlOrRd', show.text = FALSE)
 ```
 
 To get a more meaningful and interpretable legend, use the `categories` argument.
@@ -107,7 +114,8 @@ map_ng(
   x = nn,
   breaks = bb,
   categories = c("Low", "Medium", "High"),
-  col = 3L
+  col = 3L, 
+  show.text = FALSE
 )
 ```
 
@@ -120,10 +128,10 @@ To show the distribution of point data on any the maps such as GIS location data
 x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
 y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
 
-map_ng(NULL, x = x, y = y)
+map_ng("Nigeria", x = x, y = y)
 ```
 
-The function `map_ng` carried out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
+The function `map_ng` carries out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,
 
 ```{r out-of-bounds, error=TRUE}
 map_ng("Kwara", x = x, y = y)

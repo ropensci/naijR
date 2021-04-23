@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Victor Ordu.
+# Copyright (C) 2019-2021 Victor Ordu.
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ test_that("Input corner cases are checked", {
 })
 
 test_that("Wrong mobile numbers are repaired or removed.", {
-  
+  # Mobile No.pattern: http://www.5starsmsng.com/nigerian-phone-prefixes
   init.numbers <-
     c(
       "123456789",
@@ -50,7 +50,7 @@ test_that("Wrong mobile numbers are repaired or removed.", {
       "09064321987",
       "O8055577889",
       "070456789011",
-      "07031356890",    # http://www.5starsmsng.com/nigerian-phone-prefixes
+      "07031356890",    
       "07061356890",
       "08031356890",
       "08061356890",

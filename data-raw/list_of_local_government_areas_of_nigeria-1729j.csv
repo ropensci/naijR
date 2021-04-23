@@ -1,0 +1,777 @@
+SNo,Local Government Area,State
+5,Aba North,Abia State
+6,Aba South,Abia State
+62,Arochukwu,Abia State
+102,Bende,Abia State
+338,Ikwuano,Abia State
+363,Isiala Ngwa North,Abia State
+364,Isiala Ngwa South,Abia State
+371,Isuikwuato,Abia State
+548,Obi Ngwa,Abia State
+574,Ohafia,Abia State
+624,Osisioma,Abia State
+721,Ugwunagbo,Abia State
+725,Ukwa East,Abia State
+726,Ukwa West,Abia State
+730,Umu Nneochi,Abia State
+728,Umuahia North,Abia State
+729,Umuahia South,Abia State
+157,Demsa,Adamawa State
+225,Fufure,Adamawa State
+234,Ganye,Adamawa State
+241,Gayuk,Adamawa State
+251,Gombi,Adamawa State
+253,Girei,Adamawa State
+277,Hong,Adamawa State
+380,Jada,Adamawa State
+465,Lamurde,Adamawa State
+472,Madagali,Adamawa State
+480,Maiha,Adamawa State
+496,Mayo Belwa,Adamawa State
+499,Michika,Adamawa State
+506,Mubi North,Adamawa State
+507,Mubi South,Adamawa State
+542,Numan,Adamawa State
+676,Shelleng,Adamawa State
+687,Song,Adamawa State
+707,Toungo,Adamawa State
+763,Yola North,Adamawa State
+764,Yola South,Adamawa State
+3,Abak,Akwa Ibom State
+167,Eastern Obolo,Akwa Ibom State
+186,Eket,Akwa Ibom State
+204,Esit Eket,Akwa Ibom State
+205,Essien Udim,Akwa Ibom State
+209,Etim Ekpo,Akwa Ibom State
+210,Etinan,Akwa Ibom State
+288,Ibeno,Akwa Ibom State
+289,Ibesikpo Asutan,Akwa Ibom State
+291,Ibiono-Ibom,Akwa Ibom State
+321,Ika,Akwa Ibom State
+331,Ikono,Akwa Ibom State
+333,Ikot Abasi,Akwa Ibom State
+334,Ikot Ekpene,Akwa Ibom State
+350,Ini,Akwa Ibom State
+374,Itu,Akwa Ibom State
+498,Mbo,Akwa Ibom State
+513,Mkpat-Enin,Akwa Ibom State
+538,Nsit-Atai,Akwa Ibom State
+539,Nsit-Ibom,Akwa Ibom State
+540,Nsit-Ubium,Akwa Ibom State
+551,Obot Akara,Akwa Ibom State
+588,Okobo,Akwa Ibom State
+604,Onna,Akwa Ibom State
+613,Oron,Akwa Ibom State
+616,Oruk Anam,Akwa Ibom State
+718,Udung-Uko,Akwa Ibom State
+723,Ukanafun,Akwa Ibom State
+733,Uruan,Akwa Ibom State
+734,Urue-Offong/Oruko,Akwa Ibom State
+738,Uyo,Akwa Ibom State
+22,Aguata,Anambra State
+47,Anambra East,Anambra State
+48,Anambra West,Anambra State
+49,Anaocha,Anambra State
+74,Awka North,Anambra State
+75,Awka South,Anambra State
+76,Ayamelum,Anambra State
+163,Dunukofia,Anambra State
+191,Ekwusigo,Anambra State
+296,Idemili North,Anambra State
+297,Idemili South,Anambra State
+312,Ihiala,Anambra State
+532,Njikoka,Anambra State
+536,Nnewi North,Anambra State
+537,Nnewi South,Anambra State
+564,Ogbaru,Anambra State
+602,Onitsha North,Anambra State
+603,Onitsha South,Anambra State
+617,Orumba North,Anambra State
+618,Orumba South,Anambra State
+636,Oyi,Anambra State
+45,Alkaleri,Bauchi State
+97,Bauchi,Bauchi State
+116,Bogoro,Bauchi State
+142,Damban,Bauchi State
+150,Darazo,Bauchi State
+151,Dass,Bauchi State
+232,Gamawa,Bauchi State
+233,Ganjuwa,Bauchi State
+247,Giade,Bauchi State
+372,Itas/Gadau,Bauchi State
+384,Jama'are,Bauchi State
+417,Katagum,Bauchi State
+430,Kirfi,Bauchi State
+503,Misau,Bauchi State
+530,Ningi,Bauchi State
+679,Shira,Bauchi State
+696,Tafawa Balewa,Bauchi State
+709,Toro,Bauchi State
+744,Warji,Bauchi State
+768,Zaki,Bauchi State
+125,Brass,Bayelsa State
+185,Ekeremor,Bayelsa State
+437,Kolokuma/Opokuma,Bayelsa State
+524,Nembe,Bayelsa State
+565,Ogbia,Bayelsa State
+663,Sagbama,Bayelsa State
+688,Southern Ijaw,Bayelsa State
+762,Yenagoa,Bayelsa State
+58,Ado,Benue State
+19,Agatu,Benue State
+56,Apa,Benue State
+128,Buruku,Benue State
+244,Gboko,Benue State
+258,Guma,Benue State
+271,Gwer East,Benue State
+272,Gwer West,Benue State
+420,Katsina-Ala,Benue State
+439,Konshisha,Benue State
+454,Kwande,Benue State
+469,Logo,Benue State
+490,Makurdi,Benue State
+546,Obi,Benue State
+563,Ogbadibo,Benue State
+578,Ohimini,Benue State
+582,Oju,Benue State
+605,Okpokwu,Benue State
+626,Oturkpo,Benue State
+704,Tarka,Benue State
+724,Ukum,Benue State
+735,Ushongo,Benue State
+740,Vandeikya,Benue State
+1,Abadam,Borno State
+65,Askira/Uba,Borno State
+89,Bama,Borno State
+99,Bayo,Borno State
+114,Biu,Borno State
+138,Chibok,Borno State
+144,Damboa,Borno State
+158,Dikwa,Borno State
+254,Gubio,Borno State
+264,Guzamala,Borno State
+274,Gwoza,Borno State
+276,Hawul,Borno State
+387,Jere,Borno State
+399,Kaga,Borno State
+405,Kala/Balge,Borno State
+438,Konduga,Borno State
+446,Kukawa,Borno State
+457,Kwaya Kusar,Borno State
+474,Mafa,Borno State
+476,Magumeri,Borno State
+478,Maiduguri,Borno State
+491,Marte,Borno State
+505,Mobbar,Borno State
+509,Monguno,Borno State
+525,Ngala,Borno State
+526,Nganzai,Borno State
+674,Shani,Borno State
+9,Abi,Cross River State
+29,Akamkpa,Cross River State
+37,Akpabuyo,Cross River State
+83,Bakassi,Cross River State
+101,Bekwarra,Cross River State
+103,Biase,Cross River State
+117,Boki,Cross River State
+134,Calabar Municipal,Cross River State
+135,Calabar South,Cross River State
+215,Etung,Cross River State
+330,Ikom,Cross River State
+545,Obanliku,Cross River State
+553,Obubra,Cross River State
+554,Obudu,Cross River State
+559,Odukpani,Cross River State
+569,Ogoja,Cross River State
+757,Yakuur,Cross River State
+758,Yala,Cross River State
+52,Aniocha North,Delta State
+53,Aniocha South,Delta State
+119,Bomadi,Delta State
+132,Burutu,Delta State
+207,Ethiope East,Delta State
+208,Ethiope West,Delta State
+322,Ika North East,Delta State
+324,Ika South,Delta State
+368,Isoko North,Delta State
+369,Isoko South,Delta State
+522,Ndokwa East,Delta State
+523,Ndokwa West,Delta State
+589,Okpe,Delta State
+621,Oshimili North,Delta State
+622,Oshimili South,Delta State
+643,Patani,Delta State
+669,Sapele,Delta State
+717,Udu,Delta State
+719,Ughelli North,Delta State
+720,Ughelli South,Delta State
+727,Ukwuani,Delta State
+737,Uvwie,Delta State
+745,Warri North,Delta State
+746,Warri South,Delta State
+747,Warri South West,Delta State
+4,Abakaliki,Ebonyi State
+16,Afikpo North,Ebonyi State
+17,Afikpo South,Ebonyi State
+168,Ebonyi,Ebonyi State
+219,Ezza North,Ebonyi State
+220,Ezza South,Ebonyi State
+337,Ikwo,Ebonyi State
+361,Ishielu,Ebonyi State
+375,Ivo,Ebonyi State
+378,Izzi,Ebonyi State
+576,Ohaozara,Ebonyi State
+577,Ohaukwu,Ebonyi State
+601,Onicha,Ebonyi State
+32,Akoko-Edo,Edo State
+182,Egor,Edo State
+199,Esan Central,Edo State
+200,Esan North-East,Edo State
+201,Esan South-East,Edo State
+202,Esan West,Edo State
+212,Etsako Central,Edo State
+213,Etsako East,Edo State
+214,Etsako West,Edo State
+311,Igueben,Edo State
+335,Ikpoba Okha,Edo State
+607,Oredo,Edo State
+579,Orhionmwon,Edo State
+627,Ovia North-East,Edo State
+628,Ovia South-West,Edo State
+629,Owan East,Edo State
+630,Owan West,Edo State
+722,Uhunmwonde,Edo State
+13,Ado Ekiti,Ekiti State
+177,Efon,Ekiti State
+188,Ekiti East,Ekiti State
+189,Ekiti South-West,Ekiti State
+190,Ekiti West,Ekiti State
+194,Emure,Ekiti State
+245,Gbonyin,Ekiti State
+299,Ido Osi,Ekiti State
+319,Ijero,Ekiti State
+328,Ikere,Ekiti State
+329,Ikole,Ekiti State
+340,Ilejemeje,Ekiti State
+356,Irepodun/Ifelodun,Ekiti State
+359,Ise/Orun,Ekiti State
+504,Moba,Ekiti State
+635,Oye,Ekiti State
+51,Aninri,Enugu State
+73,Awgu,Enugu State
+195,Enugu East,Enugu State
+196,Enugu North,Enugu State
+197,Enugu South,Enugu State
+217,Ezeagu,Enugu State
+308,Igbo Etiti,Enugu State
+309,Igbo Eze North,Enugu State
+310,Igbo Eze South,Enugu State
+366,Isi Uzo,Enugu State
+533,Nkanu East,Enugu State
+534,Nkanu West,Enugu State
+541,Nsukka,Enugu State
+580,Oji River,Enugu State
+715,Udenu,Enugu State
+716,Udi,Enugu State
+739,Uzo Uwani,Enugu State
+2,Abaji,FCT
+514,Abuja Municipal Area Council,FCT
+133,Bwari,FCT
+266,Gwagwalada,FCT
+445,Kuje,FCT
+453,Kwali,FCT
+31,Akko,Gombe State
+87,Balanga,Gombe State
+106,Billiri,Gombe State
+162,Dukku,Gombe State
+226,Funakaye,Gombe State
+250,Gombe,Gombe State
+407,Kaltungo,Gombe State
+455,Kwami,Gombe State
+517,Nafada,Gombe State
+681,Shongom,Gombe State
+759,Yamaltu/Deba,Gombe State
+10,Aboh Mbaise,Imo State
+23,Ahiazu Mbaise,Imo State
+183,Ehime Mbano,Imo State
+218,Ezinihitte,Imo State
+294,Ideato North,Imo State
+295,Ideato South,Imo State
+313,Ihitte/Uboma,Imo State
+325,Ikeduru,Imo State
+362,Isiala Mbano,Imo State
+370,Isu,Imo State
+497,Mbaitoli,Imo State
+528,Ngor Okpala,Imo State
+531,Njaba,Imo State
+535,Nkwerre,Imo State
+543,Nwangele,Imo State
+552,Obowo,Imo State
+573,Oguta,Imo State
+575,Ohaji/Egbema,Imo State
+586,Okigwe,Imo State
+611,Orlu,Imo State
+614,Orsu,Imo State
+615,Oru East,Imo State
+619,Oru West,Imo State
+631,Owerri Municipal,Imo State
+632,Owerri North,Imo State
+633,Owerri West,Imo State
+732,Unuimo,Imo State
+71,Auyo,Jigawa State
+79,Babura,Jigawa State
+109,Biriniwa,Jigawa State
+112,Birnin Kudu,Jigawa State
+126,Buji,Jigawa State
+164,Dutse,Jigawa State
+231,Gagarawa,Jigawa State
+235,Garki,Jigawa State
+259,Gumel,Jigawa State
+262,Guri,Jigawa State
+269,Gwaram,Jigawa State
+273,Gwiwa,Jigawa State
+275,Hadejia,Jigawa State
+381,Jahun,Jigawa State
+397,Kafin Hausa,Jigawa State
+442,Kaugama,Jigawa State
+424,Kazaure,Jigawa State
+431,Kiri Kasama,Jigawa State
+433,Kiyawa,Jigawa State
+479,Maigatari,Jigawa State
+484,Malam Madori,Jigawa State
+500,Miga,Jigawa State
+655,Ringim,Jigawa State
+658,Roni,Jigawa State
+690,Sule Tankarkar,Jigawa State
+706,Taura,Jigawa State
+760,Yankwashi,Jigawa State
+110,Birnin Gwari,Kaduna State
+139,Chikun,Kaduna State
+248,Giwa,Kaduna State
+306,Igabi,Kaduna State
+323,Ikara,Kaduna State
+379,Jaba,Kaduna State
+386,Jema'a,Kaduna State
+394,Kachia,Kaduna State
+395,Kaduna North,Kaduna State
+396,Kaduna South,Kaduna State
+400,Kagarko,Kaduna State
+404,Kajuru,Kaduna State
+421,Kaura,Kaduna State
+423,Kauru,Kaduna State
+443,Kubau,Kaduna State
+444,Kudan,Kaduna State
+468,Lere,Kaduna State
+482,Makarfi,Kaduna State
+660,Sabon Gari,Kaduna State
+668,Sanga,Kaduna State
+684,Soba,Kaduna State
+770,Zangon Kataf,Kaduna State
+771,Zaria,Kaduna State
+28,Ajingi,Kano State
+42,Albasu,Kano State
+82,Bagwai,Kano State
+100,Bebeji,Kano State
+104,Bichi,Kano State
+130,Bunkure,Kano State
+140,Dala,Kano State
+143,Dambatta,Kano State
+153,Dawakin Kudu,Kano State
+154,Dawakin Tofa,Kano State
+159,Doguwa,Kano State
+221,Fagge,Kano State
+229,Gabasawa,Kano State
+236,Garko,Kano State
+237,Garun Mallam,Kano State
+240,Gaya,Kano State
+242,Gezawa,Kano State
+267,Gwale,Kano State
+270,Gwarzo,Kano State
+393,Kabo,Kano State
+412,Kano Municipal,Kano State
+414,Karaye,Kano State
+429,Kibiya,Kano State
+432,Kiru,Kano State
+447,Kumbotso,Kano State
+449,Kunchi,Kano State
+450,Kura,Kano State
+473,Madobi,Kano State
+483,Makoda,Kano State
+502,Minjibir,Kano State
+519,Nasarawa,Kano State
+650,Rano,Kano State
+654,Rimin Gado,Kano State
+657,Rogo,Kano State
+675,Shanono,Kano State
+691,Sumaila,Kano State
+698,Takai,Kano State
+703,Tarauni,Kano State
+708,Tofa,Kano State
+712,Tsanyawa,Kano State
+713,Tudun Wada,Kano State
+731,Ungogo,Kano State
+743,Warawa,Kano State
+750,Wudil,Kano State
+85,Bakori,Katsina State
+95,Batagarawa,Katsina State
+96,Batsari,Katsina State
+98,Baure,Katsina State
+107,Bindawa,Katsina State
+137,Charanchi,Katsina State
+149,Dan Musa,Katsina State
+146,Dandume,Katsina State
+148,Danja,Katsina State
+152,Daura,Katsina State
+165,Dutsi,Katsina State
+166,Dutsin Ma,Katsina State
+223,Faskari,Katsina State
+228,Funtua,Katsina State
+349,Ingawa,Katsina State
+388,Jibia,Katsina State
+398,Kafur,Katsina State
+402,Kaita,Katsina State
+409,Kankara,Katsina State
+411,Kankia,Katsina State
+419,Katsina,Katsina State
+451,Kurfi,Katsina State
+452,Kusada,Katsina State
+477,Mai'Adua,Katsina State
+485,Malumfashi,Katsina State
+487,Mani,Katsina State
+494,Mashi,Katsina State
+495,Matazu,Katsina State
+515,Musawa,Katsina State
+653,Rimi,Katsina State
+661,Sabuwa,Katsina State
+662,Safana,Katsina State
+667,Sandamu,Katsina State
+769,Zango,Katsina State
+43,Aleiro,Kebbi State
+60,Arewa Dandi,Kebbi State
+61,Argungu,Kebbi State
+70,Augie,Kebbi State
+81,Bagudo,Kebbi State
+111,Birnin Kebbi,Kebbi State
+131,Bunza,Kebbi State
+145,Dandi,Kebbi State
+222,Fakai,Kebbi State
+268,Gwandu,Kebbi State
+385,Jega,Kebbi State
+406,Kalgo,Kebbi State
+435,Koko/Besse,Kebbi State
+481,Maiyama,Kebbi State
+527,Ngaski,Kebbi State
+664,Sakaba,Kebbi State
+673,Shanga,Kebbi State
+692,Suru,Kebbi State
+748,Wasagu/Danko,Kebbi State
+761,Yauri,Kebbi State
+774,Zuru,Kebbi State
+12,Adavi,Kogi State
+26,Ajaokuta,Kogi State
+55,Ankpa,Kogi State
+93,Bassa,Kogi State
+156,Dekina,Kogi State
+283,Ibaji,Kogi State
+292,Idah,Kogi State
+307,Igalamela Odolu,Kogi State
+320,Ijumu,Kogi State
+392,Kabba/Bunu,Kogi State
+434,Kogi,Kogi State
+470,Lokoja,Kogi State
+510,Mopa Muro,Kogi State
+561,Ofu,Kogi State
+571,Ogori/Magongo,Kogi State
+583,Okehi,Kogi State
+584,Okene,Kogi State
+591,Olamaboro,Kogi State
+596,Omala,Kogi State
+755,Yagba East,Kogi State
+756,Yagba West,Kogi State
+63,Asa,Kwara State
+92,Baruten,Kwara State
+172,Edu,Kwara State
+187,Ekiti,Kwara State
+303,Ifelodun,Kwara State
+345,Ilorin East,Kwara State
+346,Ilorin South,Kwara State
+347,Ilorin West,Kwara State
+354,Irepodun,Kwara State
+365,Isin,Kwara State
+401,Kaiama,Kwara State
+511,Moro,Kwara State
+560,Offa,Kwara State
+585,Oke Ero,Kwara State
+640,Oyun,Kwara State
+644,Pategi,Kwara State
+21,Agege,Lagos State
+27,Ajeromi-Ifelodun,Lagos State
+44,Alimosho,Lagos State
+46,Amuwo-Odofin,Lagos State
+57,Apapa,Lagos State
+80,Badagry,Lagos State
+198,Epe,Lagos State
+211,Eti Osa,Lagos State
+287,Ibeju-Lekki,Lagos State
+300,Ifako-Ijaiye,Lagos State
+326,Ikeja,Lagos State
+332,Ikorodu,Lagos State
+441,Kosofe,Lagos State
+460,Lagos Island,Lagos State
+461,Lagos Mainland,Lagos State
+516,Mushin,Lagos State
+581,Ojo,Lagos State
+623,Oshodi-Isolo,Lagos State
+682,Shomolu,Lagos State
+694,Surulere,Lagos State
+41,Akwanga,Nassarawa State
+72,Awe,Nassarawa State
+160,Doma,Nassarawa State
+416,Karu,Nassarawa State
+425,Keana,Nassarawa State
+427,Keffi,Nassarawa State
+436,Kokona,Nassarawa State
+458,Lafia,Nassarawa State
+520,Nasarawa,Nassarawa State
+521,Nasarawa Egon,Nassarawa State
+547,Obi,Nassarawa State
+710,Toto,Nassarawa State
+742,Wamba,Nassarawa State
+18,Agaie,Niger State
+20,Agwara,Niger State
+105,Bida,Niger State
+121,Borgu,Niger State
+124,Bosso,Niger State
+136,Chanchaga,Niger State
+169,Edati,Niger State
+243,Gbako,Niger State
+261,Gurara,Niger State
+418,Katcha,Niger State
+440,Kontagora,Niger State
+464,Lapai,Niger State
+467,Lavun,Niger State
+475,Magama,Niger State
+489,Mariga,Niger State
+493,Mashegu,Niger State
+508,Mokwa,Niger State
+512,Moya,Niger State
+641,Paikoro,Niger State
+649,Rafi,Niger State
+652,Rijau,Niger State
+680,Shiroro,Niger State
+689,Suleja,Niger State
+695,Tafa,Niger State
+753,Wushishi,Niger State
+7,Abeokuta North,Ogun State
+8,Abeokuta South,Ogun State
+14,Ado-Odo/Ota,Ogun State
+178,Yewa North,Ogun State
+179,Yewa South,Ogun State
+216,Ewekoro,Ogun State
+305,Ifo,Ogun State
+315,Ijebu East,Ogun State
+316,Ijebu North,Ogun State
+317,Ijebu North East,Ogun State
+318,Ijebu Ode,Ogun State
+327,Ikenne,Ogun State
+348,Imeko Afon,Ogun State
+351,Ipokia,Ogun State
+544,Obafemi Owode,Ogun State
+555,Odeda,Ogun State
+557,Odogbolu,Ogun State
+572,Ogun Waterside,Ogun State
+651,Remo North,Ogun State
+671,Shagamu,Ogun State
+33,Akoko North-East,Ondo State
+34,Akoko North-West,Ondo State
+36,Akoko South-East,Ondo State
+35,Akoko South-West,Ondo State
+39,Akure North,Ondo State
+40,Akure South,Ondo State
+203,Ese Odo,Ondo State
+293,Idanre,Ondo State
+302,Ifedore,Ondo State
+314,Ilaje,Ondo State
+341,Ile Oluji/Okeigbo,Ondo State
+352,Irele,Ondo State
+556,Odigbo,Ondo State
+587,Okitipupa,Ondo State
+599,Ondo East,Ondo State
+600,Ondo West,Ondo State
+620,Ose,Ondo State
+634,Owo,Ondo State
+77,Aiyedaade,Osun State
+78,Aiyedire,Osun State
+66,Atakunmosa East,Osun State
+67,Atakunmosa West,Osun State
+118,Boluwaduro,Osun State
+122,Boripe,Osun State
+170,Ede North,Osun State
+171,Ede South,Osun State
+181,Egbedore,Osun State
+184,Ejigbo,Osun State
+173,Ife Central,Osun State
+174,Ife East,Osun State
+175,Ife North,Osun State
+176,Ife South,Osun State
+301,Ifedayo,Osun State
+304,Ifelodun,Osun State
+339,Ila,Osun State
+342,Ilesa East,Osun State
+343,Ilesa West,Osun State
+355,Irepodun,Osun State
+357,Irewole,Osun State
+367,Isokan,Osun State
+377,Iwo,Osun State
+550,Obokun,Osun State
+558,Odo Otin,Osun State
+592,Ola Oluwa,Osun State
+593,Olorunda,Osun State
+609,Oriade,Osun State
+612,Orolu,Osun State
+625,Osogbo,Osun State
+15,Afijio,Oyo State
+30,Akinyele,Oyo State
+68,Atiba,Oyo State
+69,Atisbo,Oyo State
+180,Egbeda,Oyo State
+278,Ibadan North,Oyo State
+279,Ibadan North-East,Oyo State
+280,Ibadan North-West,Oyo State
+281,Ibadan South-East,Oyo State
+282,Ibadan South-West,Oyo State
+284,Ibarapa Central,Oyo State
+285,Ibarapa East,Oyo State
+286,Ibarapa North,Oyo State
+298,Ido,Oyo State
+353,Irepo,Oyo State
+360,Iseyin,Oyo State
+373,Itesiwaju,Oyo State
+376,Iwajowa,Oyo State
+403,Kajola,Oyo State
+459,Lagelu,Oyo State
+566,Ogbomosho North,Oyo State
+567,Ogbomosho South,Oyo State
+570,Ogo Oluwa,Oyo State
+594,Olorunsogo,Oyo State
+595,Oluyole,Oyo State
+598,Ona Ara,Oyo State
+608,Orelope,Oyo State
+610,Ori Ire,Oyo State
+638,Oyo West,Oyo State
+639,Oyo East,Oyo State
+665,Saki East,Oyo State
+666,Saki West,Oyo State
+693,Surulere,Oyo State
+91,Barkin Ladi,Plateau State
+94,Bassa,Plateau State
+84,Bokkos,Plateau State
+389,Jos East,Plateau State
+390,Jos North,Plateau State
+391,Jos South,Plateau State
+408,Kanam,Plateau State
+410,Kanke,Plateau State
+463,Langtang North,Plateau State
+462,Langtang South,Plateau State
+486,Mangu,Plateau State
+501,Mikang,Plateau State
+642,Pankshin,Plateau State
+647,Qua'an Pan,Plateau State
+656,Riyom,Plateau State
+677,Shendam,Plateau State
+749,Wase,Plateau State
+11,Abua/Odual,Rivers State
+24,Ahoada East,Rivers State
+25,Ahoada West,Rivers State
+38,Akuku-Toru,Rivers State
+50,Andoni,Rivers State
+64,Asari-Toru,Rivers State
+120,Bonny,Rivers State
+155,Degema,Rivers State
+192,Eleme,Rivers State
+193,Emuoha,Rivers State
+206,Etche,Rivers State
+249,Gokana,Rivers State
+336,Ikwerre,Rivers State
+428,Khana,Rivers State
+549,Obio/Akpor,Rivers State
+562,Ogba/Egbema/Ndoni,Rivers State
+568,Ogu/Bolo,Rivers State
+590,Okrika,Rivers State
+597,Omuma,Rivers State
+606,Opobo/Nkoro,Rivers State
+637,Oyigbo,Rivers State
+645,Port Harcourt,Rivers State
+697,Tai,Rivers State
+108,Binji,Sokoto State
+115,Bodinga,Sokoto State
+147,Dange Shuni,Sokoto State
+230,Gada,Sokoto State
+252,Goronyo,Sokoto State
+255,Gudu,Sokoto State
+265,Gwadabawa,Sokoto State
+344,Illela,Sokoto State
+358,Isa,Sokoto State
+426,Kebbe,Sokoto State
+456,Kware,Sokoto State
+648,Rabah,Sokoto State
+659,Sabon Birni,Sokoto State
+672,Shagari,Sokoto State
+683,Silame,Sokoto State
+685,Sokoto North,Sokoto State
+686,Sokoto South,Sokoto State
+701,Tambuwal,Sokoto State
+702,Tangaza,Sokoto State
+714,Tureta,Sokoto State
+741,Wamako,Sokoto State
+752,Wurno,Sokoto State
+754,Yabo,Sokoto State
+59,Ardo Kola,Taraba State
+88,Bali,Taraba State
+161,Donga,Taraba State
+238,Gashaka,Taraba State
+239,Gassol,Taraba State
+290,Ibi,Taraba State
+383,Jalingo,Taraba State
+415,Karim Lamido,Taraba State
+448,Kumi,Taraba State
+466,Lau,Taraba State
+670,Sardauna,Taraba State
+699,Takum,Taraba State
+736,Ussa,Taraba State
+751,Wukari,Taraba State
+765,Yorro,Taraba State
+772,Zing,Taraba State
+90,Bade,Yobe State
+123,Bursari,Yobe State
+141,Damaturu,Yobe State
+224,Fika,Yobe State
+227,Fune,Yobe State
+246,Geidam,Yobe State
+256,Gujba,Yobe State
+257,Gulani,Yobe State
+382,Jakusko,Yobe State
+413,Karasuwa,Yobe State
+471,Machina,Yobe State
+518,Nangere,Yobe State
+529,Nguru,Yobe State
+646,Potiskum,Yobe State
+705,Tarmuwa,Yobe State
+766,Yunusari,Yobe State
+767,Yusufari,Yobe State
+54,Anka,Zamfara State
+86,Bakura,Zamfara State
+113,Birnin Magaji/Kiyaw,Zamfara State
+127,Bukkuyum,Zamfara State
+129,Bungudu,Zamfara State
+711,Chafe,Zamfara State
+260,Gummi,Zamfara State
+263,Gusau,Zamfara State
+422,Kaura Namoda,Zamfara State
+488,Maradun,Zamfara State
+492,Maru,Zamfara State
+678,Shinkafi,Zamfara State
+700,Talata Mafara,Zamfara State
+773,Zurmi,Zamfara State
+,,
+"For more information, kindly visit :  www.downloadexcelfiles.com ",,

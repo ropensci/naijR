@@ -2,7 +2,7 @@
 # 
 # GPL-3 License
 # 
-# Copyright (c) 2020 Victor Ordu
+# Copyright (c) 2020-2021 Victor Ordu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,27 +19,21 @@
 
 test_that("Input is validated", {
   myerr1 <- "One or more elements of 'region' is not a Nigerian region"
-  myerr2 <- "Type of argument supplied to 'region' is invalid."
+  myerr2 <- "Expected a character vector as 'region'"
+  
   expect_error(map_ng(999), myerr2)
-  expect_is(map_ng(NULL, plot = FALSE), 'map')
+  expect_error(map_ng(NULL, plot = FALSE), myerr2)
   expect_error(map_ng(NA), myerr2)
-  expect_error(map_ng('TRUE'), myerr1)
+  expect_error(map_ng('TRUE'), 
+               "One or more elements of 'region' is not a Nigerian region")
   expect_error(map_ng(pi), myerr2)
+  expect_warning(map_ng(plot = FALSE, show.neighbours = c(TRUE, TRUE)),
+                 "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
-                 "Display of neighbouring countries is disabled")
+                 "Display of neighbouring countries is temporarily disabled")
   # TODO: Add test case for choropleths with too few regions
 })
 
-test_that("Check on 'region' parameter works", {
-  
-  expect_equal(.processStateParam(NULL), "Nigeria")
-  expect_error(.processStateParam(), 
-               "argument \"s\" is missing, with no default")
-  expect_length(.processStateParam(states('se')), 5L)
-  expect_length(.processStateParam(character()), 37L)
-  expect_error(.processStateParam(c("Abia", "Kano", "Lifebuoy")),
-               "One or more elements of 'region' is not a Nigerian region")
-})
 
 test_that("Choropleth categories are created", {
   set.seed(50)
@@ -59,12 +53,13 @@ test_that("Choropleth categories are created", {
   expect_error(.createCategorized(int.val, br[-6]),
                "Values are out of range of breaks")
   expect_error(.createCategorized(sample(c(TRUE, FALSE), 30, TRUE)),
-               "'logical' is not a supported type")
+               "'logical' is not a supported type",
+               fixed = TRUE)
 })
 
 test_that("Decision is made on drawing choropleths", {
   all.states <- states()
-  nc.states <- states('nc')
+  nc.states <- states(gpz = 'nc')
   set.seed(23)
   vals <- lapply(list(all = all.states, nc = nc.states), function(x)
     factor(sample(LETTERS[1:5], length(x), replace = TRUE)))
@@ -76,33 +71,25 @@ test_that("Decision is made on drawing choropleths", {
   expect_false(.validateChoroplethParams(region = '.'))
 })
 
+test_that("National outline map is plotted", {
+  expect_is(map_ng("Nigeria", plot = FALSE), "map")
+})
+
 test_that("Subnational divisions are plotted", {
-  sw <- map_ng(region = states('sw'), plot = FALSE)
+  sw <- map_ng(region = states(gpz = 'sw'), plot = FALSE)
   
   expect_length(sw$names, 6L)
   expect_identical(sw$names, c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"))
 })
 
-test_that("Data for mapping are retrieved properly", {
-  db <- .getMapData("Nigeria")
-  
-  expect_error(.getMapData(NULL))
-  expect_error(.getMapData(42L))
-  expect_error(.getMapData(pi))
-  expect_error(.getMapData(TRUE))
-  expect_is(db, 'character')
-  expect_identical(db, "mapdata::worldHires")
-  expect_is(.getMapData("Abia"), 'map')
-  expect_error(.getMapData("Alaska"), 
-               "Invalid region(s) for the map: Alaska",
-               fixed = TRUE)
-  expect_error(.getMapData(c("Unreal", "Imaginary")), 
-               "Invalid region(s) for the map: Unreal, Imaginary",
-               fixed = TRUE)
+test_that("LGAs are plotted", {
+  expect_is(map_ng(lgas("Akinyele"), plot = FALSE), "map")
+  expect_is(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
-test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))
+test_that("LGAs can be plotted where a State and LGA share name", {
+  expect_is(map_ng(lgas("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
+})
 
 set.seed(4)
 df <-
@@ -199,6 +186,9 @@ test_that("List of choropleth inputs is properly checked", {
   expect_true(.assertListElements(lso))
 })
 
+
+
+
 test_that("Expected colours and related data are prepared", {
   set.seed(4)
   brks <- seq(0, 6, 2)
@@ -235,42 +225,41 @@ test_that("Expected colours and related data are prepared", {
   expect_length(cho$bins, 3L)
 })
 
-test_that("State polygon names are not repeated during computations", {
-  result <- .getUniqueStateNames(mp)
-  
-  expect_length(result, 37L)
-  expect_error(.getUniqueStateNames(states()))
-})
+
+
 
 test_that("Choropleth mapping succeeds", {
-  pop.groups <- c(1000000, 2500000, 5000000, 7500000, 10000000)
+  pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
   dat <- readRDS('data/pvc2015.rds')
+  baddat <- readRDS('data/pvc2015_badcolumn.rds')
   val <- dat$total.pop    # use name to test quasiquotation
   dat$alpha <- sample(LETTERS[1:5], nrow(dat), TRUE)  
   cat <- c("Small", "Moderate", "Large", "Mega")
   
-  expect_is(
+  expect_error(suppressWarnings(
     map_ng(
-      data = dat, 
-      x = total.pop, 
+      data = baddat,
+      x = total.pop,
       breaks = pop.groups,
       categories = cat,
-      plot = FALSE), 
-    'map')
+      plot = FALSE
+    )
+  ),
+  'No column with elements in region')
   
-  expect_is(map_ng(
+  expect_error(map_ng(
     region = dat$region,
     x = dat$total.pop,
     breaks = pop.groups,
     plot = FALSE
   ),
-  'map')
+  "Expected a character vector as 'region'")
   
   expect_error(
-    map_ng(region = dat$state,
+    map_ng(region = baddat$state,
            x = dat$total.pop,
            plot = FALSE),
-    "Breaks were not provided for the categorization of a numeric type"
+    "One or more elements of 'region' is not a Nigerian region"
   )
   
   expect_error(
@@ -283,21 +272,34 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE),
     "One or more inputs for generating choropleth options are invalid")
 
-  expect_is(
+  expect_s3_class(
     map_ng(
       data = dat,
       x = total.pop,
       breaks = pop.groups,
       plot = FALSE,
       fill = FALSE
-    ), 'map',
-    "Choropleths should be deductively drawn even when `fill == FALSE`")
+    ), 'map')
   
-  expect_is(map_ng(data = dat,
-                   x = alpha,
-                   plot = FALSE),
-            'map')
+  expect_s3_class(map_ng(data = dat,
+                         x = alpha,
+                         plot = FALSE),
+                  'map')
+  
+  ss <- states()
+  expect_s3_class(map_ng(
+    region = ss,
+    x = runif(length(ss), max = 100),
+    breaks = c(0, 40, 60, 100),
+    col = 'YlOrRd',
+    show.text = FALSE,
+    plot = FALSE
+  ),
+  'map')
 })
+
+
+
 
 test_that("Choropleth colours can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
@@ -316,63 +318,16 @@ test_that("Choropleth colours can be controlled at interface", {
   func$col <- 'blue'; expect_is(eval_tidy(func), mm)
 })
 
-test_that("Duplicated polygon names are made empty", {
-  label <- c("A:1", 'A:2', 'A:3', 'B', 'C:1', 'C:2')
-  result <- .adjustLabels(label)
-  err <- "is.character\\(x\\) is not TRUE"
-  
-  expect_error(.adjustLabels(NA), err)
-  expect_error(.adjustLabels(numeric()), err)
-  expect_error(.adjustLabels(logical()), err)
-  expect_error(.adjustLabels(NULL), err)
-  expect_type(result, 'character')
-  expect_is(result, 'character')
-  expect_length(result, 6L)
-  expect_length(grep("^$", result), 3L)
-  expect_false(any(grepl("\\:\\d$", result)))
-})
 
-test_that("States' columns are searchable within a data frame", {
-  dat <- readRDS('data/pvc2015.rds')
-  regions <- states()
-  ss <- .regionColumnIndex(dat, regions)
-  err <- "is.data.frame\\(dt\\) is not TRUE"
-  
-  expect_is(ss, 'integer')
-  expect_length(ss, 1L)
-  expect_error(.regionColumnIndex(), 
-               "argument \"dt\" is missing, with no default")
-  expect_error(.regionColumnIndex(regions, regions), err)
-  expect_equivalent(.regionColumnIndex(dat, letters), 1L)
-  expect_equivalent(.regionColumnIndex(dat, NULL), 1L)
-  expect_error(.regionColumnIndex(NULL, regions), err)
-  expect_error(.regionColumnIndex(mtcars, regions), 
-               "No column with elements in regions.")
-})
 
-test_that("Bounds for plotting points are checked", {
-  x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
-  y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
-  m <- map_ng(NULL, plot = FALSE)
-  mk <- map_ng("Kwara", plot = FALSE)
-  
-  expect_true(.xyWithinBounds(m, x, y))
-  expect_false(.xyWithinBounds(mk, x, y))
-  
-  x[4] <- -3; y[4] <- 1000
-  expect_false(.xyWithinBounds(m, x, y))
-  
-})
 
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
   mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
-  mp.lb <- map_ng(plot = FALSE)
   mm <- 'map'
   rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
   
   expect_is(mp1, mm)
-  expect_is(mp.lb, mm)
   expect_type(mp1, 'list')
   expect_s3_class(mp1, mm)
   expect_length(mp1, 4L)
@@ -390,19 +345,29 @@ test_that("'map' object is properly created", {
     expect_match(mp2$names, i, all = FALSE)
 })
 
+
+
+
 test_that("Points are mapped", {
   x <- c(3.000, 4.000, 6.000)
   y <- c(6.000, 9.000, 4.300)
   
-  expect_is(map_ng(NULL, x = x, y = y, plot = FALSE), 'map')
+  expect_error(map_ng(NULL, x = x, y = y, plot = FALSE),
+               "Expected a character vector as 'region'")
   
   x[4] <- -3; y[4] <- 1000
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
-               "Coordinates are out of bounds of the map")
+               "Expected a character vector as 'region'")
 })
 
+
+
+
 test_that("Factors can draw choropleth", {
-  getSmpl <- function(seed) { set.seed(seed); sample(letters[1:5], 37, T) }
+  getSmpl <- function(seed) { 
+    set.seed(seed)
+    sample(letters[1:5], 37, T) 
+  }
   
   getDblSmpl <- function(seed = round(runif(100, max = 500))) {
     set.seed(seed)
@@ -415,19 +380,20 @@ test_that("Factors can draw choropleth", {
   Char <- getSmpl(5)
   expect_is(map_ng(x = Char, plot = FALSE), mapClass)
   
-  dd <- data.frame(region = states(), Col = Fac, stringsAsFactors = FALSE)
+  sss <- states()
+  dd <- data.frame(region = sss, Col = Fac, stringsAsFactors = FALSE)
   expect_is(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
   
-  expect_is(map_ng(states(), x = Fac, plot = FALSE), mapClass)
-  expect_is(map_ng(states(), x = Char, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = Fac, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = Char, plot = FALSE), mapClass)
   
   Int <- sample(1L:5L, 37, TRUE)
-  expect_error(map_ng(states(), x = Int, plot = FALSE),
+  expect_error(map_ng(sss, x = Int, plot = FALSE),
                'Breaks were not provided for the categorization of a numeric type')
-  expect_is(map_ng(states(), x = as.factor(Int), plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = as.factor(Int), plot = FALSE), mapClass)
   
   brks <- c(0, 40, 60, 100)
-  expect_is(map_ng(states(), x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
+  expect_is(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
   
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
@@ -438,13 +404,48 @@ test_that("Factors can draw choropleth", {
   expect_is(eval(qq), mapClass)
 })
 
+
+
+
 test_that("Parameters passed via ellipsis work seamlessly", {
   mm <- 'map'
   
   expect_is(map_ng(lwd = 2, plot = FALSE), mm)
   expect_is(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
-  expect_is(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), mm)
+  expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
+               "Expected a character vector as 'region'")
 })
 
-test_that("Shapefile data is retrievable",
-          expect_is(.getSpatialPolygonsDataFrame(), 'SpatialPolygonsDataFrame'))
+
+
+
+test_that("All individual plain State maps can be drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(s, plot = FALSE), "map")
+})
+
+
+
+test_that("All individual LGA maps can be drawn", {
+  lgas <- lgas()
+  for (x in lgas)
+    expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
+})
+
+
+
+test_that("Map LGAs together as individual blocs", {
+  abLga <- lgas("Abia")
+  expect_s3_class(map_ng(abLga, plot = FALSE), "map")
+  
+  ## Do actual plot
+  testMap <- "data/test-map.png"
+  if (file.exists(testMap))
+    file.remove(testMap)
+  png(testMap)
+  val <- try(map_ng(abLga), silent = TRUE)
+  dev.off()
+  
+  expect_false(inherits(val, "try-error"))
+  expect_true(file.exists(testMap))
+})

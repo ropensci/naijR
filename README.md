@@ -9,12 +9,12 @@ An R package on Nigeria and for Nigeria
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/package=naijR)
-[![Travis build
-status](https://travis-ci.org/BroVic/naijR.svg?branch=master)](https://travis-ci.org/BroVic/naijR)
 [![Codecov test
 coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://codecov.io/gh/BroVic/naijR?branch=master)
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![R build
+status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
 <!-- badges: end -->
 
 The goal of **naijR** is to make it easier for R users to work with data
@@ -22,35 +22,13 @@ related to Nigeria.
 
 ## Usage
 
-### Prerequisites
-
-This is a package for use in the R ecosystem. To install R, visit
-<https://cran.r-project.org>.
-
-### Installation
-
-To download and install the current stable version of this package from
-CRAN:
-
-``` r
-install.packages("naijR")
-```
-
-The development version can be obtained from
-[GitHub](https://github.com/BroVic/naijR) with:
-
-``` r
-# If necessary, 'install.packages("remotes")' first
-remotes::install_github("BroVic/naijR")
-```
-
 ### Some simple operations
 
 #### Maps
 
 A major feature of this version of the packages is the introduction of
-various map drawing capabilities. To read more about this, read the
-vignette with this
+various map drawing capabilities. To find out more about this, read the
+vignette. It can be accessed from within R with this line of code:
 
 ``` r
 vignette('nigeria-maps', 'naijR')
@@ -59,7 +37,7 @@ vignette('nigeria-maps', 'naijR')
 #### States
 
 To create a list of all the States of the Nigerian Federation, simply
-call `states()`
+call `states()`.
 
 ``` r
 library(naijR, quietly = TRUE)
@@ -76,23 +54,27 @@ states()
 #> [19] "Kaduna"                    "Kano"                     
 #> [21] "Katsina"                   "Kebbi"                    
 #> [23] "Kogi"                      "Kwara"                    
-#> [25] "Lagos"                     "Nasarawa"                 
+#> [25] "Lagos"                     "Nassarawa"                
 #> [27] "Niger"                     "Ogun"                     
 #> [29] "Ondo"                      "Osun"                     
 #> [31] "Oyo"                       "Plateau"                  
 #> [33] "Rivers"                    "Sokoto"                   
 #> [35] "Taraba"                    "Yobe"                     
-#> [37] "Zamfara"
+#> [37] "Zamfara"                  
+#> attr(,"class")
+#> [1] "states"    "character"
 ```
 
-States from a given geo-political zone can also be selected
+States from a given geo-political zone can also be selected:
 
 ``` r
 states(gpz = "ne")  # i.e. North-East
-#> [1] "Adamawa" "Bauchi"  "Borno"   "Gombe"   "Taraba"  "Yobe"
+#> [1] "Adamawa" "Bauchi"  "Borno"   "Gombe"   "Taraba"  "Yobe"   
+#> attr(,"class")
+#> [1] "states"    "character"
 ```
 
-For other capabilities of this function, see `?states()`
+For other capabilities of this function, see `?states()`.
 
 #### Local Government Areas
 
@@ -100,27 +82,23 @@ This is a basic example that shows how to very quickly fetch the names
 of Local Government Areas within a given State:
 
 ``` r
-lgas_ng("Imo")
-#> Warning: The `test` argument of `is_state()` is deprecated as of naijR 0.1.3.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_warnings()` to see where this warning was generated.
-#> Warning: The `allow.na` argument of `is_state()` is deprecated as of naijR 0.1.3.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_warnings()` to see where this warning was generated.
+lgas("Imo")
 #>  [1] "Aboh Mbaise"      "Ahiazu Mbaise"    "Ehime Mbano"      "Ezinihitte"      
 #>  [5] "Ideato North"     "Ideato South"     "Ihitte/Uboma"     "Ikeduru"         
 #>  [9] "Isiala Mbano"     "Isu"              "Mbaitoli"         "Ngor Okpala"     
 #> [13] "Njaba"            "Nkwerre"          "Nwangele"         "Obowo"           
 #> [17] "Oguta"            "Ohaji/Egbema"     "Okigwe"           "Orlu"            
 #> [21] "Orsu"             "Oru East"         "Oru West"         "Owerri Municipal"
-#> [25] "Owerri North"     "Owerri West"      "Unuimo"
+#> [25] "Owerri North"     "Owerri West"      "Unuimo"          
+#> attr(,"class")
+#> [1] "lgas"      "character"
 ```
 
 To list all the LGAs in Nigeria, call the same function without any
 parameters:
 
 ``` r
-n <- length(lgas_ng())
+n <- length(lgas())
 sprintf("Nigeria has a total of %i Local Government Areas", n)
 #> [1] "Nigeria has a total of 774 Local Government Areas"
 ```
@@ -129,7 +107,7 @@ Want to create a function to check how many LGAs a particular State has?
 
 ``` r
 how_many_lgas <- function(state) {
-  n <- length(naijR::lgas_ng(state))
+  n <- length(naijR::lgas(state))
   cat(state, "State has", n, "LGAs\n")
 }
 
@@ -185,27 +163,25 @@ fix_mobile(dat$phone)
 #> [6] "08123456789" "09064321987" NA
 ```
 
-## Future Work
+## Installation
 
-Some enhancements to expect in future updates:
+To download and install the current stable version of this package from
+CRAN:
 
-  - Manipulation of phone numbers will provide options for the
-    introduction of separators. Also the function will become more
-    intelligent, pre-empting errors in data entry e.g. accepting the
-    letter ‘O’ as a presumed zero (`0`).
-  - `fix_mobile()` currently works with character vectors. It will be
-    allowed to work with numeric vectors, converting these to character
-    vectors internally.
-  - Misspelling of Local Government Areas is very common and it is
-    common to find so many variants, especially where compound names are
-    involved. Functionality to address this problem will be introduced.
-  - A distance matrix for major locations in the country.
+``` r
+install.packages("naijR")
+```
+
+The development version can be obtained from
+[GitHub](https://github.com/BroVic/naijR) with:
+
+``` r
+# If necessary, 'install.packages("remotes")' first
+remotes::install_github("BroVic/naijR")
+```
 
 ## Feedback/Contribution
 
-This is an open source project and contributions are welcome. Pull
-requests for R code or documentation, and any suggestions for making
-this effort worthwhile will be gladly entertained.
-
-For bug reports or feature requests, kindly submit an
-[issue](https://github.com/BroVic/naijR/issues/new).
+Contributions are welcome and pull requests for R code or documentation
+will be gladly entertained. For bug reports or feature requests, kindly
+submit an [issue](https://github.com/BroVic/naijR/issues/new).
