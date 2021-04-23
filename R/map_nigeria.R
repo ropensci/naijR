@@ -149,6 +149,9 @@ map_ng <- function(region = character(),
   ## Prepare to draw choropleth 
   if (chrplth) {
     mapq <- expr(map(database, region))  ## TODO: Consider rlang::call2
+    if (!is.null(dots$plot))
+      if (!dots$plot)
+        mapq$plot <- FALSE
     mapq$fill <- TRUE
     if (!is.null(data)) {
       vl.col <- as_name(value.x)
