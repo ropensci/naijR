@@ -125,7 +125,7 @@ map_ng <- function(region = character(),
     show.neighbours <- show.neighbours[1]
   }
   if (show.neighbours)
-    message("Display of neighbouring countries is temporarily disabled")
+    message("Display of neighbouring regions is temporarily disabled")
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
   else 
