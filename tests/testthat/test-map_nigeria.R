@@ -30,7 +30,7 @@ test_that("Input is validated", {
   expect_warning(map_ng(plot = FALSE, show.neighbours = c(TRUE, TRUE)),
                  "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
-                 "Display of neighbouring countries is temporarily disabled")
+                 "Display of neighbouring regions is temporarily disabled")
   # TODO: Add test case for choropleths with too few regions
 })
 

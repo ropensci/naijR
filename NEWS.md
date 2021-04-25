@@ -1,3 +1,8 @@
+# v0.2.1
+
+* Fixed incorrect URLs, as noted by CRAN
+* Edits to output message
+
 # v0.2.0
 
 * Added a new function `is_lga`, which checks an object for Local Government Areas.
