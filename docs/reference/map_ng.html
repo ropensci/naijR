@@ -91,7 +91,7 @@ plotting idiom utilised by maps:map and its variants." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -159,8 +159,6 @@ plotting idiom utilised by <a href='https://rdrr.io/pkg/maps/man/map.html'>maps:
   <span class='kw'>y</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>categories</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>fill</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>show.neighbours</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -177,26 +175,23 @@ plotting idiom utilised by <a href='https://rdrr.io/pkg/maps/man/map.html'>maps:
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>region</th>
-      <td><p>A character vector of a list of Nigerian States to be displayed.</p></td>
+      <td><p>A character vector of regions to be displayed. This could be 
+States or Local Government Areas.</p></td>
     </tr>
     <tr>
       <th>data</th>
       <td><p>An object containing data, principally the variables required to
-plotted in a map.</p></td>
+plot in a map.</p></td>
     </tr>
     <tr>
-      <th>x</th>
+      <th>x, y</th>
       <td><p>Numeric object or factor (or coercible to one). See <em>Details</em>.</p></td>
-    </tr>
-    <tr>
-      <th>y</th>
-      <td><p>Numeric. See <em>Details</em></p></td>
     </tr>
     <tr>
       <th>breaks</th>
       <td><p>Numeric. A vector of length &gt;= 1. If a single value i.e.
-scalar, it denote the expected number of breaks. Internally, the function
-will attempt to compute approprate category sizes or fail if out-of bounds. 
+scalar, it denotes the expected number of breaks. Internally, the function
+will attempt to compute appropriate category sizes or fail if out-of bounds. 
 Where length is &gt;= 3L, it is expected to be an arithmetic sequence that 
 represents category bounds as for <code><a href='https://rdrr.io/r/base/cut.html'>cut</a></code> (applicable 
 only to choropleth maps).</p></td>
@@ -207,42 +202,25 @@ only to choropleth maps).</p></td>
 defined, internally created labels are used.</p></td>
     </tr>
     <tr>
-      <th>col</th>
-      <td><p>Colour to be used for the plot.</p></td>
-    </tr>
-    <tr>
-      <th>fill</th>
-      <td><p>Logical. Whether to colour the plotted map region(s). When 
-drawing a choropleth map <code>fill == TRUE</code> is implied.</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>Character vector of length 1.</p></td>
-    </tr>
-    <tr>
-      <th>caption</th>
-      <td><p>Character vector of length 1.</p></td>
+      <th>title, caption</th>
+      <td><p>An optional string for annotating the map.</p></td>
     </tr>
     <tr>
       <th>show.neighbours</th>
-      <td><p>Logical; <code>TRUE</code> to display borders of
-neighbouring countries.</p></td>
+      <td><p>Logical; <code>TRUE</code> to display the immediate vicinity
+neighbouring regions/countries.</p></td>
     </tr>
     <tr>
       <th>show.text</th>
       <td><p>Logical. Apply labels to the regions of the map.</p></td>
     </tr>
     <tr>
-      <th>leg.x</th>
-      <td><p>Numeric. Position of the legend.</p></td>
-    </tr>
-    <tr>
-      <th>leg.y</th>
+      <th>leg.x, leg.y</th>
       <td><p>Numeric. Position of the legend.</p></td>
     </tr>
     <tr>
       <th>leg.title</th>
-      <td><p>Character. The legend Title</p></td>
+      <td><p>String. The legend Title</p></td>
     </tr>
     <tr>
       <th>leg.orient</th>
@@ -251,39 +229,35 @@ vertical.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Further arguments for function <code><a href='https://rdrr.io/pkg/maps/man/map.html'>map</a></code></p></td>
+      <td><p>Further arguments passed to <code><a href='https://rdrr.io/pkg/maps/man/map.html'>map</a></code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class <code>map</code>, invisibly; as a side-effect,
-results in the drawing of a map of Nigeria.</p>
-<p>An object of class <code>maps</code> containing the data used to draw the
+    <p>An object of class <code>maps</code> containing the data used to draw the
 map and which can be used for additional calls to <code><a href='https://rdrr.io/pkg/maps/man/map.html'>map</a></code> or
 other similar functions (e.g. <code><a href='https://rdrr.io/r/graphics/plot.default.html'>graphics::plot.default</a></code>).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The default value for <code>region</code> is to print all States. 
-<code>NULL</code> will print an outline map, i.e. without internal boundaries.
+    <p>The default value for <code>region</code> is to print all State boundaries.
 <code>data</code> enables the extraction of data for plotting from an object
 of class <code>data.frame</code>. Columns containing States are identified. The
-argument also provided context for quasiquotation when providing the 
-<code>x</code> and y arguments.
-For <code>x</code> and <code>y</code>, when both arguments are supplied, they are taken
-to be point coordinates and are plotted as such. If only <code>x</code> is supplied,
-it is presumed that the intention is to make a choropleth map, and thus, 
-numeric vector arguments are converted into factors i.e. number classes. 
-Otherwise factors or any object that can be coerced to a factor should be used.
-For plain plots, the <code>col</code> argument works the same as with
-<code><a href='https://rdrr.io/pkg/maps/man/map.html'>map</a></code> and variants. For choropleth maps, the colour
-provided represents a (sequential) colour palette based on 
-<code><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>RColorBrewer::brewer.pal</a></code>. The possible colour options can be
-checked with <code><a href='https://rdrr.io/r/base/options.html'>getOption("choropleth.colours")</a></code> and this can also be 
-modified by the user.</p>
+argument also provides context for quasiquotation when providing the 
+<code>x</code> and <code>y</code> arguments.</p>
+<p>For <code>x</code> and <code>y</code>, when both arguments are supplied, they are taken
+to be point coordinates. If only <code>x</code> is supplied, it is presumed that the
+intention is to make a choropleth map, and thus, numeric vector arguments are
+converted into factors i.e. number classes. Otherwise factors or any object 
+that can be coerced to a factor should be used.</p>
+<p>For plain plots, the <code>col</code> argument works the same as with
+<code><a href='https://rdrr.io/pkg/maps/man/map.html'>map</a></code>. For choropleth maps, the colour provided represents 
+a (sequential) colour palette based on <code><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>RColorBrewer::brewer.pal</a></code>. The 
+available colour options can be checked with 
+<code><a href='https://rdrr.io/r/base/options.html'>getOption("choropleth.colours")</a></code> and this can also be modified by the user.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>When adjusting the default colour choiced for choropleth maps, it is
+    <p>When adjusting the default colour choices for choropleth maps, it is
 advisable to use one of the sequential palettes. For a list of of available
 palettes, especially for more advanced use, review 
 <code><a href='https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html'>RColorBrewer::display.brewer.all</a></code></p>

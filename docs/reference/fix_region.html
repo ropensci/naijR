@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR • naijR</title>
+<title>Fix Region Names — fix_region • naijR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR" />
-<meta property="og:description" content="The naijR package is essentially an R package about Nigeria and for Nigeria." />
+<meta property="og:title" content="Fix Region Names — fix_region" />
+<meta property="og:description" content="Correct any misspelt names of administrative regions i.e. States and LGAs" />
 <meta property="og:image" content="http://brovic.github.io/naijR/logo.png" />
 
 
@@ -141,23 +141,57 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>naijR: Operations to Ease Data Analyses Specific to Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/naijR-package.R'><code>R/naijR-package.R</code></a></small>
-    <div class="hidden name"><code>naijR.Rd</code></div>
+    <h1>Fix Region Names</h1>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
+    <div class="hidden name"><code>fix_region.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The naijR package is essentially an R package about Nigeria and for Nigeria.</p>
+    <p>Correct any misspelt names of administrative regions i.e. States and LGAs</p>
     </div>
 
+    <pre class="usage"><span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
+<span class='co'># S3 method for states</span>
+<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
+<span class='co'># S3 method for lgas</span>
+<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for default</span>
+<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>An S3 object of class <code>states</code> or <code>lgas</code>. For 
+<code>fix_region.default</code>, a character vector can be passed but only
+that for States will be interpretable.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments passed to methods.</p></td>
+    </tr>
+    <tr>
+      <th>interactive</th>
+      <td><p>Logical. When <code>TRUE</code>, the function prompts the user
+to interactively select the correct LGA names from a list of available
+options.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>The transformed object. If all names are correct, the object is
+returned unchanged.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>naijR contains a number of functions that facilitate the
-management of data sets of interest including data cleaning and wrangling,
-as well as making available a number of facilities for geo-spatial data
-visuatlisation.</p>
+    <p>The function will look through a character vector and try to 
+determine if State or LGA names have been wrongly entered. This presupposes that
+the atomic vector is of type <code>character</code>. It does not test any missing
+values in the vector, leaving them untouched.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

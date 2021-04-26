@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR • naijR</title>
+<title>List Local Government Areas — lgas • naijR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR" />
-<meta property="og:description" content="The naijR package is essentially an R package about Nigeria and for Nigeria." />
+<meta property="og:title" content="List Local Government Areas — lgas" />
+<meta property="og:description" content="List Local Government Areas" />
 <meta property="og:image" content="http://brovic.github.io/naijR/logo.png" />
 
 
@@ -141,24 +141,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>naijR: Operations to Ease Data Analyses Specific to Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/naijR-package.R'><code>R/naijR-package.R</code></a></small>
-    <div class="hidden name"><code>naijR.Rd</code></div>
+    <h1>List Local Government Areas</h1>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
+    <div class="hidden name"><code>lgas.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The naijR package is essentially an R package about Nigeria and for Nigeria.</p>
+    <p>List Local Government Areas</p>
     </div>
 
+    <pre class="usage"><span class='fu'>lgas</span>(<span class='kw'>region</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)
 
+<span class='fu'>lgas_ng</span>(<span class='kw'>state</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>)</pre>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>region</th>
+      <td><p>Character; State(s) in the Federation of Nigeria. Default is
+<code>NA_character_</code>.</p></td>
+    </tr>
+    <tr>
+      <th>state</th>
+      <td><p>Character; State(s) in the Federation of Nigeria. Default is
+<code>NA_character_</code>.</p></td>
+    </tr>
+    </table>
 
-    <p>naijR contains a number of functions that facilitate the
-management of data sets of interest including data cleaning and wrangling,
-as well as making available a number of facilities for geo-spatial data
-visuatlisation.</p>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p>If length of <code>ng.state</code> == 1L, a character vector containing 
+the names of Local Government Areas; otherwise a named list whose elements 
+are character vectors of the LGAs in each state.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p><code>lga_ng</code> stands deprecated and will be removed in the next minor
+version. New code should use <code>lgas</code> instead.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='no'>how_many_lgas</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>state</span>) {
+  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>naijR</span>)
+  <span class='fu'><a href='https://rdrr.io/r/base/stopifnot.html'>stopifnot</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'><a href='is_state.html'>is_state</a></span>(<span class='no'>state</span>)))
+  <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"No. of LGAs in %s State:"</span>, <span class='no'>state</span>),
+    <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='fu'>lgas</span>(<span class='no'>state</span>)),
+    <span class='kw'>fill</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+}
+<span class='fu'>how_many_lgas</span>(<span class='st'>"Sokoto"</span>)</div><div class='output co'>#&gt; No. of LGAs in Sokoto State: 23</div><div class='input'><span class='fu'>how_many_lgas</span>(<span class='st'>"Ekiti"</span>)</div><div class='output co'>#&gt; No. of LGAs in Ekiti State: 16</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
