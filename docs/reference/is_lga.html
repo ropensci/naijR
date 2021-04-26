@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR • naijR</title>
+<title>Test for Local Government Areas — is_lga • naijR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,9 @@
 
 
 
-<meta property="og:title" content="naijR: Operations to Ease Data Analyses Specific to Nigeria — naijR" />
-<meta property="og:description" content="The naijR package is essentially an R package about Nigeria and for Nigeria." />
+<meta property="og:title" content="Test for Local Government Areas — is_lga" />
+<meta property="og:description" content="Checks a given object for Local Government Areas, represented as
+strings." />
 <meta property="og:image" content="http://brovic.github.io/naijR/logo.png" />
 
 
@@ -141,23 +142,33 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>naijR: Operations to Ease Data Analyses Specific to Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/naijR-package.R'><code>R/naijR-package.R</code></a></small>
-    <div class="hidden name"><code>naijR.Rd</code></div>
+    <h1>Test for Local Government Areas</h1>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
+    <div class="hidden name"><code>is_lga.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The naijR package is essentially an R package about Nigeria and for Nigeria.</p>
+    <p>Checks a given object for Local Government Areas, represented as
+strings.</p>
     </div>
 
+    <pre class="usage"><span class='fu'>is_lga</span>(<span class='no'>x</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>An object of type <code>character</code>. This includes higher
+dimension object classes like <code>matrix</code> and <code>array</code>.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>naijR contains a number of functions that facilitate the
-management of data sets of interest including data cleaning and wrangling,
-as well as making available a number of facilities for geo-spatial data
-visuatlisation.</p>
+    <p>A logical vector the same length as the input object. Each
+element that is not a valid Local Government Area will evaluate to
+<code>FALSE</code>.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

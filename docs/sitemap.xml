@@ -7,13 +7,16 @@
     <loc>http://brovic.github.io/naijR/reference/fix_mobile.html</loc>
   </url>
   <url>
-    <loc>http://brovic.github.io/naijR/reference/fix_state.html</loc>
+    <loc>http://brovic.github.io/naijR/reference/fix_region.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/reference/is_lga.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/is_state.html</loc>
   </url>
   <url>
-    <loc>http://brovic.github.io/naijR/reference/lgas_ng.html</loc>
+    <loc>http://brovic.github.io/naijR/reference/lgas.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/lgas_nigeria.html</loc>

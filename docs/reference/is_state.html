@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -142,7 +142,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Test an Object for States</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/states.R'><code>R/states.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
     <div class="hidden name"><code>is_state.Rd</code></div>
     </div>
 
@@ -163,7 +163,9 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A logical vector.of same length as the input.</p>
+    <p>A logical vector.of same length as the input. If the input object is
+not even of type <code>character</code>, return the object unaltered, with a
+warning.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>An element-wise check of a supplied vector is carried out. To
@@ -176,12 +178,8 @@ elements. It works only for atomic vectors, throwing an error when this
 is not the case or when <code>NULL</code> is passed to it.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'>is_state</span>(<span class='kw pkg'>naijR</span><span class='kw ns'>::</span><span class='fu'><a href='states.html'>states</a></span>()))</div><div class='output co'>#&gt; <span class='warning'>Warning: The `test` argument of `is_state()` is deprecated as of naijR 0.1.3.</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: The `allow.na` argument of `is_state()` is deprecated as of naijR 0.1.3.</span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'>is_state</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Maryland"</span>, <span class='st'>"Baden-Baden"</span>, <span class='st'>"Plateau"</span>, <span class='st'>"Sussex"</span>))</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
-</div></span></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'>is_state</span>(<span class='kw pkg'>naijR</span><span class='kw ns'>::</span><span class='fu'><a href='states.html'>states</a></span>()))</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'>is_state</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Maryland"</span>, <span class='st'>"Baden-Baden"</span>, <span class='st'>"Plateau"</span>, <span class='st'>"Sussex"</span>))</div><div class='output co'>#&gt; [1] FALSE FALSE  TRUE FALSE</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
