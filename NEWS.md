@@ -1,3 +1,7 @@
+# v0.2.2
+
+* Export S3 generic `fix_region`.
+
 # v0.2.1
 
 * Fixed incorrect URLs, as noted by CRAN
