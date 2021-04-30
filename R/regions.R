@@ -174,6 +174,7 @@ is_state <- function(x)
 #' 
 #' @return The transformed object. If all names are correct, the object is
 #' returned unchanged.
+#' @export
 fix_region <- function(x, ...)
   UseMethod("fix_region")
 
