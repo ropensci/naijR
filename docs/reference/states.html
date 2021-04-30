@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -142,7 +142,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>States of the Federal Republic of Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/states.R'><code>R/states.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
     <div class="hidden name"><code>states.Rd</code></div>
     </div>
 
@@ -150,25 +150,31 @@
     <p>States of the Federal Republic of Nigeria</p>
     </div>
 
-    <pre class="usage"><span class='fu'>states</span>(<span class='kw'>gpz</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>states</span>(<span class='no'>states</span>, <span class='kw'>gpz</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>states</th>
+      <td><p>One or more States of the Federation</p></td>
+    </tr>
+    <tr>
       <th>gpz</th>
       <td><p>Geopolitical zone. Default is <code>NULL</code>; optionally <code>"nc",
-"ne", "nw", "se", "ss"</code> and <code>"sw"</code> (see <code>Details</code>).</p></td>
+"ne", "nw", "se", "ss"</code> and <code>"sw"</code> (see "Details").</p></td>
     </tr>
     <tr>
       <th>all</th>
-      <td><p>logical; whether to include FCT in the result</p></td>
+      <td><p>logical; whether to include the Federal Capital Territory in 
+the result</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The States of Nigeria as a whole or by zones, as a character vector</p>
+    <p>The States of Nigeria as a whole or by zones, as an S3 object 
+of class <code>states</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>gpz A geo-political zone, in the Nigerian 
@@ -191,13 +197,17 @@ South-South and South-West.</p>
 #&gt; [19] "Kaduna"                    "Kano"                     
 #&gt; [21] "Katsina"                   "Kebbi"                    
 #&gt; [23] "Kogi"                      "Kwara"                    
-#&gt; [25] "Lagos"                     "Nasarawa"                 
+#&gt; [25] "Lagos"                     "Nassarawa"                
 #&gt; [27] "Niger"                     "Ogun"                     
 #&gt; [29] "Ondo"                      "Osun"                     
 #&gt; [31] "Oyo"                       "Plateau"                  
 #&gt; [33] "Rivers"                    "Sokoto"                   
 #&gt; [35] "Taraba"                    "Yobe"                     
-#&gt; [37] "Zamfara"                  </div><div class='input'><span class='fu'>states</span>(<span class='st'>"se"</span>)  <span class='co'># lists States in South-East zone</span></div><div class='output co'>#&gt; [1] "Abia"    "Anambra" "Ebonyi"  "Enugu"   "Imo"    </div></pre>
+#&gt; [37] "Zamfara"                  
+#&gt; attr(,"class")
+#&gt; [1] "states"    "character"</div><div class='input'><span class='fu'>states</span>(<span class='kw'>gpz</span> <span class='kw'>=</span> <span class='st'>"se"</span>)  <span class='co'># lists States in South-East zone</span></div><div class='output co'>#&gt; [1] "Abia"    "Anambra" "Ebonyi"  "Enugu"   "Imo"    
+#&gt; attr(,"class")
+#&gt; [1] "states"    "character"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
