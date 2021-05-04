@@ -9,21 +9,21 @@
 #' @param x A character vector of numerical strings.
 #'
 #' @return The updated vector, usually the column of a data frame.
+#' 
+#' @importFrom magrittr %>%
 #'
 #' @export
 fix_mobile <- function(x) {
   if (!is.character(x)) {
-    if (is.numeric(x))
-      x <- as.character(x)
-    else
+    if (!is.numeric(x))
       stop(sprintf("Objects of type %s are not supported", sQuote(typeof(x))))
+    x <- as.character(x)
   }
   # Remove entries that are beyond redemption i.e. too long or too short
-  x <- ifelse(nchar(x) > 11 | nchar(x) < 10, NA_character_, x)
-  
-  # Add a leading '0' if there are 10 digits
-  x <- sub("(^[0-9]{10}$)", "0\\1", x)
-  
-  # Remove those that still don't look like local mobile numbers (NG)
-  ifelse(grepl("^0[7-9][0-1][0-9]{8}$", x), x, NA_character_)
+  # then add a leading '0' if there are 10 digits
+  # and then remove those that still don't look like local mobile numbers (NG)
+  x %>% 
+    ifelse(nchar(.) > 11 | nchar(.) < 10, NA_character_, .) %>% 
+    sub("(^[0-9]{10}$)", "0\\1", .) %>% 
+    ifelse(grepl("^0[7-9][0-1][0-9]{8}$", .), ., NA_character_)
 }
