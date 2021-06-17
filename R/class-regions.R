@@ -259,3 +259,19 @@ as_lga <- function(x) {
     extract(ll, .) %>% 
     unclass
 }
+
+
+
+#' Print regions
+#' 
+#' @param x An object of class \code{regions}
+#' @param ... Additional arguments, though not set. Left for future use
+#' 
+#' @export
+print.regions <- function(x, ...) {
+  reg <- if (all(is_state(x))) "States" else "LGAs"
+  ul <- strrep("-", nchar(reg))
+  lf <- "\n"
+  cat(paste(reg, ul, sep = lf), lf)
+  cat(paste(x, collapse = lf))
+}
