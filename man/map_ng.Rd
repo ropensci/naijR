@@ -74,8 +74,9 @@ argument also provides context for quasiquotation when providing the
 \code{x} and \code{y} arguments.
 
 For \code{x} and \code{y}, when both arguments are supplied, they are taken
-to be point coordinates. If only \code{x} is supplied, it is presumed that the
-intention is to make a choropleth map, and thus, numeric vector arguments are
+to be point coordinates, where \code{x} represent longitude and \code{y}
+latitude. If only \code{x} is supplied, it is assumed that the intention of
+the user is to make a choropleth map, and thus, numeric vector arguments are
 converted into factors i.e. number classes. Otherwise factors or any object 
 that can be coerced to a factor should be used.
 
