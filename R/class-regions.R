@@ -247,7 +247,8 @@ as_lga <- function(x) {
 
 
 
-
+## Returns those LGAs that share names with their State
+## e.g. Bauchi, Oyo
 #' @importFrom magrittr %>%
 #' @importFrom magrittr extract
 .synonymRegions <- function()

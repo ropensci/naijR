@@ -94,8 +94,18 @@ fix_region.default <- function(x, ...)
     warning("'x' has length 0L or only missing values", call. = FALSE)
     return(x)
   }
-  zz <- suppressWarnings(states(x)) %>% fix_region
-  as.character(zz)
+  region <- if (any(is_lga(x)) && (!any(x %in% .synonymRegions())))
+    suppressWarnings(lgas(x))
+  else
+    suppressWarnings(states(x))
+  zz <- region %>% 
+    fix_region %>% 
+    as.character
+  cat(unique(zz), sep = "\n", fill = TRUE)
+  message(
+    "Use fix_region(states(x)) or fix_region(lgas(x) instead for reliable fix"
+  )
+  invisible(zz)
 }
 
 
