@@ -543,18 +543,19 @@ map_ng <- function(region = character(),
       abort("Too many categories")
     return(val)
   }
-  if (is.numeric(val)) {
-    if (is.null(brks))
-      abort("Breaks were not provided for the categorization of a numeric type")
-    rr <- range(val)
-    if (is_scalar_integer(brks))
-      brks <- seq(rr[1], rr[2], diff(rr) / brks)
-    if (rr[1] < min(brks) || rr[2] > max(brks))
-      abort("Values are out of range of breaks")
-    return(cut(val, brks, include.lowest = TRUE))
+  if (!is.numeric(val)) {
+    msg <- paste(sQuote(typeof(val)), "is not a supported type")
+    abort(msg)
   }
-  msg <- paste(sQuote(typeof(val)), "is not a supported type")
-  abort(msg)
+  if (is.null(brks))
+    abort(paste("Breaks were not provided for the", 
+                "categorization of a numeric type"))
+  rr <- range(val)
+  if (is_scalar_integer(brks))
+    brks <- seq(rr[1], rr[2], diff(rr) / brks)
+  if (rr[1] < min(brks) || rr[2] > max(brks))
+    abort("Values are out of range of breaks")
+  cut(val, brks, include.lowest = TRUE)
 }
 
 

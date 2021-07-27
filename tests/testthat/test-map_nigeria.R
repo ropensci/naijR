@@ -53,7 +53,7 @@ test_that("Choropleth categories are created", {
   expect_error(.createCategorized(int.val, br[-6]),
                "Values are out of range of breaks")
   expect_error(.createCategorized(sample(c(TRUE, FALSE), 30, TRUE)),
-               "'logical' is not a supported type",
+               sprintf("%s is not a supported type", sQuote("logical")),
                fixed = TRUE)
 })
 
