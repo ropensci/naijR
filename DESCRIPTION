@@ -5,7 +5,8 @@ Version: 0.2.2.9005
 Date: 2021-09-07
 Depends: 
     R (>= 3.6),
-    methods
+    methods,
+    utils
 Imports:
     RColorBrewer (>= 1.1.2),
     lifecycle (>= 0.2.0),

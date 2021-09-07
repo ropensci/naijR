@@ -24,11 +24,9 @@ states(states, gpz = NULL, all = TRUE)
 \item{all}{logical; whether to include the Federal Capital Territory in 
 the result}
 
-\item{x}{The object of class \code{region}.}
+\item{x}{The object of class \code{region}}
 
-\item{...}{Not used}
-
-\item{n}{An integer vector.}
+\item{...}{Arguments to \code{tail.default}}
 }
 \value{
 The States of Nigeria as a whole or by zones, as an S3 object 

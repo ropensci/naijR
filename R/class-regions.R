@@ -290,9 +290,9 @@ print.regions <- function(x, ...) {
 #' 
 #' @rdname states
 #' 
+#' @importFrom utils head
 #' @param x The object of class \code{region}.
-#' @param n An integer vector.
-#' @param ... Not used
+#' @param ... Arguments to \code{head.default}
 #' 
 #' @export
 head.regions <- function(x, ...)
@@ -305,6 +305,10 @@ head.regions <- function(x, ...)
 
 #' @rdname states
 #' 
+#' @importFrom utils tail
+#' @param x The object of class \code{region}
+#' @param ... Arguments to \code{tail.default}
+#' 
 #' @export
 tail.regions <- function(x, ...)
 {
@@ -313,7 +317,9 @@ tail.regions <- function(x, ...)
 
 
 
-
+## Because 'regions' is an abstract class i.e. it does not have
+## a constructor, we have to provide a means of creating the
+## states/lgas objects post-method-dispatch.
 .chooseRegionsMethod <- function(m, obj)
 {
   if (all(is_state(obj)))
