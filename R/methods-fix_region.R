@@ -81,7 +81,7 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
 #' @importFrom magrittr %>%
 #' 
 #' @export
-fix_region.default <- function(x, ...)
+  fix_region.default <- function(x, ...)
 { ## TODO: Provide verbosity by reporting on fixed items?
   if (!is.character(x))
     stop("'x' is not a character vector")
@@ -101,7 +101,6 @@ fix_region.default <- function(x, ...)
   zz <- region %>% 
     fix_region %>% 
     as.character
-  cat(unique(zz), sep = "\n", fill = TRUE)
   message(
     "Use fix_region(states(x)) or fix_region(lgas(x) instead for reliable fix"
   )

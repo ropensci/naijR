@@ -2,9 +2,18 @@
 % Please edit documentation in R/class-regions.R
 \name{states}
 \alias{states}
+\alias{print.regions}
+\alias{head.regions}
+\alias{tail.regions}
 \title{States of the Federal Republic of Nigeria}
 \usage{
 states(states, gpz = NULL, all = TRUE)
+
+\method{print}{regions}(x, ...)
+
+\method{head}{regions}(x, ...)
+
+\method{tail}{regions}(x, ...)
 }
 \arguments{
 \item{states}{One or more States of the Federation}
@@ -14,6 +23,12 @@ states(states, gpz = NULL, all = TRUE)
 
 \item{all}{logical; whether to include the Federal Capital Territory in 
 the result}
+
+\item{x}{The object of class \code{region}.}
+
+\item{...}{Not used}
+
+\item{n}{An integer vector.}
 }
 \value{
 The States of Nigeria as a whole or by zones, as an S3 object 
@@ -21,6 +36,10 @@ of class \code{states}.
 }
 \description{
 States of the Federal Republic of Nigeria
+
+Print regions
+
+Return the First or Last Parts of a Region Object
 }
 \details{
 gpz A geo-political zone, in the Nigerian 

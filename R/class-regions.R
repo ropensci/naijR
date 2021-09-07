@@ -265,14 +265,69 @@ as_lga <- function(x) {
 
 #' Print regions
 #' 
+#' @rdname states
+#' 
 #' @param x An object of class \code{regions}
 #' @param ... Additional arguments, though not set. Left for future use
 #' 
 #' @export
 print.regions <- function(x, ...) {
-  reg <- if (all(is_state(x))) "States" else "LGAs"
-  ul <- strrep("-", nchar(reg))
-  lf <- "\n"
-  cat(paste(reg, ul, sep = lf), lf)
-  cat(paste(x, collapse = lf))
+  if (!interactive())
+    return(x)
+  region <- if (all(is_state(x))) "States" else "LGAs"
+  underline <- strrep("-", nchar(region))
+  newline <- "\n"
+  cat(paste(region, underline, sep = newline), newline)
+  cat(paste("*", x, collapse = newline))
 }
+
+
+
+
+
+
+#' Return the First or Last Parts of a Region Object
+#' 
+#' @rdname states
+#' 
+#' @param x The object of class \code{region}.
+#' @param n An integer vector.
+#' @param ... Not used
+#' 
+#' @export
+head.regions <- function(x, ...)
+{
+  .chooseRegionsMethod(NextMethod(), x)
+}
+
+
+
+
+#' @rdname states
+#' 
+#' @export
+tail.regions <- function(x, ...)
+{
+  .chooseRegionsMethod(NextMethod(), x)
+}
+
+
+
+
+.chooseRegionsMethod <- function(m, obj)
+{
+  if (all(is_state(obj)))
+    states(m)
+  else
+    lgas(m)
+}
+
+
+
+# @rdname states
+# 
+# @export
+# `[.regions` <- function(x, i)
+# {
+#   NextMethod(drop = FALSE)
+# }
