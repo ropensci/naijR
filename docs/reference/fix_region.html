@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2.9007</span>
       </span>
     </div>
 
@@ -98,7 +98,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -124,7 +124,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/BroVic/naijR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -142,7 +142,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fix Region Names</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/methods-fix_region.R'><code>R/methods-fix_region.R</code></a></small>
     <div class="hidden name"><code>fix_region.Rd</code></div>
     </div>
 
@@ -150,16 +150,16 @@
     <p>Correct any misspelt names of administrative regions i.e. States and LGAs</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>fix_region</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for states</span>
-<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>fix_region</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for lgas</span>
-<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+<span class='fu'>fix_region</span><span class='op'>(</span><span class='va'>x</span>, interactive <span class='op'>=</span> <span class='cn'>FALSE</span>, quietly <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for default</span>
-<span class='fu'>fix_region</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>fix_region</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -179,6 +179,10 @@ that for States will be interpretable.</p></td>
       <td><p>Logical. When <code>TRUE</code>, the function prompts the user
 to interactively select the correct LGA names from a list of available
 options.</p></td>
+    </tr>
+    <tr>
+      <th>quietly</th>
+      <td><p>Logical; default argument is <code>FALSE</code>.</p></td>
     </tr>
     </table>
 
@@ -208,7 +212,7 @@ values in the vector, leaving them untouched.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -47,7 +47,9 @@
 
 
 <meta property="og:title" content="States of the Federal Republic of Nigeria — states" />
-<meta property="og:description" content="States of the Federal Republic of Nigeria" />
+<meta property="og:description" content="States of the Federal Republic of Nigeria
+Print regions
+Return the First or Last Parts of a Region Object" />
 <meta property="og:image" content="http://brovic.github.io/naijR/logo.png" />
 
 
@@ -90,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2.9007</span>
       </span>
     </div>
 
@@ -98,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -124,7 +126,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/BroVic/naijR/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -142,22 +144,33 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>States of the Federal Republic of Nigeria</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/regions.R'><code>R/regions.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/BroVic/naijR/blob/master/R/class-regions.R'><code>R/class-regions.R</code></a></small>
     <div class="hidden name"><code>states.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>States of the Federal Republic of Nigeria</p>
+<p>Print regions</p>
+<p>Return the First or Last Parts of a Region Object</p>
     </div>
 
-    <pre class="usage"><span class='fu'>states</span>(<span class='no'>states</span>, <span class='kw'>gpz</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>states</span><span class='op'>(</span><span class='va'>states</span>, gpz <span class='op'>=</span> <span class='cn'>NULL</span>, all <span class='op'>=</span> <span class='cn'>TRUE</span>, warn <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='co'># S3 method for regions</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for regions</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for regions</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>states</th>
-      <td><p>One or more States of the Federation</p></td>
+      <td><p>One or more States of the Federation.</p></td>
     </tr>
     <tr>
       <th>gpz</th>
@@ -167,7 +180,20 @@
     <tr>
       <th>all</th>
       <td><p>logical; whether to include the Federal Capital Territory in 
-the result</p></td>
+the result.</p></td>
+    </tr>
+    <tr>
+      <th>warn</th>
+      <td><p>logical; issue a warning when one or more elements are not
+actually States (or were misspelt).</p></td>
+    </tr>
+    <tr>
+      <th>x</th>
+      <td><p>The object of class <code>region</code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments to <code>tail.default</code></p></td>
     </tr>
     </table>
 
@@ -185,29 +211,9 @@ There are 6 zones - North-Central, North-East, North-West, South-East,
 South-South and South-West.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>states</span>()  <span class='co'># lists names of all States</span></div><div class='output co'>#&gt;  [1] "Abia"                      "Adamawa"                  
-#&gt;  [3] "Akwa Ibom"                 "Anambra"                  
-#&gt;  [5] "Bauchi"                    "Bayelsa"                  
-#&gt;  [7] "Benue"                     "Borno"                    
-#&gt;  [9] "Cross River"               "Delta"                    
-#&gt; [11] "Ebonyi"                    "Edo"                      
-#&gt; [13] "Ekiti"                     "Enugu"                    
-#&gt; [15] "Federal Capital Territory" "Gombe"                    
-#&gt; [17] "Imo"                       "Jigawa"                   
-#&gt; [19] "Kaduna"                    "Kano"                     
-#&gt; [21] "Katsina"                   "Kebbi"                    
-#&gt; [23] "Kogi"                      "Kwara"                    
-#&gt; [25] "Lagos"                     "Nassarawa"                
-#&gt; [27] "Niger"                     "Ogun"                     
-#&gt; [29] "Ondo"                      "Osun"                     
-#&gt; [31] "Oyo"                       "Plateau"                  
-#&gt; [33] "Rivers"                    "Sokoto"                   
-#&gt; [35] "Taraba"                    "Yobe"                     
-#&gt; [37] "Zamfara"                  
-#&gt; attr(,"class")
-#&gt; [1] "states"    "character"</div><div class='input'><span class='fu'>states</span>(<span class='kw'>gpz</span> <span class='kw'>=</span> <span class='st'>"se"</span>)  <span class='co'># lists States in South-East zone</span></div><div class='output co'>#&gt; [1] "Abia"    "Anambra" "Ebonyi"  "Enugu"   "Imo"    
-#&gt; attr(,"class")
-#&gt; [1] "states"    "character"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>states</span><span class='op'>(</span><span class='op'>)</span>  <span class='co'># lists names of all States</span>
+</div><div class='output co'>#&gt; Abia</div><div class='input'><span class='fu'>states</span><span class='op'>(</span>gpz <span class='op'>=</span> <span class='st'>"se"</span><span class='op'>)</span>  <span class='co'># lists States in South-East zone</span>
+</div><div class='output co'>#&gt; Abia</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -223,7 +229,7 @@ South-South and South-West.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
