@@ -319,7 +319,11 @@ tail.regions <- function(x, ...)
 
 ## Because 'regions' is an abstract class i.e. it does not have
 ## a constructor, we have to provide a means of creating the
-## states/lgas objects post-method-dispatch.
+## states/lgas objects post-method-dispatch. The behaviour we are
+## trying to establish is for both States and LGA data, and thus
+## it would be redundant to create distinct methods for them.
+## Perhaps there might be a cleaner approach, but this is as far
+## current skills can go.
 .chooseRegionsMethod <- function(m, obj)
 {
   if (all(is_state(obj)))
