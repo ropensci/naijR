@@ -108,6 +108,8 @@ new_states <- function(ss)
 #' }
 #' how_many_lgas("Sokoto")
 #' how_many_lgas("Ekiti")
+#' 
+#' @importFrom utils data
 #'
 #' @export
 lgas <- function(region = NA_character_, warn = TRUE) {
