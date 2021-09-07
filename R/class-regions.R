@@ -111,6 +111,7 @@ new_states <- function(ss)
 #'
 #' @export
 lgas <- function(region = NA_character_, warn = TRUE) {
+  data("lgas_nigeria", package = "naijR", envir = environment())
   if (!is.character(region))
     stop("Expected an object of type 'character'")
   if (length(region) == 1L && is.na(region))
