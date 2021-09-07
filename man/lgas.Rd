@@ -5,13 +5,16 @@
 \alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
-lgas(region = NA_character_)
+lgas(region = NA_character_, warn = TRUE)
 
 lgas_ng(state = NA_character_)
 }
 \arguments{
 \item{region}{Character; State(s) in the Federation of Nigeria. Default is
 \code{NA_character_}.}
+
+\item{warn}{logical; issue a warning when one or more elements are not
+actually Local Government Areas (or were misspelt).}
 
 \item{state}{Character; State(s) in the Federation of Nigeria. Default is
 \code{NA_character_}.}

@@ -7,7 +7,6 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
@@ -37,9 +36,11 @@ vignette('nigeria-maps', 'naijR')
 #### States
 To create a list of all the States of the Nigerian Federation, simply call `states()`.
 
-```{r}
+```{r, results='hold'}
 library(naijR, quietly = TRUE)
-states()
+ss <- states()
+head(ss)
+cat(sprintf("\n...but Nigeria has %i States.", length(ss)))
 ```
 
 States from a given geo-political zone can also be selected:

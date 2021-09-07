@@ -7,7 +7,7 @@
 \alias{tail.regions}
 \title{States of the Federal Republic of Nigeria}
 \usage{
-states(states, gpz = NULL, all = TRUE)
+states(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 \method{print}{regions}(x, ...)
 
@@ -16,13 +16,16 @@ states(states, gpz = NULL, all = TRUE)
 \method{tail}{regions}(x, ...)
 }
 \arguments{
-\item{states}{One or more States of the Federation}
+\item{states}{One or more States of the Federation.}
 
 \item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 "ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").}
 
 \item{all}{logical; whether to include the Federal Capital Territory in 
-the result}
+the result.}
+
+\item{warn}{logical; issue a warning when one or more elements are not
+actually States (or were misspelt).}
 
 \item{x}{The object of class \code{region}}
 

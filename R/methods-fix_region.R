@@ -44,8 +44,8 @@ fix_region.states <- function(x, ...)
   
   x <- .fixRegionInternal(x, ss)
   x[i] <- fullFCT
-  if (!inherits(x, "states"))
-    x <- suppressWarnings(states(x))
+  attributes(x) <- NULL
+  x <- states(x, warn = FALSE)
   invisible(x)
 }
 
@@ -58,9 +58,10 @@ fix_region.states <- function(x, ...)
 #' @param interactive Logical. When \code{TRUE}, the function prompts the user
 #' to interactively select the correct LGA names from a list of available
 #' options.
+#' @param quietly Logical; default argument is \code{FALSE}.
 #' 
 #' @export
-fix_region.lgas <- function(x, interactive = FALSE, ...)
+fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
   vals <- .fixRegionInternal(x, lgas(), ...)
   if (interactive) {
@@ -68,6 +69,8 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
     if (tolower(ans) == "y")
       vals <- .fixLgasInteractively(vals)
   }
+  if (!quietly)
+    .reportOnFixes(vals)
   attributes(vals) <- NULL
   invisible(vals)
 }
@@ -82,7 +85,7 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
 #' 
 #' @export
   fix_region.default <- function(x, ...)
-{ ## TODO: Provide verbosity by reporting on fixed items?
+{
   if (!is.character(x))
     stop("'x' is not a character vector")
   empty <- grepl("^$", x)
@@ -102,25 +105,26 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
     fix_region %>% 
     as.character
   message(
-    "Use fix_region(states(x)) or fix_region(lgas(x) instead for reliable fix"
+    paste("Consider reconstructing 'x' with",
+          "`states()` or `lgas()` for a more reliable fix")
   )
-  invisible(zz)
+  zz
 }
 
 
 
 
-
+  
+## Approximately matches a string on a list of regions i.e States or LGAs.
+## @param str A string to be matched
+## @param regions The values to be matched against, specifically from regions
+##
+## @return A vector of the same length as str with the approximately
+## matched value, which in the case of misspelling should be the correct one.
+##
+## This function is mapped to a vector of states/LGAs
 .fixRegionInternal <- function(x, region, ...)
 {
-  ## Approximately matches a string on a list of regions i.e States or LGAs.
-  ## @param str A string to be matched
-  ## @param regions The values to be matched against, specifically from regions
-  ##
-  ## @return A vector of the same length as str with the approximetly
-  ## matched value, which in the case of misspelling should be the correct one.
-  ##
-  ## This function is mapped to a vector of states/LGAs
   .getProperVal <- function(str, regions) {
     abbrFCT <- .fctOptions("abbrev")
     if (!is.na(match(str, regions)))
@@ -132,47 +136,46 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
     }
     
     ## First remove spaces around slashes
-    ## TODO: Note that there is an element of hard-coding here
+    ## TODO: Note that there is an element of hard-coding here.
+    ## The related issue should be addressed at source.
     str <- str %>% 
       gsub("\\s\\/", "/", .) %>% 
       gsub("\\/\\s", "/", .) %>% 
       sub("-\\s", "-", .) %>% 
       sub("^Egbado/", "", .)
     
-    
-    ## Now check for exact matching
-    matched <-
+    ## Now, check for exact matching.
+    good <-
       grep(paste0('^', str, '$'),
            regions,
            value = TRUE,
            ignore.case = TRUE)
     
+    if (length(good) == 1L) 
+      return(good)
     
-    if (length(matched) == 1L) 
-      return(matched)
+    ## Otherwise check for approximate matches.
+    fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
     
-    ## Otherwise check for approximate matches
-    matched <- agrep(str, regions, value = TRUE, max.distance = 1)
-    
-    if (length(matched) == 1L)
-      return(matched)
-    
-    if (length(matched) > 1L) {
-      .warnOnMultipleMatches(str, matched)
+    if (length(fixed) == 1L) {
+      fix.status <<-
+        structure(c(fix.status, fixed), names = c(names(fix.status), str))
+      return(fixed)
     }
-    else if (!length(matched))
-      notFound <<- c(notFound, str)
-    str
+    
+    if (length(fixed) > 1L)
+      .warnOnMultipleMatches(str, fixed)
+    
+    cant.fix <<- c(cant.fix, str)
+    str  # return misspelt string unchanged
   }
   
-  notFound <- character()
+  cant.fix <- character()
+  fix.status <- character()
   v <-
     vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
-  if (length(notFound)) {
-    message("Approximate match(es) not found for the following:")
-    sapply(notFound, function(x) message(paste("*", x)))
-    attr(v, "misspelt") <- notFound
-  }
+  attr(v, "misspelt") <- cant.fix
+  attr(v, "regions.fixed") <- fix.status
   v
 }
 
@@ -192,6 +195,36 @@ fix_region.lgas <- function(x, interactive = FALSE, ...)
 
 
 
+.reportOnFixes <- function(obj)
+{
+  ATTR_ <- attributes(obj)
+  badspell <- ATTR_$misspelt
+  hasBadspell <- !identical(badspell, character(0))
+  if (hasBadspell) {
+    msg1 <- .messageHeader("Fix(es) not applied")
+    x <- sapply(badspell, function(x) paste("*", x))
+    message(msg1, paste(x, sep = "\n"))
+  }
+  fixes <- ATTR_$regions.fixed
+  if (!identical(fixes, character(0))) {
+    if (hasBadspell)
+      message("")    # just add newline
+    msg2 <- .messageHeader("Successful fix(es)")
+    x <- 
+      mapply(function(a, b) sprintf("* %s => %s\n", a, b), names(fixes), fixes)
+    message(msg2, paste(x, sep = '\n'))
+  }
+}
+
+
+#' @importFrom magrittr %>%
+.messageHeader <- function(hdr)
+{
+  hdr %>% 
+    paste0(":") %>% 
+    paste(strrep("-", nchar(.)), sep = '\n') %>% 
+    paste0("\n")
+}
 
 
 

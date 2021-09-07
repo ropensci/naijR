@@ -17,11 +17,13 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 
 #' States of the Federal Republic of Nigeria
 #' 
-#' @param states One or more States of the Federation
+#' @param states One or more States of the Federation.
 #' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
 #'  "ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").
 #' @param all logical; whether to include the Federal Capital Territory in 
-#' the result
+#' the result.
+#' @param warn logical; issue a warning when one or more elements are not
+#' actually States (or were misspelt).
 #' 
 #' @return The States of Nigeria as a whole or by zones, as an S3 object 
 #' of class \code{states}.
@@ -37,11 +39,11 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' states()  # lists names of all States
 #' states(gpz = "se")  # lists States in South-East zone
 #' @export
-states <- function(states, gpz = NULL, all = TRUE)
+states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
   stopifnot(is.logical(all))
   if (!missing(states) && is.character(states)) {
-    if (!all(is_state(states)))
+    if (warn && !all(is_state(states)))
       warning("One or more elements of 'states' is not an actual State",
               call. = FALSE)
     return(new_states(states))
@@ -89,6 +91,8 @@ new_states <- function(ss)
 #'
 #' @param region Character; State(s) in the Federation of Nigeria. Default is
 #' \code{NA_character_}.
+#' @param warn logical; issue a warning when one or more elements are not
+#' actually Local Government Areas (or were misspelt).
 #' 
 #' @return If length of \code{ng.state} == 1L, a character vector containing 
 #' the names of Local Government Areas; otherwise a named list whose elements 
@@ -106,7 +110,7 @@ new_states <- function(ss)
 #' how_many_lgas("Ekiti")
 #'
 #' @export
-lgas <- function(region = NA_character_) {
+lgas <- function(region = NA_character_, warn = TRUE) {
   if (!is.character(region))
     stop("Expected an object of type 'character'")
   if (length(region) == 1L && is.na(region))
@@ -125,7 +129,7 @@ lgas <- function(region = NA_character_) {
     sl
   }
   else if (any(areLgas <- is_lga(region))) {
-    if (!all(areLgas))
+    if (warn && !all(areLgas))
       warning("One or more elements is not an LGA")
     region
   }
@@ -149,6 +153,10 @@ new_lgas <- function(x)
 }
 
 
+
+
+
+
 #' @rdname lgas
 #' @param state Character; State(s) in the Federation of Nigeria. Default is
 #' \code{NA_character_}.
@@ -161,6 +169,11 @@ lgas_ng <- function(state = NA_character_) {
   .Deprecated("lgas")
   as.character(lgas(region = state))
 }
+
+
+
+
+
 
 
 # ----
@@ -278,7 +291,7 @@ print.regions <- function(x, ...) {
   underline <- strrep("-", nchar(region))
   newline <- "\n"
   cat(paste(region, underline, sep = newline), newline)
-  cat(paste("*", x, collapse = newline))
+  cat(paste("*", x, collapse = newline), "\n")
 }
 
 
@@ -331,13 +344,3 @@ tail.regions <- function(x, ...)
   else
     lgas(m)
 }
-
-
-
-# @rdname states
-# 
-# @export
-# `[.regions` <- function(x, i)
-# {
-#   NextMethod(drop = FALSE)
-# }

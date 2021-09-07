@@ -11,7 +11,7 @@ fix_region(x, ...)
 
 \method{fix_region}{states}(x, ...)
 
-\method{fix_region}{lgas}(x, interactive = FALSE, ...)
+\method{fix_region}{lgas}(x, interactive = FALSE, quietly = FALSE, ...)
 
 \method{fix_region}{default}(x, ...)
 }
@@ -25,6 +25,8 @@ that for States will be interpretable.}
 \item{interactive}{Logical. When \code{TRUE}, the function prompts the user
 to interactively select the correct LGA names from a list of available
 options.}
+
+\item{quietly}{Logical; default argument is \code{FALSE}.}
 }
 \value{
 The transformed object. If all names are correct, the object is

@@ -17,25 +17,32 @@ test_that("input is validated before fixing state names", {
 
 
 test_that("Messaging is clear when fixing regions via character vectors", {
-  correctLga <- "Demsa"
-  misspeltLga <- "Fufure"
+  lg <- c("Fufure", "Demsa", "Fufore", "Machika", "Ganye", "Noman", "Fufure")
+  correctLga <- lg[2]
+  misspeltLga <- lg[3]
   bothlga <- c(correctLga, misspeltLga)
   
-  # expect_silent(fix_region(correctLga))
-  # expect_message(fix_region(correctLga), regexp = NA)
   expect_silent(fix_region(lgas(correctLga)))
+  expect_error(fix_region(lgas(misspeltLga)), 
+               "not a valid region")
+  expect_message(fix_region(lgas(bothlga, warn = FALSE)),
+                 "Successful fix\\(es\\)\\:.+\\*\\sFufore => Fufure")
   expect_message(
     fix_region(bothlga),
-    "Use fix_region(states(x)) or fix_region(lgas(x) instead for reliable fix",
+    "reconstructing 'x' with `states()` or `lgas()` for a more reliable",
     fixed = TRUE
   )
+  expect_warning(fix_region(lgas(lg, warn = FALSE)), 
+                 "approximately matched more than one region")
+  expect_message(suppressWarnings(fix_region(lgas(lg, warn = FALSE))),
+                 "Fufore => Fufure.+Noman => Numan")
 })
 
 
 test_that("various cases for fixing state names", {
   ss <- states()
-  ss2 <- suppressWarnings(states(c("Oyo", "Legos")))
-  ssx <- suppressWarnings(states(c("xxx", "Benue")))
+  ss2 <- states(c("Oyo", "Legos"), warn = FALSE)
+  ssx <- states(c("xxx", "Benue"), warn = FALSE)
   ss.us <- c("kentucky", "Bornu", "Abia")
   
   expect_equivalent(fix_region(ss), ss)
@@ -44,11 +51,10 @@ test_that("various cases for fixing state names", {
   expect_identical(fix_region('plateau'), 'Plateau')
   
   fixed2 <- suppressMessages(fix_region(ss2))
-  expect_identical(fixed2, states(c("Oyo", "Lagos")))
+  expect_identical(fixed2, states(c("Oyo", "Lagos"), warn = FALSE))
   expect_length(fixed2, 2L)
   
   fixed.x <- suppressMessages(fix_region(ssx))
-  expect_match(attr(fixed.x, 'misspelt'), "xxx")
   expect_length(fixed.x, 2L)
   
   expect_identical(fix_region(ss.us),
@@ -60,9 +66,7 @@ test_that("various cases for fixing state names", {
 
 
 test_that("Misspelt LGA can be fixed (limited)", {
-  result <- suppressWarnings(fix_region(lgas(c(
-    "Amuwo Odofin", "Lagos Island"
-  ))))
+  result <- fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE))
   
   expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
   
