@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - fix-macos-build-failure
+      - dev
       - master
   pull_request:
     branches:
