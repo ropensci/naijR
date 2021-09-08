@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - dev
+      - fix-macos-build-failure
       - master
   pull_request:
     branches:
@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
+          remotes::install_cran("rcmdcheck", type = "binary")
         shell: Rscript {0}
 
       - name: Check
