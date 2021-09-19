@@ -449,3 +449,17 @@ test_that("Map LGAs together as individual blocs", {
   expect_false(inherits(val, "try-error"))
   expect_true(file.exists(testMap))
 })
+
+
+test_that("Number of LGAs matches the number extracted for mapping", {
+  # This test case is created for bug fix that involved the creation
+  # of wrong LGA coordinates for Borno State -> Kagarko is included
+  for (i in states()) {
+    lg <- lgas(i)
+    mplg <- map_ng(lg, plot = FALSE, exact = TRUE)$names
+    
+    expect_equal(length(lg), length(mplg))
+    # expect_true(all(mplg %in% lg))
+    # expect_true(all(lg %in% mplg))
+  }
+})

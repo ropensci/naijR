@@ -134,3 +134,16 @@ test_that("LGA names shared with States can be coerced into 'states' objects", {
   expect_s3_class(as_state("Kogi"), stateclass)
   expect_s3_class(as_state("Ebonyi"), stateclass)
 })
+
+
+
+test_that("Correct number of LGAs are returned for each State", {
+  ss <- states()
+  numLg <- as.integer(table(lgas_nigeria$state))
+  
+  expect_equal(sum(numLg), 774L)
+  expect_length(lgas(), 774L)
+  
+  for (i in seq_along(ss)) 
+    expect_equal(length(lgas(ss[i])), numLg[i])
+})
