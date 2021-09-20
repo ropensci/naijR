@@ -142,14 +142,19 @@ map_ng <- function(region = character(),
     chrplth <- FALSE
   
   database <- .getMapData(region)
-  mapq <- expr(map(database, regions = region, ...))
+  
+  ## Create a regular expression for drawing regions. There is a 
+  ## to account for situations where there are multiple polygons
+  ## for the same State/LGA
+  region.regex <- .regexDuplicatedPolygons(region)
+  mapq <- quote(map(database, regions = region.regex, ...))
   
   ## Capture 'dots'
   dots <- list(...)
   
   ## Prepare to draw choropleth 
   if (chrplth) {
-    mapq <- expr(map(database, region))  ## TODO: Consider rlang::call2
+    mapq <- expr(map(database, region.regex))  ## TODO: Consider rlang::call2
     if (!is.null(dots$plot))
       if (!dots$plot)
         mapq$plot <- FALSE
@@ -193,7 +198,7 @@ map_ng <- function(region = character(),
   ## `maps::map()` used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
-  database <- eval_tidy(mapq)    # possibly, a new `database` is created
+  database <- eval(mapq)    # possibly, a new `database` is created
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
   if (show.text) {
@@ -214,7 +219,7 @@ map_ng <- function(region = character(),
       map.text(
         database,
         regions = txt,
-        exact = TRUE,                # disallow partial matching
+        exact = TRUE,
         labels = .adjustLabels(txt),
         add = TRUE)
     }
@@ -644,11 +649,10 @@ map_ng <- function(region = character(),
 
 # Provides a regex pattern for checking polygons for jurisdictions that
 # are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
-# TODO: DEPRECATE.
 .regexDuplicatedPolygons <- function(x)
 {
   stopifnot(is.character(x))
-  paste0("^(", x,")(.?|\\:\\d*)$")
+  paste0("^(", paste0(x, collapse = "|"),")(\\:\\d)?$")
 }
 
 

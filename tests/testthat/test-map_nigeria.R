@@ -136,20 +136,6 @@ test_that("Hexadecimal colour format is detected internally", {
   expect_false(.isHexColor(trio_na))
 })
 
-test_that("Regular expression for checking polygons is built", {
-  result <- .regexDuplicatedPolygons("WORD")
-  err.char <- "is.character\\(x\\) is not TRUE"
-  
-  expect_error(.regexDuplicatedPolygons(), 
-               "argument \"x\" is missing, with no default")
-  expect_error(.regexDuplicatedPolygons(NULL), err.char)
-  expect_error(.regexDuplicatedPolygons(numeric()), err.char)
-  expect_error(.regexDuplicatedPolygons(logical()), err.char)
-  expect_error(.regexDuplicatedPolygons(NA), err.char)
-  expect_type(result, "character")
-  expect_is(result, "character")
-  expect_equal(result, "^(WORD)(.?|\\:\\d*)$")
-})
 
 test_that("Colours are reassigned when duplicate polygons exist", {
   mapnames <- c("Kano:1", "Kano:2", "Abia:1", "Abia:2", "Abia:3", "Oyo")
@@ -454,11 +440,13 @@ test_that("Map LGAs together as individual blocs", {
 test_that("Number of LGAs matches the number extracted for mapping", {
   # This test case is created for bug fix that involved the creation
   # of wrong LGA coordinates for Borno State -> Kagarko is included
-  for (i in states()) {
+  for (i in states(all = FALSE)) {
+    # browser()
     lg <- lgas(i)
-    mplg <- map_ng(lg, plot = FALSE, exact = TRUE)$names
+    mplg <- map_ng(lg, plot = FALSE)$names
     
-    expect_equal(length(lg), length(mplg))
+    rgx <- .regexDuplicatedPolygons(lg)
+    expect_match(mplg, rgx)
     # expect_true(all(mplg %in% lg))
     # expect_true(all(lg %in% mplg))
   }
