@@ -145,5 +145,5 @@ test_that("Correct number of LGAs are returned for each State", {
   expect_length(lgas(), 774L)
   
   for (i in seq_along(ss)) 
-    expect_equal(length(lgas(ss[i])), numLg[i])
+    expect_equal(length(lgas(ss[i])), numLg[i], label = ss[i])
 })
