@@ -5,29 +5,39 @@
 \alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
-lgas(region = NA_character_, warn = TRUE)
+lgas(region = NA_character_, warn = TRUE, strict = FALSE)
 
 lgas_ng(state = NA_character_)
 }
 \arguments{
-\item{region}{Character; State(s) in the Federation of Nigeria. Default is
-\code{NA_character_}.}
+\item{region}{Context-dependent. Either State(s) of the Federation 
+or Local Government Area(s) - internal checks are performed to determine
+what applies. In cases where States are synonymous to LGAs, the default 
+behaviour is to use the State as a basis for selecting the LGAs. This
+can be modified with \code{strict}. The default value is 
+\code{NA_character_} and will return all 774 LGAs.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
 actually Local Government Areas (or were misspelt).}
+
+\item{strict}{logical; in the event of a name clash between State/LGA, 
+return only the specified LGA when this argument is set to \code{TRUE}.}
 
 \item{state}{Character; State(s) in the Federation of Nigeria. Default is
 \code{NA_character_}.}
 }
 \value{
 If length of \code{ng.state} == 1L, a character vector containing 
-the names of Local Government Areas; otherwise a named list whose elements 
+the names of Local Government Areas; otherwise a named list, whose elements 
 are character vectors of the LGAs in each state.
 }
 \description{
 List Local Government Areas
 }
 \note{
+There are six (6) LGAs that share names with their State - Bauchi, 
+Ebonyi, Gombe, Katsina, Kogi and Ekiti.
+
 \code{lga_ng} stands deprecated and will be removed in the next minor
 version. New code should use \code{lgas} instead.
 }
