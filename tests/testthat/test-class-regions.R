@@ -64,7 +64,7 @@ test_that("illegal input is caught early", {
   
   expect_error(lgas("Saarland"))
   expect_error(lgas("Maryland"),
-               "One or more elements is not a valid region in Nigeria",
+               "One or more elements is not a valid LGA in Nigeria",
                fixed = TRUE)
   expect_error(lgas(888), chErr)
   expect_error(lgas(NULL), chErr)
@@ -146,4 +146,21 @@ test_that("Correct number of LGAs are returned for each State", {
   
   for (i in seq_along(ss)) 
     expect_equal(length(lgas(ss[i])), numLg[i], label = ss[i])
+})
+
+
+test_that("State/LGAs synonyms are handled", {
+  expect_length(lgas("Oyo"), 33L)
+  expect_error(lgas("Oyo", strict = TRUE),
+               "One or more elements is not a valid LGA in Nigeria")
+  expect_length(lgas("Bauchi"), 20L)
+  expect_length(lgas("Bauchi", strict = TRUE), 1L)
+})
+
+
+test_that("LGA objects' attributes are set when appropriate", {
+  expect_identical(attr(lgas("Abia"), "State"), "Abia")
+  expect_length(attr(lgas(c("Kebbi", "Jigawa")), "State"), 2L)
+  expect_length(attributes(lgas("Rivers")), 2L)
+  expect_length(attributes(lgas()), 1L)
 })

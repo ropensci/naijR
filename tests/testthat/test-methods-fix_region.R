@@ -23,8 +23,7 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   bothlga <- c(correctLga, misspeltLga)
   
   expect_silent(fix_region(lgas(correctLga)))
-  expect_error(fix_region(lgas(misspeltLga)), 
-               "not a valid region")
+  expect_error(fix_region(lgas(misspeltLga)), "not a valid LGA")
   expect_message(fix_region(lgas(bothlga, warn = FALSE)),
                  "Successful fix\\(es\\)\\:.+\\*\\sFufore => Fufure")
   expect_message(

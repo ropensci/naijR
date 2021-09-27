@@ -75,7 +75,7 @@ test_that("National outline map is plotted", {
   expect_is(map_ng("Nigeria", plot = FALSE), "map")
 })
 
-test_that("Subnational divisions are plotted", {
+test_that("Geo-political Zones are plotted", {
   sw <- map_ng(region = states(gpz = 'sw'), plot = FALSE)
   
   expect_length(sw$names, 6L)
@@ -87,9 +87,7 @@ test_that("LGAs are plotted", {
   expect_is(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
-test_that("LGAs can be plotted where a State and LGA share name", {
-  expect_is(map_ng(lgas("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
-})
+
 
 set.seed(4)
 df <-
@@ -411,6 +409,10 @@ test_that("All individual plain State maps can be drawn", {
 })
 
 
+test_that("All LGAs within a given State are drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
+})
 
 test_that("All individual LGA maps can be drawn", {
   lgas <- lgas()
