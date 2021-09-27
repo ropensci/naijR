@@ -46,7 +46,7 @@ defined, internally created labels are used.}
 \item{show.neighbours}{Logical; \code{TRUE} to display the immediate vicinity
 neighbouring regions/countries.}
 
-\item{show.text}{Logical. Apply labels to the regions of the map.}
+\item{show.text}{Logical. Whether to display the labels of regions.}
 
 \item{leg.x, leg.y}{Numeric. Position of the legend.}
 

@@ -1,6 +1,6 @@
 ## ---- Utility function(s) - for maintenance use only ----
 ##      This file is not part of the build, but is being
-##      recorded by Git.Thus will be available to maintainers only
+##      recorded by Git. Thus will be available to maintainers only
 ##
 ## Inspects the data object of a shapefile.
 ## This function could be useful, for example, when trying to 

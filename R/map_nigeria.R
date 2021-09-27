@@ -60,7 +60,7 @@ globalVariables(c(".", "STATE"))
 #' vertical.
 #' @param show.neighbours Logical; \code{TRUE} to display the immediate vicinity
 #' neighbouring regions/countries.
-#' @param show.text Logical. Apply labels to the regions of the map.
+#' @param show.text Logical. Whether to display the labels of regions.
 #' @param ... Further arguments passed to \code{\link[maps]{map}}
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
@@ -142,14 +142,19 @@ map_ng <- function(region = character(),
     chrplth <- FALSE
   
   database <- .getMapData(region)
-  mapq <- expr(map(database, regions = region, ...))
+  
+  ## Create a regular expression for drawing regions. There is a 
+  ## to account for situations where there are multiple polygons
+  ## for the same State/LGA
+  region.regex <- .regexDuplicatedPolygons(region)
+  mapq <- quote(map(database, regions = region.regex, ...))
   
   ## Capture 'dots'
   dots <- list(...)
   
   ## Prepare to draw choropleth 
   if (chrplth) {
-    mapq <- expr(map(database, region))  ## TODO: Consider rlang::call2
+    mapq <- expr(map(database, region.regex))  ## TODO: Consider rlang::call2
     if (!is.null(dots$plot))
       if (!dots$plot)
         mapq$plot <- FALSE
@@ -193,7 +198,7 @@ map_ng <- function(region = character(),
   ## `maps::map()` used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
-  database <- eval_tidy(mapq)    # possibly, a new `database` is created
+  database <- eval(mapq)    # possibly, a new `database` is created
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
   if (show.text) {
@@ -214,7 +219,7 @@ map_ng <- function(region = character(),
       map.text(
         database,
         regions = txt,
-        exact = TRUE,                # disallow partial matching
+        exact = TRUE,
         labels = .adjustLabels(txt),
         add = TRUE)
     }
@@ -251,12 +256,11 @@ map_ng <- function(region = character(),
 
 
 
-## MARK FOR DEPRECATION
+## TODO: MARKED FOR DEPRECATION
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
 ## This function's use will be overtaken by the introduction 
 ## of LGA level mapping.
-#' @importFrom rlang abort
 .processRegionParam <- function(s)
 {
   stopifnot(is.character(s))
@@ -266,7 +270,7 @@ map_ng <- function(region = character(),
   if (length(s) == 0L)
     s <- all.st
   if (!all(s %in% all.st) && !all(s %in% lgas()))
-    abort("One or more elements of 'region' is not a Nigerian region")
+    stop("One or more elements of 'region' is not a Nigerian region")
   s
 }
 
@@ -317,35 +321,40 @@ map_ng <- function(region = character(),
 {
   if (identical(x, 'Nigeria'))
     return("mapdata::worldHires")
-  .getMapData(states())
+  if (x %in% .synonymRegions() || is_state(x))
+    return(.getMapData(states()))
+  .getMapData(lgas(x))
 }
 
 
 .getMapData.lgas <- function(x)
 {
-    obj <- shp.lga
-    .getMapFromSpObject(obj)
+  spo <- shp.lga[['spatialObject']]
+  st.nm <- attr(x, 'State')
+  if (length(st.nm) > 1L)
+    stop("Drawing LGA maps of adjoining States is not yet supported")
+  lgaObj <- if (!is.null(st.nm)) {
+    if (st.nm %in% .fctOptions())  # peculiar to this scope
+      st.nm <- "Abuja"
+    spo[grep(.regexSubsetRegions(st.nm), spo@data$STATE), ]
+  }
+  else
+    spo[grep(.regexSubsetRegions(x), spo@data$LGA), ]
+  .createBaseMapsObject(lgaObj, shp.lga)
  }
-
-
 
 .getMapData.states <- function(x)
 {
-  obj <- shp.state
-  .getMapFromSpObject(obj)
+  spo <- shp.state[['spatialObject']]
+  stateObj <- 
+    spo[grep(.regexSubsetRegions(x), spo@data$admin1Name), ]
+  .createBaseMapsObject(stateObj, shp.state)
 }
-
-
 
 #' @importFrom maps SpatialPolygons2map
-.getMapFromSpObject <- function(shp.data)
-{
-  stopifnot(inherits(shp.data, 'ShapefileProps'))
-  SpatialPolygons2map(shp.data[['spatialObject']],
-                      namefield = shp.data[['namefield']])
+.createBaseMapsObject <- function(obj, shapefileObj) {
+  SpatialPolygons2map(obj, namefield = shapefileObj[['namefield']])
 }
-
-
 
 
 
@@ -644,15 +653,19 @@ map_ng <- function(region = character(),
 
 # Provides a regex pattern for checking polygons for jurisdictions that
 # are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
-# TODO: DEPRECATE.
 .regexDuplicatedPolygons <- function(x)
 {
   stopifnot(is.character(x))
-  paste0("^(", x,")(.?|\\:\\d*)$")
+  paste0("^(", paste0(x, collapse = "|"),")(\\:\\d)?$")
 }
 
 
 
+
+.regexSubsetRegions <- function(x) {
+  stopifnot(is.character(x))
+  paste0(x, collapse = "|")
+}
 
 
 

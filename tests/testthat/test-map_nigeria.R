@@ -75,7 +75,7 @@ test_that("National outline map is plotted", {
   expect_is(map_ng("Nigeria", plot = FALSE), "map")
 })
 
-test_that("Subnational divisions are plotted", {
+test_that("Geo-political Zones are plotted", {
   sw <- map_ng(region = states(gpz = 'sw'), plot = FALSE)
   
   expect_length(sw$names, 6L)
@@ -87,9 +87,7 @@ test_that("LGAs are plotted", {
   expect_is(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
-test_that("LGAs can be plotted where a State and LGA share name", {
-  expect_is(map_ng(lgas("Oyo"), plot = FALSE), "map")   # Oyo State has an LGA called 'Oyo'
-})
+
 
 set.seed(4)
 df <-
@@ -136,20 +134,6 @@ test_that("Hexadecimal colour format is detected internally", {
   expect_false(.isHexColor(trio_na))
 })
 
-test_that("Regular expression for checking polygons is built", {
-  result <- .regexDuplicatedPolygons("WORD")
-  err.char <- "is.character\\(x\\) is not TRUE"
-  
-  expect_error(.regexDuplicatedPolygons(), 
-               "argument \"x\" is missing, with no default")
-  expect_error(.regexDuplicatedPolygons(NULL), err.char)
-  expect_error(.regexDuplicatedPolygons(numeric()), err.char)
-  expect_error(.regexDuplicatedPolygons(logical()), err.char)
-  expect_error(.regexDuplicatedPolygons(NA), err.char)
-  expect_type(result, "character")
-  expect_is(result, "character")
-  expect_equal(result, "^(WORD)(.?|\\:\\d*)$")
-})
 
 test_that("Colours are reassigned when duplicate polygons exist", {
   mapnames <- c("Kano:1", "Kano:2", "Abia:1", "Abia:2", "Abia:3", "Oyo")
@@ -425,6 +409,10 @@ test_that("All individual plain State maps can be drawn", {
 })
 
 
+test_that("All LGAs within a given State are drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
+})
 
 test_that("All individual LGA maps can be drawn", {
   lgas <- lgas()
@@ -448,4 +436,20 @@ test_that("Map LGAs together as individual blocs", {
   
   expect_false(inherits(val, "try-error"))
   expect_true(file.exists(testMap))
+})
+
+
+test_that("Number of LGAs matches the number extracted for mapping", {
+  # This test case is created for bug fix that involved the creation
+  # of wrong LGA coordinates for Borno State -> Kagarko is included
+  for (i in states(all = FALSE)) {
+    # browser()
+    lg <- lgas(i)
+    mplg <- map_ng(lg, plot = FALSE)$names
+    
+    rgx <- .regexDuplicatedPolygons(lg)
+    expect_match(mplg, rgx)
+    # expect_true(all(mplg %in% lg))
+    # expect_true(all(lg %in% mplg))
+  }
 })
