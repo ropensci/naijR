@@ -1,3 +1,7 @@
+# maijR 0.3.1
+* Fixed a bug that affected the proper rendering of LGA-level maps for some of the States. The approach used was to simply filter the entire data when requiring a State map, so as to reduce name clashes that occurred from synonyms amongst some of the LGAs and/or States.
+* Enabled the fine-tuning of creation of `lgas` objects in the event that the argument provided is the name of an LGA that is synonymous with it's State (argument `strict`).
+
 # naijR 0.3.0
 * Provide new methods for the S3 generics `head` and `tail` to work with objects that inherit from class `regions`.
 * The S3 constructors `states` and `lgas` gain a logical argument `warn` to control whether or not they issue a warning when an input string does not contain an actual State/LGA.
