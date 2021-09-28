@@ -66,8 +66,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          remotes::install_deps(dependencies = TRUE, type = "binary")
-          remotes::install_cran("rcmdcheck", type = "binary")
+          remotes::install_deps(dependencies = TRUE, type = "both")
+          remotes::install_cran("rcmdcheck", type = "both")
         shell: Rscript {0}
 
       - name: Check
