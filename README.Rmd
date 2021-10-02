@@ -69,7 +69,7 @@ Want to create a function to check how many LGAs a particular State has?
 
 ```{r}
 how_many_lgas <- function(state) {
-  n <- length(naijR::lgas(state))
+  n <- length(lgas(state))
   cat(state, "State has", n, "LGAs\n")
 }
 
