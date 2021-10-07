@@ -327,10 +327,17 @@ as_lga <- function(x) {
 print.regions <- function(x, ...) {
   if (!interactive())
     return(x)
-  region <- if (all(is_state(x))) "States" else "LGAs"
-  underline <- strrep("-", nchar(region))
+  st <- "States"
+  lg <- "LGAs"
+  hdr <- if (length(x) > 1L) {
+    if (all(is_state(x))) st else lg
+  }
+  else {
+    if (inherits(x, "lgas")) lg else st
+  }
+  underline <- strrep("-", nchar(hdr))
   newline <- "\n"
-  cat(paste(region, underline, sep = newline), newline)
+  cat(paste(hdr, underline, sep = newline), newline)
   cat(paste("*", x, collapse = newline), "\n")
 }
 

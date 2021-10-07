@@ -124,11 +124,6 @@ test_that("Mispelt LGA are discovered", {
 
 
 
-
-
-
-
-
 test_that("is_lga recognises LGAs", {
   anlga <- "Amuwo-Odofin"
   veclga <- c("Akira-Uba", "Hawul", NA)
@@ -136,4 +131,17 @@ test_that("is_lga recognises LGAs", {
   
   expect_true(is_lga(anlga))
   expect_false(all(is_lga(veclga)))
+})
+
+
+
+test_that("State/LGA synonyms are discernible", {
+  rr <- .synonymRegions()
+  for (i in rr) {
+    expect_true(is_state(i))
+    expect_true(is_lga(i))
+    expect_true(is_state(states(i)))
+    expect_true(all(is_lga(lgas(i))))
+    expect_true(is_lga(lgas(i, strict = TRUE)))
+  }
 })
