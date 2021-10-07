@@ -23,8 +23,8 @@
           ##   phone numbers belonging to anyone, living  ##
           ##   or dead. If any number here looks like a   ##
           ##   number you know, please notify us via      ##
-          ##   email (victorordu at outlook.com) to have  ##
-          ##   it removed from the source code.           ##
+          ##   email (victorordu at outlook dot com) to   ##
+          ##   have it removed from the source code.      ##
           ##################################################
           ##################################################
           
