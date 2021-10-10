@@ -21,11 +21,13 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   correctLga <- lg[2]
   misspeltLga <- lg[3]
   bothlga <- c(correctLga, misspeltLga)
-  
+  msghdr.rgx <- "Successful fix\\(es\\)\\:.+\\*\\s"
   expect_silent(fix_region(lgas(correctLga)))
   expect_error(fix_region(lgas(misspeltLga)), "not a valid LGA")
   expect_message(fix_region(lgas(bothlga, warn = FALSE)),
-                 "Successful fix\\(es\\)\\:.+\\*\\sFufore => Fufure")
+                 paste0(msghdr.rgx, "Fufore => Fufure"))
+  expect_message(fix_region(c("Owerri north", "Owerri West")),
+                 paste0(msghdr.rgx, "Owerri north => Owerri North"))
   expect_message(
     fix_region(bothlga),
     "reconstructing 'x' with `states()` or `lgas()` for a more reliable",
@@ -69,4 +71,10 @@ test_that("Misspelt LGA can be fixed (limited)", {
   
   expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
   
+})
+
+
+
+test_that("outputs", {
+  expect_invisible(fix_region(c("Fufore", "Demsa")))
 })

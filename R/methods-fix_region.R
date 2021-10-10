@@ -8,6 +8,11 @@
 #' the atomic vector is of type \code{character}. It does not test any missing
 #' values in the vector, leaving them untouched.
 #' 
+#' @note When passed a character vector of length \code{1L}, in the case of a
+#' mispelt LGA, the function signals an error; the presumption is that a fix
+#' can readily be applied interactively. However, longer vectors with misspelt
+#' LGAs will trigger other functionalities for fixing the mistakes.
+#' 
 #' @param x An S3 object of class \code{states} or \code{lgas}. For 
 #' \code{fix_region.default}, a character vector can be passed but only
 #' that for States will be interpretable.
@@ -60,6 +65,10 @@ fix_region.states <- function(x, ...)
 #' options.
 #' @param quietly Logical; default argument is \code{FALSE}.
 #' 
+#' @examples 
+#' try(fix_region("Owerri north")) # ERROR
+#' fix_region(c("Owerri north", "Owerri West"))
+#' 
 #' @export
 fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
@@ -98,7 +107,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     return(x)
   }
   region <- if (any(is_lga(x)) && (!any(x %in% .synonymRegions())))
-    suppressWarnings(lgas(x))
+    lgas(x, warn = FALSE)
   else
     suppressWarnings(states(x))
   zz <- region %>% 
@@ -108,7 +117,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     paste("Consider reconstructing 'x' with",
           "`states()` or `lgas()` for a more reliable fix")
   )
-  zz
+  invisible(zz)
 }
 
 
@@ -149,7 +158,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       grep(paste0('^', str, '$'),
            regions,
            value = TRUE,
-           ignore.case = TRUE)
+           ignore.case = FALSE)
     
     if (length(good) == 1L) 
       return(good)
@@ -170,8 +179,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     str  # return misspelt string unchanged
   }
   
-  cant.fix <- character()
-  fix.status <- character()
+  fix.status <- cant.fix <- character()
   v <-
     vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
   attr(v, "misspelt") <- cant.fix
