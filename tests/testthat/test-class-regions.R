@@ -34,24 +34,12 @@ test_that("input is validated", {
 
 
 test_that("'states' object is constructed", {
-  expect_warning(states(c("Nasarawa", "Oyo")),
-                 "One or more elements of 'states' is not an actual State")
+  expect_warning(states(c("Oyo", "Legos")), 
+                 "One or more items is not a State. Spelling error\\?")
+  expect_silent(states(c("xxx", "Benue"), warn = FALSE))
+  expect_warning(states(c("kentucky", "Bornu", "Abia")))
+  expect_warning(states(c("Nasarawa", "Oyo")))
 })
-
-
-
-
-test_that("Internal object listing states is created and retrievable", {
-  default <- .getAllStates()
-  notDefault <- .getAllStates(FALSE)
-  
-  expect_type(default, 'list')
-  expect_named(default)
-  expect_identical(names(default), c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
-  expect_type(notDefault, 'character')
-  expect_null(names(notDefault))
-})
-
 
 
 
@@ -63,9 +51,7 @@ test_that("illegal input is caught early", {
   chErr <- "Expected an object of type 'character'"
   
   expect_error(lgas("Saarland"))
-  expect_error(lgas("Maryland"),
-               "One or more elements is not a valid LGA in Nigeria",
-               fixed = TRUE)
+  expect_error(lgas("Maryland"), "None of the items is a valid LGA")
   expect_error(lgas(888), chErr)
   expect_error(lgas(NULL), chErr)
   expect_error(lgas(TRUE), chErr)
@@ -87,7 +73,7 @@ test_that("LGAs are returned correctly", {
   expect_named(res2, nam)
   expect_length(res2, 2L)
   expect_warning(lgas(c("Oyo West", "Obomo Ngwa")), 
-                 "One or more elements is not an LGA")
+                 "One or more items is not an LGA")
 })
 
 
@@ -152,7 +138,7 @@ test_that("Correct number of LGAs are returned for each State", {
 test_that("State/LGAs synonyms are handled", {
   expect_length(lgas("Oyo"), 33L)
   expect_error(lgas("Oyo", strict = TRUE),
-               "One or more elements is not a valid LGA in Nigeria")
+               "strict can only be set to TRUE where State/LGA syonnyms exist")
   expect_length(lgas("Bauchi"), 20L)
   expect_length(lgas("Bauchi", strict = TRUE), 1L)
 })
