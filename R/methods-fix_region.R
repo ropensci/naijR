@@ -9,9 +9,12 @@
 #' values in the vector, leaving them untouched.
 #' 
 #' @note When passed a character vector of length \code{1L}, in the case of a
-#' mispelt LGA, the function signals an error; the presumption is that a fix
-#' can readily be applied interactively. However, longer vectors with misspelt
-#' LGAs will trigger other functionalities for fixing the mistakes.
+#' misspelt LGA, the function signals an error; the presumption is that a fix
+#' can readily be applied interactively. When all the items provided are 
+#' misspelt, nothing happens, but the user is advised to use the appropriate
+#' constructor function so as to improve the accuracy of the repairs. When
+#' there is a mix of misspelt and properly spelt LGAs, other functionalities
+#' for fixing the mistakes are available via mode \code{interactive}.
 #' 
 #' @param x An S3 object of class \code{states} or \code{lgas}. For 
 #' \code{fix_region.default}, a character vector can be passed but only
@@ -42,13 +45,13 @@ fix_region.states <- function(x, ...)
     i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
     i_full <- grep(fullFCT, x)
   }
-  i <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
+  iFct <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
   ss <- states()
-  if (length(i)) 
+  if (length(iFct)) 
     ss <- sub(fullFCT, abbrFCT, ss)
   
   x <- .fixRegionInternal(x, ss)
-  x[i] <- fullFCT
+  x[iFct] <- fullFCT
   attributes(x) <- NULL
   x <- states(x, warn = FALSE)
   invisible(x)
@@ -88,7 +91,12 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-
+## Sometimes the States/LGAs will be supplied as ordinary character vectors
+## For this case, this method tries to do some kind of sorting, determining
+## which kind of region the input represents i.e. States or LGAs. Once this
+## is determined, the appropriate constructor (`states()` or `lgas()`, 
+## respectively) will be applied and from there the appropriate method is 
+## called internally to attempt to fix the input.
 #' @rdname fix_region
 #' @importFrom magrittr %>%
 #' 
@@ -106,17 +114,26 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     warning("'x' has length 0L or only missing values", call. = FALSE)
     return(x)
   }
-  region <- if (any(is_lga(x)) && (!any(x %in% .synonymRegions())))
+  
+  ## For the LGAs case, the expectation is that in a vector with more than
+  ## one element, if any of the elements passess the test of being an LGA
+  ## then one can safely assume that the other element(s) that fail the test
+  ## did so because they were misspelt. An automatic fix will then be attempted.
+  region <- if (any(is_lga(x)))
     lgas(x, warn = FALSE)
+  else if (any(is_state(x)))
+    states(x, warn = FALSE)
   else
-    suppressWarnings(states(x))
-  zz <- region %>% 
-    fix_region %>% 
-    as.character
-  message(
-    paste("Consider reconstructing 'x' with",
-          "`states()` or `lgas()` for a more reliable fix")
-  )
+    stop(
+      paste(
+        "Incorrect region name(s);",
+        "consider reconstructing 'x' with",
+        "`states()` or `lgas()` for a more reliable fix"
+      ),
+      call. = FALSE
+    )
+  zz <- region %>% fix_region %>% as.character
+  
   invisible(zz)
 }
 
@@ -139,7 +156,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     if (!is.na(match(str, regions)))
       return(str)
     if (inherits(regions, "states")) {
-      if (agrepl(str, abbrFCT, max.distance = 2)
+      if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
           && identical(toupper(str), abbrFCT))
         return(abbrFCT)
     }
@@ -164,7 +181,12 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       return(good)
     
     ## Otherwise check for approximate matches.
-    fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
+    fixed <-
+      agrep(paste0('^', str, '$'),
+            regions,
+            value = TRUE,
+            fixed = FALSE,
+            max.distance = .pkgLevDistance())
     
     if (length(fixed) == 1L) {
       fix.status <<-
@@ -209,18 +231,18 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   badspell <- ATTR_$misspelt
   hasBadspell <- !identical(badspell, character(0))
   if (hasBadspell) {
-    msg1 <- .messageHeader("Fix(es) not applied")
-    x <- sapply(badspell, function(x) paste("*", x))
-    message(msg1, paste(x, sep = "\n"))
+    hdr1 <- .messageHeader("Fix(es) not applied")
+    x <- sapply(badspell, function(x) paste0("* ", x, "\n"))
+    message(hdr1, paste0(x), appendLF = FALSE)
   }
   fixes <- ATTR_$regions.fixed
   if (!identical(fixes, character(0))) {
     if (hasBadspell)
       message("")    # just add newline
-    msg2 <- .messageHeader("Successful fix(es)")
+    hdr2 <- .messageHeader("Successful fix(es)")
     x <- 
       mapply(function(a, b) sprintf("* %s => %s\n", a, b), names(fixes), fixes)
-    message(msg2, paste0(x))
+    message(hdr2, paste0(x), appendLF = FALSE)
   }
 }
 

@@ -43,9 +43,12 @@ values in the vector, leaving them untouched.
 }
 \note{
 When passed a character vector of length \code{1L}, in the case of a
-mispelt LGA, the function signals an error; the presumption is that a fix
-can readily be applied interactively. However, longer vectors with misspelt
-LGAs will trigger other functionalities for fixing the mistakes.
+misspelt LGA, the function signals an error; the presumption is that a fix
+can readily be applied interactively. When all the items provided are 
+misspelt, nothing happens, but the user is advised to use the appropriate
+constructor function so as to improve the accuracy of the repairs. When
+there is a mix of misspelt and properly spelt LGAs, other functionalities
+for fixing the mistakes are available via mode \code{interactive}.
 }
 \examples{
 try(fix_region("Owerri north")) # ERROR

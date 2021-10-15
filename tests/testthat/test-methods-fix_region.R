@@ -12,7 +12,7 @@ test_that("input is validated before fixing state names", {
                  "Tried to fix empty strings - may produce errors")
   expect_warning(fix_region(NA_character_), warn0)
   expect_warning(fix_region(character()), warn0)
-  expect_type(fix_region(matrix(states())), "character") ## preserve class??
+  # expect_type(fix_region(matrix(states())), "character") ## preserve class??
 })
 
 
@@ -21,31 +21,22 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   correctLga <- lg[2]
   misspeltLga <- lg[3]
   bothlga <- c(correctLga, misspeltLga)
-  msghdr.rgx <- "Successful fix\\(es\\)\\:.+\\*\\s"
+  hdr.rgx <- "Successful fix\\(es\\)\\:.+\\*\\s"
   fuf.rgx <- "Fufore => Fufure"
   
   expect_silent(fix_region(lgas(correctLga)))
-  expect_error(fix_region(lgas(misspeltLga)), "not a valid LGA")
-  expect_message(
-    fix_region(bothlga),
-    "reconstructing 'x' with `states()` or `lgas()` for a more reliable",
-    fixed = TRUE
-  )
+  expect_message(fix_region(lgas(misspeltLga, warn = FALSE)), fuf.rgx)
+  expect_message(fix_region(bothlga), fuf.rgx)
   expect_warning(fix_region(lgas(lg, warn = FALSE)), 
                  "approximately matched more than one region")
-  expect_message(suppressWarnings(fix_region(lgas(lg, warn = FALSE))),
+  expect_message(suppressWarnings(fix_region(lgas(lg))),
                  paste0(fuf.rgx, ".+Noman => Numan"))
   expect_message(fix_region(lgas(bothlga, warn = FALSE)),
-                 paste0(msghdr.rgx, fuf.rgx))
-  # 
-  # lg[lg == "Noman"] <- "Numan"
-  # lg[lg == "Machika"] <- "Michika"
-  lg[1] <- "Fufore"
-  
+                 paste0(hdr.rgx, fuf.rgx))
   expect_message(suppressWarnings(fix_region(lg)),
-                 paste0(msghdr.rgx, fuf.rgx, "\\n"))  # TODO: Check again
+                 paste0(hdr.rgx, fuf.rgx, "\\n"))  # TODO: Check again
   expect_message(fix_region(c("Owerri north", "Owerri West")),
-                 paste0(msghdr.rgx, "Owerri north => Owerri North"))
+                 paste0(hdr.rgx, "Owerri north => Owerri North"))
 })
 
 
@@ -56,9 +47,9 @@ test_that("various cases for fixing state names", {
   ss.us <- c("kentucky", "Bornu", "Abia")
   
   expect_equivalent(fix_region(ss), ss)
-  expect_identical(fix_region('Fct'), "Federal Capital Territory")
-  expect_identical(fix_region('Kane'), "Kano")
-  expect_identical(fix_region('plateau'), 'Plateau')
+  expect_error(fix_region('Fct'), "Incorrect region name")
+  expect_error(fix_region('Kane'))
+  expect_error(fix_region('plateau'))
   
   fixed2 <- suppressMessages(fix_region(ss2))
   expect_identical(fixed2, states(c("Oyo", "Lagos"), warn = FALSE))
@@ -79,6 +70,9 @@ test_that("Misspelt LGA can be fixed (limited)", {
   result <- fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE))
   
   expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
+  expect_error(fix_region("Legos Island"))
+  expect_error(fix_region(c("Amuwo Odofin", "Legos Island")), 
+               "Incorrect region name") # both misspelt!
   
 })
 
