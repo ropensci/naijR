@@ -149,8 +149,13 @@ lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
       sl <- unname(unlist(sl))
     sl
   }
-  else if (all(is_lga(region)))
-    region
+  else if (all(is_lga(region))) {
+    lg <- region
+    region <- lgas_nigeria$state[lgas_nigeria$lga == lg]
+    if ((numSt <- length(region)) > 1L)
+      warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
+    lg
+  }
   else if (.hasMisspeltLgas(region)) { 
     if (warn)
       warning(.warnSpelling('lga'), call. = FALSE)
@@ -443,4 +448,23 @@ tail.regions <- function(x, ...)
     states(m)
   else
     lgas(m)
+}
+
+
+
+
+# TODO: Export this function in next release
+#' @importFrom utils menu
+focus_lga_on_state <- function(lga, state = NULL)
+{
+  if (!inherits(lga, "lgas"))
+    stop("Expected an object of class 'lgas'")
+  if (length(lga) > 1L)
+    stop("Focusing is performed only for single LGA objects")
+  ss <- attr(lga, "State")
+  if (is.null(state)) {
+    state <- ss[menu(ss, title = "Which State does this LGA belong to?")]
+  }
+  attr(lga, "State") <- state
+  lga
 }

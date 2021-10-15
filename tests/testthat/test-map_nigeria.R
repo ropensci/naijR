@@ -414,11 +414,13 @@ test_that("All LGAs within a given State are drawn", {
     expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
 })
 
-test_that("All individual LGA maps can be drawn", {
-  lgas <- lgas()
-  for (x in lgas)
-    expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
-})
+# TODO: Release this test in next release v 0.4 when `focus_lga_on_stats` 
+# is exported
+# test_that("All individual LGA maps can be drawn", {
+#   lgas <- lgas()
+#   for (x in lgas)
+#     expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
+# })
 
 
 
