@@ -16,3 +16,4 @@
 ^tests/testthat/data/test-map.png$
 ^inst/extdata/ng_admin$
 ^inst/extdata/nigeria-lgas$
+^vignettes/img/interactive-\db.png$
