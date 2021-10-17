@@ -83,7 +83,6 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   }
   if (!quietly)
     .reportOnFixes(vals)
-  attributes(vals) <- NULL
   invisible(vals)
 }
 
