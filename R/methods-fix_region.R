@@ -320,10 +320,20 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-.fixRegionsManually <- function(wrong, correct, src)
+fix_region_manual <- function(x, wrong, correct)
 {
-  patterns <- paste0("^", wrong, "$")
-  wrongIndexed <- vapply(patterns, grep, integer(1), x = src)
-  src[wrongIndexed] <- correct
-  src
+  if (!(inherits(x, "states") || inherits(x, "lgas"))) {
+    if (!is.character(x))
+      stop("Operation cannot be done on objects of type ", sQuote(typeof(x)))
+  }
+  if ((length(wrong) != length(correct)) && length(correct) > 1L)
+    stop("Substitutions must be single or the same number as targetted fixes")
+  if (length(correct) == 1L) {
+    x[x %in% wrong] <- correct
+    # warning???
+    return(x)
+  }
+  for (i in seq_along(wrong))
+    x[x %in% wrong[i]] <- correct[i]
+  x
 }
