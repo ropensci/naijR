@@ -414,13 +414,19 @@ test_that("All LGAs within a given State are drawn", {
     expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
 })
 
-# TODO: Release this test in next release v 0.4 when `focus_lga_on_stats` 
-# is exported
-# test_that("All individual LGA maps can be drawn", {
-#   lgas <- lgas()
-#   for (x in lgas)
-#     expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
-# })
+
+test_that("All individual LGA maps can be drawn", {
+  for (s in states()) {
+    lgs <- lgas(s)
+    for (lg in lgs) {
+      x <- suppressWarnings(lgas(lg))
+      state <- attr(x, "State")
+      if (length(state) > 1L)
+        x <- disambiguate(x, parent = s)
+      expect_s3_class(map_ng(x, plot = FALSE), "map")
+    }
+  }
+})
 
 
 
@@ -441,17 +447,3 @@ test_that("Map LGAs together as individual blocs", {
 })
 
 
-test_that("Number of LGAs matches the number extracted for mapping", {
-  # This test case is created for bug fix that involved the creation
-  # of wrong LGA coordinates for Borno State -> Kagarko is included
-  for (i in states(all = FALSE)) {
-    # browser()
-    lg <- lgas(i)
-    mplg <- map_ng(lg, plot = FALSE)$names
-    
-    rgx <- .regexDuplicatedPolygons(lg)
-    expect_match(mplg, rgx)
-    # expect_true(all(mplg %in% lg))
-    # expect_true(all(lg %in% mplg))
-  }
-})
