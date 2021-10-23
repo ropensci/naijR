@@ -1,7 +1,7 @@
-# naijr 0.3.2
+# naijR 0.3.2
 * Improved on print methods
 
-# maijR 0.3.1
+# naijR 0.3.1
 * Fixed a bug that affected the proper rendering of LGA-level maps for some of the States. The approach used was to simply filter the entire data when requiring a State map, so as to reduce name clashes that occurred from synonyms amongst some of the LGAs and/or States.
 * Enabled the fine-tuning of creation of `lgas` objects in the event that the argument provided is the name of an LGA that is synonymous with it's State (argument `strict`).
 
