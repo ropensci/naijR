@@ -148,8 +148,16 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## matched value, which in the case of misspelling should be the correct one.
 ##
 ## This function is mapped to a vector of states/LGAs
+#' @importFrom magrittr %>%
 .fixRegionInternal <- function(x, region, ...)
 {
+  stopifnot(is.character(x), is.character(region))
+  cant.fix <- character()
+  fix.status <- character()
+  
+  ## Internal function to enable identification of entries that need to
+  ## be fixed and preparing attributes that will enable further processing
+  ## downstream.
   .getProperVal <- function(str, regions) {
     abbrFCT <- .fctOptions("abbrev")
     if (!is.na(match(str, regions)))
@@ -160,52 +168,54 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
         return(abbrFCT)
     }
     
-    ## First remove spaces around slashes
-    ## TODO: Note that there is an element of hard-coding here.
-    ## The related issue should be addressed at source.
+    ## First remove spaces around slashes and hyphens
     str <- str %>% 
       gsub("\\s\\/", "/", .) %>% 
       gsub("\\/\\s", "/", .) %>% 
       sub("-\\s", "-", .) %>% 
-      sub("^Egbado/", "", .)
+      sub("^Egbado/", "", .) ## TODO: Note hard-coding here. Address later.
     
     ## Now, check for exact matching.
     good <-
-      grep(paste0('^', str, '$'),
-           regions,
-           value = TRUE,
-           ignore.case = FALSE)
-    
+      grep(paste0('^', str, '$'), regions, value = TRUE, ignore.case = TRUE) %>% 
+      unique()
     if (length(good) == 1L) 
       return(good)
     
     ## Otherwise check for approximate matches.
-    fixed <-
-      agrep(paste0('^', str, '$'),
-            regions,
-            value = TRUE,
-            fixed = FALSE,
-            max.distance = .pkgLevDistance())
-    
-    if (length(fixed) == 1L) {
-      fix.status <<-
-        structure(c(fix.status, fixed), names = c(names(fix.status), str))
+    fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
+    numFixed <- length(fixed)
+    if (numFixed == 1L) {
+      fix.status <<- fix.status %>% 
+        {
+          structure(c(., fixed), names = c(names(.), str))
+        }
       return(fixed)
     }
-    
-    if (length(fixed) > 1L)
+    if (numFixed > 1L)
       .warnOnMultipleMatches(str, fixed)
     
+    # if we get to this point, return misspelt string unchanged
     cant.fix <<- c(cant.fix, str)
-    str  # return misspelt string unchanged
+    str
   }
   
-  fix.status <- cant.fix <- character()
   v <-
     vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
-  attr(v, "misspelt") <- unique(cant.fix)
-  attr(v, "regions.fixed") <- fix.status[which(!duplicated(names(fix.status)))]
-  v
+  attr(v, "misspelt") <- cant.fix
+  
+  ## Reduce data for reporting on fixes to only the 
+  ## unique instances to avoid repetitive printouts
+  if (length(fix.status) > 1L) {
+    allfix <- names(fix.status)
+    if (anyDuplicated(allfix)) {
+      dups <- which(duplicated(allfix))
+      fix.status <- fix.status[-dups]
+    }
+  }
+  
+  attr(v, "regions.fixed") <- fix.status
+  return(v)
 }
 
 
