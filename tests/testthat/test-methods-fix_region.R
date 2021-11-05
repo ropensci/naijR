@@ -21,11 +21,25 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   correctLga <- lg[2]
   misspeltLga <- lg[3]
   bothlga <- c(correctLga, misspeltLga)
+  multi.lga <- readRDS("data/mispelt-lga.rds")
+  .msgfunc <- function(x) {
+    stopifnot(grepl("^(.+)(\\s=>\\s)(.+)$", x))
+    sprintf("Successful fix\\(es\\)\\:\\n\\-+\\n\\*\\s%s\\n\\n$", x)
+  } #                                                 ^
+    #                                               Note place-holder
+  change1 <- "Fufore => Fufure"
+  change2 <- "Fafure => Fufure"
+  msg1 <- .msgfunc(change1)
+  msg2 <- .msgfunc(change2)
+  
+  # ----
   
   expect_silent(fix_region(lgas(correctLga)))
   expect_error(fix_region(lgas(misspeltLga)), "not a valid LGA")
-  expect_message(fix_region(lgas(bothlga, warn = FALSE)),
-                 "Successful fix\\(es\\)\\:.+\\*\\sFufore => Fufure")
+  expect_message(fix_region(lgas(bothlga, warn = FALSE)), msg1)
+  expect_message(fix_region(lgas(c(bothlga, "Fufore"), warn = FALSE)), msg1)
+  expect_message(fix_region(lgas(c(bothlga, "Fafure"), warn = FALSE)),
+                 sprintf("%s\\n\\*\\s%s", change1, change2))
   expect_message(
     fix_region(bothlga),
     "reconstructing 'x' with `states()` or `lgas()` for a more reliable",
@@ -34,7 +48,9 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   expect_warning(fix_region(lgas(lg, warn = FALSE)), 
                  "approximately matched more than one region")
   expect_message(suppressWarnings(fix_region(lgas(lg, warn = FALSE))),
-                 "Fufore => Fufure.+Noman => Numan")
+                 sprintf("%s.+Noman => Numan", change1))
+  expect_message(fix_region(lgas(multi.lga, warn = FALSE)),
+                 change1)
 })
 
 

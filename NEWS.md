@@ -1,3 +1,6 @@
+# naijR 0.3.3
+* Fixed repetitions in the output when multiple LGAs' spellings are corrected.
+
 # naijR 0.3.2
 * Improved on print methods
 
