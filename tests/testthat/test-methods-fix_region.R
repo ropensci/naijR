@@ -1,7 +1,7 @@
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not a character vector"
   warn0 <- "'x' has length 0L or only missing values"
-
+  
   expect_error(fix_region(99), errchr)
   expect_error(fix_region(NA), errchr)
   expect_error(fix_region(c(NA, NA, NA)), errchr)
@@ -12,7 +12,7 @@ test_that("input is validated before fixing state names", {
                  "Tried to fix empty strings - may produce errors")
   expect_warning(fix_region(NA_character_), warn0)
   expect_warning(fix_region(character()), warn0)
-  # expect_type(fix_region(matrix(states())), "character") ## preserve class??
+  expect_type(fix_region(matrix(states())), "character") ## preserve class??
 })
 
 
@@ -26,7 +26,7 @@ test_that("Messaging is clear when fixing regions via character vectors", {
     stopifnot(grepl("^(.+)(\\s=>\\s)(.+)$", x))
     sprintf("Successful fix\\(es\\)\\:\\n\\-+\\n\\*\\s%s\\n\\n$", x)
   } #                                                 ^
-    #                                               Note place-holder
+  #                                               Note place-holder
   change1 <- "Fufore => Fufure"
   change2 <- "Fafure => Fufure"
   msg1 <- .msgfunc(change1)
@@ -61,9 +61,9 @@ test_that("various cases for fixing state names", {
   ss.us <- c("kentucky", "Bornu", "Abia")
   
   expect_equivalent(fix_region(ss), ss)
-  expect_error(fix_region('Fct'), "Incorrect region name")
-  expect_error(fix_region('Kane'))
-  expect_error(fix_region('plateau'))
+  expect_identical(fix_region('Fct'), "Federal Capital Territory")
+  expect_identical(fix_region('Kane'), "Kano")
+  expect_identical(fix_region('plateau'), 'Plateau')
   
   fixed2 <- suppressMessages(fix_region(ss2))
   expect_identical(fixed2, states(c("Oyo", "Lagos"), warn = FALSE))
@@ -84,14 +84,5 @@ test_that("Misspelt LGA can be fixed (limited)", {
   result <- fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE))
   
   expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
-  expect_error(fix_region("Legos Island"))
-  expect_error(fix_region(c("Amuwo Odofin", "Legos Island")), 
-               "Incorrect region name") # both misspelt!
   
-})
-
-
-
-test_that("outputs", {
-  expect_invisible(fix_region(c("Fufore", "Demsa")))
 })
