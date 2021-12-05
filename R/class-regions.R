@@ -69,6 +69,24 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 
 
+.getAllStates <- function(named = TRUE)
+{
+  names <- sort(unique(lgas_nigeria$gpz))
+  ss <- sapply(names, FUN = function(x) {
+    lgas_nigeria |>
+      subset(subset = gpz == x, select = state) |>
+      unique()
+  })
+  if (!named)
+    return(sort(unname(unlist(ss))))
+  names(ss) <- sub("\\.state", "", names(ss))
+  ss
+}
+
+
+
+
+
 
 ## Low-level constructor
 new_states <- function(ss) 
@@ -284,7 +302,8 @@ as_lga <- function(x) {
     is_state %>% 
     which %>% 
     extract(ll, .) %>% 
-    unclass
+    unclass %>% 
+    unique       # because Nasarawa exists in 2 different States
 }
 
 

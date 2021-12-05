@@ -34,22 +34,8 @@ test_that("input is validated", {
 
 
 test_that("'states' object is constructed", {
-  expect_warning(states(c("Nasarawa", "Oyo")),
+  expect_warning(states(c("Nassarawa", "Oyo")),
                  "One or more elements of 'states' is not an actual State")
-})
-
-
-
-
-test_that("Internal object listing states is created and retrievable", {
-  default <- .getAllStates()
-  notDefault <- .getAllStates(FALSE)
-  
-  expect_type(default, 'list')
-  expect_named(default)
-  expect_identical(names(default), c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct'))
-  expect_type(notDefault, 'character')
-  expect_null(names(notDefault))
 })
 
 

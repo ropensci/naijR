@@ -329,10 +329,10 @@ map_ng <- function(region = character(),
 
 .getMapData.lgas <- function(x)
 {
-  spo <- shp.lga[['spatialObject']]
+  spo <- .fixNasState(shp.lga[['spatialObject']], "STATE")
   st.nm <- attr(x, 'State')
   if (length(st.nm) > 1L)
-    stop("Drawing LGA maps of adjoining States is not yet supported")
+    stop("LGA-level maps for adjoining States are not yet supported")
   lgaObj <- if (!is.null(st.nm)) {
     if (st.nm %in% .fctOptions())  # peculiar to this scope
       st.nm <- "Abuja"
@@ -343,13 +343,22 @@ map_ng <- function(region = character(),
   .createBaseMapsObject(lgaObj, shp.lga)
  }
 
+
+
+
+
 .getMapData.states <- function(x)
 {
-  spo <- shp.state[['spatialObject']]
+  spo <- .fixNasState(shp.state[['spatialObject']], "admin1Name")
+  
   stateObj <- 
     spo[grep(.regexSubsetRegions(x), spo@data$admin1Name), ]
   .createBaseMapsObject(stateObj, shp.state)
 }
+
+
+
+
 
 #' @importFrom maps SpatialPolygons2map
 .createBaseMapsObject <- function(obj, shapefileObj) {
@@ -357,13 +366,31 @@ map_ng <- function(region = character(),
 }
 
 
-
-
-.fixBadNames <- function(map)
+.fixNasState <- function(obj, namefield)
 {
-  map$names[map$names == "Nasarawa"] <- "Nassarawa"
-  map
+  .fixBadShpfileRegion(obj, namefield, "Nassarawa", "Nasarawa")
 }
+
+
+.fixBadShpfileRegion <- function(obj, namefield, old, new) 
+{
+  # TODO: Consider using reference semantics for 'obj'
+  stopifnot({
+    isS4(obj)
+    is.character(namefield)
+    is.character(old)
+    is.character(new)
+  })
+  obj@data[[namefield]] <- sub(old, new, obj@data[[namefield]])
+  obj
+}
+
+
+# .fixBadNames <- function(map)
+# {
+#   map$names[map$names == "Nasarawa"] <- "Nassarawa"
+#   map
+# }
 
 
 
