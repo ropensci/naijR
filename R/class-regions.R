@@ -48,7 +48,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
               call. = FALSE)
     return(new_states(states))
   }
-  stl <- .getAllStates()
+  stl <- getAllStates()
   if (!all)
     stl$fct <- NULL
   if (!is.null(gpz) && missing(states)) {
@@ -68,17 +68,33 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 
 
-
-.getAllStates <- function(named = TRUE)
+#' @importFrom magrittr %>%
+#' @importFrom magrittr %$%
+getAllStates <- function(named = TRUE)
 {
-  names <- sort(unique(lgas_nigeria$gpz))
-  ss <- sapply(names, FUN = function(x) {
-    lgas_nigeria |>
-      subset(subset = gpz == x, select = state) |>
-      unique()
+  stopifnot(
+    length(named) == 1L,
+    is.logical(named),
+    !is.na(named)
+  )
+  zones <- lgas_nigeria$gpz %>% 
+    unique %>% 
+    sort
+  ss <- sapply(zones, function(zn) {
+    lgas_nigeria %$%
+      {
+        state[gpz == zn]
+      } %>% 
+      unique
   })
+  stopifnot(!is.null(ss))
   if (!named)
-    return(sort(unname(unlist(ss))))
+    return({
+      ss %>% 
+        unlist %>% 
+        unname %>% 
+        sort
+    })
   names(ss) <- sub("\\.state", "", names(ss))
   ss
 }

@@ -47,7 +47,7 @@ is_state <- function(x)
   fctOpts <- .fctOptions()
   x %>%
     sub(fctOpts["abbrev"], fctOpts["full"], .) %>%
-    `%in%`(.getAllStates(named = FALSE)) %>%
+    `%in%`(getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
       .

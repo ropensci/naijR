@@ -453,3 +453,10 @@ test_that("Number of LGAs matches the number extracted for mapping", {
     # expect_true(all(lg %in% mplg))
   }
 })
+
+
+
+# test_that("Mapping of adjoining States", {
+#   expect_error(map_ng(lgas(c("Imo", "Abia"))), 
+#                "LGA-level maps for adjoining States are not yet supported")
+# })
