@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-globalVariables(c("lgas_nigeria", "state", "lga"))
+globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
 
 #' States of the Federal Republic of Nigeria
 #' 
