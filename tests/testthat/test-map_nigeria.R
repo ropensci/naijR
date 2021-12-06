@@ -447,3 +447,25 @@ test_that("Map LGAs together as individual blocs", {
 })
 
 
+
+test_that("Number of LGAs matches the number extracted for mapping", {
+  # This test case is created for bug fix that involved the creation
+  # of wrong LGA coordinates for Borno State -> Kagarko is included
+  for (i in states(all = FALSE)) {
+    # browser()
+    lg <- lgas(i)
+    mplg <- map_ng(lg, plot = FALSE)$names
+    
+    rgx <- .regexDuplicatedPolygons(lg)
+    expect_match(mplg, rgx)
+    # expect_true(all(mplg %in% lg))
+    # expect_true(all(lg %in% mplg))
+  }
+})
+
+
+
+# test_that("Mapping of adjoining States", {
+#   expect_error(map_ng(lgas(c("Imo", "Abia"))), 
+#                "LGA-level maps for adjoining States are not yet supported")
+# })

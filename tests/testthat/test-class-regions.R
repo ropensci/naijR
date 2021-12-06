@@ -38,8 +38,11 @@ test_that("'states' object is constructed", {
                  "One or more items is not a State. Spelling error\\?")
   expect_silent(states(c("xxx", "Benue"), warn = FALSE))
   expect_warning(states(c("kentucky", "Bornu", "Abia")))
-  expect_warning(states(c("Nasarawa", "Oyo")))
+  expect_warning(states(c("Nassarawa", "Oyo")),
+                 "One or more elements of 'states' is not an actual State")
 })
+
+
 
 
 

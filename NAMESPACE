@@ -26,7 +26,11 @@ importFrom(graphics,legend)
 importFrom(graphics,par)
 importFrom(graphics,points)
 importFrom(lifecycle,deprecate_soft)
+<<<<<<< HEAD
 importFrom(magrittr,"%<>%")
+=======
+importFrom(magrittr,"%$%")
+>>>>>>> hotfix-nass
 importFrom(magrittr,"%>%")
 importFrom(magrittr,extract)
 importFrom(maps,SpatialPolygons2map)
