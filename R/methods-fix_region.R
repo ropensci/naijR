@@ -118,9 +118,11 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## one element, if any of the elements passess the test of being an LGA
   ## then one can safely assume that the other element(s) that fail the test
   ## did so because they were misspelt. An automatic fix will then be attempted.
-  region <- if (any(is_lga(x)))
-    lgas(x, warn = FALSE)
-  else if (any(is_state(x)))
+  ## First, ignore synonymous elements i.e. those that are both States/LGAs.
+  nonSynonyms <- x[!x %in% .synonymRegions()]
+  region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
+    lgas(x, warn = FALSE)                    # to allow creation of temporary,
+  else if (any(is_state(nonSynonyms)))       # even with misspelt elements
     states(x, warn = FALSE)
   else
     stop(
