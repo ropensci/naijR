@@ -81,3 +81,37 @@ test_that("Misspelt LGA can be fixed (limited)", {
 test_that("outputs", {
   expect_invisible(fix_region(c("Fufore", "Demsa")))
 })
+
+
+
+
+test_that("regions can be fixed manually", {
+  bs <- states(c("Oyo", "Lagos", "Abya"), warn = FALSE)
+  bl <- lgas(c("Damboo", "Biu", "Hawl", "Shank", "Damboe"), warn = FALSE)
+  lag <-  "Lagos"
+  errTyp <- "The operation cannot be done on objects of type"
+  output2 <- lgas(c("Damboo", "Biu", "Hawul", "Shani", "Damboe"), warn = FALSE)
+  wrong2 <- c("Hawl", "Shank")
+  
+  expect_error(fix_region_manual(bs, lag, "Legos"),
+               "'Legos' is not a valid region")
+  for (elem in list(999L, NULL, NA, TRUE, pi))
+    expect_error(fix_region_manual(elem, lag, "Lagos"), errTyp)
+  # expect_error(fix_region_manual("TRUE", lag, "Lagos"))
+  expect_identical(fix_region_manual(bs, "Abya", "Abia"),
+                   states(c("Oyo", "Lagos", "Abia")))
+  expect_identical(fix_region_manual(bl, c("Damboo", "Damboe"), "Damboa"),
+                   lgas(c("Damboa", "Biu", "Hawl", "Shank", "Damboa"), 
+                        warn = FALSE))
+  expect_identical(fix_region_manual(bl, wrong2, c("Hawul", "Shani")), output2)
+  expect_warning(fix_region_manual(bl, wrong2, c("Hawul", "FakeLG")), 
+               "'FakeLG' is not a valid region")
+  expect_error(
+    fix_region_manual(
+      bl, 
+      c("Hawl", "shank"),         # used the wrong case in element #2
+      c("Hawul", "FakeLG")),
+    regexp = "'shank' is not an element of 'bl'"
+  )   
+  
+})

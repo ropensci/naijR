@@ -151,7 +151,7 @@ lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
   }
   else if (all(is_lga(region))) {
     lg <- region
-    region <- lgas_nigeria$state[lgas_nigeria$lga == lg]
+    region <- unique(lgas_nigeria$state[lgas_nigeria$lga %in% lg])
     if ((numSt <- length(region)) > 1L)
       warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
     lg

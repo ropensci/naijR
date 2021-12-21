@@ -86,6 +86,15 @@ is_lga <- function(x)
 
 
 
+assertRegion <- function(x) {
+  if (!is_state(x) && !is_lga(x))
+    stop(sQuote(x, q = FALSE), " is not a valid region")
+  x
+}
+
+
+
+
 
 .getAllStates <- function(named = TRUE)
 {

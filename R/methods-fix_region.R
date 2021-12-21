@@ -319,21 +319,45 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-
+#' Fix Spelling of Regions Manually
+#' 
+#' Enable users to interactively and directly change to spelling of States
+#' and/or Local Government Areas (LGAs)
+#' 
+#' @param x The object to be modified
+#' @param wrong The misspelt element(s) of \code{x}.
+#' @param correct The correction that is to be applied to the misspelt element(s)
+#' 
+#' @export
 fix_region_manual <- function(x, wrong, correct)
 {
-  if (!(inherits(x, "states") || inherits(x, "lgas"))) {
+  arg <- substitute(x)
+  if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
     if (!is.character(x))
-      stop("Operation cannot be done on objects of type ", sQuote(typeof(x)))
+      stop("The operation cannot be done on objects of type ", sQuote(typeof(x)))
   }
   if ((length(wrong) != length(correct)) && length(correct) > 1L)
     stop("Substitutions must be single or the same number as targetted fixes")
   if (length(correct) == 1L) {
+    correct <- assertRegion(correct)
     x[x %in% wrong] <- correct
-    # warning???
     return(x)
   }
-  for (i in seq_along(wrong))
-    x[x %in% wrong[i]] <- correct[i]
+  
+  ## In the loop, we will allow exception handling so that execution is
+  ## not made clunky when multiple corrections are attempted at once.
+  for (i in seq_along(wrong)) {
+    iCorrect <- correct[i]
+    iWrong <- wrong[i]
+    if (!match(iWrong, x, nomatch = 0))
+      stop(sQuote(iWrong, q = FALSE),
+           " is not an element of ",
+           sQuote(arg, q = FALSE))
+    tryCatch({
+      iCorrect <- assertRegion(iCorrect)
+      x[x %in% iWrong] <- iCorrect
+    }, error = function(e) warning(conditionMessage(e), call. = FALSE))
+  }
+  # TODO: Apply a correctness check and warn if mistakes remain?
   x
 }
