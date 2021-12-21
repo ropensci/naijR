@@ -5,7 +5,7 @@
 \alias{lgas_ng}
 \title{List Local Government Areas}
 \usage{
-lgas(region = NA_character_, warn = TRUE, strict = FALSE)
+lgas(region = NA_character_, strict = FALSE, warn = TRUE)
 
 lgas_ng(state = NA_character_)
 }
@@ -17,11 +17,11 @@ behaviour is to use the State as a basis for selecting the LGAs. This
 can be modified with \code{strict}. The default value is 
 \code{NA_character_} and will return all 774 LGAs.}
 
-\item{warn}{logical; issue a warning when one or more elements are not
-actually Local Government Areas (or were misspelt).}
-
 \item{strict}{logical; in the event of a name clash between State/LGA, 
 return only the specified LGA when this argument is set to \code{TRUE}.}
+
+\item{warn}{logical; issue a warning when one or more elements are not
+actually Local Government Areas (or were misspelt).}
 
 \item{state}{Character; State(s) in the Federation of Nigeria. Default is
 \code{NA_character_}.}

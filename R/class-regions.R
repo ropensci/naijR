@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-globalVariables(c("lgas_nigeria", "state", "lga"))
+globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
 
 #' States of the Federal Republic of Nigeria
 #' 
@@ -47,7 +47,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
       warning(.warnSpelling('state'), call. = FALSE)
     return(new_states(states))
   }
-  stl <- .getAllStates()
+  stl <- getAllStates()
   if (!all)
     stl$fct <- NULL
   if (!is.null(gpz) && missing(states)) {
@@ -72,6 +72,40 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
   txt <- switch(region.type, state = "a State", lga = "an LGA")
   sprintf("One or more items is not %s. Spelling error?", txt)
 }
+
+
+
+#' @importFrom magrittr %>%
+#' @importFrom magrittr %$%
+getAllStates <- function(named = TRUE)
+{
+  stopifnot(
+    length(named) == 1L,
+    is.logical(named),
+    !is.na(named)
+  )
+  zones <- lgas_nigeria$gpz %>% 
+    unique %>% 
+    sort
+  ss <- sapply(zones, function(zn) {
+    lgas_nigeria %$%
+      {
+        state[gpz == zn]
+      } %>% 
+      unique
+  })
+  stopifnot(!is.null(ss))
+  if (!named)
+    return({
+      ss %>% 
+        unlist %>% 
+        unname %>% 
+        sort
+    })
+  names(ss) <- sub("\\.state", "", names(ss))
+  ss
+}
+
 
 
 
@@ -102,10 +136,10 @@ new_states <- function(ss)
 #' behaviour is to use the State as a basis for selecting the LGAs. This
 #' can be modified with \code{strict}. The default value is 
 #' \code{NA_character_} and will return all 774 LGAs.
-#' @param warn logical; issue a warning when one or more elements are not
-#' actually Local Government Areas (or were misspelt).
 #' @param strict logical; in the event of a name clash between State/LGA, 
 #' return only the specified LGA when this argument is set to \code{TRUE}.
+#' @param warn logical; issue a warning when one or more elements are not
+#' actually Local Government Areas (or were misspelt).
 #' 
 #' @note There are six (6) LGAs that share names with their State - Bauchi, 
 #' Ebonyi, Gombe, Katsina, Kogi and Ekiti.
@@ -128,7 +162,7 @@ new_states <- function(ss)
 #' @importFrom utils data
 #'
 #' @export
-lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
+lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
   if (!is.character(region))
     stop("Expected an object of type 'character'")
@@ -141,7 +175,7 @@ lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
       subset(
         lgas_nigeria,
         state %in% s,
-        select = lga,  # TODO: Refactor
+        select = lga,
         drop = TRUE
       ))
     names(sl) <- region
@@ -334,7 +368,8 @@ as_lga <- function(x) {
     is_state %>% 
     which %>% 
     extract(ll, .) %>% 
-    unclass
+    unclass %>% 
+    unique       # because Nasarawa exists in 2 different States
 }
 
 
@@ -455,16 +490,16 @@ tail.regions <- function(x, ...)
 
 # TODO: Export this function in next release
 #' @importFrom utils menu
-focus_lga_on_state <- function(lga, state = NULL)
+disambiguate <- function(x, parent = NULL)
 {
-  if (!inherits(lga, "lgas"))
+  if (!inherits(x, "lgas"))
     stop("Expected an object of class 'lgas'")
-  if (length(lga) > 1L)
-    stop("Focusing is performed only for single LGA objects")
-  ss <- attr(lga, "State")
-  if (is.null(state)) {
-    state <- ss[menu(ss, title = "Which State does this LGA belong to?")]
+  if (length(x) > 1L)
+    stop("Disambiguation is done only for single-length objects")
+  ss <- attr(x, "State")
+  if (is.null(parent)) {
+    parent <- ss[menu(ss, title = "Which State does this LGA belong to?")]
   }
-  attr(lga, "State") <- state
-  lga
+  attr(x, "State") <- parent
+  x
 }

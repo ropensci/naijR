@@ -47,7 +47,7 @@ is_state <- function(x)
   fctOpts <- .fctOptions()
   x %>%
     sub(fctOpts["abbrev"], fctOpts["full"], .) %>%
-    `%in%`(.getAllStates(named = FALSE)) %>%
+    `%in%`(getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA
       .
@@ -90,27 +90,4 @@ assertRegion <- function(x) {
   if (!is_state(x) && !is_lga(x))
     stop(sQuote(x, q = FALSE), " is not a valid region")
   x
-}
-
-
-
-
-
-.getAllStates <- function(named = TRUE)
-{
-  names <- if (named)
-    c('nc', 'ne', 'nw', 'se', 'ss', 'sw', 'fct')
-  ss <- structure(list(
-    c("Benue", "Kogi", "Kwara", "Nassarawa", "Niger", "Plateau"),
-    c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
-    c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
-    c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
-    c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
-    c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
-    c("Federal Capital Territory")
-  ),
-  names = names)
-  if (!named)
-    return(unlist(ss))
-  ss
 }

@@ -142,6 +142,16 @@ test_that("State/LGA synonyms are discernible", {
     expect_true(is_lga(i))
     expect_true(is_state(states(i)))
     expect_true(all(is_lga(lgas(i))))
-    expect_true(is_lga(lgas(i, strict = TRUE)))
+    expect_true(suppressWarnings(is_lga(lgas(i, strict = TRUE))))
   }
+})
+
+
+test_that("Warnings on multiple LGAs", {
+  nas <- "Nasarawa"
+  wrn <- "The LGA 'Nasarawa' is found in 2 States"
+  
+  expect_silent(lgas(nas))
+  expect_warning(lgas(nas, strict = TRUE), wrn)
+  expect_warning(lgas(nas, strict = TRUE, warn = FALSE), wrn)
 })

@@ -10,7 +10,7 @@ An R package on Nigeria and for Nigeria
 [![CRAN
 status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/package=naijR)
 [![Codecov test
-coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://codecov.io/gh/BroVic/naijR?branch=master)
+coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/BroVic/naijR?branch=master)
 [![R build
 status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
 [![Lifecycle:

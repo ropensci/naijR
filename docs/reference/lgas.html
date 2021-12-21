@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
     <p>List Local Government Areas</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lgas</span><span class='op'>(</span>region <span class='op'>=</span> <span class='cn'>NA_character_</span>, warn <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>lgas</span><span class='op'>(</span>region <span class='op'>=</span> <span class='cn'>NA_character_</span>, warn <span class='op'>=</span> <span class='cn'>TRUE</span>, strict <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
 <span class='fu'>lgas_ng</span><span class='op'>(</span>state <span class='op'>=</span> <span class='cn'>NA_character_</span><span class='op'>)</span></pre>
 
@@ -159,13 +159,22 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>region</th>
-      <td><p>Character; State(s) in the Federation of Nigeria. Default is
-<code>NA_character_</code>.</p></td>
+      <td><p>Context-dependent. Either State(s) of the Federation 
+or Local Government Area(s) - internal checks are performed to determine
+what applies. In cases where States are synonymous to LGAs, the default 
+behaviour is to use the State as a basis for selecting the LGAs. This
+can be modified with <code>strict</code>. The default value is 
+<code>NA_character_</code> and will return all 774 LGAs.</p></td>
     </tr>
     <tr>
       <th>warn</th>
       <td><p>logical; issue a warning when one or more elements are not
 actually Local Government Areas (or were misspelt).</p></td>
+    </tr>
+    <tr>
+      <th>strict</th>
+      <td><p>logical; in the event of a name clash between State/LGA, 
+return only the specified LGA when this argument is set to <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>state</th>
@@ -177,11 +186,13 @@ actually Local Government Areas (or were misspelt).</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>If length of <code>ng.state</code> == 1L, a character vector containing 
-the names of Local Government Areas; otherwise a named list whose elements 
+the names of Local Government Areas; otherwise a named list, whose elements 
 are character vectors of the LGAs in each state.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p><code>lga_ng</code> stands deprecated and will be removed in the next minor
+    <p>There are six (6) LGAs that share names with their State - Bauchi, 
+Ebonyi, Gombe, Katsina, Kogi and Ekiti.</p>
+<p><code>lga_ng</code> stands deprecated and will be removed in the next minor
 version. New code should use <code>lgas</code> instead.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
