@@ -82,3 +82,12 @@ is_lga <- function(x)
   x %in% lgas()
 }
 
+
+
+
+
+assertRegion <- function(x) {
+  if (!is_state(x) && !is_lga(x))
+    stop(sQuote(x, q = FALSE), " is not a valid region")
+  x
+}

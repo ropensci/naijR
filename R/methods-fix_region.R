@@ -8,6 +8,14 @@
 #' the atomic vector is of type \code{character}. It does not test any missing
 #' values in the vector, leaving them untouched.
 #' 
+#' @note When passed a character vector of length \code{1L}, in the case of a
+#' misspelt LGA, the function signals an error; the presumption is that a fix
+#' can readily be applied interactively. When all the items provided are 
+#' misspelt, nothing happens, but the user is advised to use the appropriate
+#' constructor function so as to improve the accuracy of the repairs. When
+#' there is a mix of misspelt and properly spelt LGAs, other functionalities
+#' for fixing the mistakes are available via mode \code{interactive}.
+#' 
 #' @param x An S3 object of class \code{states} or \code{lgas}. For 
 #' \code{fix_region.default}, a character vector can be passed but only
 #' that for States will be interpretable.
@@ -37,13 +45,13 @@ fix_region.states <- function(x, ...)
     i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
     i_full <- grep(fullFCT, x)
   }
-  i <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
+  iFct <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
   ss <- states()
-  if (length(i)) 
+  if (length(iFct)) 
     ss <- sub(fullFCT, abbrFCT, ss)
   
   x <- .fixRegionInternal(x, ss)
-  x[i] <- fullFCT
+  x[iFct] <- fullFCT
   attributes(x) <- NULL
   x <- states(x, warn = FALSE)
   invisible(x)
@@ -60,6 +68,10 @@ fix_region.states <- function(x, ...)
 #' options.
 #' @param quietly Logical; default argument is \code{FALSE}.
 #' 
+#' @examples 
+#' try(fix_region("Owerri north")) # ERROR
+#' fix_region(c("Owerri north", "Owerri West"))
+#' 
 #' @export
 fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
@@ -71,7 +83,6 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   }
   if (!quietly)
     .reportOnFixes(vals)
-  attributes(vals) <- NULL
   invisible(vals)
 }
 
@@ -79,7 +90,12 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-
+## Sometimes the States/LGAs will be supplied as ordinary character vectors
+## For this case, this method tries to do some kind of sorting, determining
+## which kind of region the input represents i.e. States or LGAs. Once this
+## is determined, the appropriate constructor (`states()` or `lgas()`, 
+## respectively) will be applied and from there the appropriate method is 
+## called internally to attempt to fix the input.
 #' @rdname fix_region
 #' @importFrom magrittr %>%
 #' 
@@ -97,18 +113,29 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     warning("'x' has length 0L or only missing values", call. = FALSE)
     return(x)
   }
-  region <- if (any(is_lga(x)) && (!any(x %in% .synonymRegions())))
-    suppressWarnings(lgas(x))
+  
+  ## For the LGAs case, the expectation is that in a vector with more than
+  ## one element, if any of the elements passess the test of being an LGA
+  ## then one can safely assume that the other element(s) that fail the test
+  ## did so because they were misspelt. An automatic fix will then be attempted.
+  ## First, ignore synonymous elements i.e. those that are both States/LGAs.
+  nonSynonyms <- x[!x %in% .synonymRegions()]
+  region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
+    lgas(x, warn = FALSE)                    # to allow creation of temporary,
+  else if (any(is_state(nonSynonyms)))       # even with misspelt elements
+    states(x, warn = FALSE)
   else
-    suppressWarnings(states(x))
-  zz <- region %>% 
-    fix_region %>% 
-    as.character
-  message(
-    paste("Consider reconstructing 'x' with",
-          "`states()` or `lgas()` for a more reliable fix")
-  )
-  zz
+    stop(
+      paste(
+        "Incorrect region name(s);",
+        "consider reconstructing 'x' with",
+        "`states()` or `lgas()` for a more reliable fix"
+      ),
+      call. = FALSE
+    )
+  zz <- region %>% fix_region %>% as.character
+  
+  invisible(zz)
 }
 
 
@@ -138,7 +165,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     if (!is.na(match(str, regions)))
       return(str)
     if (inherits(regions, "states")) {
-      if (agrepl(str, abbrFCT, max.distance = 2)
+      if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
           && identical(toupper(str), abbrFCT))
         return(abbrFCT)
     }
@@ -215,18 +242,18 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   badspell <- ATTR_$misspelt
   hasBadspell <- !identical(badspell, character(0))
   if (hasBadspell) {
-    msg1 <- .messageHeader("Fix(es) not applied")
-    x <- sapply(badspell, function(x) paste("*", x))
-    message(msg1, paste(x, sep = "\n"))
+    hdr1 <- .messageHeader("Fix(es) not applied")
+    x <- sapply(badspell, function(x) paste0("* ", x, "\n"))
+    message(hdr1, paste0(x), appendLF = FALSE)
   }
   fixes <- ATTR_$regions.fixed
   if (!identical(fixes, character(0))) {
     if (hasBadspell)
       message("")    # just add newline
-    msg2 <- .messageHeader("Successful fix(es)")
+    hdr2 <- .messageHeader("Successful fix(es)")
     x <- 
       mapply(function(a, b) sprintf("* %s => %s\n", a, b), names(fixes), fixes)
-    message(msg2, paste(x, sep = '\n'))
+    message(hdr2, paste0(x), appendLF = FALSE)
   }
 }
 
@@ -248,22 +275,26 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## is generated by `.fixRegionInternal` and has an attribute called `misspelt`,
 ## which is the collection of names needing repair.
 #' @importFrom utils menu
+#' @importFrom magrittr %<>%
 .fixLgasInteractively <- function(lga.list)
 {
   stopifnot(interactive())
   allLgas <- lgas()
   opt <- NA
-  retry <- "Retry"
-  quit <- "Quit"
-  skip <- "Skip"
+  retry <- "RETRY"
+  quit <- "QUIT"
+  skip <- "SKIP"
   skipped <- character()
   bad.values <- attr(lga.list, "misspelt")
-  for (i in bad.values) {
-    message("Fixing ", sQuote(i))
+  for (bad in bad.values) {
+    message("Fixing ", sQuote(bad))
     repeat {
       choices <- readline("Search pattern: ") %>% 
-        grep(allLgas, value = TRUE, ignore.case = TRUE) %>% 
-        c(retry, skip, quit)
+        {
+          rs <- grep(., allLgas, value = TRUE, ignore.case = TRUE)
+          c(retry, skip, quit, rs)
+        }
+       
       opt <- menu(choices, FALSE, "Select the LGA")
       chosen <- choices[opt]
       if (chosen != retry)
@@ -272,10 +303,15 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     if (chosen == quit)
       break
     if (chosen == skip) {
-      skipped <- c(skipped, i)
+      skipped <- c(skipped, bad)
       next
     }
-    lga.list <- sub(i, chosen, lga.list)
+    lga.list <- sub(bad, chosen, lga.list)
+    attr(lga.list, "misspelt") <- bad.values[bad.values != bad]
+    attr(lga.list, "regions.fixed") %<>% 
+    {
+      structure(c(., chosen), names = c(names(.), bad))
+    }
   }
   if (length(skipped))
     warning("The following items were skipped and should be fixed manually: ",
@@ -295,11 +331,45 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-
-.fixRegionsManually <- function(wrong, correct, src)
+#' Fix Spelling of Regions Manually
+#' 
+#' Enable users to interactively and directly change to spelling of States
+#' and/or Local Government Areas (LGAs)
+#' 
+#' @param x The object to be modified
+#' @param wrong The misspelt element(s) of \code{x}.
+#' @param correct The correction that is to be applied to the misspelt element(s)
+#' 
+#' @export
+fix_region_manual <- function(x, wrong, correct)
 {
-  patterns <- paste0("^", wrong, "$")
-  wrongIndexed <- vapply(patterns, grep, integer(1), x = src)
-  src[wrongIndexed] <- correct
-  src
+  arg <- substitute(x)
+  if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
+    if (!is.character(x))
+      stop("The operation cannot be done on objects of type ", sQuote(typeof(x)))
+  }
+  if ((length(wrong) != length(correct)) && length(correct) > 1L)
+    stop("Substitutions must be single or the same number as targetted fixes")
+  if (length(correct) == 1L) {
+    correct <- assertRegion(correct)
+    x[x %in% wrong] <- correct
+    return(x)
+  }
+  
+  ## In the loop, we will allow exception handling so that execution is
+  ## not made clunky when multiple corrections are attempted at once.
+  for (i in seq_along(wrong)) {
+    iCorrect <- correct[i]
+    iWrong <- wrong[i]
+    if (!match(iWrong, x, nomatch = 0))
+      stop(sQuote(iWrong, q = FALSE),
+           " is not an element of ",
+           sQuote(arg, q = FALSE))
+    tryCatch({
+      iCorrect <- assertRegion(iCorrect)
+      x[x %in% iWrong] <- iCorrect
+    }, error = function(e) warning(conditionMessage(e), call. = FALSE))
+  }
+  # TODO: Apply a correctness check and warn if mistakes remain?
+  x
 }

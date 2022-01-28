@@ -41,3 +41,17 @@ determine if State or LGA names have been wrongly entered. This presupposes that
 the atomic vector is of type \code{character}. It does not test any missing
 values in the vector, leaving them untouched.
 }
+\note{
+When passed a character vector of length \code{1L}, in the case of a
+misspelt LGA, the function signals an error; the presumption is that a fix
+can readily be applied interactively. When all the items provided are 
+misspelt, nothing happens, but the user is advised to use the appropriate
+constructor function so as to improve the accuracy of the repairs. When
+there is a mix of misspelt and properly spelt LGAs, other functionalities
+for fixing the mistakes are available via mode \code{interactive}.
+}
+\examples{
+try(fix_region("Owerri north")) # ERROR
+fix_region(c("Owerri north", "Owerri West"))
+
+}

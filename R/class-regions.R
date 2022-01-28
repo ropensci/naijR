@@ -44,8 +44,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
   stopifnot(is.logical(all))
   if (!missing(states) && is.character(states)) {
     if (warn && !all(is_state(states)))
-      warning("One or more elements of 'states' is not an actual State",
-              call. = FALSE)
+      warning(.warnSpelling('state'), call. = FALSE)
     return(new_states(states))
   }
   stl <- getAllStates()
@@ -65,6 +64,14 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 }
 
 
+
+
+## Provides some uniformity in the messaging b/w States & LGAs
+.warnSpelling <- function(region.type) {
+  region.type <- match.arg(region.type, c("state", "lga"))
+  txt <- switch(region.type, state = "a State", lga = "an LGA")
+  sprintf("One or more items is not %s. Spelling error?", txt)
+}
 
 
 
@@ -129,10 +136,10 @@ new_states <- function(ss)
 #' behaviour is to use the State as a basis for selecting the LGAs. This
 #' can be modified with \code{strict}. The default value is 
 #' \code{NA_character_} and will return all 774 LGAs.
-#' @param warn logical; issue a warning when one or more elements are not
-#' actually Local Government Areas (or were misspelt).
 #' @param strict logical; in the event of a name clash between State/LGA, 
 #' return only the specified LGA when this argument is set to \code{TRUE}.
+#' @param warn logical; issue a warning when one or more elements are not
+#' actually Local Government Areas (or were misspelt).
 #' 
 #' @note There are six (6) LGAs that share names with their State - Bauchi, 
 #' Ebonyi, Gombe, Katsina, Kogi and Ekiti.
@@ -155,10 +162,12 @@ new_states <- function(ss)
 #' @importFrom utils data
 #'
 #' @export
-lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
+lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
   if (!is.character(region))
     stop("Expected an object of type 'character'")
+  if (strict && !any(region %in% .synonymRegions()))
+    stop("strict can only be set to TRUE where State/LGA syonnyms exist")
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
   lst <- if (all(is_state(region)) && !strict) {
@@ -166,7 +175,7 @@ lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
       subset(
         lgas_nigeria,
         state %in% s,
-        select = lga,  # TODO: Refactor
+        select = lga,
         drop = TRUE
       ))
     names(sl) <- region
@@ -174,24 +183,65 @@ lgas <- function(region = NA_character_, warn = TRUE, strict = FALSE) {
       sl <- unname(unlist(sl))
     sl
   }
-  else if (any(areLgas <- is_lga(region))) {
-    if (warn && !all(areLgas))
-      warning("One or more elements is not an LGA")
+  else if (all(is_lga(region))) {
+    lg <- region
+    region <- unique(lgas_nigeria$state[lgas_nigeria$lga %in% lg])
+    if ((numSt <- length(region)) > 1L)
+      warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
+    lg
+  }
+  else if (.hasMisspeltLgas(region)) { 
+    if (warn)
+      warning(.warnSpelling('lga'), call. = FALSE)
     ret <- region
     region <- as.null(region)  # set to NULL b/c of attribute in final output
     ret
   }
-  else  # TODO: remove this condition?
-    stop("One or more elements is not a valid LGA in Nigeria")
+  else if (.hasNonLgaAll(region))
+    stop("None of the items is a valid LGA")
   structure(new_lgas(lst), State = region)
 }
 
 
+.hasNonLgaMixed <- function(x) {
+  stopifnot(is.character(x))
+  matches <- .boolPartialLgaMatches(x)
+  if (.hasNonLgaAll(x))
+    return(FALSE)
+  sum(matches) < length(x)
+}
+
+.hasNonLgaAll <- function(x) {
+  stopifnot(is.character(x))
+  sum(.boolPartialLgaMatches(x)) == 0L
+}
+
+.hasMisspeltLgas <- function(x) {
+  stopifnot(is.character(x))
+  matches <- .boolExactLgaMatches(x)
+  if (.hasNonLgaAll(x))
+    return(FALSE)
+  sum(matches) < length(x)
+}
+
+.boolExactLgaMatches <- function(x) {
+  stopifnot(is.character(x))
+  grepl(.lgaRegex(x), lgas())
+}
 
 
+.boolPartialLgaMatches <- function(x) {
+  stopifnot(is.character(x))
+  agrepl(.lgaRegex(x),
+         lgas(),
+         fixed = FALSE,
+         max.distance = .pkgLevDistance())
+}
 
-
-
+.lgaRegex <- function(x) {
+  stopifnot(is.character(x))
+  paste0("^", paste(x, collapse = "|"), "$")
+}
 
 # Low-level S3 constructor for lgas object
 new_lgas <- function(x)
@@ -308,7 +358,7 @@ as_lga <- function(x) {
 
 
 ## Returns those LGAs that share names with their State
-## e.g. Bauchi, Oyo
+## e.g. Bauchi, Ekiti
 #' @importFrom magrittr %>%
 #' @importFrom magrittr extract
 .synonymRegions <- function()
@@ -365,16 +415,24 @@ print.regions <- function(x, ...) {
   st <- "States"
   lg <- "LGAs"
   hdr <- if (length(x) > 1L) {
-    if (all(is_state(x))) st else lg
+    if (all(is_state(x)) || inherits(x, "states"))
+      st
+    else
+      lg
   }
   else {
-    if (inherits(x, "lgas")) lg else st
+    if (inherits(x, "lgas"))
+      lg
+    else
+      st
   }
   underline <- strrep("-", nchar(hdr))
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
   cat(paste("*", x, collapse = newline), "\n")
 }
+
+
 
 
 
@@ -425,4 +483,23 @@ tail.regions <- function(x, ...)
     states(m)
   else
     lgas(m)
+}
+
+
+
+
+# TODO: Export this function in next release
+#' @importFrom utils menu
+disambiguate <- function(x, parent = NULL)
+{
+  if (!inherits(x, "lgas"))
+    stop("Expected an object of class 'lgas'")
+  if (length(x) > 1L)
+    stop("Disambiguation is done only for single-length objects")
+  ss <- attr(x, "State")
+  if (is.null(parent)) {
+    parent <- ss[menu(ss, title = "Which State does this LGA belong to?")]
+  }
+  attr(x, "State") <- parent
+  x
 }

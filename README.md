@@ -26,9 +26,10 @@ related to Nigeria.
 
 #### Maps
 
-A major feature of this version of the packages is the introduction of
-various map drawing capabilities. To find out more about this, read the
-vignette. It can be accessed from within R with this line of code:
+One of the useful aspects of this package is enabling users to plot
+country and sub-national geo-spatial maps. Currently, only vector-type
+graphics are supported. To find out more, read the vignette–accessible
+from within R as follows:
 
 ``` r
 vignette('nigeria-maps', 'naijR')

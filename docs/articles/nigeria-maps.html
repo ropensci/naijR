@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -67,6 +67,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/interactive.html">Approach to Correcting Misspelt Local Government Areas</a>
+    </li>
+    <li>
       <a href="../articles/nigeria-maps.html">nigeria-maps</a>
     </li>
   </ul>
@@ -97,7 +100,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>nigeria-maps</h1>
             
-            <h4 class="date">2021-11-05</h4>
+            <h4 class="date">2021-12-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/master/vignettes/nigeria-maps.Rmd"><code>vignettes/nigeria-maps.Rmd</code></a></small>
       <div class="hidden name"><code>nigeria-maps.Rmd</code></div>
@@ -150,10 +153,10 @@
 <span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">ss</span>, var <span class="op">=</span> <span class="va">vv</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">dd</span><span class="op">)</span>
 <span class="co">#&gt;       state var</span>
-<span class="co">#&gt; 1      Abia   B</span>
-<span class="co">#&gt; 2   Adamawa   E</span>
-<span class="co">#&gt; 3 Akwa Ibom   E</span>
-<span class="co">#&gt; 4   Anambra   E</span>
+<span class="co">#&gt; 1      Abia   E</span>
+<span class="co">#&gt; 2   Adamawa   C</span>
+<span class="co">#&gt; 3 Akwa Ibom   B</span>
+<span class="co">#&gt; 4   Anambra   D</span>
 <span class="co">#&gt; 5    Bauchi   A</span>
 <span class="co">#&gt; 6   Bayelsa   B</span></code></pre></div>
 <div id="using-a-data-frame" class="section level3">
@@ -165,7 +168,7 @@
 <p><img src="nigeria-maps_files/figure-html/df-approach-1.png" width="700"></p>
 <p>Note the following:</p>
 <ul>
-<li>The argument <code>var</code> is the name of the column of our data frame that has the variable to be mapped. It is found via the mechanism called <em>quasiquotation</em>; to explore this further see <code><a href="https://rlang.r-lib.org/reference/nse-force.html">?rlang::quasiquotation</a></code>.</li>
+<li>The argument <code>var</code> is the name of the column of our data frame that has the variable to be mapped. It is found via the mechanism called <em>quasiquotation</em>; to explore this further see <code><a href="https://rdrr.io/pkg/rlang/man/nse-force.html">?rlang::quasiquotation</a></code>.</li>
 <li>The colours darken sequentially from A through E and it follows the natural (alphabetical) ordering of the factor levels (i.e. category labels). To control this order upfront, create an <strong>ordered factor</strong> using any the various ways available in R. (See <code><a href="https://rdrr.io/r/base/factor.html">?ordered</a></code>)</li>
 <li>Our variable <code>var</code> is actually a character vector, but internally is converted to a factor.</li>
 </ul>

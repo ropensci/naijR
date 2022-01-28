@@ -414,10 +414,18 @@ test_that("All LGAs within a given State are drawn", {
     expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
 })
 
+
 test_that("All individual LGA maps can be drawn", {
-  lgas <- lgas()
-  for (x in lgas)
-    expect_s3_class(map_ng(lgas(x), plot = FALSE), "map")
+  for (s in states()) {
+    lgs <- lgas(s)
+    for (lg in lgs) {
+      x <- suppressWarnings(lgas(lg))
+      state <- attr(x, "State")
+      if (length(state) > 1L)
+        x <- disambiguate(x, parent = s)
+      expect_s3_class(map_ng(x, plot = FALSE), "map")
+    }
+  }
 })
 
 
@@ -437,6 +445,7 @@ test_that("Map LGAs together as individual blocs", {
   expect_false(inherits(val, "try-error"))
   expect_true(file.exists(testMap))
 })
+
 
 
 test_that("Number of LGAs matches the number extracted for mapping", {

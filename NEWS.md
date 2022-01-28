@@ -1,3 +1,10 @@
+# naijR 0.4.0
+* Introduce the ability to 'manually' fix names of States or LGAs.
+* Update the documentation with a new vignette.
+
+# naijR 0.3.4
+* Fixed package-wide misuse of the word _Nasarawa_.
+
 # naijR 0.3.3
 * Fixed repetitions in the output when multiple LGAs' spellings are corrected.
 

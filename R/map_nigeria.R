@@ -841,7 +841,7 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 
 
 .fetchNamefield.states <- function(x, dt) {
-  dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
+  # dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
   nmfld <- NA
   for (i in seq_len(ncol(dt))) {
     if (all(x %in% dt[[i]])) {   # all MUST be states
