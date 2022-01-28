@@ -90,7 +90,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
       </span>
     </div>
 
@@ -112,6 +112,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/interactive.html">Approach to Correcting Misspelt Local Government Areas</a>
+    </li>
     <li>
       <a href="../articles/nigeria-maps.html">nigeria-maps</a>
     </li>
@@ -196,7 +199,21 @@ returned unchanged.</p>
 determine if State or LGA names have been wrongly entered. This presupposes that
 the atomic vector is of type <code>character</code>. It does not test any missing
 values in the vector, leaving them untouched.</p>
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
+    <p>When passed a character vector of length <code>1L</code>, in the case of a
+misspelt LGA, the function signals an error; the presumption is that a fix
+can readily be applied interactively. When all the items provided are 
+misspelt, nothing happens, but the user is advised to use the appropriate
+constructor function so as to improve the accuracy of the repairs. When
+there is a mix of misspelt and properly spelt LGAs, other functionalities
+for fixing the mistakes are available via mode <code>interactive</code>.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'>fix_region</span><span class='op'>(</span><span class='st'>"Owerri north"</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># ERROR</span>
+</div><div class='output co'>#&gt; <span class='message'>Consider reconstructing 'x' with `states()` or `lgas()` for a more reliable fix</span></div><div class='output co'>#&gt; [1] "Owerri north"</div><div class='input'><span class='fu'>fix_region</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Owerri north"</span>, <span class='st'>"Owerri West"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Consider reconstructing 'x' with `states()` or `lgas()` for a more reliable fix</span></div><div class='output co'>#&gt; [1] "Owerri North" "Owerri West" </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
