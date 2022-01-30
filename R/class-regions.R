@@ -84,6 +84,7 @@ getAllStates <- function(named = TRUE)
     is.logical(named),
     !is.na(named)
   )
+  data("lgas_nigeria", package = "naijR", envir = environment())
   zones <- lgas_nigeria$gpz %>% 
     unique %>% 
     sort
