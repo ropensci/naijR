@@ -68,9 +68,10 @@ globalVariables(c(".", "STATE"))
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
-#' of class \code{data.frame}. Columns containing States are identified. The
-#' argument also provides context for quasiquotation when providing the 
-#' \code{x} and \code{y} arguments.
+#' of class \code{data.frame}. Columns containing regions (i.e. States as well as
+#' supported sub-national jurisdictions) are identified. The argument also
+#' provides context for quasiquotation when providing the \code{x} and
+#' \code{y} arguments.
 #' 
 #' For \code{x} and \code{y}, when both arguments are supplied, they are taken
 #' to be point coordinates, where \code{x} represent longitude and \code{y}
@@ -88,7 +89,7 @@ globalVariables(c(".", "STATE"))
 #' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
-#' \code{RColorBrewer::display.brewer.all}
+#' \code{RColorBrewer::display.brewer.all}.
 #'
 #' @examples
 #' \dontrun{

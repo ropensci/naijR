@@ -465,6 +465,56 @@ test_that("Number of LGAs matches the number extracted for mapping", {
 
 
 
+
+test_that("Choropleth map can be formed with excluded regions", {
+  # Issue #27
+  mapClass <- "map"
+  colpal <- "YlOrRd"
+  excluded.reg <- c("Abia", "Jigawa")
+  green <- "green"
+  d <- data.frame(state = states(),
+                  total = sample(LETTERS[1:4], 37, TRUE))
+  
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      plot = FALSE
+    ),
+    mapClass
+  )
+  
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = green,
+      plot = FALSE
+    ),
+    mapClass
+  )
+  
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = green,
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    mapClass
+  )
+})
+
+
+
+
 # test_that("Mapping of adjoining States", {
 #   expect_error(map_ng(lgas(c("Imo", "Abia"))), 
 #                "LGA-level maps for adjoining States are not yet supported")
