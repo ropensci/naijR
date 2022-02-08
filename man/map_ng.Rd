@@ -97,7 +97,7 @@ available colour options can be checked with
 When adjusting the default colour choices for choropleth maps, it is
 advisable to use one of the sequential palettes. For a list of of available
 palettes, especially for more advanced use, review 
-\code{RColorBrewer::display.brewer.all}
+\code{RColorBrewer::display.brewer.all}.
 }
 \examples{
 \dontrun{
