@@ -204,7 +204,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   
   v <-
     vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
-  attr(v, "misspelt") <- cant.fix
+  attr(v, "misspelt") <- sort(unique(cant.fix))
   
   ## Reduce data for reporting on fixes to only the 
   ## unique instances to avoid repetitive printouts
