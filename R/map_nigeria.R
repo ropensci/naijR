@@ -53,9 +53,12 @@ globalVariables(c(".", "STATE"))
 #' only to choropleth maps).
 #' @param categories The legend for the choropleth-plotted categories. If not 
 #' defined, internally created labels are used.
+#' @param excluded Regions to be excluded from a choropleth map.
+#' @param exclude.fill Colour-shading to be used to indicate \code{excluded}
+#' regions. Must be a vector of the same length as \code{excluded}.
 #' @param title,caption An optional string for annotating the map.
 #' @param leg.x,leg.y Numeric. Position of the legend.
-#' @param leg.title String. The legend Title
+#' @param leg.title String. The legend title.
 #' @param leg.orient The orientation of the legend i.e. whether horizontal or
 #' vertical.
 #' @param show.neighbours Logical; \code{TRUE} to display the immediate vicinity
@@ -65,9 +68,10 @@ globalVariables(c(".", "STATE"))
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
-#' of class \code{data.frame}. Columns containing States are identified. The
-#' argument also provides context for quasiquotation when providing the 
-#' \code{x} and \code{y} arguments.
+#' of class \code{data.frame}. Columns containing regions (i.e. States as well as
+#' supported sub-national jurisdictions) are identified. The argument also
+#' provides context for quasiquotation when providing the \code{x} and
+#' \code{y} arguments.
 #' 
 #' For \code{x} and \code{y}, when both arguments are supplied, they are taken
 #' to be point coordinates, where \code{x} represent longitude and \code{y}
@@ -85,7 +89,7 @@ globalVariables(c(".", "STATE"))
 #' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
-#' \code{RColorBrewer::display.brewer.all}
+#' \code{RColorBrewer::display.brewer.all}.
 #'
 #' @examples
 #' \dontrun{
@@ -105,6 +109,8 @@ map_ng <- function(region = character(),
                    y = NULL,
                    breaks = NULL,
                    categories = NULL,
+                   excluded = NULL,
+                   exclude.fill = NULL,
                    title = NULL,
                    caption = NULL,
                    show.neighbours = FALSE,
@@ -176,7 +182,8 @@ map_ng <- function(region = character(),
         breaks = breaks,
         categories = categories
       )
-    cOpts <- .prepareChoroplethOptions(database, cParams, dots$col)
+    cOpts <-
+      .prepareChoroplethOptions(database, cParams, dots$col, excluded, exclude.fill)
     mapq$col <- cOpts$colors
     lego <- match.arg(leg.orient)
     horiz <- if (identical(lego, 'vertical')) 
@@ -493,7 +500,7 @@ map_ng <- function(region = character(),
 
 #' @importFrom rlang abort
 .prepareChoroplethOptions <-
-  function(map, opts, col = NULL)
+  function(map, opts, col = NULL, ...)
   {
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
@@ -518,7 +525,7 @@ map_ng <- function(region = character(),
     mapregions <- .getUniqueStateNames(map)
     new.ind <- order(df$region, mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
-    colors <- .reassignColours(map$names, ord.df$region, ord.df$color)
+    colors <- .reassignColours(map$names, ord.df$region, ord.df$color, ...)
     list(colors = colors,
          scheme = colrange,
          bins = cats)
@@ -605,7 +612,7 @@ map_ng <- function(region = character(),
 #' @importFrom magrittr %>%
 #' @importFrom rlang abort
 #' @importFrom tools toTitleCase
-.processColouring <- function(col = NULL, n)
+.processColouring <- function(col = NULL, n, ...)
 {
   .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
   if (is.null(col))
@@ -660,15 +667,26 @@ map_ng <- function(region = character(),
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
 # properly applied to the respective regions and not recycled.
-.reassignColours <- function(names, regions, in.colours)
+.reassignColours <- 
+  function(names, all.regions, in.colours, excl.region = NULL, excl.col = NULL)
 {
-  stopifnot(is.character(names), all(is_state(regions)), .isHexColor(in.colours))
+  stopifnot(is.character(names), all(is_state(all.regions)), .isHexColor(in.colours))
   out.colours <- new.names <- rep(NA, length(names))
-  for (i in seq_along(regions)) {
-    regx <- .regexDuplicatedPolygons(regions[i])
+  for (i in seq_along(all.regions)) {
+    regx <- .regexDuplicatedPolygons(all.regions[i])
     ind <- grep(regx, names)
     out.colours[ind] <- in.colours[i]
     new.names[ind] <- sub(regx, "\\1", names[ind])[1]
+  }
+  
+  ## Take care of situations where a region is not to be part of
+  ## the choropleth and should be given an 'off-colour'
+  if (!is.null(excl.region)) {
+      off.color <- "grey"
+    if (!is.null(excl.col))
+      off.color <- excl.col
+    excluded <- match(excl.region, new.names)
+    out.colours[excluded] <- off.color
   }
   structure(out.colours, names = new.names)
 }

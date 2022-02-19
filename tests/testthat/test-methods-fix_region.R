@@ -85,9 +85,15 @@ test_that("various cases for fixing state names", {
 
 
 test_that("Misspelt LGA can be fixed (limited)", {
-  result <- fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE))
+  tar.lgas <- lgas(readRDS("data/taraba-lga.rds"), warn = FALSE)
+  fixed <- suppressWarnings(suppressMessages(fix_region(tar.lgas)))
   
-  expect_equivalent(result, c("Amuwo-Odofin", "Lagos Island"))
+  expect_length(attr(fixed, "misspelt"), 1L)
+  
+  expect_equivalent(
+    fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE)), 
+    c("Amuwo-Odofin", "Lagos Island")
+  )
   
 })
 

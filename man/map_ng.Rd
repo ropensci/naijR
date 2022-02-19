@@ -11,6 +11,8 @@ map_ng(
   y = NULL,
   breaks = NULL,
   categories = NULL,
+  excluded = NULL,
+  exclude.fill = NULL,
   title = NULL,
   caption = NULL,
   show.neighbours = FALSE,
@@ -41,6 +43,11 @@ only to choropleth maps).}
 \item{categories}{The legend for the choropleth-plotted categories. If not 
 defined, internally created labels are used.}
 
+\item{excluded}{Regions to be excluded from a choropleth map.}
+
+\item{exclude.fill}{Colour-shading to be used to indicate \code{excluded}
+regions. Must be a vector of the same length as \code{excluded}.}
+
 \item{title, caption}{An optional string for annotating the map.}
 
 \item{show.neighbours}{Logical; \code{TRUE} to display the immediate vicinity
@@ -50,7 +57,7 @@ neighbouring regions/countries.}
 
 \item{leg.x, leg.y}{Numeric. Position of the legend.}
 
-\item{leg.title}{String. The legend Title}
+\item{leg.title}{String. The legend title.}
 
 \item{leg.orient}{The orientation of the legend i.e. whether horizontal or
 vertical.}
@@ -69,9 +76,10 @@ plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 \details{
 The default value for \code{region} is to print all State boundaries.
 \code{data} enables the extraction of data for plotting from an object
-of class \code{data.frame}. Columns containing States are identified. The
-argument also provides context for quasiquotation when providing the 
-\code{x} and \code{y} arguments.
+of class \code{data.frame}. Columns containing regions (i.e. States as well as
+supported sub-national jurisdictions) are identified. The argument also
+provides context for quasiquotation when providing the \code{x} and
+\code{y} arguments.
 
 For \code{x} and \code{y}, when both arguments are supplied, they are taken
 to be point coordinates, where \code{x} represent longitude and \code{y}
@@ -90,7 +98,7 @@ available colour options can be checked with
 When adjusting the default colour choices for choropleth maps, it is
 advisable to use one of the sequential palettes. For a list of of available
 palettes, especially for more advanced use, review 
-\code{RColorBrewer::display.brewer.all}
+\code{RColorBrewer::display.brewer.all}.
 }
 \examples{
 \dontrun{
