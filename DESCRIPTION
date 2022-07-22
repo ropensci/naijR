@@ -1,10 +1,11 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.4.1.9004
-Date: 2022-02-18
+Version: 0.4.2
+Date: 2022-07-18
 Depends: 
     R (>= 3.6),
+    grDevices,
     methods,
     utils
 Imports:
@@ -34,7 +35,7 @@ Description: A set of convenience functions as well as geographical/political
 License: GPL-3
 LazyData: TRUE
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://brovic.github.io/naijR/

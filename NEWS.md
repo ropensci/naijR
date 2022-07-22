@@ -1,3 +1,10 @@
+# naijR 0.4.2
+* Improved type checking for mapping functionality and better fidelity.
+
+# naijR 0.4.1
+* Enable the exclusion of selected States from a choropleth map (#27).
+* Cleaner output for `states` and `lgas` objects.
+
 # naijR 0.4.0
 * Introduce the ability to 'manually' fix names of States or LGAs.
 * Update the documentation with a new vignette.

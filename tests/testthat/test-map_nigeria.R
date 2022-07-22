@@ -510,6 +510,48 @@ test_that("Choropleth map can be formed with excluded regions", {
     ),
     mapClass
   )
+  
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = c(green, "grey"),
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    "Non-null 'exclude.fill' must be of length 1L",
+    fixed = TRUE
+  )
+  
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = "notacolour",
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    "'exclude.fill' must be a valid colour",
+    fixed = TRUE
+  )
+  
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = 99L,
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    "'exclude.fill' must be a string",
+    fixed = TRUE
+  )
 })
 
 
@@ -519,3 +561,29 @@ test_that("Choropleth map can be formed with excluded regions", {
 #   expect_error(map_ng(lgas(c("Imo", "Abia"))), 
 #                "LGA-level maps for adjoining States are not yet supported")
 # })
+
+
+
+test_that(
+  "Mapping fails when choropleth is plotted with repetitive State levels",
+  {
+    data("esoph")
+    set.seed(87)
+    ng.esoph <-  
+      transform(esoph, state = sample(states(), nrow(esoph), TRUE))
+    
+    expect_error(map_ng(data = ng.esoph, x = agegp, plot = FALSE), 
+                 "argument lengths differ")
+    
+    # One record per State (although there are missing states)
+    ng.esoph <- ng.esoph[!duplicated(ng.esoph$state), ]
+    
+    expect_s3_class(
+      map_ng(ng.esoph$state, x = ng.esoph$agegp, plot = FALSE),
+      "map"
+    )
+    expect_s3_class(
+      map_ng(data = ng.esoph, x = agegp, plot = FALSE),
+      "map"
+    ) 
+  })

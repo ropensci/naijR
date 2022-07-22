@@ -326,10 +326,14 @@ map_ng <- function(region = character(),
 #' @import mapdata
 .getMapData.default <- function(x) 
 {
+  if (is.factor(x))
+    x <- as.character(x)
+  stopifnot(is.character(x))
   if (identical(x, 'Nigeria'))
     return("mapdata::worldHires")
-  if (x %in% .synonymRegions() || is_state(x))
-    return(.getMapData(states()))
+  if ((length(x) == 1L && (x %in% .synonymRegions()))
+      || all(is_state(x)))
+    return(.getMapData(states(x)))
   .getMapData(lgas(x))
 }
 
@@ -523,6 +527,8 @@ map_ng <- function(region = character(),
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
     mapregions <- .getUniqueStateNames(map)
+    if (nrow(df) < length(mapregions))
+      mapregions <- mapregions[mapregions %in% df$region]
     new.ind <- order(df$region, mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
     colors <- .reassignColours(map$names, ord.df$region, ord.df$color, ...)
@@ -667,10 +673,15 @@ map_ng <- function(region = character(),
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
 # properly applied to the respective regions and not recycled.
+#' @importFrom grDevices colours
 .reassignColours <- 
   function(names, all.regions, in.colours, excl.region = NULL, excl.col = NULL)
 {
-  stopifnot(is.character(names), all(is_state(all.regions)), .isHexColor(in.colours))
+  stopifnot({
+    is.character(names)
+    all(is_state(all.regions))
+    .isHexColor(in.colours)
+  })
   out.colours <- new.names <- rep(NA, length(names))
   for (i in seq_along(all.regions)) {
     regx <- .regexDuplicatedPolygons(all.regions[i])
@@ -683,8 +694,15 @@ map_ng <- function(region = character(),
   ## the choropleth and should be given an 'off-colour'
   if (!is.null(excl.region)) {
       off.color <- "grey"
-    if (!is.null(excl.col))
+    if (!is.null(excl.col)) {
+      if (length(excl.col) > 1L)
+        stop("Non-null 'exclude.fill' must be of length 1L")
+      if (!is.character(excl.col))
+        stop("'exclude.fill' must be a string")
+      if (!excl.col %in% colours())
+        stop("'exclude.fill' must be a valid colour")
       off.color <- excl.col
+    }
     excluded <- match(excl.region, new.names)
     out.colours[excluded] <- off.color
   }
