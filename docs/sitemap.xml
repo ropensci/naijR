@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://brovic.github.io/naijR/404.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/articles/interactive.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/articles/nigeria-maps.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/authors.html</loc>
+  </url>
+  <url>
     <loc>http://brovic.github.io/naijR/index.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/news/index.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/coercion.html</loc>
@@ -16,6 +37,12 @@
     <loc>http://brovic.github.io/naijR/reference/fix_region_manual.html</loc>
   </url>
   <url>
+    <loc>http://brovic.github.io/naijR/reference/fix_state.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/reference/index.html</loc>
+  </url>
+  <url>
     <loc>http://brovic.github.io/naijR/reference/is_lga.html</loc>
   </url>
   <url>
@@ -23,6 +50,9 @@
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/lgas.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/reference/lgas_ng.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/lgas_nigeria.html</loc>
@@ -35,11 +65,5 @@
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/states.html</loc>
-  </url>
-  <url>
-    <loc>http://brovic.github.io/naijR/articles/interactive.html</loc>
-  </url>
-  <url>
-    <loc>http://brovic.github.io/naijR/articles/nigeria-maps.html</loc>
   </url>
 </urlset>

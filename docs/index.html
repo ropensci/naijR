@@ -33,6 +33,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -45,23 +47,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.3</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -81,7 +77,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/BroVic/naijR/">
+  <a href="https://github.com/BroVic/naijR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -98,9 +94,9 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="naijr-an-r-package-on-nigeria-and-for-nigeria-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#naijr-an-r-package-on-nigeria-and-for-nigeria-" class="anchor"></a><em>naijR</em>: An R package on Nigeria and for Nigeria <img src="reference/figures/logo.png" width="100px" align="right">
+<div class="section level1">
+<div class="page-header"><h1 id="naijr-an-r-package-on-nigeria-and-for-nigeria-">
+<em>naijR</em>: An R package on Nigeria and for Nigeria <img src="reference/figures/logo.png" width="100px" align="right"><a class="anchor" aria-label="anchor" href="#naijr-an-r-package-on-nigeria-and-for-nigeria-"></a>
 </h1></div>
 <p><em>naijR</em> is an R package that contains a suite of functions that make it easier to deal with data and datasets about the country Nigeria and its constituent parts. <br></p>
 <p>Inspiration for the project is drawn from experience within real data science projects where peculiar problems are often encountered, such as:</p>
@@ -114,9 +110,9 @@
 </li>
 </ul>
 <p><em>naijR</em> brings an approach to data analysis that is tailored towards enhance the productivity of anyone working with any data that has to do with Nigeria. <br></p>
-<div id="things-that-naijr-can-do" class="section level2">
-<h2 class="hasAnchor">
-<a href="#things-that-naijr-can-do" class="anchor"></a>Things that <em>naijR</em> can do</h2>
+<div class="section level2">
+<h2 id="things-that-naijr-can-do">Things that <em>naijR</em> can do<a class="anchor" aria-label="anchor" href="#things-that-naijr-can-do"></a>
+</h2>
 <p>There are a number of things that one can to with this package. These include:</p>
 <ul>
 <li>List all the States of the Nigerian Federation or group them by geo-political zones.</li>
@@ -127,16 +123,16 @@
 </ul>
 <p><em>Additional functionality is being added and will be available in future releases</em>.</p>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting Started</h2>
+<div class="section level2">
+<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
 <p>The easiest way to start using this package is within an active R session by running</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'naijR'</span><span class="op">)</span></code></pre></div>
-<p><br> This will install the <strong>stable version</strong> from <a href="https://cran.r-project.org/package=naijR">CRAN</a>. To work with the <strong>development version</strong> of the package, it can be installed from <a href="https://github.com/BroVic/naijR">GitHub</a> with</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'naijR'</span><span class="op">)</span></span></code></pre></div>
+<p><br> This will install the <strong>stable version</strong> from <a href="https://cran.r-project.org/package=naijR" class="external-link">CRAN</a>. To work with the <strong>development version</strong> of the package, it can be installed from <a href="https://github.com/BroVic/naijR" class="external-link">GitHub</a> with</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages('remotes')</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"BroVic/naijR"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages('remotes')</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BroVic/naijR"</span><span class="op">)</span></span></code></pre></div>
 <p><br> For an introduction to the package’s ability to draw Nigeria country maps, read this <a href="articles/nigeria-maps.html">article</a></p>
 </div>
 </div>
@@ -144,40 +140,51 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=naijR">https://​cloud.r-project.org/​package=naijR</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/BroVic/naijR/">https://​github.com/​BroVic/​naijR/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/BroVic/naijR/issues">https://​github.com/​BroVic/​naijR/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=naijR" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/BroVic/naijR/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/BroVic/naijR/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></small></li>
+<li><small><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></small></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Victor Ordu <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3716-0668" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing naijR</a></li>
 </ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Victor Ordu <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3716-0668" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+</ul>
+</div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Victor Ordu.</p>
+  <p></p>
+<p>Developed by Victor Ordu.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -185,6 +192,8 @@
 
   
 
+
+  
 
   </body>
 </html>
