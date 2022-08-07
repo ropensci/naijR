@@ -1,10 +1,10 @@
-pandoc: 2.11.4
-pkgdown: 1.6.1
+pandoc: '2.18'
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   interactive: interactive.html
   nigeria-maps: nigeria-maps.html
-last_built: 2021-12-24T08:06Z
+last_built: 2022-07-23T12:06Z
 urls:
   reference: http://brovic.github.io/naijR/reference
   article: http://brovic.github.io/naijR/articles
