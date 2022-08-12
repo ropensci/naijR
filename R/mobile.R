@@ -14,11 +14,12 @@
 #'
 #' @export
 fix_mobile <- function(x) {
-  if (!is.character(x)) {
-    if (!is.numeric(x))
-      stop(sprintf("Objects of type %s are not supported", sQuote(typeof(x))))
+  if (!is.null(x) && all(is.na(x)) || is.numeric(x))
     x <- as.character(x)
-  }
+  
+  if (!is.character(x)) 
+    stop(sprintf("Objects of type %s are not supported", sQuote(typeof(x))))
+  
   # Remove entries that are beyond redemption i.e. too long or too short
   # then add a leading '0' if there are 10 digits
   # and then remove those that still don't look like local mobile numbers (NG)

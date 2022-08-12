@@ -32,7 +32,9 @@ test_that("Input corner cases are checked", {
   err1 <- "Objects of type .+ are not supported"
   
   expect_error(fix_mobile(NULL), err1)
-  expect_error(fix_mobile(NA), err1)
+  expect_type(fix_mobile(NA), "character")
+  expect_identical(fix_mobile(NA), NA_character_)
+  expect_identical(fix_mobile(c("8034510441", NA))[2], NA_character_)
   expect_error(fix_mobile(data.frame(x = c(09012343829, 08132348321))), err1)
   expect_error(fix_mobile(), "argument \"x\" is missing, with no default")
 })

@@ -1,3 +1,11 @@
+# naijR 0.4.4
+## Bug fix:
+
+* `fix_mobile` fails unexpectedly when only `NA` is supplied as argument. This causes practical problems when, for example, it encounters a column with only missing values.
+
+# naijR 0.4.3
+* Addressed a build problem related to CRAN submission.
+
 # naijR 0.4.2
 * Improved type checking for mapping functionality and better fidelity.
 
