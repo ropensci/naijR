@@ -5,6 +5,10 @@
 #' @details This format is specific to that used in a given location - for
 #' now the function is useful only for Nigeria mobile numbers, which come in
 #' the format expressed by the regex pattern \code{"^0[7-9][0-1][0-9]{8}$"}.
+#' 
+#' @note There is an option for producing warnings on any mobile number entries
+#' that may have been removed from the vector, by setting the option
+#' \code{verbose} to \code{TRUE}.
 #'
 #' @param x A character vector of numerical strings.
 #'
@@ -32,8 +36,7 @@ fix_mobile <- function(x) {
     x <- sub(prefix.rgx, "\\2", x)
   }
   
-  # Pre-empt situations where letter 'O' is entered as a leading zero.
-  x <- gsub("O", "0", x, ignore.case = TRUE)
+  x <- .removeLetterO(x)
   
   # Separators are checked and removed
   x <- vapply(x, .processSeparators, character(1), USE.NAMES = TRUE)
@@ -46,8 +49,14 @@ fix_mobile <- function(x) {
   
   x <- sub("(^\\d{10}$)", paste0(prefix, "\\1"), x)
   
-  # remove if it still doesn't look like a mobile number
-  ifelse(grepl("[7-9][0-1]\\d{8}$", x), x, NA_character_)
+  like.mobile <- grepl("[7-9][0-1]\\d{8}$", x)
+  
+  if (getOption("verbose"))
+    warning(
+      "Additional original/transformed number removed: ",
+      paste(na.exclude(x)[!like.mobile], collapse = ", ")
+    )
+  ifelse(like.mobile, x, NA_character_)
 }
 
 
@@ -56,22 +65,27 @@ fix_mobile <- function(x) {
 
 # Checks for non-digit characters that could be separators
 # specifically, spaces, dashes and dots (- and .).
-# NB: The initial thinking was to maintain separators within 
-# the numbers, but this has be jettisoned. However, with this 
-# function, working with these separators becomes a lot
-# easier, and if in future it is desirable to maintain the
-# formatting, this could be done more easily.
+# NB: The initial thinking was to maintain separators within the numbers, but
+# this has be jettisoned. However, with this function, working with these
+# separators becomes a lot easier, and if in future it is desirable to maintain 
+# the formatting, this could be done more easily.
 .processSeparators <- function(str) {
+  stopifnot(is.character(str))
+  
+  verbose <- getOption("verbose")
   chars <- charToRaw(str)
   notd <- which(!(chars >= 0x30 & chars <= 0x39))
   sep <- chars[notd]
   
-  # When the separators differ, the number
-  # is considered unusable. This may also
-  # mean that other characters exist that
-  # have nothing to do with phone numbers.
-  if (isFALSE(Reduce(identical, sep)))
+  # When the separators differ, the number is considered unusable. This may also
+  # mean that other characters exist that have nothing to do with phone numbers.
+  msg <- " was removed"
+  if (isFALSE(Reduce(identical, sep))) {
+    if (verbose)
+      warning(sQuote(str), msg, call. = FALSE)
+    
     return(NA_character_)
+  }
   
   # Remove entries that are beyond redemption i.e. too long or too short
   # The separators will be considered with the number of actual digits.
@@ -79,11 +93,36 @@ fix_mobile <- function(x) {
   nlenmax <- nsep + 11L
   nlenmin <- nsep + 10L
   
-  if (nchar(str) > nlenmax || nchar(str) < nlenmin)
+  if (nchar(str) > nlenmax || nchar(str) < nlenmin) {
+    if (verbose)
+      warning(sQuote(str), msg, call. = FALSE)
+    
     return(NA_character_)
+  }
   
   if (length(notd))
     chars <- chars[-notd]
   
   rawToChar(chars)
+}
+
+
+
+# Pre-empts situations where letter 'O' instead of zero,
+# making replacements where necessary
+.removeLetterO <- function(x) {
+  stopifnot(is.character(x))
+  orgx <- "O"
+  
+  if (getOption("verbose")) {
+    remv <- x[grepl(orgx, x, ignore.case = TRUE)]
+    warning(
+      length(remv),
+      " numbers were removed: ", 
+      paste(remv, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  
+  gsub(orgx, "0", x, ignore.case = TRUE)
 }

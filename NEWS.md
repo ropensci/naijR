@@ -3,6 +3,7 @@
 
 * Effectively handle mobile numbers that have common separators in them, namely whitespace, '-' or '.'.
 * Repair mobile numbers where poor data entry interchanges zeros (`0`s) with the letter `O` (works for both upper and lower case).
+* Repair of mobile numbers now offers optional imformation for users.
 
 # naijR 0.4.4
 ## Bug fix:

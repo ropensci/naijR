@@ -20,3 +20,8 @@ This format is specific to that used in a given location - for
 now the function is useful only for Nigeria mobile numbers, which come in
 the format expressed by the regex pattern \code{"^0[7-9][0-1][0-9]{8}$"}.
 }
+\note{
+There is an option for producing warnings on any mobile number entries
+that may have been removed from the vector, by setting the option
+\code{verbose} to \code{TRUE}.
+}
