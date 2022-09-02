@@ -52,6 +52,7 @@ test_that("Wrong mobile numbers are repaired or removed.", {
       "08123456789",
       "09064321987",
       "O8055577889",  # starts with letter 'O'
+      "07O2135689o",  # has lower & upper case 'O'
       "070456789011",
       "07031356890",    
       "07061356890",
@@ -107,10 +108,12 @@ test_that("Wrong mobile numbers are repaired or removed.", {
   expect_identical(fin.numbers[5], "07098765432")
   expect_identical(fin.numbers[6], "08123456789")
   expect_identical(fin.numbers[7], "09064321987")
-  for (i in 10:length(init.numbers))
+  expect_identical(fin.numbers[8], "08055577889")
+  expect_identical(fin.numbers[9], "07021356890")
+  expect_equal(fin.numbers[10], NA_character_)
+  
+  for (i in 11:length(init.numbers))
     expect_identical(fin.numbers[i], init.numbers[i])
-  expect_equal(fin.numbers[8], "08055577889")
-  expect_equal(fin.numbers[9], NA_character_)
 })
 
 

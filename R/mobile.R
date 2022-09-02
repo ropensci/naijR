@@ -25,21 +25,25 @@ fix_mobile <- function(x) {
   x <- stringi::stri_trim_both(x)
   prefix.rgx <- "^(\\+?234\\s?)"
   prefixed <- grepl(prefix.rgx, x)
+  hasprefix <- any(prefixed)
   
-  if (any(prefixed)) {
+  if (hasprefix) {
     prefix <- "+234"  # TODO: Extract actual prefixes for vectorized operations
     x <- sub(prefix.rgx, "\\2", x)
   }
   
-  # Pre-empt a situation where the letter 'O' is mistakenly
-  # entered as a leading zero.
-  x <- sub("^O", "0", x)
+  # Pre-empt situations where letter 'O' is entered as a leading zero.
+  x <- gsub("O", "0", x, ignore.case = TRUE)
   
-  # Separators are checked
+  # Separators are checked and removed
   x <- vapply(x, .processSeparators, character(1), USE.NAMES = TRUE)
   
   # place prefix where necessary
-  prefix <- if (any(prefixed)) prefix[which(prefixed)[1]] else "0"
+  prefix <- if (hasprefix)
+    prefix[which(prefixed)[1]]
+  else
+    "0"
+  
   x <- sub("(^\\d{10}$)", paste0(prefix, "\\1"), x)
   
   # remove if it still doesn't look like a mobile number
