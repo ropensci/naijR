@@ -56,6 +56,7 @@ fix_mobile <- function(x) {
       "Additional original/transformed number removed: ",
       paste(na.exclude(x)[!like.mobile], collapse = ", ")
     )
+  
   ifelse(like.mobile, x, NA_character_)
 }
 
