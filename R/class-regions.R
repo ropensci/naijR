@@ -395,9 +395,48 @@ as_lga <- function(x) {
 
 
 
+# TODO: Export this function in next release
+# @importFrom utils menu
+disambiguate <- function(x, parent = NULL)
+{
+  if (length(x) > 1L)
+    stop("Disambiguation is done only for single-length objects")
+  
+  if (!is_lga(x))
+    stop("Expected an object of class 'lgas'")
+  
+  ss <- attr(x, "State")
+  
+  if (is.null(parent)) {
+    title <- sprintf("Which State does the LGA '%s' belong to?", x)
+    parent <- ss[menu(ss, graphics = TRUE, title = title)]
+  }
+  
+  attr(x, "State") <- parent
+  x
+}
 
 
 
+
+
+
+# Methods for internal generics ####
+
+## Because 'regions' is an abstract class i.e. it does not have
+## a constructor, we have to provide a means of creating the
+## states/lgas objects post-method-dispatch. The behaviour we are
+## trying to establish is for both States and LGA data, and thus
+## it would be redundant to create distinct methods for them.
+## Perhaps there might be a cleaner approach, but this is as far
+## current skills can go.
+.chooseRegionsMethod <- function(m, obj)
+{
+  if (all(is_state(obj)))
+    new_states(m)
+  else
+    new_lgas(m)
+}
 
 
 
@@ -470,37 +509,49 @@ tail.regions <- function(x, ...)
 }
 
 
-
-## Because 'regions' is an abstract class i.e. it does not have
-## a constructor, we have to provide a means of creating the
-## states/lgas objects post-method-dispatch. The behaviour we are
-## trying to establish is for both States and LGA data, and thus
-## it would be redundant to create distinct methods for them.
-## Perhaps there might be a cleaner approach, but this is as far
-## current skills can go.
-.chooseRegionsMethod <- function(m, obj)
+#' @export
+c.regions <- function(...)
 {
-  if (all(is_state(obj)))
-    states(m)
-  else
-    lgas(m)
+  ls <- unlist(list(...), use.names = FALSE)
+  #
+  # if (!Reduce(identical, lapply(all, class)))
+  #   stop("All objects must be of the same class")
+  # ls <- lapply(list(...), unclass)
+  # new_states(unlist(ls, use.names = FALSE))
+  .chooseRegionsMethod(NextMethod(), ls)
+}
+
+## Extraction functions for 'regions' objects
+## Note: The replacement versions already work adequately
+## with their default methods
+#' @export
+`[[.regions` <- function(x, i, exact = TRUE)
+{
+  .chooseRegionsMethod(NextMethod(), x)
+}
+
+#' @export
+`[.regions` <- function(x, i)
+{
+  .chooseRegionsMethod(NextMethod(), x)
 }
 
 
-
-
-# TODO: Export this function in next release
-#' @importFrom utils menu
-disambiguate <- function(x, parent = NULL)
+#' @export
+na.exclude.regions <- function(object)
 {
-  if (!inherits(x, "lgas"))
-    stop("Expected an object of class 'lgas'")
-  if (length(x) > 1L)
-    stop("Disambiguation is done only for single-length objects")
-  ss <- attr(x, "State")
-  if (is.null(parent)) {
-    parent <- ss[menu(ss, title = "Which State does this LGA belong to?")]
-  }
-  attr(x, "State") <- parent
-  x
+  if (!anyNA(object))
+    return(object)
+  
+  object <- na.exclude(unclass(object))
+  na.attr <- attributes(object)
+  
+  object <- if (all(is_state(object)))
+    new_states(object)
+  else
+    new_lgas(object)
+  
+  class(object) <- c(class(na.attr$na.action), class(object))
+  attr(object, "na.action") <- na.attr$na.action
+  object
 }

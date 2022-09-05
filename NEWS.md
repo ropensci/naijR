@@ -1,4 +1,7 @@
-# naijR 0.4.5
+# naijR 0.5.0
+## New features:
+* New methods for `?InternalGenerics` are introduces e.g. for `c()`, `[`, `[[`, `na.exclude`, etc.
+
 ## Enhancements:
 
 * Effectively handle mobile numbers that have common separators in them, namely whitespace, '-' or '.'.

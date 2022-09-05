@@ -38,8 +38,8 @@ is_state <- function(x)
   na.pos <- 0L
   if (anyNA(x)) {
     warning("Invalid entries were replaced with NAs", call. = FALSE)
-    excl <- stats::na.exclude(x)
-    na.pos <- stats::na.action(excl)
+    excl <- na.exclude(x)
+    na.pos <- na.action(excl)
   }
   
   if (length(x) == 0L)
