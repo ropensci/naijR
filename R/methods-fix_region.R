@@ -17,8 +17,8 @@
 #' for fixing the mistakes are available via mode \code{interactive}.
 #' 
 #' @param x An S3 object of class \code{states} or \code{lgas}. For 
-#' \code{fix_region.default}, a character vector can be passed but only
-#' that for States will be interpretable.
+#' \code{fix_region.default}, a character vector (or an object coercible to 
+#' one) can be passed but only that for 'States' will be interpretable.
 #' @param ... Arguments passed to methods.
 #' 
 #' @return The transformed object. If all names are correct, the object is
@@ -102,6 +102,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 #' @export
   fix_region.default <- function(x, ...)
 {
+  if (is.factor(x))
+    x <- as.character(x)
   if (!is.character(x))
     stop("'x' is not a character vector")
   empty <- grepl("^$", x)

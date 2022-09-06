@@ -5,7 +5,7 @@
 \alias{print.regions}
 \alias{head.regions}
 \alias{tail.regions}
-\title{States of the Federal Republic of Nigeria}
+\title{Create an Object for the States of Nigeria}
 \usage{
 states(states, gpz = NULL, all = TRUE, warn = TRUE)
 
@@ -16,16 +16,18 @@ states(states, gpz = NULL, all = TRUE, warn = TRUE)
 \method{tail}{regions}(x, ...)
 }
 \arguments{
-\item{states}{One or more States of the Federation.}
+\item{states}{A character vector with strings representing one or more 
+States of Nigeria.}
 
-\item{gpz}{Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
-"ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").}
+\item{gpz}{\code{NULL} (the default) or one or more of the following 
+strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"} 
+(see "Details").}
 
 \item{all}{logical; whether to include the Federal Capital Territory in 
 the result.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
-actually States (or were misspelt).}
+actually States (i.e. they were misspelt).}
 
 \item{x}{The object of class \code{region}}
 
@@ -36,19 +38,20 @@ The States of Nigeria as a whole or by zones, as an S3 object
 of class \code{states}.
 }
 \description{
-States of the Federal Republic of Nigeria
+Create an Object for the States of Nigeria
 
 Print regions
 
 Return the First or Last Parts of a Region Object
 }
 \details{
-gpz A geo-political zone, in the Nigerian 
-context, is a national subdivision that groups contiguous states. 
-Historically, they arise from subnational administrative divisions 
-known as 'regions' that existed at the time of the country's independence.
-There are 6 zones - North-Central, North-East, North-West, South-East,
-South-South and South-West.
+\code{gpz} represents a geopolitical zone which, in the Nigerian 
+context, is a national subdivision that groups contiguous states that bear
+certain socio-cultural and political similarities. Historically, they arise
+from sub-national administrative divisions known as 'Regions' that existed 
+at the time of the country's independence. There are at present 6 such 
+zones - North-Central, North-East, North-West, South-East,South-South and 
+South-West.
 }
 \examples{
 states()  # lists names of all States

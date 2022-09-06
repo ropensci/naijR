@@ -15,11 +15,12 @@ test_that("input is validated before fixing state names", {
                  "Tried to fix empty strings - may produce errors")
   expect_warning(fix_region(NA_character_), warn0)
   expect_warning(fix_region(character()), warn0)
+  expect_warning(fix_region(factor()), warn0)
   expect_type(fix_region(matrix(states())), "character") ## preserve class??
 })
 
 
-test_that("Messaging is clear when fixing regions via character vectors", {
+test_that("Messaging clear when fixing via character vectors or factors", {
   # Function for creating regular expressions for matching messages
   .msgfunc <- function(x) {
     stopifnot(grepl("^(.+)(\\s=>\\s)(.+)$", x))
@@ -27,31 +28,61 @@ test_that("Messaging is clear when fixing regions via character vectors", {
   } #                                                 ^
   #                                               Note place-holder
   
-  lg <- c("Fufure", "Demsa", "Fufore", "Machika", "Ganye", "Noman", "Fufure")
-  correctLga <- lg[2]
-  misspeltLga <- lg[3]
-  bothlga <- c(correctLga, misspeltLga)
+  # data
   multi.lga <- readRDS("data/mispelt-lga.rds")
+  
+  # messages
   change1 <- "Fufore => Fufure"
   change2 <- "Fafure => Fufure"
   msg1 <- .msgfunc(change1)
   msg2 <- .msgfunc(change2)
+  morethanone <- "approximately matched more than one region"
   
-  # ----
+  # character vectors ----
+  lg.chr <- c("Fufure", "Demsa", "Fufore", "Machika", "Ganye", "Noman", "Fufure")
+  correctLga.chr <- lg.chr[2]
+  misspeltLga.chr <- lg.chr[3]
+  bothlga.chr <- c(correctLga.chr, misspeltLga.chr)
   
-  expect_silent(fix_region(lgas(correctLga)))
-  expect_message(fix_region(lgas(misspeltLga, warn = FALSE)))
-  expect_message(fix_region(lgas(bothlga, warn = FALSE)), msg1)
-  expect_message(fix_region(lgas(c(bothlga, "Fufore"), warn = FALSE)), msg1)
-  expect_message(fix_region(lgas(c(bothlga, "Fafure"), warn = FALSE)),
+  expect_silent(fix_region(lgas(correctLga.chr)))
+  expect_message(fix_region(lgas(misspeltLga.chr, warn = FALSE)))
+  expect_message(fix_region(lgas(bothlga.chr, warn = FALSE)), msg1)
+  expect_message(fix_region(lgas(c(bothlga.chr, "Fufore"), warn = FALSE)), msg1)
+  expect_message(fix_region(lgas(c(bothlga.chr, "Fafure"), warn = FALSE)),
                  sprintf("%s\\n\\*\\s%s", change1, change2))
-  expect_error(fix_region(misspeltLga), totalerr, fixed = TRUE)
-  expect_warning(fix_region(lgas(lg, warn = FALSE)), 
-                 "approximately matched more than one region")
-  expect_message(suppressWarnings(fix_region(lgas(lg, warn = FALSE))),
+  expect_error(fix_region(misspeltLga.chr), totalerr, fixed = TRUE)
+  expect_warning(fix_region(lgas(lg.chr, warn = FALSE)), morethanone)
+  expect_message(suppressWarnings(fix_region(lgas(lg.chr, warn = FALSE))),
                  sprintf("%s.+Noman => Numan", change1))
   expect_message(fix_region(lgas(multi.lga, warn = FALSE)),
                  change1)
+  
+  # factors ----
+  lg.fac <- factor(lg.chr)
+  correctLga.fac <- droplevels(lg.fac[2])
+  misspeltLga.fac <- droplevels(lg.fac[3])
+  bothlga.fac <- c(correctLga.fac, misspeltLga.fac)
+  
+  expect_silent(fix_region(lgas(correctLga.fac)))
+  expect_message(fix_region(lgas(misspeltLga.fac, warn = FALSE)))
+  expect_message(fix_region(lgas(bothlga.fac, warn = FALSE)), msg1)
+  
+  expect_message(fix_region(lgas(
+    c(bothlga.fac, factor("Fufore")), 
+    warn = FALSE)), msg1)
+  
+  expect_message(
+    fix_region(lgas(
+      c(bothlga.fac, factor("Fafure")), warn = FALSE)),
+    sprintf("%s\\n\\*\\s%s", change1, change2))
+  
+  expect_error(fix_region(misspeltLga.fac), totalerr, fixed = TRUE)
+  expect_warning(fix_region(lgas(lg.fac, warn = FALSE)), morethanone)
+  expect_message(suppressWarnings(fix_region(lgas(lg.fac, warn = FALSE))),
+                 sprintf("%s.+Noman => Numan", change1))
+  expect_message(fix_region(lgas(multi.lga, warn = FALSE)),
+                 change1)
+  
 })
 
 

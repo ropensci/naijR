@@ -7,6 +7,7 @@
 * Effectively handle mobile numbers that have common separators in them, namely whitespace, '-' or '.'.
 * Repair mobile numbers where poor data entry interchanges zeros (`0`s) with the letter `O` (works for both upper and lower case).
 * Repair of mobile numbers now offers optional imformation for users.
+* Allow the use of factor input when creating objects of class `regions`.
 
 # naijR 0.4.4
 ## Bug fix:

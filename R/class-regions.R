@@ -15,51 +15,68 @@
 
 globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
 
-#' States of the Federal Republic of Nigeria
+#' Create an Object for the States of Nigeria
 #' 
-#' @param states One or more States of the Federation.
-#' @param gpz Geopolitical zone. Default is \code{NULL}; optionally \code{"nc",
-#'  "ne", "nw", "se", "ss"} and \code{"sw"} (see "Details").
-#' @param all logical; whether to include the Federal Capital Territory in 
-#' the result.
+#' @param states A character vector with strings representing one or more 
+#' States of Nigeria. If missing, the function will return a \code{states} 
+#' all the States, with or without the Federal Capital Territory (FCT).
+#' @param gpz \code{NULL} (the default) or, case insensitively, one or more of
+#' the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"} 
+#' (see "Details").
+#' @param all logical; whether to include the FCT in the result.
 #' @param warn logical; issue a warning when one or more elements are not
-#' actually States (or were misspelt).
+#' actually States (i.e. they were misspelt).
 #' 
 #' @return The States of Nigeria as a whole or by zones, as an S3 object 
 #' of class \code{states}.
 #' 
-#' @details gpz A geo-political zone, in the Nigerian 
-#' context, is a national subdivision that groups contiguous states. 
-#' Historically, they arise from subnational administrative divisions 
-#' known as 'regions' that existed at the time of the country's independence.
-#' There are 6 zones - North-Central, North-East, North-West, South-East,
-#' South-South and South-West.
+#' @details \code{gpz} represents a geopolitical zone which, in the Nigerian 
+#' context, is a national subdivision that groups contiguous states that bear
+#' certain socio-cultural and political similarities. Historically, they arise
+#' from sub-national administrative divisions known as 'Regions' that existed 
+#' at the time of the country's independence. There are at present 6 such 
+#' zones - North-Central, North-East, North-West, South-East,South-South and 
+#' South-West.
 #' 
 #' @examples
 #' states()  # lists names of all States
 #' states(gpz = "se")  # lists States in South-East zone
+#' 
 #' @export
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
-  stopifnot(is.logical(all))
+  if (!is.logical(all))
+    stop("'all' is not logical")
+  
+  if (!is.logical(warn))
+    stop("'warn' is not logical")
+  
   if (!missing(states) && is.character(states)) {
     if (warn && !all(is_state(states)))
       warning(.warnSpelling('state'), call. = FALSE)
+    
     return(new_states(states))
   }
+  
   stl <- getAllStates()
+  
   if (!all)
     stl$fct <- NULL
+  
   if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
       stop("argument supplied 'gpz' is not of type 'character'")
+    
     gpz <- tolower(gsub("\\s+", "", gpz))
     x <- match.arg(gpz, names(stl), several.ok = TRUE)
     stl <- stl[x]
   }
+  
   ss <- as.vector(unlist(stl), mode = 'character')
+  
   if (is.null(gpz))
     ss <- sort(ss)
+  
   new_states(ss)
 }
 
@@ -69,7 +86,13 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 ## Provides some uniformity in the messaging b/w States & LGAs
 .warnSpelling <- function(region.type) {
   region.type <- match.arg(region.type, c("state", "lga"))
-  txt <- switch(region.type, state = "a State", lga = "an LGA")
+  
+  txt <- switch(
+    region.type, 
+    state = "a State", 
+    lga = "an LGA"
+  )
+  
   sprintf("One or more items is not %s. Spelling error?", txt)
 }
 
@@ -85,9 +108,11 @@ getAllStates <- function(named = TRUE)
     !is.na(named)
   )
   data("lgas_nigeria", package = "naijR", envir = environment())
+  
   zones <- lgas_nigeria$gpz %>% 
     unique %>% 
     sort
+  
   ss <- sapply(zones, function(zn) {
     lgas_nigeria %$%
       {
@@ -95,7 +120,9 @@ getAllStates <- function(named = TRUE)
       } %>% 
       unique
   })
+  
   stopifnot(!is.null(ss))
+  
   if (!named)
     return({
       ss %>% 
@@ -103,6 +130,7 @@ getAllStates <- function(named = TRUE)
         unname %>% 
         sort
     })
+  
   names(ss) <- sub("\\.state", "", names(ss))
   ss
 }
@@ -129,7 +157,7 @@ new_states <- function(ss)
 
 
 
-#' List Local Government Areas
+#' Create on Object for Local Government Areas
 #'
 #' @param region Context-dependent. Either State(s) of the Federation 
 #' or Local Government Area(s) - internal checks are performed to determine
@@ -165,12 +193,19 @@ new_states <- function(ss)
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
+  
+  if (is.factor(region))
+    region <- as.character(region)
+  
   if (!is.character(region))
     stop("Expected an object of type 'character'")
+  
   if (strict && !any(region %in% .synonymRegions()))
     stop("strict can only be set to TRUE where State/LGA syonnyms exist")
+  
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
+  
   lst <- if (all(is_state(region)) && !strict) {
     sl <- lapply(region, function(s)
       subset(
@@ -180,26 +215,32 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
         drop = TRUE
       ))
     names(sl) <- region
+    
     if (length(region) == 1L)
       sl <- unname(unlist(sl))
+    
     sl
   }
   else if (all(is_lga(region))) {
     lg <- region
     region <- unique(lgas_nigeria$state[lgas_nigeria$lga %in% lg])
+    
     if ((numSt <- length(region)) > 1L)
       warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
+    
     lg
   }
   else if (.hasMisspeltLgas(region)) { 
     if (warn)
       warning(.warnSpelling('lga'), call. = FALSE)
+    
     ret <- region
     region <- as.null(region)  # set to NULL b/c of attribute in final output
     ret
   }
   else if (.hasNonLgaAll(region))
     stop("None of the items is a valid LGA")
+  
   structure(new_lgas(lst), State = region)
 }
 
@@ -207,8 +248,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 .hasNonLgaMixed <- function(x) {
   stopifnot(is.character(x))
   matches <- .boolPartialLgaMatches(x)
+  
   if (.hasNonLgaAll(x))
     return(FALSE)
+  
   sum(matches) < length(x)
 }
 
@@ -220,8 +263,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 .hasMisspeltLgas <- function(x) {
   stopifnot(is.character(x))
   matches <- .boolExactLgaMatches(x)
+  
   if (.hasNonLgaAll(x))
     return(FALSE)
+  
   sum(matches) < length(x)
 }
 
@@ -233,6 +278,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 .boolPartialLgaMatches <- function(x) {
   stopifnot(is.character(x))
+  
   agrepl(.lgaRegex(x),
          lgas(),
          fixed = FALSE,
@@ -343,12 +389,18 @@ as_lga <- function(x) {
 
 .validateCoercible <- function(obj)
 {
+  if (is.factor(obj))
+    obj <- as.character(obj)
+  
   if (!is.character(obj))
     stop("Expected a character vector")
+  
   if (length(obj) > 1L)
     stop("To coerce a region with synonyms, use a vector of length 1L")
+  
   if (!obj %in% .synonymRegions())
     stop("The object does not possess State/LGA synonyms")
+  
   if (inherits(obj, "regions")) {
     obj <- unclass(obj)
     warning("Object was stripped down to mode 'character'", call. = FALSE)
@@ -365,6 +417,7 @@ as_lga <- function(x) {
 .synonymRegions <- function()
 {
   ll <- lgas()
+  
   ll %>% 
     is_state %>% 
     which %>% 
@@ -385,8 +438,10 @@ as_lga <- function(x) {
 .fctOptions <- function(opt = c("all", "full", "abbrev")) {
   opt <- match.arg(opt)
   vec <- c(full = "Federal Capital Territory", abbrev = "FCT")
+  
   if (opt != "all")
     return(vec[opt])
+  
   vec
 }
 
@@ -452,8 +507,10 @@ disambiguate <- function(x, parent = NULL)
 print.regions <- function(x, ...) {
   if (!interactive())
     return(x)
+  
   st <- "States"
   lg <- "LGAs"
+  
   hdr <- if (length(x) > 1L) {
     if (all(is_state(x)) || inherits(x, "states"))
       st
@@ -466,6 +523,7 @@ print.regions <- function(x, ...) {
     else
       st
   }
+  
   underline <- strrep("-", nchar(hdr))
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
