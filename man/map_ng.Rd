@@ -17,10 +17,11 @@ map_ng(
   caption = NULL,
   show.neighbours = FALSE,
   show.text = FALSE,
-  leg.x = 13L,
-  leg.y = 7L,
-  leg.title,
-  leg.orient = c("vertical", "horizontal"),
+  legend.text = NULL,
+  leg.x = deprecated(),
+  leg.y = deprecated(),
+  leg.title = NULL,
+  leg.orient = deprecated(),
   ...
 )
 }
@@ -55,12 +56,16 @@ neighbouring regions/countries.}
 
 \item{show.text}{Logical. Whether to display the labels of regions.}
 
-\item{leg.x, leg.y}{Numeric. Position of the legend.}
+\item{legend.text}{Logical (whether to show the legend) or character vector
+(actual strings for the legend). The latter will override whatever is 
+provided by \code{categories}, giving the user additional control.}
+
+\item{leg.x, leg.y}{Numeric. Position of the legend (deprecated).}
 
 \item{leg.title}{String. The legend title.}
 
 \item{leg.orient}{The orientation of the legend i.e. whether horizontal or
-vertical.}
+vertical (deprecated).}
 
 \item{...}{Further arguments passed to \code{\link[maps]{map}}}
 }
@@ -92,7 +97,13 @@ For plain plots, the \code{col} argument works the same as with
 \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
 a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
 available colour options can be checked with 
-\code{getOption("choropleth.colours")} and this can also be modified by the user.
+\code{getOption("choropleth.colours")} and this can also be modified by the 
+user.
+
+If the default legend is unsatisfactory, it is recommended that the user
+sets the \code{legend.text} argument to \code{FALSE}; the next function
+call should be \code{\link[graphics]{legend}} which will enable finer
+control over the legend.
 }
 \note{
 When adjusting the default colour choices for choropleth maps, it is

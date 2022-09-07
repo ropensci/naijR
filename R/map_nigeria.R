@@ -36,6 +36,9 @@ globalVariables(c(".", "STATE"))
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom graphics points
+#' @importFrom lifecycle deprecate_warn
+#' @importFrom lifecycle deprecated
+#' @importFrom lifecycle is_present
 #' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
@@ -57,13 +60,16 @@ globalVariables(c(".", "STATE"))
 #' @param exclude.fill Colour-shading to be used to indicate \code{excluded}
 #' regions. Must be a vector of the same length as \code{excluded}.
 #' @param title,caption An optional string for annotating the map.
-#' @param leg.x,leg.y Numeric. Position of the legend.
-#' @param leg.title String. The legend title.
-#' @param leg.orient The orientation of the legend i.e. whether horizontal or
-#' vertical.
 #' @param show.neighbours Logical; \code{TRUE} to display the immediate vicinity
 #' neighbouring regions/countries.
 #' @param show.text Logical. Whether to display the labels of regions.
+#' @param legend.text Logical (whether to show the legend) or character vector
+#' (actual strings for the legend). The latter will override whatever is 
+#' provided by \code{categories}, giving the user additional control.
+#' @param leg.x,leg.y Numeric. Position of the legend (deprecated).
+#' @param leg.title String. The legend title.
+#' @param leg.orient The orientation of the legend i.e. whether horizontal or
+#' vertical (deprecated). 
 #' @param ... Further arguments passed to \code{\link[maps]{map}}
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
@@ -84,7 +90,13 @@ globalVariables(c(".", "STATE"))
 #' \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
 #' a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
 #' available colour options can be checked with 
-#' \code{getOption("choropleth.colours")} and this can also be modified by the user.
+#' \code{getOption("choropleth.colours")} and this can also be modified by the 
+#' user.
+#' 
+#' If the default legend is unsatisfactory, it is recommended that the user
+#' sets the \code{legend.text} argument to \code{FALSE}; the next function
+#' call should be \code{\link[graphics]{legend}} which will enable finer
+#' control over the legend.
 #' 
 #' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
@@ -115,24 +127,44 @@ map_ng <- function(region = character(),
                    caption = NULL,
                    show.neighbours = FALSE,
                    show.text = FALSE,
-                   leg.x = 13L,
-                   leg.y = 7L,
-                   leg.title,
-                   leg.orient = c('vertical', 'horizontal'),
+                   legend.text = NULL,
+                   leg.x = deprecated(),
+                   leg.y = deprecated(),
+                   leg.title = NULL,
+                   leg.orient = deprecated(),
                    ...)
 {
   ## TODO: Allow this function to accept a matrix e.g. for plotting points
   if (!is.character(region))
     stop("Expected a character vector as 'region'")
+  
   region <- .processRegionParam(region)
+  
   if (!is.logical(show.neighbours))
     stop("'show.neighbours' should be a boolean")
+  
   if (length(show.neighbours) > 1L) {
     warning("Only the first element of 'show.neighbours' was used")
     show.neighbours <- show.neighbours[1]
   }
+  
   if (show.neighbours)
     message("Display of neighbouring regions is temporarily disabled")
+  
+  if (is.null(legend.text)) {
+    legend.text <- TRUE
+  }
+  else {
+    if (is.logical(legend.text))
+      if (length(legend.text) > 1L) {
+        legend.text <- legend.text[1]
+        warning("Only the first element of 'legend text' was used")
+      }
+    else if (!is.character(legend.text))
+      stop("A non-NULL input for 'legend.text' must be exclusively",
+           "of type character or logical")
+  }
+  
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
   else 
@@ -144,6 +176,7 @@ map_ng <- function(region = character(),
     value.x <- eval_tidy(value.x)
     .validateChoroplethParams(value.x, region, data)
   }
+  
   if (!is_null(y))
     chrplth <- FALSE
   
@@ -185,13 +218,12 @@ map_ng <- function(region = character(),
     cOpts <-
       .prepareChoroplethOptions(database, cParams, dots$col, excluded, exclude.fill)
     mapq$col <- cOpts$colors
-    lego <- match.arg(leg.orient)
-    horiz <- if (identical(lego, 'vertical')) 
-      FALSE 
-    else 
-      TRUE
-    leg.tit <- if (!missing(leg.title)) 
-      as.character(leg.title)
+    
+    if (lifecycle::is_present(leg.orient)) {
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.orient))
+    }
+    
+    
   }
   
   outlineMap <- identical(region, 'Nigeria')
@@ -206,8 +238,10 @@ map_ng <- function(region = character(),
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
   database <- eval(mapq)    # possibly, a new `database` is created
+  
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
+  
   if (show.text) {
     txt <- "Nigeria"
     if (!outlineMap) {
@@ -234,32 +268,61 @@ map_ng <- function(region = character(),
   
   ## Annotate
   title(main = title, sub = caption)
+  
   if(!is_null(y)) {
     if (!.xyWithinBounds(database, x, y))
       stop("Coordinates are out of bounds of the map")
   }
+  
   if (chrplth) {
+    
     if (is.null(categories))
       categories <- cOpts$bins
-    legend(
-      x = leg.x,
-      y = leg.y,
-      legend = categories,
-      fill = cOpts$scheme,
-      xpd = NA,
-      horiz = horiz,
-      title = leg.tit
-    )
+    
+    # The default setting of 'legend.text' is TRUE
+    showleg <- if (is.character(legend.text)) {
+      
+      if (!identical(length(categories), length(legend.text)))
+        stop("Lengths of categories and provided legend do not match")
+      
+      categories <- legend.text
+      TRUE
+    }
+    else
+      legend.text
+    
+    if (lifecycle::is_present(leg.x))
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.x))
+    
+    if (lifecycle::is_present(leg.y))
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.y))
+    
+    if (showleg) 
+      legend(
+        x = 13L,
+        y = 7L,
+        legend = categories,
+        fill = cOpts$scheme,
+        xpd = NA,
+        title = leg.title
+      )
   }
-  else if(!is_null(y))
+  else if (!is_null(y))
     points(x, y, pch = "+") 
   
   invisible(database)
 }
 
 
+.nextMinorVer <- function()
+{
+  ">= 0.6.0"
+}
 
 
+.deprecMsg <- function(arg) {
+  sprintf("map_ng(%s = )", arg)
+}
 
 
 

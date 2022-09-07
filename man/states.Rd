@@ -17,14 +17,14 @@ states(states, gpz = NULL, all = TRUE, warn = TRUE)
 }
 \arguments{
 \item{states}{A character vector with strings representing one or more 
-States of Nigeria.}
+States of Nigeria. If missing, the function will return a \code{states} 
+all the States, with or without the Federal Capital Territory (FCT).}
 
-\item{gpz}{\code{NULL} (the default) or one or more of the following 
-strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"} 
+\item{gpz}{\code{NULL} (the default) or, case insensitively, one or more of
+the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"} 
 (see "Details").}
 
-\item{all}{logical; whether to include the Federal Capital Territory in 
-the result.}
+\item{all}{logical; whether to include the FCT in the result.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
 actually States (i.e. they were misspelt).}
@@ -56,4 +56,5 @@ South-West.
 \examples{
 states()  # lists names of all States
 states(gpz = "se")  # lists States in South-East zone
+
 }

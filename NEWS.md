@@ -3,15 +3,17 @@
 * New methods for `?InternalGenerics` are introduces e.g. for `c()`, `[`, `[[`, `na.exclude`, etc.
 
 ## Enhancements:
-
 * Effectively handle mobile numbers that have common separators in them, namely whitespace, '-' or '.'.
 * Repair mobile numbers where poor data entry interchanges zeros (`0`s) with the letter `O` (works for both upper and lower case).
 * Repair of mobile numbers now offers optional imformation for users.
 * Allow the use of factor input when creating objects of class `regions`.
+* Added a new argument `legend.text` for `map_ng` using an idiom that is similar to the one used in `base::barplot`.
+
+## Deprecated:
+* Arguments of `map_ng` - `leg.x`, `leg.y`, and `leg.orient` were marked for deprecation in the next minor release.
 
 # naijR 0.4.4
 ## Bug fix:
-
 * `fix_mobile` fails unexpectedly when only `NA` is supplied as argument. This causes practical problems when, for example, it encounters a column with only missing values.
 
 # naijR 0.4.3
