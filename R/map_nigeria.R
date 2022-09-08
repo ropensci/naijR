@@ -135,44 +135,55 @@ map_ng <- function(region = character(),
                    ...)
 {
   ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  if (!is.character(region))
-    stop("Expected a character vector as 'region'")
+  # if (inherits(region, "regions"))
+  #   region <- as.character(region)
   
-  region <- .processRegionParam(region)
+  if (!is.character(region))
+    stop(sprintf("Expected a character vector as '%s'", .arg_str(region)))
+  
+  if (!is.null(data) && !is.data.frame(data))
+    stop(sprintf("A non-NULL input for '%s' must be a data frame",
+                 .arg_str(data)))
   
   if (!is.logical(show.neighbours))
-    stop("'show.neighbours' should be a boolean")
+    stop(sprintf("'%s' should be a boolean", .arg_str(show.neighbours)))
   
   if (length(show.neighbours) > 1L) {
-    warning("Only the first element of 'show.neighbours' was used")
+    warning(.first_elem_warn(.arg_str(show.neighbours)))
     show.neighbours <- show.neighbours[1]
   }
   
   if (show.neighbours)
     message("Display of neighbouring regions is temporarily disabled")
   
-  if (is.null(legend.text)) {
-    legend.text <- TRUE
-  }
+  legend.text <- if (is.null(legend.text))
+    TRUE
   else {
-    if (is.logical(legend.text))
-      if (length(legend.text) > 1L) {
-        legend.text <- legend.text[1]
-        warning("Only the first element of 'legend text' was used")
-      }
+    
+    if (is.logical(legend.text)) {
+      
+      if (length(legend.text) > 1L)
+        warning(.first_elem_warn(deparse(quote(legend.text))))
+      
+      legend.text[1]
+    }
     else if (!is.character(legend.text))
-      stop("A non-NULL input for 'legend.text' must be exclusively",
-           "of type character or logical")
+      stop(sprintf(
+        "A non-NULL input for '%s' must be of type character or logical",
+        .arg_str(legend.text)
+      ))
   }
+  
+  region <- .processRegionParam(region)
   
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
   else 
     enexpr(x)
   
-  chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
+  chrplth <- if (is_null(value.x) || is_symbol(value.x))
     .validateChoroplethParams(!!value.x, region, data)  # TODO: Refactor
-  } else {
+  else {
     value.x <- eval_tidy(value.x)
     .validateChoroplethParams(value.x, region, data)
   }
@@ -194,10 +205,14 @@ map_ng <- function(region = character(),
   ## Prepare to draw choropleth 
   if (chrplth) {
     mapq <- expr(map(database, region.regex))  ## TODO: Consider rlang::call2
+    
     if (!is.null(dots$plot))
+      
       if (!dots$plot)
         mapq$plot <- FALSE
+    
     mapq$fill <- TRUE
+    
     if (!is.null(data)) {
       vl.col <- as_name(value.x)
       st.col <- .regionColumnIndex(data, region)
@@ -208,6 +223,7 @@ map_ng <- function(region = character(),
       cStates <- region
       cValue <- value.x
     }
+    
     cParams <-
       list(
         region = cStates,
@@ -215,8 +231,10 @@ map_ng <- function(region = character(),
         breaks = breaks,
         categories = categories
       )
+    
     cOpts <-
       .prepareChoroplethOptions(database, cParams, dots$col, excluded, exclude.fill)
+    
     mapq$col <- cOpts$colors
     
     if (lifecycle::is_present(leg.orient)) {
@@ -225,8 +243,6 @@ map_ng <- function(region = character(),
     
     
   }
-  
-  outlineMap <- identical(region, 'Nigeria')
   
   ## Draw a `maps::map()` (with or without labels) or capture the object.
   ##
@@ -243,36 +259,39 @@ map_ng <- function(region = character(),
     return(database)
   
   if (show.text) {
-    txt <- "Nigeria"
-    if (!outlineMap) {
+    txt <- .ngName()
+    
+    if (!identical(region, .ngName())) {
+      
       txt <- database$name %>%
         { 
-          # Account for multi-polygon regions
+          # Account for multi-polygonic regions
           # TODO: Scope this to parent environment
           rgxRegions <-
             function(x, nms) {
               rgx <- paste0("^", x, "(\\:\\d*)?$")
               grep(rgx, nms, value = TRUE)
             }
+          
           is <- lapply(region, rgxRegions, nms = .)
           unlist(is)
         }
+      
       map.text(
         database,
         regions = txt,
         exact = TRUE,
         labels = .adjustLabels(txt),
-        add = TRUE)
+        add = TRUE
+      )
     }
   }
   
   ## Annotate
   title(main = title, sub = caption)
   
-  if(!is_null(y)) {
-    if (!.xyWithinBounds(database, x, y))
-      stop("Coordinates are out of bounds of the map")
-  }
+  if(!is_null(y) && !.xyWithinBounds(database, x, y))
+    stop("Coordinates are out of bounds of the map")
   
   if (chrplth) {
     
@@ -314,33 +333,22 @@ map_ng <- function(region = character(),
 }
 
 
-.nextMinorVer <- function()
-{
-  ">= 0.6.0"
-}
 
-
-.deprecMsg <- function(arg) {
-  sprintf("map_ng(%s = )", arg)
-}
-
-
-
-## TODO: MARKED FOR DEPRECATION
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
-## This function's use will be overtaken by the introduction 
-## of LGA level mapping.
 .processRegionParam <- function(s)
 {
   stopifnot(is.character(s))
-  if (identical(s, "Nigeria"))
-    return(s)
-  all.st <- states(all = TRUE)
+  
   if (length(s) == 0L)
-    s <- all.st
-  if (!all(s %in% all.st) && !all(s %in% lgas()))
-    stop("One or more elements of 'region' is not a Nigerian region")
+    return(states(all = TRUE))
+  
+  isvalid <- all(is_state(s)) || all(is_lga(s))
+  
+  if (!isvalid || s != .ngName())
+    stop(sprintf("One or more elements of '%s' is not a Nigerian region",
+         deparse(substitute(s))),
+         call. = FALSE)
   s
 }
 
@@ -355,23 +363,33 @@ map_ng <- function(region = character(),
 .validateChoroplethParams <- function(val = NULL, region = NULL, data = NULL)
 {
   # TODO: Add some verbosity.
-  no.region <- is.null(region) || identical(region, "Nigeria")
+  no.region <- isFALSE(length(region) > 0L) || identical(region, .ngName())
+  
   if (no.region && is.null(data))
     return(FALSE)
+  
   arg <- enexpr(val)
+  
   if (!no.region &&
       is.character(region) && all(is_state(region)) && !is_null(arg))
     return(TRUE)
+  
   if (!is.data.frame(data))
     return(FALSE)
+  
   ind <- try(.regionColumnIndex(data), silent = TRUE)
+  
   if (inherits(ind, 'try-error'))
     return(FALSE)
+  
   if (is_symbol(arg))
     return(as_name(arg) %in% names(data))
+  
   if (is.null(arg))
+    
     if (ncol(data) < 2L)
       return(FALSE)
+  
   TRUE
 }
 
@@ -391,12 +409,16 @@ map_ng <- function(region = character(),
 {
   if (is.factor(x))
     x <- as.character(x)
+  
   stopifnot(is.character(x))
+  
   if (identical(x, 'Nigeria'))
     return("mapdata::worldHires")
+  
   if ((length(x) == 1L && (x %in% .synonymRegions()))
       || all(is_state(x)))
     return(.getMapData(states(x)))
+  
   .getMapData(lgas(x))
 }
 
@@ -405,15 +427,19 @@ map_ng <- function(region = character(),
 {
   spo <- .fixNasState(shp.lga[['spatialObject']], "STATE")
   st.nm <- attr(x, 'State')
+  
   if (length(st.nm) > 1L)
     stop("LGA-level maps for adjoining States are not yet supported")
+  
   lgaObj <- if (!is.null(st.nm)) {
+    
     if (st.nm %in% .fctOptions())  # peculiar to this scope
       st.nm <- "Abuja"
     spo[grep(.regexSubsetRegions(st.nm), spo@data$STATE), ]
   }
   else
     spo[grep(.regexSubsetRegions(x), spo@data$LGA), ]
+  
   .createBaseMapsObject(lgaObj, shp.lga)
  }
 
@@ -427,6 +453,7 @@ map_ng <- function(region = character(),
   
   stateObj <- 
     spo[grep(.regexSubsetRegions(x), spo@data$admin1Name), ]
+  
   .createBaseMapsObject(stateObj, shp.state)
 }
 
@@ -508,6 +535,7 @@ map_ng <- function(region = character(),
 
 # For possible export later
 .shpLayer <- function(level) {
+  
   if (level == 'state')
     "nga_admbnda_adm1_osgof_20161215"
   else if (level == 'lga')
@@ -530,17 +558,22 @@ map_ng <- function(region = character(),
 .regionColumnIndex <- function(dt, s = NULL)
 {
   stopifnot(is.data.frame(dt))
+  
   if (is.null(s))
     s <- states()
   
   ## Checks if a column has the names of States, returning TRUE is so.
   .fx <- function(x) {
+    
     if (is.factor(x))    # TODO: Earmark for removal
       x <- as.character(x)
+    
     ret <- logical(1)
+    
     if (is.character(x)) {
       areStates <- is_state(x)
       ret <- all(areStates)
+      
       if (!ret && any(areStates)) {
         misspelt <- which(!areStates)
         msg <- sprintf("The following regions are misspelt: %s",
@@ -550,11 +583,15 @@ map_ng <- function(region = character(),
     }
     ret
   }
+  
   n <- vapply(dt, .fx, logical(1))
+  
   if (!sum(n))
     abort(sprintf("No column with elements in %s.", deparse(substitute(s))))
+  
   if (sum(n) > 1)
     warning("Multiple columns have States, so the first is used")
+  
   which(n)[1]
 }
 
@@ -572,15 +609,19 @@ map_ng <- function(region = character(),
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
     stopifnot(inherits(map, 'map'))
+    
     if(!.assertListElements(opts))
       abort("One or more inputs for generating choropleth options are invalid")
+    
     brks <- opts$breaks
+    
     df <-
       data.frame(
         region = opts$region,
         value = opts$value,
         stringsAsFactors = FALSE
       )
+    
     df$cat <- .createCategorized(df$value, brks)
     cats <- levels(df$cat)
     colrange <- .processColouring(col, length(cats))
@@ -590,11 +631,14 @@ map_ng <- function(region = character(),
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
     mapregions <- .getUniqueStateNames(map)
+    
     if (nrow(df) < length(mapregions))
       mapregions <- mapregions[mapregions %in% df$region]
+    
     new.ind <- order(df$region, mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
     colors <- .reassignColours(map$names, ord.df$region, ord.df$color, ...)
+    
     list(colors = colors,
          scheme = colrange,
          bins = cats)
@@ -609,11 +653,13 @@ map_ng <- function(region = character(),
 .assertListElements <- function(x) {
   stopifnot(c('region', 'value', 'breaks') %in% names(x))
   region.valid <- all(is_state(x$region))
+  
   value.valid <- 
     x$value %>% 
     {
       is.numeric(.) || is.factor(.) || is.character(.)
     }
+  
   cat.valid <-
     x$categories %>%
     {
@@ -650,23 +696,32 @@ map_ng <- function(region = character(),
 {
   if (is.character(val))
     val <- as.factor(val)
+  
   if (is.factor(val)) {
+    
     if (length(levels(val)) >= 10L)
       abort("Too many categories")
+    
     return(val)
   }
+  
   if (!is.numeric(val)) {
     msg <- paste(sQuote(typeof(val)), "is not a supported type")
     abort(msg)
   }
+  
   if (is.null(brks))
     abort(paste("Breaks were not provided for the", 
                 "categorization of a numeric type"))
+  
   rr <- range(val)
+  
   if (is_scalar_integer(brks))
     brks <- seq(rr[1], rr[2], diff(rr) / brks)
+  
   if (rr[1] < min(brks) || rr[2] > max(brks))
     abort("Values are out of range of breaks")
+  
   cut(val, brks, include.lowest = TRUE)
 }
 
@@ -684,29 +739,39 @@ map_ng <- function(region = character(),
 .processColouring <- function(col = NULL, n, ...)
 {
   .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
+  
   if (is.null(col))
     col <- .DefaultChoroplethColours[1]
+  
   if (is.numeric(col)) {
     default.pal <- .get_R_palette()
     all.cols <- default.pal %>% 
       sub("(green)(3)", "\\1", .) %>% 
       sub("gray", "grey", .)
+    
     if (!col %in% seq_along(all.cols))
-      abort(sprintf("'color' must range between 1L and %iL", length(all.cols)))
+      abort(sprintf("'color' must range between 1L and %iL", 
+                    length(all.cols)))
+    
     col <- all.cols[col]
   }
+  
   among.def.cols <- col %in% .DefaultChoroplethColours
   in.other.pal <- !among.def.cols && (col %in% rownames(brewer.pal.info))
+  
   pal <-
     if (!among.def.cols) {
+      
       if (!in.other.pal)
         abort(
           sprintf("'%s' is not a supported colour or palette", col)
         )
+      
       col
     }
     else
       paste0(tools::toTitleCase(col), "s")
+  
   RColorBrewer::brewer.pal(n, pal)
 }
 
@@ -759,11 +824,12 @@ map_ng <- function(region = character(),
       off.color <- "grey"
     if (!is.null(excl.col)) {
       if (length(excl.col) > 1L)
-        stop("Non-null 'exclude.fill' must be of length 1L")
+        stop(sprintf("Non-null '%s' must be of length 1L",
+                     .arg_str(exclude.fill)))
       if (!is.character(excl.col))
-        stop("'exclude.fill' must be a string")
+        stop(sprintf("'%s' must be a string", .arg_str(exclude.fill)))
       if (!excl.col %in% colours())
-        stop("'exclude.fill' must be a valid colour")
+        stop(sprintf("'%s' must be a valid colour", .arg_str(exclude.fill)))
       off.color <- excl.col
     }
     excluded <- match(excl.region, new.names)
@@ -873,14 +939,18 @@ map_ng <- function(region = character(),
 ShapefileProps <- function(regions)
 {
   shp <- .getShapefileDir(regions)
-  dsn <- system.file(file.path("extdata", shp),
+  pkgdir <- "extdata"
+  
+  dsn <- system.file(file.path(pkgdir, shp),
                      package = 'naijR',
                      mustWork = TRUE)
+  
   if (identical(dsn, character(1)))
-    stop("The map data could not be found in 'extdata'")
-  pat <- "\\.shp$"
-  shpfl <- list.files(dsn, pat)
-  lyr <- sub(pattern = paste0("(.+)(", pat, ")"), "\\1", shpfl)
+    stop(sprintf("The map data could not be found in '%s'", pkgdir))
+  
+  rgx <- "\\.shp$"
+  shpfl <- list.files(dsn, rgx)
+  lyr <- sub(pattern = paste0("(.+)(", rgx, ")"), "\\1", shpfl)
   sp <- readOGR(dsn, lyr, verbose = FALSE)
   
   ## The following shapefile, has some unwanted data
@@ -927,26 +997,69 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 
 .fetchNamefield.lgas <- function(x, dt) {
   nmfld <- NA
+  
   for (i in seq_len(ncol(dt))) {
+    
     if (all(unique(dt[[i]]) %in% states()))  # skip column with States
       next
+    
     if (any(x %in% dt[[i]])) {   # just any LGAs will do, since some of them
       nmfld <- colnames(dt)[i]   # also share names with their State
       break
     }
   }
+  
   nmfld
 }
+
+
 
 
 .fetchNamefield.states <- function(x, dt) {
   # dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
   nmfld <- NA
+  
   for (i in seq_len(ncol(dt))) {
+    
     if (all(x %in% dt[[i]])) {   # all MUST be states
       nmfld <- colnames(dt)[i]
       break
     }
+    
   }
+  
   nmfld
+}
+
+
+
+
+
+## Messages -----------------------------------------------------------------
+.ngName <- function()
+{
+  "Nigeria"
+}
+
+.arg_str <- function(arg)
+{
+  deparse(substitute(arg))
+}
+
+
+.first_elem_warn <- function(arg)
+{
+  stopifnot(is.character(arg) && length(arg) == 1L)
+  sprintf("Only the first element of '%s' was used", arg)
+}
+
+
+.nextMinorVer <- function()
+{
+  ">= 0.6.0"
+}
+
+
+.deprecMsg <- function(arg) {
+  sprintf("map_ng(%s = )", arg)
 }

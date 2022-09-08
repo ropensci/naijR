@@ -31,6 +31,8 @@ test_that("Input is validated", {
                  "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring regions is temporarily disabled")
+  expect_error(map_ng(data = vector()), 
+               "A non-NULL input for 'data' must be a data frame")
   # TODO: Add test case for choropleths with too few regions
 })
 
@@ -283,10 +285,16 @@ test_that("Choropleth mapping succeeds", {
 })
 
 
+test_that("Draw choropleth automatically with 2-column data frames", {
+  d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  
+  expect_s3_class(try(map_ng(data = d, plot = FALSE)), "map")
+})
 
 
 test_that("Choropleth colours can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
+  
   func <- expr(map_ng(
     data = dat,
     x = total.pop,
@@ -295,11 +303,16 @@ test_that("Choropleth colours can be controlled at interface", {
     plot = FALSE,
     col = NULL
   ))
+  
   mm <- 'map'
   
   expect_is(eval_tidy(func), mm)
-  func$col <- "YlOrRd"; expect_is(eval_tidy(func), mm)
-  func$col <- 'blue'; expect_is(eval_tidy(func), mm)
+  
+  func$col <- "YlOrRd"
+  expect_is(eval_tidy(func), mm)
+  
+  func$col <- 'blue'
+  expect_is(eval_tidy(func), mm)
 })
 
 

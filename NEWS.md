@@ -7,7 +7,10 @@
 * Repair mobile numbers where poor data entry interchanges zeros (`0`s) with the letter `O` (works for both upper and lower case).
 * Repair of mobile numbers now offers optional imformation for users.
 * Allow the use of factor input when creating objects of class `regions`.
-* Added a new argument `legend.text` for `map_ng` using an idiom that is similar to the one used in `base::barplot`.
+* Added a new argument `legend.text` for `map_ng` using an idiom that is similar to the one used in `base::barplot`, thanks to observations made by @VictoriaLatham in issue #27.
+
+# Bug fixes:
+* `map_ng` accepted arguments that were not `data.frame`s leading to unwieldy errors. It is now made sure to fail early in such cases
 
 ## Deprecated:
 * Arguments of `map_ng` - `leg.x`, `leg.y`, and `leg.orient` were marked for deprecation in the next minor release.
