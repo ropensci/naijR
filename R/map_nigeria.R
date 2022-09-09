@@ -133,11 +133,7 @@ map_ng <- function(region = character(),
                    leg.title = NULL,
                    leg.orient = deprecated(),
                    ...)
-{
-  ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  # if (inherits(region, "regions"))
-  #   region <- as.character(region)
-  
+{    ## TODO: Allow this function to accept a matrix e.g. for plotting points
   if (!is.character(region))
     stop(sprintf("Expected a character vector as '%s'", .arg_str(region)))
   
@@ -145,8 +141,13 @@ map_ng <- function(region = character(),
     stop(sprintf("A non-NULL input for '%s' must be a data frame",
                  .arg_str(data)))
   
+  if (is.data.frame(data) && ncol(data) < 2L)
+    stop(sprintf("Insufficient variables in '%s' to generate a plot",
+                 deparse(quote(data))))
+  
   if (!is.logical(show.neighbours))
-    stop(sprintf("'%s' should be a boolean", .arg_str(show.neighbours)))
+    stop(sprintf("'%s' should be a logical value", 
+                 .arg_str(show.neighbours)))
   
   if (length(show.neighbours) > 1L) {
     warning(.first_elem_warn(.arg_str(show.neighbours)))
@@ -156,7 +157,8 @@ map_ng <- function(region = character(),
   if (show.neighbours)
     message("Display of neighbouring regions is temporarily disabled")
   
-  legend.text <- if (is.null(legend.text))
+  legend.text <- 
+    if (is.null(legend.text))
     TRUE
   else {
     
@@ -181,30 +183,31 @@ map_ng <- function(region = character(),
   else 
     enexpr(x)
   
-  chrplth <- if (is_null(value.x) || is_symbol(value.x))
+  use.choropleth <- if (is_null(value.x) || is_symbol(value.x)) {
     .validateChoroplethParams(!!value.x, region, data)  # TODO: Refactor
+  }
+  else if (!is_null(y)) {
+    FALSE
+  }
   else {
     value.x <- eval_tidy(value.x)
     .validateChoroplethParams(value.x, region, data)
   }
   
-  if (!is_null(y))
-    chrplth <- FALSE
-  
-  database <- .getMapData(region)
+  mapdata <- .getMapData(region)
   
   ## Create a regular expression for drawing regions. There is a 
   ## to account for situations where there are multiple polygons
   ## for the same State/LGA
   region.regex <- .regexDuplicatedPolygons(region)
-  mapq <- quote(map(database, regions = region.regex, ...))
+  mapq <- quote(map(mapdata, regions = region.regex, ...))
   
   ## Capture 'dots'
   dots <- list(...)
   
   ## Prepare to draw choropleth 
-  if (chrplth) {
-    mapq <- expr(map(database, region.regex))  ## TODO: Consider rlang::call2
+  if (use.choropleth) {
+    mapq <- expr(map(mapdata, region.regex))  ## TODO: Consider rlang::call2
     
     if (!is.null(dots$plot))
       
@@ -213,35 +216,34 @@ map_ng <- function(region = character(),
     
     mapq$fill <- TRUE
     
-    if (!is.null(data)) {
-      vl.col <- as_name(value.x)
-      st.col <- .regionColumnIndex(data, region)
-      cValue <-  data[[vl.col]]
-      cStates <- data[[st.col]]
-    }
-    else {
-      cStates <- region
-      cValue <- value.x
-    }
+    cParams <- list(
+      region = region,
+      value = value.x,
+      breaks = breaks,
+      categories = categories
+    )
     
-    cParams <-
-      list(
-        region = cStates,
-        value = cValue,   
-        breaks = breaks,
-        categories = categories
-      )
+    if (!is.null(data)) {
+      st.col <- .regionColumnIndex(data, region)
+      
+      ## Bet on a two-column data frame that has a
+      ## a column with valid regions
+      vl.col <- if (is.null(value.x) && ncol(data) == 2L)
+        names(data)[-st.col]
+      else
+        as_name(value.x)
+      
+      cParams$value <-  data[[vl.col]]
+      cParams$region <- data[[st.col]]
+    }
     
     cOpts <-
-      .prepareChoroplethOptions(database, cParams, dots$col, excluded, exclude.fill)
+      .prepChoroplethOpts(mapdata, cParams, dots$col, excluded, exclude.fill)
     
     mapq$col <- cOpts$colors
     
-    if (lifecycle::is_present(leg.orient)) {
+    if (lifecycle::is_present(leg.orient))
       lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.orient))
-    }
-    
-    
   }
   
   ## Draw a `maps::map()` (with or without labels) or capture the object.
@@ -253,10 +255,13 @@ map_ng <- function(region = character(),
   ## `maps::map()` used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
-  database <- eval(mapq)    # possibly, a new `database` is created
+  database <- eval(mapq)    # DO NOT CHANGE THE NAME OF THIS VARIABLE!
   
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
+  
+  if(!is_null(y) && !.xyWithinBounds(database, x, y))
+    stop("Coordinates are out of bounds of the map")
   
   if (show.text) {
     txt <- .ngName()
@@ -290,10 +295,7 @@ map_ng <- function(region = character(),
   ## Annotate
   title(main = title, sub = caption)
   
-  if(!is_null(y) && !.xyWithinBounds(database, x, y))
-    stop("Coordinates are out of bounds of the map")
-  
-  if (chrplth) {
+  if (use.choropleth) {
     
     if (is.null(categories))
       categories <- cOpts$bins
@@ -332,7 +334,7 @@ map_ng <- function(region = character(),
   invisible(database)
 }
 
-
+# Internal helper functions ---------------------------------------------------
 
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
@@ -343,52 +345,120 @@ map_ng <- function(region = character(),
   if (length(s) == 0L)
     return(states(all = TRUE))
   
-  isvalid <- all(is_state(s)) || all(is_lga(s))
+  isregion <- all(is_state(s)) || all(is_lga(s))
   
-  if (!isvalid || s != .ngName())
-    stop(sprintf("One or more elements of '%s' is not a Nigerian region",
-         deparse(substitute(s))),
-         call. = FALSE)
+  if (!isregion) {
+    
+    if (length(s) > 1L) {
+      stop(sprintf(
+        "One or more elements of '%s' is not a Nigerian region",
+        deparse(substitute(s))
+      ),
+      call. = FALSE)
+    }
+    else if (s != .ngName()) {
+      stop(
+        sprintf(
+          "Single inputs for '%s' only support the value '%s'",
+          deparse(substitute(s)),
+          .ngName()
+        ),
+        call. = FALSE
+      )
+    }
+  }
+  
   s
 }
 
 
 
 
+# Makes sure that all the elements required for making
+# a choropleth map are available. These are:
+# - A data frame with a value and region column identified
+# - A 2-column data frame with one column of regions
+# - A region and value as separate vectors
+# 
+
+# - 
 
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
 .validateChoroplethParams <- function(val = NULL, region = NULL, data = NULL)
-{
-  # TODO: Add some verbosity.
-  no.region <- isFALSE(length(region) > 0L) || identical(region, .ngName())
+{   # TODO: Add some verbosity.
+  .hasRegions <- function(x) {
+    stopifnot(isFALSE(is.null(x)))
+    all(is_state(x)) || all(is_lga(x))
+  }
   
-  if (no.region && is.null(data))
-    return(FALSE)
+  val <- enexpr(val)
   
-  arg <- enexpr(val)
-  
-  if (!no.region &&
-      is.character(region) && all(is_state(region)) && !is_null(arg))
-    return(TRUE)
-  
-  if (!is.data.frame(data))
-    return(FALSE)
-  
-  ind <- try(.regionColumnIndex(data), silent = TRUE)
-  
-  if (inherits(ind, 'try-error'))
-    return(FALSE)
-  
-  if (is_symbol(arg))
-    return(as_name(arg) %in% names(data))
-  
-  if (is.null(arg))
+  ## If 'data' is NULL, then both 'val' and 'region' must be present
+  ## and 'region' must have valid States or LGAs
+  if (is.null(data)) {
     
-    if (ncol(data) < 2L)
+    if (is.null(val) || is.null(region))
       return(FALSE)
+    
+    if (!.hasRegions(region) && !is.null(val))
+      return(FALSE)
+    # At this point, we have two valid vectors only
+  }
+  
+  data.has.regions <- FALSE
+  
+  if (is.data.frame(data)) {
+    index <- .regionColumnIndex(data)
+    data.has.regions <- as.logical(index)
+    region <- unique(data[[index]])
+  }
+  else if (!is.null(data)) {
+    warning(sprintf("'%s' is invalid for choropleths but was ignored",
+                    .arg_str(data)))
+  }
+  
+  ## If 'region' is NULL, it must be found automatically in 'data'
+  if (is.null(region)) {
+    
+    if (isFALSE(data.has.regions))
+      return(FALSE)
+    
+    region <- character()
+  }
+  
+  if (!.hasRegions(region))
+    return(FALSE)
+  
+  ## If 'val' is null, it must exist in 'data', but can only be
+  ## deduced if 'data' has only 2 columns and the other column is 
+  ## confirmed to contain strings representing regions (i.e. States
+  ## or LGAs)
+  if (is.null(val)) {
+    if (is.null(data))
+      return(FALSE)
+    
+    if (ncol(data) > 2L)
+      return(FALSE)
+    
+    if (isFALSE(.hasRegions(region)) && isFALSE(data.has.regions))
+      return(FALSE)
+  }
+  
+  if (!is.null(val)) {
+    
+    if (is.data.frame(data)) {
+    
+      if (is_symbol(val) &&
+          isFALSE(as_name(val) %in% names(data))) {
+        stop(sprintf("The column '%s' does not exist in '%s'",
+                     .arg_str(val), .arg_str(data)),
+             call. = FALSE)
+      }
+    }
+  }
   
   TRUE
 }
@@ -559,10 +629,7 @@ map_ng <- function(region = character(),
 {
   stopifnot(is.data.frame(dt))
   
-  if (is.null(s))
-    s <- states()
-  
-  ## Checks if a column has the names of States, returning TRUE is so.
+  ## Checks if a column has the names of States, returning TRUE if so.
   .fx <- function(x) {
     
     if (is.factor(x))    # TODO: Earmark for removal
@@ -574,11 +641,14 @@ map_ng <- function(region = character(),
       areStates <- is_state(x)
       ret <- all(areStates)
       
+      # TODO: apply a ?restart here when there are misspelt States
+      # and try to fix them automatically and then apply the function
+      # one more time. Do so verbosely.
       if (!ret && any(areStates)) {
         misspelt <- which(!areStates)
-        msg <- sprintf("The following regions are misspelt: %s",
-                       paste(x[!areStates], collapse = ","))
-        warning(msg, call. = FALSE)
+        warning(sprintf("Misspelt region(s) in the dataset: %s",
+                        paste(x[!areStates], collapse = ", ")),
+                call. = FALSE)
       }
     }
     ret
@@ -586,11 +656,17 @@ map_ng <- function(region = character(),
   
   n <- vapply(dt, .fx, logical(1))
   
+  if (is.null(s))
+    s <- states()
+  
   if (!sum(n))
-    abort(sprintf("No column with elements in %s.", deparse(substitute(s))))
+    stop(sprintf("No column with elements in '%s'.", 
+                  deparse(substitute(dt))),
+         call. = FALSE)
   
   if (sum(n) > 1)
-    warning("Multiple columns have States, so the first is used")
+    warning("Multiple columns have regions, so the first was used",
+            call. = FALSE)
   
   which(n)[1]
 }
@@ -603,7 +679,7 @@ map_ng <- function(region = character(),
 
 
 #' @importFrom rlang abort
-.prepareChoroplethOptions <-
+.prepChoroplethOpts <-
   function(map, opts, col = NULL, ...)
   {
     # TODO: Set limits for variables and brk

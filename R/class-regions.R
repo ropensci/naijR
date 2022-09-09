@@ -451,9 +451,27 @@ as_lga <- function(x) {
 
 
 # TODO: Export this function in next release
+# Disambiguate Synonymous States and LGAs
+# 
+# Some LGAs in Nigeria bear the name of the States to which they belong to.
+# This function will apply an attribute to such an LGA to distinguish it from
+# its State.
+# 
+# @param x A character vector or \code{region} object of length 1L.
+# @param parent The name of the State to which the LGA is to belong to.
+# 
+# @details For \code{parent}, if it is not provided by the user, an interactive
+# prompt will be presented to the user to select the appropriate state - but 
+# only in interactive sessions; if run as a batch command, this functionality
+# will signal an error.
+#
 # @importFrom utils menu
-disambiguate <- function(x, parent = NULL)
+# @export
+disambiguate_lga <- function(x, parent = NULL)
 {
+  if (!is.character(x))
+    stop(sQuote(deparse(quote(x))), "must be a character vector")
+  
   if (length(x) > 1L)
     stop("Disambiguation is done only for single-length objects")
   
@@ -463,6 +481,10 @@ disambiguate <- function(x, parent = NULL)
   ss <- attr(x, "State")
   
   if (is.null(parent)) {
+    
+    if (!interactive())
+      stop("Disambiguation can only be done in interactive mode")
+    
     title <- sprintf("Which State does the LGA '%s' belong to?", x)
     parent <- ss[menu(ss, graphics = TRUE, title = title)]
   }
