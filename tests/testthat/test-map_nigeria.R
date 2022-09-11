@@ -343,7 +343,6 @@ test_that("Number of LGAs matches the number extracted for mapping", {
 
 
 test_that("Choropleth map can be formed with excluded regions", {
-  # Issue #27
   mapClass <- "map"
   colpal <- "YlOrRd"
   excluded.reg <- c("Abia", "Jigawa")
@@ -397,7 +396,8 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "Non-null 'exclude.fill' must be of length 1L",
+    paste("Only one colour can be used to denote regions excluded", 
+          "from the choropleth colouring scheme"),
     fixed = TRUE
   )
   
@@ -411,7 +411,8 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "'exclude.fill' must be a valid colour",
+    paste("The colour used for excluded regions must be valid",
+          "i.e. an element of the built-in set 'colours()'"),
     fixed = TRUE
   )
   
@@ -425,7 +426,7 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "'exclude.fill' must be a string",
+    "Colour indicators of type 'integer' are not supported",
     fixed = TRUE
   )
 })

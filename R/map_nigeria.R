@@ -886,7 +886,9 @@ map_ng <- function(region = character(),
     all(is_state(all.regions))
     .isHexColor(in.colours)
   })
+  
   out.colours <- new.names <- rep(NA, length(names))
+  
   for (i in seq_along(all.regions)) {
     regx <- .regexDuplicatedPolygons(all.regions[i])
     ind <- grep(regx, names)
@@ -898,19 +900,28 @@ map_ng <- function(region = character(),
   ## the choropleth and should be given an 'off-colour'
   if (!is.null(excl.region)) {
       off.color <- "grey"
+    
     if (!is.null(excl.col)) {
+      
       if (length(excl.col) > 1L)
-        stop(sprintf("Non-null '%s' must be of length 1L",
-                     .arg_str(exclude.fill)))
+        stop(paste("Only one colour can be used to denote regions excluded",
+             "from the choropleth colouring scheme"))
+      
       if (!is.character(excl.col))
-        stop(sprintf("'%s' must be a string", .arg_str(exclude.fill)))
+        stop(sprintf("Colour indicators of type '%s' are not supported",
+                     typeof(excl.col)))
+      
       if (!excl.col %in% colours())
-        stop(sprintf("'%s' must be a valid colour", .arg_str(exclude.fill)))
+        stop(paste("The colour used for excluded regions must be valid",
+             "i.e. an element of the built-in set 'colours()'"))
+
       off.color <- excl.col
     }
+
     excluded <- match(excl.region, new.names)
     out.colours[excluded] <- off.color
   }
+
   structure(out.colours, names = new.names)
 }
 
