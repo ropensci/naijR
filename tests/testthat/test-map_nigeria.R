@@ -35,6 +35,7 @@ test_that("Input is validated", {
                "A non-NULL input for 'data' must be a data frame")
   expect_error(map_ng(data = data.frame(col = runif(10))),
                "Insufficient variables in 'data' to generate a plot")
+  expect_error(map_ng(data.frame()), "A data frame was passed;")
   # TODO: Add test case for choropleths with too few regions
 })
 
@@ -142,13 +143,23 @@ test_that("Choropleth mapping succeeds", {
     plot = FALSE
   ),
   'map')
+  
+  expect_s3_class(map_ng(
+    region = ss,
+    x = sample(LETTERS[1:5], length(ss), TRUE),
+    col = "red",
+    show.text = FALSE,
+    plot = FALSE
+  ), "map")
 })
 
 
 test_that("Draw choropleth automatically with 2-column data frames", {
-  d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  ds <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  dl <- data.frame(LGA = lgas(), value = sample(LETTERS[1:5], 774, TRUE))
   
-  expect_s3_class(try(map_ng(data = d, plot = FALSE)), "map")
+  for (df in list(ds, dl)) 
+    expect_s3_class(try(map_ng(data = df, plot = FALSE)), "map")
 })
 
 
@@ -277,33 +288,33 @@ test_that("Parameters passed via ellipsis work seamlessly", {
 
 
 
-# test_that("All individual plain State maps can be drawn", {
-#   for (s in states())
-#     expect_s3_class(map_ng(s, plot = FALSE), "map")
-# })
-# 
-# 
-# test_that("All LGAs within a given State are drawn", {
-#   for (s in states())
-#     expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
-# })
-# 
-# 
-# test_that("All individual LGA maps can be drawn", {
-#   for (s in states()) {
-#     lgs <- lgas(s)
-#     
-#     for (lg in lgs) {
-#       x <- suppressWarnings(lgas(lg))
-#       state <- attr(x, "State")
-#       
-#       if (length(state) > 1L)
-#         x <- disambiguate_lga(x, parent = s)
-#       
-#       expect_s3_class(map_ng(x, plot = FALSE), "map")
-#     }
-#   }
-# })
+test_that("All individual plain State maps can be drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(s, plot = FALSE), "map")
+})
+
+
+test_that("All LGAs within a given State are drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
+})
+
+
+test_that("All individual LGA maps can be drawn", {
+  for (s in states()) {
+    lgs <- lgas(s)
+
+    for (lg in lgs) {
+      x <- suppressWarnings(lgas(lg))
+      state <- attr(x, "State")
+
+      if (length(state) > 1L)
+        x <- disambiguate_lga(x, parent = s)
+
+      expect_s3_class(map_ng(x, plot = FALSE), "map")
+    }
+  }
+})
 
 
 
@@ -464,3 +475,20 @@ test_that(
       "map"
     ) 
   })
+
+
+test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
+  d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.x = 8L, plot = FALSE))
+  # })
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.y = 94L, plot = FALSE))
+  # }) 
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.orient = "horiz", plot = FALSE))
+  # })
+})

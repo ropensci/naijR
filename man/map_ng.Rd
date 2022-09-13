@@ -20,7 +20,7 @@ map_ng(
   legend.text = NULL,
   leg.x = deprecated(),
   leg.y = deprecated(),
-  leg.title = NULL,
+  leg.title,
   leg.orient = deprecated(),
   ...
 )
@@ -62,7 +62,8 @@ provided by \code{categories}, giving the user additional control.}
 
 \item{leg.x, leg.y}{Numeric. Position of the legend (deprecated).}
 
-\item{leg.title}{String. The legend title.}
+\item{leg.title}{String. The legend title. If missing, a default value is
+acquired from the data. To turn off the legend title, pass \code{NULL}.}
 
 \item{leg.orient}{The orientation of the legend i.e. whether horizontal or
 vertical (deprecated).}

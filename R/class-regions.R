@@ -432,6 +432,22 @@ as_lga <- function(x) {
 
 
 
+.stateSharedLgas <- function()
+{
+  list(
+    Nasarawa = c("Nasarawa", "Kano"),
+    Obi = c("Benue", "Nasarawa"),
+    Ifelodun = c("Kwara", "Osun"),
+    Irepodun = c("Kwara", "Osun"),
+    Surulere = c("Lagos", "Oyo"),
+    Bassa = c("Kogi", "Plateau")
+  )
+}
+
+
+
+
+
 
 ## Get a vector with both the abbreviated and full versions of the 
 ## national capital's name, just return one of the two.

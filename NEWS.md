@@ -1,13 +1,14 @@
 # naijR 0.5.0
 ## New features:
-* New methods for `?InternalGenerics` are introduces e.g. for `c()`, `[`, `[[`, `na.exclude`, etc.
+* New methods for `?InternalGenerics` were introduced e.g. for `c()`, `[`, `[[`, `na.exclude`, etc.
 
 ## Enhancements:
 * Effectively handle mobile numbers that have common separators in them, namely whitespace, '-' or '.'.
 * Repair mobile numbers where poor data entry interchanges zeros (`0`s) with the letter `O` (works for both upper and lower case).
-* Repair of mobile numbers now offers optional imformation for users.
+* Repair of mobile numbers now offers optional information for users.
 * Allow the use of factor input when creating objects of class `regions`.
 * Added a new argument `legend.text` for `map_ng` using an idiom that is similar to the one used in `base::barplot`, thanks to observations made by @VictoriaLatham in issue #27.
+* Simplified the creation of choropleth maps with 2-column data frames; one of the columns is to be a vector of valid States or Local Government Areas, and the other a factor or something coercible to one. 
 
 # Bug fixes:
 * `map_ng` accepted arguments that were not `data.frame`s leading to unwieldy errors. It is now made sure to fail early in such cases

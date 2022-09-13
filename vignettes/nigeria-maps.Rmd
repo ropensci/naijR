@@ -68,15 +68,15 @@ numStates <- length(ss)
 vv <- sample(LETTERS[1:5], numStates, TRUE)
 
 # Create a data frame and view top rows
-dd <- data.frame(state = ss, var = vv, stringsAsFactors = FALSE)
+dd <- data.frame(state = ss, letter = vv)
 head(dd)
 ```
 
 ### Using a data frame
-To draw this choropleth, we will use the data frame approach first:
+The easiest way to draw the choropleth map is to pass a two-column data frame to the `data` argument. Thus if the data frame has more columns, it is trivial to subset it and extract the 2 columns of interest. Continuing with our example,
 
 ```{r df-approach}
-map_ng(data = dd, x = var, show.text = FALSE)
+map_ng(data = dd)
 ```
 
 Note the following:

@@ -19,6 +19,8 @@
 
 globalVariables(c(".", "STATE"))
 
+# Exported function(s) ---------------------------------------------------------
+
 #' Map of Nigeria
 #'
 #' Maps of the Federal Republic of Nigeria that are based on the basic
@@ -67,7 +69,8 @@ globalVariables(c(".", "STATE"))
 #' (actual strings for the legend). The latter will override whatever is 
 #' provided by \code{categories}, giving the user additional control.
 #' @param leg.x,leg.y Numeric. Position of the legend (deprecated).
-#' @param leg.title String. The legend title.
+#' @param leg.title String. The legend title. If missing, a default value is
+#' acquired from the data. To turn off the legend title, pass \code{NULL}.
 #' @param leg.orient The orientation of the legend i.e. whether horizontal or
 #' vertical (deprecated). 
 #' @param ... Further arguments passed to \code{\link[maps]{map}}
@@ -130,12 +133,18 @@ map_ng <- function(region = character(),
                    legend.text = NULL,
                    leg.x = deprecated(),
                    leg.y = deprecated(),
-                   leg.title = NULL,
+                   leg.title,
                    leg.orient = deprecated(),
                    ...)
 {    ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  if (!is.character(region))
-    stop(sprintf("Expected a character vector as '%s'", .arg_str(region)))
+  if (!is.character(region)) {
+    msg <- sprintf("Expected a character vector as '%s'.", .arg_str(region))
+    
+    addmsg <- if (is.data.frame(region))
+      "A data frame was passed; did you mean to use 'data' instead?"
+    
+    stop(paste(msg, addmsg))
+  }
   
   if (!is.null(data) && !is.data.frame(data))
     stop(sprintf("A non-NULL input for '%s' must be a data frame",
@@ -196,7 +205,7 @@ map_ng <- function(region = character(),
   
   mapdata <- .getMapData(region)
   
-  ## Create a regular expression for drawing regions. There is a 
+  ## Create a regular expression for drawing regions so as 
   ## to account for situations where there are multiple polygons
   ## for the same State/LGA
   region.regex <- .regexDuplicatedPolygons(region)
@@ -224,17 +233,17 @@ map_ng <- function(region = character(),
     )
     
     if (!is.null(data)) {
-      st.col <- .regionColumnIndex(data, region)
+      region.col <- .regionColumnIndex(data, region)
       
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
-      vl.col <- if (is.null(value.x) && ncol(data) == 2L)
-        names(data)[-st.col]
+      value.x <- if (is.null(value.x) && ncol(data) == 2L)
+        names(data)[-region.col]
       else
         as_name(value.x)
       
-      cParams$value <-  data[[vl.col]]
-      cParams$region <- data[[st.col]]
+      cParams$value <-  data[[value.x]]
+      cParams$region <- data[[region.col]]
     }
     
     cOpts <-
@@ -255,7 +264,10 @@ map_ng <- function(region = character(),
   ## `maps::map()` used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
-  database <- eval(mapq)    # DO NOT CHANGE THE NAME OF THIS VARIABLE!
+  tryCatch({
+    database <- eval(mapq)    # DO NOT CHANGE THE NAME OF THIS VARIABLE!
+  }, 
+  error = function(e) stop(e))
   
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
@@ -318,6 +330,15 @@ map_ng <- function(region = character(),
     if (lifecycle::is_present(leg.y))
       lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.y))
     
+    if (missing(leg.title)) {
+      
+      leg.title <- if (is.null(data))
+        deparse(substitute(x))
+      else
+        value.x
+      
+    }
+    
     if (showleg) 
       legend(
         x = 13L,
@@ -334,7 +355,7 @@ map_ng <- function(region = character(),
   invisible(database)
 }
 
-# Internal helper functions ---------------------------------------------------
+# Internal helper function(s) ---------------------------------------------------
 
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
@@ -389,11 +410,6 @@ map_ng <- function(region = character(),
 #' @importFrom rlang is_symbol
 .validateChoroplethParams <- function(val = NULL, region = NULL, data = NULL)
 {   # TODO: Add some verbosity.
-  .hasRegions <- function(x) {
-    stopifnot(isFALSE(is.null(x)))
-    all(is_state(x)) || all(is_lga(x))
-  }
-  
   val <- enexpr(val)
   
   ## If 'data' is NULL, then both 'val' and 'region' must be present
@@ -403,7 +419,7 @@ map_ng <- function(region = character(),
     if (is.null(val) || is.null(region))
       return(FALSE)
     
-    if (!.hasRegions(region) && !is.null(val))
+    if (!.allAreRegions(region) && !is.null(val))
       return(FALSE)
     # At this point, we have two valid vectors only
   }
@@ -413,7 +429,15 @@ map_ng <- function(region = character(),
   if (is.data.frame(data)) {
     index <- .regionColumnIndex(data)
     data.has.regions <- as.logical(index)
-    region <- unique(data[[index]])
+    
+    # Once identified, the regions in the data frame are
+    # to replace those in the original variable. Since this
+    # function is designed to return a boolean value, a 
+    # super-assignment is used to effect the change.
+    if (data.has.regions) {
+      r <- data[[index]]
+      assign(deparse(substitute(region)), r, envir = parent.frame())
+    }
   }
   else if (!is.null(data)) {
     warning(sprintf("'%s' is invalid for choropleths but was ignored",
@@ -429,13 +453,13 @@ map_ng <- function(region = character(),
     region <- character()
   }
   
-  if (!.hasRegions(region))
+  if (!.allAreRegions(region))
     return(FALSE)
   
   ## If 'val' is null, it must exist in 'data', but can only be
   ## deduced if 'data' has only 2 columns and the other column is 
   ## confirmed to contain strings representing regions (i.e. States
-  ## or LGAs)
+  ## or LGAs).
   if (is.null(val)) {
     if (is.null(data))
       return(FALSE)
@@ -443,7 +467,7 @@ map_ng <- function(region = character(),
     if (ncol(data) > 2L)
       return(FALSE)
     
-    if (isFALSE(.hasRegions(region)) && isFALSE(data.has.regions))
+    if (isFALSE(.allAreRegions(region)) && isFALSE(data.has.regions))
       return(FALSE)
   }
   
@@ -462,8 +486,6 @@ map_ng <- function(region = character(),
   
   TRUE
 }
-
-
 
 
 
@@ -635,21 +657,16 @@ map_ng <- function(region = character(),
     if (is.factor(x))    # TODO: Earmark for removal
       x <- as.character(x)
     
-    ret <- logical(1)
+    ret <- FALSE
     
     if (is.character(x)) {
-      areStates <- is_state(x)
-      ret <- all(areStates)
+     ret <- .allAreRegions(x)
       
       # TODO: apply a ?restart here when there are misspelt States
       # and try to fix them automatically and then apply the function
       # one more time. Do so verbosely.
-      if (!ret && any(areStates)) {
-        misspelt <- which(!areStates)
-        warning(sprintf("Misspelt region(s) in the dataset: %s",
-                        paste(x[!areStates], collapse = ", ")),
-                call. = FALSE)
-      }
+      if (!ret && .someAreRegions(x))
+        warning("Misspelt region(s) in the dataset", call. = FALSE)
     }
     ret
   }
@@ -706,12 +723,18 @@ map_ng <- function(region = character(),
     # interest is definitely a factor
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
-    mapregions <- .getUniqueStateNames(map)
+    rgx <- "(^.+)(:.+$)"
+    indexMultiPolygons <- grep(rgx, map$names)
+    mapregions <- sub(rgx, "\\1", map$names)
+    m <- mapregions[indexMultiPolygons]
+    m <-  m[!duplicated(m)]
+    mapregions <- mapregions[-indexMultiPolygons]
+    mapregions <- c(mapregions, m)
     
     if (nrow(df) < length(mapregions))
       mapregions <- mapregions[mapregions %in% df$region]
     
-    new.ind <- order(df$region, mapregions)
+    new.ind <- order(as.character(df$region), mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
     colors <- .reassignColours(map$names, ord.df$region, ord.df$color, ...)
     
@@ -728,7 +751,8 @@ map_ng <- function(region = character(),
 #' @import magrittr
 .assertListElements <- function(x) {
   stopifnot(c('region', 'value', 'breaks') %in% names(x))
-  region.valid <- all(is_state(x$region))
+  
+  region.valid <- .allAreRegions(x$region)
   
   value.valid <- 
     x$value %>% 
@@ -749,15 +773,6 @@ map_ng <- function(region = character(),
 }
 
 
-
-
-
-
-.getUniqueStateNames <- function(map)
-{
-  stopifnot(inherits(map, 'map'))
-  unique(sub("(^.+)(:.+$)", "\\1", map$names))
-}
 
 
 
@@ -1148,5 +1163,5 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 
 
 .deprecMsg <- function(arg) {
-  sprintf("map_ng(%s = )", arg)
+  sprintf("map_ng(%s = )", deparse(substitute(arg)))
 }

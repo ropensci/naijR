@@ -91,3 +91,19 @@ assertRegion <- function(x) {
     stop(sQuote(x, q = FALSE), " is not a valid region")
   x
 }
+
+
+
+
+# Checks whether an object has all its elements as States or LGAs
+.allAreRegions <- function(x) {
+  stopifnot(isFALSE(is.null(x)))
+  all(is_state(x)) || all(is_lga(x))
+}
+
+
+
+.someAreRegions <- function(x) {
+  stopifnot(isFALSE(is.null(x)))
+  isFALSE(.allAreRegions(x)) && (any(is_state(x)) || any(is_lga(x)))
+}
