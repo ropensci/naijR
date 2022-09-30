@@ -81,6 +81,15 @@
 <li>Added a new argument <code>legend.text</code> for <code>map_ng</code> using an idiom that is similar to the one used in <code>base::barplot</code>, thanks to observations made by <a href="https://github.com/VictoriaLatham" class="external-link">@VictoriaLatham</a> in issue <a href="https://github.com/BroVic/naijR/issues/27" class="external-link">#27</a>.</li>
 <li>Simplified the creation of choropleth maps with 2-column data frames; one of the columns is to be a vector of valid States or Local Government Areas, and the other a factor or something coercible to one.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-0">Bug fixes:<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-0"></a></h3>
+<ul><li>
+<code>map_ng</code> accepted arguments that were not <code>data.frame</code>s leading to unwieldy errors. It is now made sure to fail early in such cases</li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecated-0-5-0">Deprecated:<a class="anchor" aria-label="anchor" href="#deprecated-0-5-0"></a></h3>
+<ul><li>Arguments of <code>map_ng</code> - <code>leg.x</code>, <code>leg.y</code>, and <code>leg.orient</code> were marked for deprecation in the next minor release.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.4" id="naijr-044">naijR 0.4.4<small>2022-08-30</small><a class="anchor" aria-label="anchor" href="#naijr-044"></a></h2>
