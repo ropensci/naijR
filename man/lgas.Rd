@@ -3,7 +3,7 @@
 \name{lgas}
 \alias{lgas}
 \alias{lgas_ng}
-\title{List Local Government Areas}
+\title{Create on Object for Local Government Areas}
 \usage{
 lgas(region = NA_character_, strict = FALSE, warn = TRUE)
 
@@ -32,7 +32,7 @@ the names of Local Government Areas; otherwise a named list, whose elements
 are character vectors of the LGAs in each state.
 }
 \description{
-List Local Government Areas
+Create on Object for Local Government Areas
 }
 \note{
 There are six (6) LGAs that share names with their State - Bauchi, 

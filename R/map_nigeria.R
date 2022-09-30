@@ -19,6 +19,8 @@
 
 globalVariables(c(".", "STATE"))
 
+# Exported function(s) ---------------------------------------------------------
+
 #' Map of Nigeria
 #'
 #' Maps of the Federal Republic of Nigeria that are based on the basic
@@ -36,6 +38,9 @@ globalVariables(c(".", "STATE"))
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom graphics points
+#' @importFrom lifecycle deprecate_warn
+#' @importFrom lifecycle deprecated
+#' @importFrom lifecycle is_present
 #' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
@@ -57,13 +62,17 @@ globalVariables(c(".", "STATE"))
 #' @param exclude.fill Colour-shading to be used to indicate \code{excluded}
 #' regions. Must be a vector of the same length as \code{excluded}.
 #' @param title,caption An optional string for annotating the map.
-#' @param leg.x,leg.y Numeric. Position of the legend.
-#' @param leg.title String. The legend title.
-#' @param leg.orient The orientation of the legend i.e. whether horizontal or
-#' vertical.
 #' @param show.neighbours Logical; \code{TRUE} to display the immediate vicinity
 #' neighbouring regions/countries.
 #' @param show.text Logical. Whether to display the labels of regions.
+#' @param legend.text Logical (whether to show the legend) or character vector
+#' (actual strings for the legend). The latter will override whatever is 
+#' provided by \code{categories}, giving the user additional control.
+#' @param leg.x,leg.y Numeric. Position of the legend (deprecated).
+#' @param leg.title String. The legend title. If missing, a default value is
+#' acquired from the data. To turn off the legend title, pass \code{NULL}.
+#' @param leg.orient The orientation of the legend i.e. whether horizontal or
+#' vertical (deprecated). 
 #' @param ... Further arguments passed to \code{\link[maps]{map}}
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
@@ -84,7 +93,13 @@ globalVariables(c(".", "STATE"))
 #' \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
 #' a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
 #' available colour options can be checked with 
-#' \code{getOption("choropleth.colours")} and this can also be modified by the user.
+#' \code{getOption("choropleth.colours")} and this can also be modified by the 
+#' user.
+#' 
+#' If the default legend is unsatisfactory, it is recommended that the user
+#' sets the \code{legend.text} argument to \code{FALSE}; the next function
+#' call should be \code{\link[graphics]{legend}} which will enable finer
+#' control over the legend.
 #' 
 #' @note When adjusting the default colour choices for choropleth maps, it is
 #' advisable to use one of the sequential palettes. For a list of of available
@@ -115,86 +130,130 @@ map_ng <- function(region = character(),
                    caption = NULL,
                    show.neighbours = FALSE,
                    show.text = FALSE,
-                   leg.x = 13L,
-                   leg.y = 7L,
+                   legend.text = NULL,
+                   leg.x = deprecated(),
+                   leg.y = deprecated(),
                    leg.title,
-                   leg.orient = c('vertical', 'horizontal'),
+                   leg.orient = deprecated(),
                    ...)
-{
-  ## TODO: Allow this function to accept a matrix e.g. for plotting points
-  if (!is.character(region))
-    stop("Expected a character vector as 'region'")
-  region <- .processRegionParam(region)
+{    ## TODO: Allow this function to accept a matrix e.g. for plotting points
+  if (!is.character(region)) {
+    msg <- sprintf("Expected a character vector as '%s'.", .arg_str(region))
+    
+    addmsg <- if (is.data.frame(region))
+      "A data frame was passed; did you mean to use 'data' instead?"
+    
+    stop(paste(msg, addmsg))
+  }
+  
+  if (!is.null(data) && !is.data.frame(data))
+    stop(sprintf("A non-NULL input for '%s' must be a data frame",
+                 .arg_str(data)))
+  
+  if (is.data.frame(data) && ncol(data) < 2L)
+    stop(sprintf("Insufficient variables in '%s' to generate a plot",
+                 deparse(quote(data))))
+  
   if (!is.logical(show.neighbours))
-    stop("'show.neighbours' should be a boolean")
+    stop(sprintf("'%s' should be a logical value", 
+                 .arg_str(show.neighbours)))
+  
   if (length(show.neighbours) > 1L) {
-    warning("Only the first element of 'show.neighbours' was used")
+    warning(.first_elem_warn(.arg_str(show.neighbours)))
     show.neighbours <- show.neighbours[1]
   }
+  
   if (show.neighbours)
     message("Display of neighbouring regions is temporarily disabled")
+  
+  legend.text <- 
+    if (is.null(legend.text))
+    TRUE
+  else {
+    
+    if (is.logical(legend.text)) {
+      
+      if (length(legend.text) > 1L)
+        warning(.first_elem_warn(deparse(quote(legend.text))))
+      
+      legend.text[1]
+    }
+    else if (!is.character(legend.text))
+      stop(sprintf(
+        "A non-NULL input for '%s' must be of type character or logical",
+        .arg_str(legend.text)
+      ))
+  }
+  
+  region <- .processRegionParam(region)
+  
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
   else 
     enexpr(x)
   
-  chrplth <- if (is_null(value.x) || is_symbol(value.x)) {
+  use.choropleth <- if (is_null(value.x) || is_symbol(value.x)) {
     .validateChoroplethParams(!!value.x, region, data)  # TODO: Refactor
-  } else {
+  }
+  else if (!is_null(y)) {
+    FALSE
+  }
+  else {
     value.x <- eval_tidy(value.x)
     .validateChoroplethParams(value.x, region, data)
   }
-  if (!is_null(y))
-    chrplth <- FALSE
   
-  database <- .getMapData(region)
+  mapdata <- .getMapData(region)
   
-  ## Create a regular expression for drawing regions. There is a 
+  ## Create a regular expression for drawing regions so as 
   ## to account for situations where there are multiple polygons
   ## for the same State/LGA
   region.regex <- .regexDuplicatedPolygons(region)
-  mapq <- quote(map(database, regions = region.regex, ...))
+  mapq <- quote(map(mapdata, regions = region.regex, ...))
   
   ## Capture 'dots'
   dots <- list(...)
   
   ## Prepare to draw choropleth 
-  if (chrplth) {
-    mapq <- expr(map(database, region.regex))  ## TODO: Consider rlang::call2
+  if (use.choropleth) {
+    mapq <- expr(map(mapdata, region.regex))  ## TODO: Consider rlang::call2
+    
     if (!is.null(dots$plot))
+      
       if (!dots$plot)
         mapq$plot <- FALSE
+    
     mapq$fill <- TRUE
+    
+    cParams <- list(
+      region = region,
+      value = value.x,
+      breaks = breaks,
+      categories = categories
+    )
+    
     if (!is.null(data)) {
-      vl.col <- as_name(value.x)
-      st.col <- .regionColumnIndex(data, region)
-      cValue <-  data[[vl.col]]
-      cStates <- data[[st.col]]
+      region.col <- .regionColumnIndex(data, region)
+      
+      ## Bet on a two-column data frame that has a
+      ## a column with valid regions
+      value.x <- if (is.null(value.x) && ncol(data) == 2L)
+        names(data)[-region.col]
+      else
+        as_name(value.x)
+      
+      cParams$value <-  data[[value.x]]
+      cParams$region <- data[[region.col]]
     }
-    else {
-      cStates <- region
-      cValue <- value.x
-    }
-    cParams <-
-      list(
-        region = cStates,
-        value = cValue,   
-        breaks = breaks,
-        categories = categories
-      )
+    
     cOpts <-
-      .prepareChoroplethOptions(database, cParams, dots$col, excluded, exclude.fill)
+      .prepChoroplethOpts(mapdata, cParams, dots$col, excluded, exclude.fill)
+    
     mapq$col <- cOpts$colors
-    lego <- match.arg(leg.orient)
-    horiz <- if (identical(lego, 'vertical')) 
-      FALSE 
-    else 
-      TRUE
-    leg.tit <- if (!missing(leg.title)) 
-      as.character(leg.title)
+    
+    if (lifecycle::is_present(leg.orient))
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.orient))
   }
-  
-  outlineMap <- identical(region, 'Nigeria')
   
   ## Draw a `maps::map()` (with or without labels) or capture the object.
   ##
@@ -205,114 +264,228 @@ map_ng <- function(region = character(),
   ## `maps::map()` used by the evaluator function. For more details,
   ## inspect the source code for `maps::map.text()`. This is actually a 
   ## bug in the 'maps' package.
-  database <- eval(mapq)    # possibly, a new `database` is created
+  tryCatch({
+    database <- eval(mapq)    # DO NOT CHANGE THE NAME OF THIS VARIABLE!
+  }, 
+  error = function(e) stop(e))
+  
   if (!is.null(dots$plot) && !dots$plot)
     return(database)
+  
+  if(!is_null(y) && !.xyWithinBounds(database, x, y))
+    stop("Coordinates are out of bounds of the map")
+  
   if (show.text) {
-    txt <- "Nigeria"
-    if (!outlineMap) {
+    txt <- .ngName()
+    
+    if (!identical(region, .ngName())) {
+      
       txt <- database$name %>%
         { 
-          # Account for multi-polygon regions
+          # Account for multi-polygonic regions
           # TODO: Scope this to parent environment
           rgxRegions <-
             function(x, nms) {
               rgx <- paste0("^", x, "(\\:\\d*)?$")
               grep(rgx, nms, value = TRUE)
             }
+          
           is <- lapply(region, rgxRegions, nms = .)
           unlist(is)
         }
+      
       map.text(
         database,
         regions = txt,
         exact = TRUE,
         labels = .adjustLabels(txt),
-        add = TRUE)
+        add = TRUE
+      )
     }
   }
   
   ## Annotate
   title(main = title, sub = caption)
-  if(!is_null(y)) {
-    if (!.xyWithinBounds(database, x, y))
-      stop("Coordinates are out of bounds of the map")
-  }
-  if (chrplth) {
+  
+  if (use.choropleth) {
+    
     if (is.null(categories))
       categories <- cOpts$bins
-    legend(
-      x = leg.x,
-      y = leg.y,
-      legend = categories,
-      fill = cOpts$scheme,
-      xpd = NA,
-      horiz = horiz,
-      title = leg.tit
-    )
+    
+    # The default setting of 'legend.text' is TRUE
+    showleg <- if (is.character(legend.text)) {
+      
+      if (!identical(length(categories), length(legend.text)))
+        stop("Lengths of categories and provided legend do not match")
+      
+      categories <- legend.text
+      TRUE
+    }
+    else
+      legend.text
+    
+    if (lifecycle::is_present(leg.x))
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.x))
+    
+    if (lifecycle::is_present(leg.y))
+      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.y))
+    
+    if (missing(leg.title)) {
+      
+      leg.title <- if (is.null(data))
+        deparse(substitute(x))
+      else
+        value.x
+      
+    }
+    
+    if (showleg) 
+      legend(
+        x = 13L,
+        y = 7L,
+        legend = categories,
+        fill = cOpts$scheme,
+        xpd = NA,
+        title = leg.title
+      )
   }
-  else if(!is_null(y))
+  else if (!is_null(y))
     points(x, y, pch = "+") 
   
   invisible(database)
 }
 
+# Internal helper function(s) ---------------------------------------------------
 
-
-
-
-
-
-## TODO: MARKED FOR DEPRECATION
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
-## This function's use will be overtaken by the introduction 
-## of LGA level mapping.
 .processRegionParam <- function(s)
 {
   stopifnot(is.character(s))
-  if (identical(s, "Nigeria"))
-    return(s)
-  all.st <- states(all = TRUE)
+  
   if (length(s) == 0L)
-    s <- all.st
-  if (!all(s %in% all.st) && !all(s %in% lgas()))
-    stop("One or more elements of 'region' is not a Nigerian region")
+    return(states(all = TRUE))
+  
+  isregion <- all(is_state(s)) || all(is_lga(s))
+  
+  if (!isregion) {
+    
+    if (length(s) > 1L) {
+      stop(sprintf(
+        "One or more elements of '%s' is not a Nigerian region",
+        deparse(substitute(s))
+      ),
+      call. = FALSE)
+    }
+    else if (s != .ngName()) {
+      stop(
+        sprintf(
+          "Single inputs for '%s' only support the value '%s'",
+          deparse(substitute(s)),
+          .ngName()
+        ),
+        call. = FALSE
+      )
+    }
+  }
+  
   s
 }
 
 
 
 
+# Makes sure that all the elements required for making
+# a choropleth map are available. These are:
+# - A data frame with a value and region column identified
+# - A 2-column data frame with one column of regions
+# - A region and value as separate vectors
+# 
+
+# - 
 
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
 .validateChoroplethParams <- function(val = NULL, region = NULL, data = NULL)
-{
-  # TODO: Add some verbosity.
-  no.region <- is.null(region) || identical(region, "Nigeria")
-  if (no.region && is.null(data))
-    return(FALSE)
-  arg <- enexpr(val)
-  if (!no.region &&
-      is.character(region) && all(is_state(region)) && !is_null(arg))
-    return(TRUE)
-  if (!is.data.frame(data))
-    return(FALSE)
-  ind <- try(.regionColumnIndex(data), silent = TRUE)
-  if (inherits(ind, 'try-error'))
-    return(FALSE)
-  if (is_symbol(arg))
-    return(as_name(arg) %in% names(data))
-  if (is.null(arg))
-    if (ncol(data) < 2L)
+{   # TODO: Add some verbosity.
+  val <- enexpr(val)
+  
+  ## If 'data' is NULL, then both 'val' and 'region' must be present
+  ## and 'region' must have valid States or LGAs
+  if (is.null(data)) {
+    
+    if (is.null(val) || is.null(region))
       return(FALSE)
+    
+    if (!.allAreRegions(region) && !is.null(val))
+      return(FALSE)
+    # At this point, we have two valid vectors only
+  }
+  
+  data.has.regions <- FALSE
+  
+  if (is.data.frame(data)) {
+    index <- .regionColumnIndex(data)
+    data.has.regions <- as.logical(index)
+    
+    # Once identified, the regions in the data frame are
+    # to replace those in the original variable. Since this
+    # function is designed to return a boolean value, a 
+    # super-assignment is used to effect the change.
+    if (data.has.regions) {
+      r <- data[[index]]
+      assign(deparse(substitute(region)), r, envir = parent.frame())
+    }
+  }
+  else if (!is.null(data)) {
+    warning(sprintf("'%s' is invalid for choropleths but was ignored",
+                    .arg_str(data)))
+  }
+  
+  ## If 'region' is NULL, it must be found automatically in 'data'
+  if (is.null(region)) {
+    
+    if (isFALSE(data.has.regions))
+      return(FALSE)
+    
+    region <- character()
+  }
+  
+  if (!.allAreRegions(region))
+    return(FALSE)
+  
+  ## If 'val' is null, it must exist in 'data', but can only be
+  ## deduced if 'data' has only 2 columns and the other column is 
+  ## confirmed to contain strings representing regions (i.e. States
+  ## or LGAs).
+  if (is.null(val)) {
+    if (is.null(data))
+      return(FALSE)
+    
+    if (ncol(data) > 2L)
+      return(FALSE)
+    
+    if (isFALSE(.allAreRegions(region)) && isFALSE(data.has.regions))
+      return(FALSE)
+  }
+  
+  if (!is.null(val)) {
+    
+    if (is.data.frame(data)) {
+    
+      if (is_symbol(val) &&
+          isFALSE(as_name(val) %in% names(data))) {
+        stop(sprintf("The column '%s' does not exist in '%s'",
+                     .arg_str(val), .arg_str(data)),
+             call. = FALSE)
+      }
+    }
+  }
+  
   TRUE
 }
-
-
 
 
 
@@ -328,12 +501,16 @@ map_ng <- function(region = character(),
 {
   if (is.factor(x))
     x <- as.character(x)
+  
   stopifnot(is.character(x))
+  
   if (identical(x, 'Nigeria'))
     return("mapdata::worldHires")
+  
   if ((length(x) == 1L && (x %in% .synonymRegions()))
       || all(is_state(x)))
     return(.getMapData(states(x)))
+  
   .getMapData(lgas(x))
 }
 
@@ -342,15 +519,19 @@ map_ng <- function(region = character(),
 {
   spo <- .fixNasState(shp.lga[['spatialObject']], "STATE")
   st.nm <- attr(x, 'State')
+  
   if (length(st.nm) > 1L)
     stop("LGA-level maps for adjoining States are not yet supported")
+  
   lgaObj <- if (!is.null(st.nm)) {
+    
     if (st.nm %in% .fctOptions())  # peculiar to this scope
       st.nm <- "Abuja"
     spo[grep(.regexSubsetRegions(st.nm), spo@data$STATE), ]
   }
   else
     spo[grep(.regexSubsetRegions(x), spo@data$LGA), ]
+  
   .createBaseMapsObject(lgaObj, shp.lga)
  }
 
@@ -364,6 +545,7 @@ map_ng <- function(region = character(),
   
   stateObj <- 
     spo[grep(.regexSubsetRegions(x), spo@data$admin1Name), ]
+  
   .createBaseMapsObject(stateObj, shp.state)
 }
 
@@ -445,6 +627,7 @@ map_ng <- function(region = character(),
 
 # For possible export later
 .shpLayer <- function(level) {
+  
   if (level == 'state')
     "nga_admbnda_adm1_osgof_20161215"
   else if (level == 'lga')
@@ -467,31 +650,41 @@ map_ng <- function(region = character(),
 .regionColumnIndex <- function(dt, s = NULL)
 {
   stopifnot(is.data.frame(dt))
-  if (is.null(s))
-    s <- states()
   
-  ## Checks if a column has the names of States, returning TRUE is so.
+  ## Checks if a column has the names of States, returning TRUE if so.
   .fx <- function(x) {
+    
     if (is.factor(x))    # TODO: Earmark for removal
       x <- as.character(x)
-    ret <- logical(1)
+    
+    ret <- FALSE
+    
     if (is.character(x)) {
-      areStates <- is_state(x)
-      ret <- all(areStates)
-      if (!ret && any(areStates)) {
-        misspelt <- which(!areStates)
-        msg <- sprintf("The following regions are misspelt: %s",
-                       paste(x[!areStates], collapse = ","))
-        warning(msg, call. = FALSE)
-      }
+     ret <- .allAreRegions(x)
+      
+      # TODO: apply a ?restart here when there are misspelt States
+      # and try to fix them automatically and then apply the function
+      # one more time. Do so verbosely.
+      if (!ret && .someAreRegions(x))
+        warning("Misspelt region(s) in the dataset", call. = FALSE)
     }
     ret
   }
+  
   n <- vapply(dt, .fx, logical(1))
+  
+  if (is.null(s))
+    s <- states()
+  
   if (!sum(n))
-    abort(sprintf("No column with elements in %s.", deparse(substitute(s))))
+    stop(sprintf("No column with elements in '%s'.", 
+                  deparse(substitute(dt))),
+         call. = FALSE)
+  
   if (sum(n) > 1)
-    warning("Multiple columns have States, so the first is used")
+    warning("Multiple columns have regions, so the first was used",
+            call. = FALSE)
+  
   which(n)[1]
 }
 
@@ -503,21 +696,25 @@ map_ng <- function(region = character(),
 
 
 #' @importFrom rlang abort
-.prepareChoroplethOptions <-
+.prepChoroplethOpts <-
   function(map, opts, col = NULL, ...)
   {
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
     stopifnot(inherits(map, 'map'))
+    
     if(!.assertListElements(opts))
       abort("One or more inputs for generating choropleth options are invalid")
+    
     brks <- opts$breaks
+    
     df <-
       data.frame(
         region = opts$region,
         value = opts$value,
         stringsAsFactors = FALSE
       )
+    
     df$cat <- .createCategorized(df$value, brks)
     cats <- levels(df$cat)
     colrange <- .processColouring(col, length(cats))
@@ -526,12 +723,21 @@ map_ng <- function(region = character(),
     # interest is definitely a factor
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
-    mapregions <- .getUniqueStateNames(map)
+    rgx <- "(^.+)(:.+$)"
+    indexMultiPolygons <- grep(rgx, map$names)
+    mapregions <- sub(rgx, "\\1", map$names)
+    m <- mapregions[indexMultiPolygons]
+    m <-  m[!duplicated(m)]
+    mapregions <- mapregions[-indexMultiPolygons]
+    mapregions <- c(mapregions, m)
+    
     if (nrow(df) < length(mapregions))
       mapregions <- mapregions[mapregions %in% df$region]
-    new.ind <- order(df$region, mapregions)
+    
+    new.ind <- order(as.character(df$region), mapregions)
     ord.df <- df[new.ind, ]    # This is why a data frame was made
     colors <- .reassignColours(map$names, ord.df$region, ord.df$color, ...)
+    
     list(colors = colors,
          scheme = colrange,
          bins = cats)
@@ -545,12 +751,15 @@ map_ng <- function(region = character(),
 #' @import magrittr
 .assertListElements <- function(x) {
   stopifnot(c('region', 'value', 'breaks') %in% names(x))
-  region.valid <- all(is_state(x$region))
+  
+  region.valid <- .allAreRegions(x$region)
+  
   value.valid <- 
     x$value %>% 
     {
       is.numeric(.) || is.factor(.) || is.character(.)
     }
+  
   cat.valid <-
     x$categories %>%
     {
@@ -568,15 +777,6 @@ map_ng <- function(region = character(),
 
 
 
-.getUniqueStateNames <- function(map)
-{
-  stopifnot(inherits(map, 'map'))
-  unique(sub("(^.+)(:.+$)", "\\1", map$names))
-}
-
-
-
-
 
 
 # Creates a  categorised variable from its inputs if not already a factor
@@ -587,23 +787,32 @@ map_ng <- function(region = character(),
 {
   if (is.character(val))
     val <- as.factor(val)
+  
   if (is.factor(val)) {
+    
     if (length(levels(val)) >= 10L)
       abort("Too many categories")
+    
     return(val)
   }
+  
   if (!is.numeric(val)) {
     msg <- paste(sQuote(typeof(val)), "is not a supported type")
     abort(msg)
   }
+  
   if (is.null(brks))
     abort(paste("Breaks were not provided for the", 
                 "categorization of a numeric type"))
+  
   rr <- range(val)
+  
   if (is_scalar_integer(brks))
     brks <- seq(rr[1], rr[2], diff(rr) / brks)
+  
   if (rr[1] < min(brks) || rr[2] > max(brks))
     abort("Values are out of range of breaks")
+  
   cut(val, brks, include.lowest = TRUE)
 }
 
@@ -621,29 +830,39 @@ map_ng <- function(region = character(),
 .processColouring <- function(col = NULL, n, ...)
 {
   .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
+  
   if (is.null(col))
     col <- .DefaultChoroplethColours[1]
+  
   if (is.numeric(col)) {
     default.pal <- .get_R_palette()
     all.cols <- default.pal %>% 
       sub("(green)(3)", "\\1", .) %>% 
       sub("gray", "grey", .)
+    
     if (!col %in% seq_along(all.cols))
-      abort(sprintf("'color' must range between 1L and %iL", length(all.cols)))
+      abort(sprintf("'color' must range between 1L and %iL", 
+                    length(all.cols)))
+    
     col <- all.cols[col]
   }
+  
   among.def.cols <- col %in% .DefaultChoroplethColours
   in.other.pal <- !among.def.cols && (col %in% rownames(brewer.pal.info))
+  
   pal <-
     if (!among.def.cols) {
+      
       if (!in.other.pal)
         abort(
           sprintf("'%s' is not a supported colour or palette", col)
         )
+      
       col
     }
     else
       paste0(tools::toTitleCase(col), "s")
+  
   RColorBrewer::brewer.pal(n, pal)
 }
 
@@ -682,7 +901,9 @@ map_ng <- function(region = character(),
     all(is_state(all.regions))
     .isHexColor(in.colours)
   })
+  
   out.colours <- new.names <- rep(NA, length(names))
+  
   for (i in seq_along(all.regions)) {
     regx <- .regexDuplicatedPolygons(all.regions[i])
     ind <- grep(regx, names)
@@ -694,18 +915,28 @@ map_ng <- function(region = character(),
   ## the choropleth and should be given an 'off-colour'
   if (!is.null(excl.region)) {
       off.color <- "grey"
+    
     if (!is.null(excl.col)) {
+      
       if (length(excl.col) > 1L)
-        stop("Non-null 'exclude.fill' must be of length 1L")
+        stop(paste("Only one colour can be used to denote regions excluded",
+             "from the choropleth colouring scheme"))
+      
       if (!is.character(excl.col))
-        stop("'exclude.fill' must be a string")
+        stop(sprintf("Colour indicators of type '%s' are not supported",
+                     typeof(excl.col)))
+      
       if (!excl.col %in% colours())
-        stop("'exclude.fill' must be a valid colour")
+        stop(paste("The colour used for excluded regions must be valid",
+             "i.e. an element of the built-in set 'colours()'"))
+
       off.color <- excl.col
     }
+
     excluded <- match(excl.region, new.names)
     out.colours[excluded] <- off.color
   }
+
   structure(out.colours, names = new.names)
 }
 
@@ -810,14 +1041,18 @@ map_ng <- function(region = character(),
 ShapefileProps <- function(regions)
 {
   shp <- .getShapefileDir(regions)
-  dsn <- system.file(file.path("extdata", shp),
+  pkgdir <- "extdata"
+  
+  dsn <- system.file(file.path(pkgdir, shp),
                      package = 'naijR',
                      mustWork = TRUE)
+  
   if (identical(dsn, character(1)))
-    stop("The map data could not be found in 'extdata'")
-  pat <- "\\.shp$"
-  shpfl <- list.files(dsn, pat)
-  lyr <- sub(pattern = paste0("(.+)(", pat, ")"), "\\1", shpfl)
+    stop(sprintf("The map data could not be found in '%s'", pkgdir))
+  
+  rgx <- "\\.shp$"
+  shpfl <- list.files(dsn, rgx)
+  lyr <- sub(pattern = paste0("(.+)(", rgx, ")"), "\\1", shpfl)
   sp <- readOGR(dsn, lyr, verbose = FALSE)
   
   ## The following shapefile, has some unwanted data
@@ -864,26 +1099,69 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 
 .fetchNamefield.lgas <- function(x, dt) {
   nmfld <- NA
+  
   for (i in seq_len(ncol(dt))) {
+    
     if (all(unique(dt[[i]]) %in% states()))  # skip column with States
       next
+    
     if (any(x %in% dt[[i]])) {   # just any LGAs will do, since some of them
       nmfld <- colnames(dt)[i]   # also share names with their State
       break
     }
   }
+  
   nmfld
 }
+
+
 
 
 .fetchNamefield.states <- function(x, dt) {
   # dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
   nmfld <- NA
+  
   for (i in seq_len(ncol(dt))) {
+    
     if (all(x %in% dt[[i]])) {   # all MUST be states
       nmfld <- colnames(dt)[i]
       break
     }
+    
   }
+  
   nmfld
+}
+
+
+
+
+
+## Messages -----------------------------------------------------------------
+.ngName <- function()
+{
+  "Nigeria"
+}
+
+.arg_str <- function(arg)
+{
+  deparse(substitute(arg))
+}
+
+
+.first_elem_warn <- function(arg)
+{
+  stopifnot(is.character(arg) && length(arg) == 1L)
+  sprintf("Only the first element of '%s' was used", arg)
+}
+
+
+.nextMinorVer <- function()
+{
+  ">= 0.6.0"
+}
+
+
+.deprecMsg <- function(arg) {
+  sprintf("map_ng(%s = )", deparse(substitute(arg)))
 }

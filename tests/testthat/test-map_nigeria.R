@@ -25,51 +25,20 @@ test_that("Input is validated", {
   expect_error(map_ng(NULL, plot = FALSE), myerr2)
   expect_error(map_ng(NA), myerr2)
   expect_error(map_ng('TRUE'), 
-               "One or more elements of 'region' is not a Nigerian region")
+               "Single inputs for 'region' only support the value 'Nigeria'")
   expect_error(map_ng(pi), myerr2)
-  expect_warning(map_ng(plot = FALSE, show.neighbours = c(TRUE, TRUE)),
-                 "Only the first element of 'show.neighbours' was used")
+  # expect_warning(map_ng(plot = FALSE, show.neighbours = c(TRUE, TRUE)),
+  #                "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring regions is temporarily disabled")
+  expect_error(map_ng(data = vector()), 
+               "A non-NULL input for 'data' must be a data frame")
+  expect_error(map_ng(data = data.frame(col = runif(10))),
+               "Insufficient variables in 'data' to generate a plot")
+  expect_error(map_ng(data.frame()), "A data frame was passed;")
   # TODO: Add test case for choropleths with too few regions
 })
 
-
-# test_that("Choropleth categories are created", {
-#   set.seed(50)
-#   int.val <- sample(1:100, 20)
-#   br <- c(0, 20, 40, 60, 80, 100)
-#   c <- .createCategorized(int.val, br)
-#   d <- .createCategorized(int.val, 5L)
-#   
-#   expect_length(c, 20L)
-#   expect_length(d, 20L)
-#   expect_type(c, 'integer')
-#   expect_type(d, 'integer')
-#   expect_is(c, "factor")
-#   expect_is(d, "factor")
-#   expect_length(levels(c), 5L)
-#   expect_length(levels(d), 5L)
-#   expect_error(.createCategorized(int.val, br[-6]),
-#                "Values are out of range of breaks")
-#   expect_error(.createCategorized(sample(c(TRUE, FALSE), 30, TRUE)),
-#                sprintf("%s is not a supported type", sQuote("logical")),
-#                fixed = TRUE)
-# })
-
-# test_that("Decision is made on drawing choropleths", {
-#   all.states <- states()
-#   nc.states <- states(gpz = 'nc')
-#   set.seed(23)
-#   vals <- lapply(list(all = all.states, nc = nc.states), function(x)
-#     factor(sample(LETTERS[1:5], length(x), replace = TRUE)))
-#   all.ints <- sample(1:5, 37L, replace = T)
-#   
-#   expect_true(.validateChoroplethParams(region = all.states, val = vals$all))
-#   expect_true(.validateChoroplethParams(data = data.frame(nc.states, vals$nc)))
-#   expect_true(.validateChoroplethParams(region = all.states, val = all.ints))
-#   expect_false(.validateChoroplethParams(region = '.'))
-# })
 
 test_that("National outline map is plotted", {
   expect_is(map_ng("Nigeria", plot = FALSE), "map")
@@ -104,112 +73,6 @@ lso <-
     category = LETTERS[seq_len(length(brks))]
   )
 
-# test_that("Internal function for preparing colours is validated", {
-#   mt <- matrix(1:3)
-#   err1 <- "is\\.atomic\\(x\\) is not TRUE"
-#   err2 <- "Expected dim\\(x\\) to evaluate to NULL"
-#   err3 <- 'argument "bins" is missing, with no default'
-#   err4 <- 'inherits(map, "map") is not TRUE'
-# 
-#   expect_error(.prepareChoroplethOptions(), 
-#                "argument \"map\" is missing, with no default")
-#   expect_error(.prepareChoroplethOptions(NULL), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(df, brks), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(vals, df), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(df, df), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(mt, brks), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(vals, c(1:3)), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(vals, mt), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions(mt, mt), err4, fixed = TRUE)
-#   expect_error(.prepareChoroplethOptions())
-# })
-
-# test_that("Hexadecimal colour format is detected internally", {
-#   trio <- trio_na <- c("#CCCCCC", '#FFFFFF', "#AB7402")
-#   trio_na[4] <- NA_character_
-#   
-#   expect_true(.isHexColor("#DE458E"))
-#   expect_false(.isHexColor("Hex"))
-#   expect_true(.isHexColor(trio))
-#   expect_false(.isHexColor(trio_na))
-# })
-
-
-# test_that("Colours are reassigned when duplicate polygons exist", {
-#   mapnames <- c("Kano:1", "Kano:2", "Abia:1", "Abia:2", "Abia:3", "Oyo")
-#   statenames <- c("Abia", "Kano", "Oyo")
-#   init.color <- c("#FFFFFF", "#CCCCCC", "#000000")
-#   fin.color <- .reassignColours(mapnames, statenames, init.color)
-#   not.ng <- c("Maryland", "Saarland")
-#   
-#   expect_length(fin.color, length(mapnames))
-#   expect_named(fin.color)
-#   expect_true(any(duplicated(names(fin.color))))
-#   expect_equal(sum(duplicated(names(fin.color))), 3L)
-#   expect_error(.reassignColours(mapnames, not.ng, init.color), 
-#                "all(is_state(regions)) is not TRUE",
-#                fixed = TRUE)
-#   expect_error(
-#     .reassignColours(mapnames, statenames, rep("NoHexs", length(statenames))),
-#     ".isHexColor\\(in.colours\\) is not TRUE")
-# })
-
-# test_that("Appropriate palette is used", {
-#   p3 <- c("black", "red", "green3", "blue", "cyan", "magenta", "yellow", "gray")
-#   pal <- .get_R_palette()
-#   
-#   expect_equivalent(pal, p3)
-# })
-# 
-# test_that("Colours are prepared for plotting", {
-#   expect_error(.processColouring(col = 'brown', 5L), 
-#                "'brown' is not a supported colour or palette")
-# })
-
-# test_that("List of choropleth inputs is properly checked", {
-#   expect_true(.assertListElements(lso))
-# })
-
-
-
-
-# test_that("Expected colours and related data are prepared", {
-#   set.seed(4)
-#   brks <- seq(0, 6, 2)
-#   obj <-
-#     list(
-#       region = states(),
-#       value = sample(0:6, 37, TRUE),
-#       breaks = brks,
-#       categories = LETTERS[seq_len(length(brks))]
-#     )
-#   mp <- map_ng(plot = FALSE)
-#   cho <- .prepareChoroplethOptions(mp, obj)
-#   cols <-
-#     c(
-#       "#F0F0F0", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#636363", "#BDBDBD", "#F0F0F0",
-#       "#636363", "#BDBDBD", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#F0F0F0", "#F0F0F0",
-#       "#636363", "#636363", "#636363", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#636363",
-#       "#F0F0F0", "#F0F0F0", "#F0F0F0", "#BDBDBD", "#BDBDBD", "#BDBDBD", "#F0F0F0",
-#       "#636363", "#BDBDBD", "#BDBDBD", "#636363", "#BDBDBD", "#636363", "#BDBDBD",
-#       "#F0F0F0", "#636363", "#636363", "#F0F0F0", "#636363", "#BDBDBD"
-#     )
-# 
-#   expect_is(cho, "list")
-#   expect_type(cho, "list")
-#   expect_length(cho, 3L)
-#   expect_named(cho, c("colors", "scheme", "bins"))
-#   expect_type(cho$colors, 'character')
-#   expect_type(cho$scheme, 'character')
-#   expect_type(cho$bins, 'character')
-#   expect_equivalent(cho$colors, cols)
-#   expect_identical(cho$scheme, c("#F0F0F0", "#BDBDBD", "#636363"))
-#   expect_identical(cho$bins, c("[0,2]", "(2,4]", "(4,6]"))
-#   expect_length(cho$scheme, 3L)
-#   expect_length(cho$bins, 3L)
-# })
-
-
 
 
 test_that("Choropleth mapping succeeds", {
@@ -229,7 +92,7 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE
     )
   ),
-  'No column with elements in region')
+  "No column with elements in 'data'")
   
   expect_error(map_ng(
     region = dat$region,
@@ -254,7 +117,7 @@ test_that("Choropleth mapping succeeds", {
       category = cat,
       col = 2L,
       plot = FALSE),
-    "One or more inputs for generating choropleth options are invalid")
+    "The column 'val' does not exist in 'data'")
 
   expect_s3_class(
     map_ng(
@@ -280,13 +143,29 @@ test_that("Choropleth mapping succeeds", {
     plot = FALSE
   ),
   'map')
+  
+  expect_s3_class(map_ng(
+    region = ss,
+    x = sample(LETTERS[1:5], length(ss), TRUE),
+    col = "red",
+    show.text = FALSE,
+    plot = FALSE
+  ), "map")
 })
 
 
+test_that("Draw choropleth automatically with 2-column data frames", {
+  ds <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  dl <- data.frame(LGA = lgas(), value = sample(LETTERS[1:5], 774, TRUE))
+  
+  for (df in list(ds, dl)) 
+    expect_s3_class(try(map_ng(data = df, plot = FALSE)), "map")
+})
 
 
 test_that("Choropleth colours can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
+  
   func <- expr(map_ng(
     data = dat,
     x = total.pop,
@@ -295,11 +174,16 @@ test_that("Choropleth colours can be controlled at interface", {
     plot = FALSE,
     col = NULL
   ))
+  
   mm <- 'map'
   
   expect_is(eval_tidy(func), mm)
-  func$col <- "YlOrRd"; expect_is(eval_tidy(func), mm)
-  func$col <- 'blue'; expect_is(eval_tidy(func), mm)
+  
+  func$col <- "YlOrRd"
+  expect_is(eval_tidy(func), mm)
+  
+  func$col <- 'blue'
+  expect_is(eval_tidy(func), mm)
 })
 
 
@@ -357,6 +241,7 @@ test_that("Factors can draw choropleth", {
     set.seed(seed)
     runif(37, max = 100)
   }
+  
   mapClass <- 'map'
   Fac <- ordered(getSmpl(2))
   expect_is(map_ng(x = Fac, plot = FALSE), mapClass)
@@ -418,11 +303,14 @@ test_that("All LGAs within a given State are drawn", {
 test_that("All individual LGA maps can be drawn", {
   for (s in states()) {
     lgs <- lgas(s)
+
     for (lg in lgs) {
       x <- suppressWarnings(lgas(lg))
       state <- attr(x, "State")
+
       if (length(state) > 1L)
-        x <- disambiguate(x, parent = s)
+        x <- disambiguate_lga(x, parent = s)
+
       expect_s3_class(map_ng(x, plot = FALSE), "map")
     }
   }
@@ -452,7 +340,6 @@ test_that("Number of LGAs matches the number extracted for mapping", {
   # This test case is created for bug fix that involved the creation
   # of wrong LGA coordinates for Borno State -> Kagarko is included
   for (i in states(all = FALSE)) {
-    # browser()
     lg <- lgas(i)
     mplg <- map_ng(lg, plot = FALSE)$names
     
@@ -467,7 +354,6 @@ test_that("Number of LGAs matches the number extracted for mapping", {
 
 
 test_that("Choropleth map can be formed with excluded regions", {
-  # Issue #27
   mapClass <- "map"
   colpal <- "YlOrRd"
   excluded.reg <- c("Abia", "Jigawa")
@@ -521,7 +407,8 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "Non-null 'exclude.fill' must be of length 1L",
+    paste("Only one colour can be used to denote regions excluded", 
+          "from the choropleth colouring scheme"),
     fixed = TRUE
   )
   
@@ -535,7 +422,8 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "'exclude.fill' must be a valid colour",
+    paste("The colour used for excluded regions must be valid",
+          "i.e. an element of the built-in set 'colours()'"),
     fixed = TRUE
   )
   
@@ -549,7 +437,7 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     ),
-    "'exclude.fill' must be a string",
+    "Colour indicators of type 'integer' are not supported",
     fixed = TRUE
   )
 })
@@ -587,3 +475,20 @@ test_that(
       "map"
     ) 
   })
+
+
+test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
+  d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.x = 8L, plot = FALSE))
+  # })
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.y = 94L, plot = FALSE))
+  # }) 
+  # 
+  # rlang::with_options(lifecycle_verbosity = "warning", {
+  #   expect_warning(map_ng(data = d, leg.orient = "horiz", plot = FALSE))
+  # })
+})

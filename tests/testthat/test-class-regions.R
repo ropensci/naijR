@@ -14,6 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 library(naijR)
 
+## Class names commonly used in this script
+st.cl <- "states"
+lg.cl <- "lgas"
+reg.cl <- "regions"
+
 ## ---- State related tests ----
 test_that("input is validated", {
   expect_error(states(gpz = 99))
@@ -109,7 +114,7 @@ test_that("Regions without synonyms are not treated after validation", {
 })
 
 test_that("State names shared with LGAs can be coerced into 'lgas' objects", {
-  lgaclass <- "lgas"
+  lgaclass <- lg.cl
   
   expect_s3_class(as_lga("Bauchi"), lgaclass)
   expect_s3_class(as_lga("Gombe"), lgaclass)
@@ -117,7 +122,7 @@ test_that("State names shared with LGAs can be coerced into 'lgas' objects", {
 
 
 test_that("LGA names shared with States can be coerced into 'states' objects", {
-  stateclass <- "states"
+  stateclass <- st.cl
   
   expect_s3_class(as_state("Kogi"), stateclass)
   expect_s3_class(as_state("Ebonyi"), stateclass)
@@ -151,4 +156,68 @@ test_that("LGA objects' attributes are set when appropriate", {
   expect_length(attr(lgas(c("Kebbi", "Jigawa")), "State"), 2L)
   expect_length(attributes(lgas("Rivers")), 2L)
   expect_length(attributes(lgas()), 1L)
+})
+
+## ---- Internal generics ----
+test_that("objects can be concatenated", {
+  se <- states(gpz = "se")
+  ss <- states(gpz = "ss")
+  state.combo <- c(se, ss)
+  lga.combo <- c(lgas("Sokoto"), lgas("Kebbi"))
+  
+  expect_s3_class(state.combo, st.cl)
+  expect_s3_class(state.combo, reg.cl)
+  expect_s3_class(lga.combo, lg.cl)
+  expect_s3_class(lga.combo, reg.cl)
+})
+
+test_that("'regions' objects can be subset/indexed into", {
+  ne <- states(gpz = "ne")
+  oslg <- lgas("Osun")
+  bo <- ne[[3]]
+  egb <- oslg[[9]]
+  three.states <- ne[c(4, 2)]
+  four.lgas <- oslg[1:4]
+  
+  expect_s3_class(bo, st.cl)
+  expect_s3_class(bo, reg.cl)
+  expect_s3_class(bo, "character")
+  expect_s3_class(egb, lg.cl)
+  expect_s3_class(egb, reg.cl)
+  expect_s3_class(egb, "character")
+  expect_s3_class(three.states, st.cl)
+  expect_s3_class(three.states, reg.cl)
+  expect_s3_class(three.states, "character")
+  expect_s3_class(four.lgas, lg.cl)
+  expect_s3_class(four.lgas, reg.cl)
+  expect_s3_class(four.lgas, "character")
+})
+
+test_that("missing values in 'regions' are handled", {
+  sel.st <- states(c("Imo", "Kaduna", "Adamawa"))
+  sel.st[[2]] <- "Kano"
+  sel.st[4] <- "Jigawa"
+  sel.st[5] <- states("Kwara")
+  sel.st[2:3] <- NA
+  nomiss.st <- na.exclude(sel.st)
+  
+  sel.lg <- lgas("Ebonyi")
+  sel.lg[[2]] <- "Hawul"
+  sel.lg[4] <- "Kwaya Kusar"
+  sel.lg[5] <- lgas("Shani")
+  sel.lg[c(2, 4:5)] <- NA
+  nomiss.lg <- na.exclude(sel.lg)
+  
+  ex.cl <- "exclude"
+  expect_s3_class(nomiss.st, ex.cl)
+  expect_s3_class(nomiss.st, st.cl)
+  expect_s3_class(nomiss.st, reg.cl)
+  expect_s3_class(nomiss.st, "character")
+  expect_s3_class(nomiss.lg, ex.cl)
+  expect_s3_class(nomiss.lg, lg.cl)
+  expect_s3_class(nomiss.lg, reg.cl)
+  expect_s3_class(nomiss.lg, "character")
+  
+  expect_false(inherits(states("Lagos"), ex.cl))
+  expect_false(inherits(lgas("Shomolu"), ex.cl))
 })

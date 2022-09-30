@@ -17,8 +17,8 @@ fix_region(x, ...)
 }
 \arguments{
 \item{x}{An S3 object of class \code{states} or \code{lgas}. For 
-\code{fix_region.default}, a character vector can be passed but only
-that for States will be interpretable.}
+\code{fix_region.default}, a character vector (or an object coercible to 
+one) can be passed but only that for 'States' will be interpretable.}
 
 \item{...}{Arguments passed to methods.}
 

@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   interactive: interactive.html
   nigeria-maps: nigeria-maps.html
-last_built: 2022-08-31T10:24Z
+last_built: 2022-09-30T12:15Z
 urls:
   reference: http://brovic.github.io/naijR/reference
   article: http://brovic.github.io/naijR/articles

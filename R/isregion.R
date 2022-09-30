@@ -38,8 +38,8 @@ is_state <- function(x)
   na.pos <- 0L
   if (anyNA(x)) {
     warning("Invalid entries were replaced with NAs", call. = FALSE)
-    excl <- stats::na.exclude(x)
-    na.pos <- stats::na.action(excl)
+    excl <- na.exclude(x)
+    na.pos <- na.action(excl)
   }
   
   if (length(x) == 0L)
@@ -90,4 +90,20 @@ assertRegion <- function(x) {
   if (!is_state(x) && !is_lga(x))
     stop(sQuote(x, q = FALSE), " is not a valid region")
   x
+}
+
+
+
+
+# Checks whether an object has all its elements as States or LGAs
+.allAreRegions <- function(x) {
+  stopifnot(isFALSE(is.null(x)))
+  all(is_state(x)) || all(is_lga(x))
+}
+
+
+
+.someAreRegions <- function(x) {
+  stopifnot(isFALSE(is.null(x)))
+  isFALSE(.allAreRegions(x)) && (any(is_state(x)) || any(is_lga(x)))
 }
