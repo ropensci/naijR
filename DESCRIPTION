@@ -16,7 +16,7 @@ Imports:
     maps (>= 3.3.0),
     rgdal (>= 1.4.4),
     rlang (>= 0.4.0),
-    stringi (>= 1.7.8)
+    stringi (>= 1.7.6)
 Suggests: 
     covr,
     here,
