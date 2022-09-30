@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -66,6 +66,22 @@
       <small>Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.0" id="naijr-050">naijR 0.5.0<a class="anchor" aria-label="anchor" href="#naijr-050"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-5-0">New features:<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
+<ul><li>New methods for <code><a href="https://rdrr.io/r/base/InternalMethods.html" class="external-link">?InternalGenerics</a></code> were introduced e.g. for <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>, <code>[</code>, <code>[[</code>, <code>na.exclude</code>, etc.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-5-0">Enhancements:<a class="anchor" aria-label="anchor" href="#enhancements-0-5-0"></a></h3>
+<ul><li>Effectively handle mobile numbers that have common separators in them, namely whitespace, ‘-’ or ‘.’.</li>
+<li>Repair mobile numbers where poor data entry interchanges zeros (<code>0</code>s) with the letter <code>O</code> (works for both upper and lower case).</li>
+<li>Repair of mobile numbers now offers optional information for users.</li>
+<li>Allow the use of factor input when creating objects of class <code>regions</code>.</li>
+<li>Added a new argument <code>legend.text</code> for <code>map_ng</code> using an idiom that is similar to the one used in <code>base::barplot</code>, thanks to observations made by <a href="https://github.com/VictoriaLatham" class="external-link">@VictoriaLatham</a> in issue <a href="https://github.com/BroVic/naijR/issues/27" class="external-link">#27</a>.</li>
+<li>Simplified the creation of choropleth maps with 2-column data frames; one of the columns is to be a vector of valid States or Local Government Areas, and the other a factor or something coercible to one.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.4" id="naijr-044">naijR 0.4.4<small>2022-08-30</small><a class="anchor" aria-label="anchor" href="#naijr-044"></a></h2>
 <div class="section level3">

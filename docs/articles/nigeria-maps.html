@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>nigeria-maps</h1>
             
-            <h4 data-toc-skip class="date">2022-08-31</h4>
+            <h4 data-toc-skip class="date">2022-09-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/vignettes/nigeria-maps.Rmd" class="external-link"><code>vignettes/nigeria-maps.Rmd</code></a></small>
       <div class="hidden name"><code>nigeria-maps.Rmd</code></div>
@@ -174,22 +174,24 @@ meaningless data:</p>
 <span><span class="va">vv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, <span class="va">numStates</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a data frame and view top rows</span></span>
-<span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">ss</span>, var <span class="op">=</span> <span class="va">vv</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">ss</span>, letter <span class="op">=</span> <span class="va">vv</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dd</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       state var</span></span>
-<span><span class="co">#&gt; 1      Abia   E</span></span>
-<span><span class="co">#&gt; 2   Adamawa   B</span></span>
-<span><span class="co">#&gt; 3 Akwa Ibom   A</span></span>
-<span><span class="co">#&gt; 4   Anambra   B</span></span>
-<span><span class="co">#&gt; 5    Bauchi   C</span></span>
-<span><span class="co">#&gt; 6   Bayelsa   A</span></span></code></pre></div>
+<span><span class="co">#&gt;       state letter</span></span>
+<span><span class="co">#&gt; 1      Abia      C</span></span>
+<span><span class="co">#&gt; 2   Adamawa      B</span></span>
+<span><span class="co">#&gt; 3 Akwa Ibom      C</span></span>
+<span><span class="co">#&gt; 4   Anambra      A</span></span>
+<span><span class="co">#&gt; 5    Bauchi      A</span></span>
+<span><span class="co">#&gt; 6   Bayelsa      D</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="using-a-data-frame">Using a data frame<a class="anchor" aria-label="anchor" href="#using-a-data-frame"></a>
 </h3>
-<p>To draw this choropleth, we will use the data frame approach
-first:</p>
+<p>The easiest way to draw the choropleth map is to pass a two-column
+data frame to the <code>data</code> argument. Thus if the data frame has
+more columns, it is trivial to subset it and extract the 2 columns of
+interest. Continuing with our example,</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dd</span>, x <span class="op">=</span> <span class="va">var</span>, show.text <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dd</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/df-approach-1.png" width="700"></p>
 <p>Note the following:</p>
 <ul>
