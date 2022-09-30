@@ -10,7 +10,7 @@
 * Added a new argument `legend.text` for `map_ng` using an idiom that is similar to the one used in `base::barplot`, thanks to observations made by @VictoriaLatham in issue #27.
 * Simplified the creation of choropleth maps with 2-column data frames; one of the columns is to be a vector of valid States or Local Government Areas, and the other a factor or something coercible to one. 
 
-# Bug fixes:
+## Bug fixes:
 * `map_ng` accepted arguments that were not `data.frame`s leading to unwieldy errors. It is now made sure to fail early in such cases
 
 ## Deprecated:
