@@ -8,7 +8,8 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  comment = ""
 )
 ```
 # naijR <img src="man/figures/logo.png" width=120px align="right" />
@@ -33,10 +34,11 @@ One of the useful aspects of this package is enabling users to plot country and 
 vignette('nigeria-maps', 'naijR')
 ```
 
+### Administrative Regions
 #### States
 To create a list of all the States of the Nigerian Federation, simply call `states()`.
 
-```{r, results='hold'}
+```{r, results='as-is'}
 library(naijR, quietly = TRUE)
 ss <- states()
 head(ss)
@@ -74,10 +76,9 @@ how_many_lgas <- function(state) {
 }
 
 how_many_lgas("Sokoto")
-how_many_lgas("Ekiti")
 ```
 
-#### Working with phone numbers
+### Working with phone numbers
 It is common to come across datasets where phone numbers are wrongly entered or misinterpreted by software like MS Excel. The function `fix_mobile()` helps with this.
 
 ```{r mobile}
