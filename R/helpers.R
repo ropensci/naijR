@@ -4,4 +4,10 @@
 
 # Sets the Levenshtein distance being used package-wide for functions that
 # carry out partial matching
-.pkgLevDistance <- function() 1L
+.pkgLevDistance <- function() {1L}
+
+
+
+onWindowsInteractive <- function() {
+  .Platform$OS.type == "windows" && interactive()
+}

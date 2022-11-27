@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.5.0.9000
-Date: 2022-10-01
+Version: 0.5.0.9009
+Date: 2022-11-27
 Depends: 
     R (>= 3.6),
     grDevices,

@@ -221,3 +221,9 @@ test_that("missing values in 'regions' are handled", {
   expect_false(inherits(states("Lagos"), ex.cl))
   expect_false(inherits(lgas("Shomolu"), ex.cl))
 })
+
+
+## TODO: Export in next MINOR release.
+# test_that("LGA and States can be disambiguated where appropriate", {
+#   
+# })
