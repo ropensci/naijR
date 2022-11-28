@@ -93,6 +93,17 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       vals <- .fixLgasInteractively(vals)
   }
   
+  if (is.null(vals)) {
+    msg <- "The operation was cancelled"
+    
+    if (onWindowsInteractive())
+      winDialog("ok", msg)
+    else
+      message(msg)
+    
+    return(invisible(x))
+  }
+  
   if (!quietly)
     .reportOnFixes(vals)
   
@@ -188,8 +199,10 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       return(str)
     
     if (inherits(regions, "states")) {
+      
       if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
           && identical(toupper(str), abbrFCT))
+        
         return(abbrFCT)
     }
     
@@ -217,6 +230,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
         {
           structure(c(., fixed), names = c(names(.), str))
         }
+      
       return(fixed)
     }
     
@@ -358,10 +372,18 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       else
         readline(prompt)
       
-      choices <- pattern %>% 
+      if (pattern == "" || is.null(pattern))
+        return()
+      
+      choices <- pattern %>%
+        grep(allLgas, value = TRUE, ignore.case = TRUE) %>%
+        sort() %>%
         {
-          result <- grep(., allLgas, value = TRUE, ignore.case = TRUE)
-          c(result, unname(unlist(altopt)))
+          alt <- altopt %>% 
+            unlist() %>% 
+            unname()
+          
+          c(., alt)
         }
        
       menuopt <-
@@ -380,19 +402,31 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       next
     }
     
-    lga.list <- sub(bad, chosen, lga.list)
-    attr(lga.list, "misspelt") <- bad.values[bad.values != bad]
+    lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
     
-    attr(lga.list, "regions.fixed") %<>% 
-    {
-      structure(c(., chosen), names = c(names(.), bad))
-    }
+    attr(lga.list, "misspelt") %<>%
+      {
+        .[. != bad]
+      }
+    
+    attr(lga.list, "regions.fixed") %<>%
+      {
+        structure(c(., chosen), names = c(names(.), bad))
+      }
   }
   
-  if (length(skipped))
-    warning("The following items were skipped and should be fixed manually: ",
-            paste(skipped, collapse = ", "),
-            call. = FALSE)
+  if (length(skipped)) {
+    msg <-
+      paste(
+        "The following items were skipped and should be fixed manually:",
+        paste(skipped, collapse = ", ")
+      )
+    
+    if (onWindowsInteractive())
+      winDialog("ok", msg)
+    else
+      message(msg)
+  }
   
   lga.list
 }
@@ -423,6 +457,7 @@ fix_region_manual <- function(x, wrong, correct)
   arg <- substitute(x)
   
   if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
+    
     if (!is.character(x))
       stop("The operation cannot be done on objects of type ", sQuote(typeof(x)))
   }
@@ -450,7 +485,9 @@ fix_region_manual <- function(x, wrong, correct)
     tryCatch({
       iCorrect <- assertRegion(iCorrect)
       x[x %in% iWrong] <- iCorrect
-    }, error = function(e) warning(conditionMessage(e), call. = FALSE))
+    }, error = function(e) {
+      warning(conditionMessage(e), call. = FALSE)
+    })
   }
   # TODO: Apply a correctness check and warn if mistakes remain?
   x
