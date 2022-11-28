@@ -557,22 +557,17 @@ print.regions <- function(x, ...) {
   lg <- "LGAs"
   
   hdr <- if (length(x) > 1L) {
-    if (all(is_state(x)) || inherits(x, "states"))
-      st
-    else
-      lg
+    if (all(is_state(x)) || inherits(x, "states")) st else lg
   }
   else {
-    if (inherits(x, "lgas"))
-      lg
-    else
-      st
+    if (inherits(x, "lgas")) lg else st
   }
   
-  underline <- strrep("-", nchar(hdr))
+  dash <- "-"
+  underline <- strrep(dash, nchar(hdr))
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
-  cat(paste("*", x, collapse = newline), "\n")
+  cat(paste(dash, x, collapse = newline), newline)
 }
 
 
