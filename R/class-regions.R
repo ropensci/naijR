@@ -190,6 +190,7 @@ new_states <- function(ss)
 #' 
 #' @importFrom utils data
 #' @importFrom magrittr %>%
+#' @importFrom magrittr extract2
 #'
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
@@ -450,24 +451,6 @@ as_lga <- function(x) {
     Bassa = c("Kogi", "Plateau")
   )
 }
-
-
-
-
-
-
-## Get a vector with both the abbreviated and full versions of the 
-## national capital's name, just return one of the two.
-.fctOptions <- function(opt = c("all", "full", "abbrev")) {
-  opt <- match.arg(opt)
-  vec <- c(full = "Federal Capital Territory", abbrev = "FCT")
-  
-  if (opt != "all")
-    return(vec[opt])
-  
-  vec
-}
-
 
 
 

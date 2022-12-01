@@ -492,3 +492,24 @@ test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
   #   expect_warning(map_ng(data = d, leg.orient = "horiz", plot = FALSE))
   # })
 })
+
+
+test_that("Labels are show", {
+  expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), "map")
+  expect_s3_class(map_ng(states(gpz = "sw"), show.text = TRUE, plot = FALSE),
+                  "map")
+  expect_s3_class(map_ng(
+    states(gpz = "sw"),
+    show.text = TRUE,
+    col = 4,
+    plot = FALSE
+  ), "map")
+  
+})
+
+
+test_that("Labels can be resized", {
+  expect_error(map_ng(show.text = TRUE, cex = ".75"))
+  expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), "map")
+  expect_s3_class(map_ng(show.text = TRUE, cex = .5, plot = FALSE), "map")
+})
