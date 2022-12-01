@@ -12,7 +12,8 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  results = 'hide'
 )
 ```
 
@@ -83,7 +84,7 @@ When the automatic fixes are not feasible, the user has the option of doing it i
 
 When a misspelt LGA has more than one match, the interactive approach is the viable option for effecting fixes.
 
-```{r, message = FALSE}
+```{r, include = FALSE, message = FALSE}
 adamawa <- c("Fufore", "Demsa", "Machika", "Fufure", "Ganye", "Hong")
 
 # check for misspelt LGAs and, if necessary, attempt to fix
@@ -127,7 +128,7 @@ adamawa <- fix_region_manual(adamawa, "Machika", "Michika")
 
 At the end of it all, the spellings are fixed.
 
-```{r}
+```{r, results = 'markup'}
 all(is_lga(adamawa))
 ```
 
@@ -135,5 +136,5 @@ all(is_lga(adamawa))
 When spelling errors are identified and the correct one is known, then a manual fix can be applied. For this, we use the function `fix_region_manual` and its use is pretty straightforward:
 
 
-```{r manual-fix}
+```{r manual-fix, eval = FALSE}
 ```
