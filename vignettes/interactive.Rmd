@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -69,6 +69,8 @@ fix_region(c("Legos Island", "Amuwo Odofin"))
 fix_region(lgas(c("Legos Island", "Amuwo Odofin")))
 ```
 
+This displays the following dialog:
+
 ![](img/interactive-1b.png)
 
 When the spelling mistakes depart very far from the function's partial matching capability, the user is told the fixes that could not be made. A possible solution lies in the next level of name repair.
@@ -84,12 +86,17 @@ When the automatic fixes are not feasible, the user has the option of doing it i
 
 When a misspelt LGA has more than one match, the interactive approach is the viable option for effecting fixes.
 
-```{r, include = FALSE, message = FALSE}
+```{r, eval = 1}
 adamawa <- c("Fufore", "Demsa", "Machika", "Fufure", "Ganye", "Hong")
 
 # check for misspelt LGAs and, if necessary, attempt to fix
 if (!all(is_lga(adamawa)))
   adamawa <- fix_region(adamawa)
+```
+
+```{r, include = FALSE}
+if (!all(is_lga(adamawa)))
+  adamawa <- suppressMessages(fix_region(adamawa))
 ```
 
 ![](img/interactive-2a.png)
