@@ -71,7 +71,7 @@ fix_region(lgas(c("Legos Island", "Amuwo Odofin")))
 
 This displays the following dialog:
 
-![](img/interactive-1b.png)
+<!-- ![](img/interactive-1b.png) -->
 
 When the spelling mistakes depart very far from the function's partial matching capability, the user is told the fixes that could not be made. A possible solution lies in the next level of name repair.
 
