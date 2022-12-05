@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
       </span>
     </div>
 
@@ -67,7 +67,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.5.0" id="naijr-050">naijR 0.5.0<a class="anchor" aria-label="anchor" href="#naijr-050"></a></h2>
+<h2 class="page-header" data-toc-text="0.5.1" id="naijr-051">naijR 0.5.1<a class="anchor" aria-label="anchor" href="#naijr-051"></a></h2>
+<ul><li>In nested calls with the function <code>fix_region</code>, the <code>lgas</code> constructor function does not warn if there are spelling mistakes, as this turned out to be a bit confusing when it was used. In earlier versions, warnings persisted even after fixes were applied.</li>
+<li>In carrying out interactive fixes, particularly of LGA spellings, the more familiar and intuitive native Windows messaging and dialog system is used. Works only on Windows machines; on Linux and MacOs, the usual messaging and interaction occurs at the R console.</li>
+<li>Control the size of map labels with the <code>cex</code> argument (passed on to <code><a href="https://rdrr.io/pkg/maps/man/map.text.html" class="external-link">maps::map.text</a></code> internally, via <code>...</code>).</li>
+<li>Handle instances where the term <em>Abuja</em> is used as a State (which technically it is not) and signal a warning to the user.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.0" id="naijr-050">naijR 0.5.0<small>2022-09-30</small><a class="anchor" aria-label="anchor" href="#naijr-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-5-0">New features:<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
 <ul><li>New methods for <code><a href="https://rdrr.io/r/base/InternalMethods.html" class="external-link">?InternalGenerics</a></code> were introduced e.g. for <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>, <code>[</code>, <code>[[</code>, <code>na.exclude</code>, etc.</li>

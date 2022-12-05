@@ -44,9 +44,18 @@ is_state <- function(x)
   
   if (length(x) == 0L)
     return(FALSE)
+  
+  abujas <- match("Abuja", x)
+  
+  if (!is.na(abujas))
+    warning("'Abuja' in position(s) ", 
+            paste(abujas, collapse = ", "), 
+            "is not a State. Use 'Federal Capital Territory' instead")
+  
   fctOpts <- .fctOptions()
+  
   x %>%
-    sub(fctOpts["abbrev"], fctOpts["full"], .) %>%
+    .toggleFct("full") %>%
     `%in%`(getAllStates(named = FALSE)) %>%
     {
       .[na.pos] <- NA

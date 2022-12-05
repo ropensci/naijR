@@ -189,6 +189,8 @@ new_states <- function(ss)
 #' how_many_lgas("Ekiti")
 #' 
 #' @importFrom utils data
+#' @importFrom magrittr %>%
+#' @importFrom magrittr extract2
 #'
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
@@ -230,8 +232,14 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     
     lg
   }
-  else if (.hasMisspeltLgas(region)) { 
-    if (warn)
+  else if (.hasMisspeltLgas(region)) {
+    # Do not warn if this function is used inside a call to `fix_region`
+    funname <- sys.call(1) %>% 
+      as.list() %>% 
+      extract2(1) %>% 
+      as.character()
+    
+    if (warn && funname != 'fix_region')
       warning(.warnSpelling('lga'), call. = FALSE)
     
     ret <- region
@@ -448,25 +456,7 @@ as_lga <- function(x) {
 
 
 
-
-## Get a vector with both the abbreviated and full versions of the 
-## national capital's name, just return one of the two.
-.fctOptions <- function(opt = c("all", "full", "abbrev")) {
-  opt <- match.arg(opt)
-  vec <- c(full = "Federal Capital Territory", abbrev = "FCT")
-  
-  if (opt != "all")
-    return(vec[opt])
-  
-  vec
-}
-
-
-
-
-
-
-# TODO: Export this function in next release
+## TODO: Export in next MINOR release.
 # Disambiguate Synonymous States and LGAs
 # 
 # Some LGAs in Nigeria bear the name of the States to which they belong to.
@@ -502,13 +492,13 @@ disambiguate_lga <- function(x, parent = NULL)
       stop("Disambiguation can only be done in interactive mode")
     
     title <- sprintf("Which State does the LGA '%s' belong to?", x)
-    parent <- ss[menu(ss, graphics = TRUE, title = title)]
+    parent <-
+      ss[menu(ss, graphics = .Platform$OS.type == 'windows', title = title)]
   }
   
   attr(x, "State") <- parent
   x
 }
-
 
 
 
@@ -550,22 +540,17 @@ print.regions <- function(x, ...) {
   lg <- "LGAs"
   
   hdr <- if (length(x) > 1L) {
-    if (all(is_state(x)) || inherits(x, "states"))
-      st
-    else
-      lg
+    if (all(is_state(x)) || inherits(x, "states")) st else lg
   }
   else {
-    if (inherits(x, "lgas"))
-      lg
-    else
-      st
+    if (inherits(x, "lgas")) lg else st
   }
   
-  underline <- strrep("-", nchar(hdr))
+  dash <- "-"
+  underline <- strrep(dash, nchar(hdr))
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
-  cat(paste("*", x, collapse = newline), "\n")
+  cat(paste(dash, x, collapse = newline), newline)
 }
 
 

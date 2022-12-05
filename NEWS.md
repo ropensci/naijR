@@ -1,3 +1,9 @@
+# naijR 0.5.1
+* In nested calls with the function `fix_region`, the `lgas` constructor function does not warn if there are spelling mistakes, as this turned out to be a bit confusing when it was used. In earlier versions, warnings persisted even after fixes were applied.
+* In carrying out interactive fixes, particularly of LGA spellings, the more familiar and intuitive native Windows messaging and dialog system is used. Works only on Windows machines; on Linux and MacOs, the usual messaging and interaction occurs at the R console.
+* Control the size of map labels with the `cex` argument (passed on to `maps::map.text` internally, via `...`).
+* Handle instances where the term *Abuja* is used as a State (which technically it is not) and signal a warning to the user.
+
 # naijR 0.5.0
 ## New features:
 * New methods for `?InternalGenerics` were introduced e.g. for `c()`, `[`, `[[`, `na.exclude`, etc.

@@ -35,6 +35,8 @@ from within R as follows:
 vignette('nigeria-maps', 'naijR')
 ```
 
+### Administrative Regions
+
 #### States
 
 To create a list of all the States of the Nigerian Federation, simply
@@ -44,37 +46,37 @@ call `states()`.
 library(naijR, quietly = TRUE)
 ss <- states()
 head(ss)
+Abia
+
+Adamawa
+
+Akwa Ibom
+
+Anambra
+
+Bauchi
+
+Bayelsa
 cat(sprintf("\n...but Nigeria has %i States.", length(ss)))
-## Abia
 
-## Adamawa
-
-## Akwa Ibom
-
-## Anambra
-
-## Bauchi
-
-## Bayelsa
-## 
-## ...but Nigeria has 37 States.
+...but Nigeria has 37 States.
 ```
 
 States from a given geo-political zone can also be selected:
 
 ``` r
 states(gpz = "ne")  # i.e. North-East
-## Adamawa
+Adamawa
 
-## Bauchi
+Bauchi
 
-## Borno
+Borno
 
-## Gombe
+Gombe
 
-## Taraba
+Taraba
 
-## Yobe
+Yobe
 ```
 
 For other capabilities of this function, see `?states()`.
@@ -86,59 +88,59 @@ of Local Government Areas within a given State:
 
 ``` r
 lgas("Imo")
-## Aboh Mbaise
+Aboh Mbaise
 
-## Ahiazu Mbaise
+Ahiazu Mbaise
 
-## Ehime Mbano
+Ehime Mbano
 
-## Ezinihitte
+Ezinihitte
 
-## Ideato North
+Ideato North
 
-## Ideato South
+Ideato South
 
-## Ihitte/Uboma
+Ihitte/Uboma
 
-## Ikeduru
+Ikeduru
 
-## Isiala Mbano
+Isiala Mbano
 
-## Isu
+Isu
 
-## Mbaitoli
+Mbaitoli
 
-## Ngor Okpala
+Ngor Okpala
 
-## Njaba
+Njaba
 
-## Nkwerre
+Nkwerre
 
-## Nwangele
+Nwangele
 
-## Obowo
+Obowo
 
-## Oguta
+Oguta
 
-## Ohaji/Egbema
+Ohaji/Egbema
 
-## Okigwe
+Okigwe
 
-## Orlu
+Orlu
 
-## Orsu
+Orsu
 
-## Oru East
+Oru East
 
-## Oru West
+Oru West
 
-## Owerri Municipal
+Owerri Municipal
 
-## Owerri North
+Owerri North
 
-## Owerri West
+Owerri West
 
-## Unuimo
+Unuimo
 ```
 
 To list all the LGAs in Nigeria, call the same function without any
@@ -147,7 +149,7 @@ parameters:
 ``` r
 n <- length(lgas())
 sprintf("Nigeria has a total of %i Local Government Areas", n)
-## [1] "Nigeria has a total of 774 Local Government Areas"
+[1] "Nigeria has a total of 774 Local Government Areas"
 ```
 
 Want to create a function to check how many LGAs a particular State has?
@@ -159,12 +161,10 @@ how_many_lgas <- function(state) {
 }
 
 how_many_lgas("Sokoto")
-## Sokoto State has 23 LGAs
-how_many_lgas("Ekiti")
-## Ekiti State has 16 LGAs
+Sokoto State has 23 LGAs
 ```
 
-#### Working with phone numbers
+### Working with phone numbers
 
 It is common to come across datasets where phone numbers are wrongly
 entered or misinterpreted by software like MS Excel. The function
@@ -172,7 +172,7 @@ entered or misinterpreted by software like MS Excel. The function
 
 ``` r
 fix_mobile("8032000000")
-## [1] "08032000000"
+[1] "08032000000"
 ```
 
 The function works on vectors; thus an entire column of a table with
@@ -193,21 +193,21 @@ are turned into missing values, e.g.
     "O8055577889"
   )
 ))
-##   serialno       phone
-## 1        1   123456789
-## 2        2  0123456789
-## 3        3  8000000001
-## 4        4  9012345678
-## 5        5 07098765432
-## 6        6 08123456789
-## 7        7 09064321987
-## 8        8 O8055577889
+  serialno       phone
+1        1   123456789
+2        2  0123456789
+3        3  8000000001
+4        4  9012345678
+5        5 07098765432
+6        6 08123456789
+7        7 09064321987
+8        8 O8055577889
 ```
 
 ``` r
 fix_mobile(dat$phone)
-## [1] NA            NA            "08000000001" "09012345678" "07098765432"
-## [6] "08123456789" "09064321987" NA
+[1] NA            NA            "08000000001" "09012345678" "07098765432"
+[6] "08123456789" "09064321987" "08055577889"
 ```
 
 ## Installation

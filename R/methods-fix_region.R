@@ -39,14 +39,18 @@ fix_region.states <- function(x, ...)
   abbrFCT <- .fctOptions("abbrev")
   fullFCT <- .fctOptions("full")
   sumFct <- sum(.fctOptions() %in% x)
+  
   if (sumFct == 2)
     x <- sub(abbrFCT, fullFCT, x)
+  
   if (sumFct == 1) {
     i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
     i_full <- grep(fullFCT, x)
   }
+  
   iFct <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
   ss <- states()
+  
   if (length(iFct)) 
     ss <- sub(fullFCT, abbrFCT, ss)
   
@@ -75,14 +79,34 @@ fix_region.states <- function(x, ...)
 #' @export
 fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
-  vals <- .fixRegionInternal(x, lgas(), ...)
+  vals <- .fixRegionInternal(x, lgas(), interactive, ...)
+  
   if (interactive) {
-    ans <- readline("Do you want to repair interactively? (Y/N): ")
+    prompt <- "Do you want to repair interactively?"
+    
+    ans <- if (onWindowsInteractive())
+      substr(winDialog("yesno", prompt), 0, 1)
+    else
+      readline(paste(prompt, " (Y/N): "))
+    
     if (tolower(ans) == "y")
       vals <- .fixLgasInteractively(vals)
   }
+  
+  if (is.null(vals)) {
+    msg <- "The operation was cancelled"
+    
+    if (onWindowsInteractive())
+      winDialog("ok", msg)
+    else
+      message(msg)
+    
+    return(invisible(x))
+  }
+  
   if (!quietly)
     .reportOnFixes(vals)
+  
   invisible(vals)
 }
 
@@ -104,13 +128,18 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
   if (is.factor(x))
     x <- as.character(x)
+  
   if (!is.character(x))
     stop("'x' is not a character vector")
+  
   empty <- grepl("^$", x)
+  
   if (length(empty) > 0L && all(empty))  ## diff character(0) and character(1)
     stop("'x' only has empty strings")
+  
   if (any(empty))
     warning("Tried to fix empty strings - may produce errors")
+  
   if (all(is.na(x)) || !length(x)) {
     warning("'x' has length 0L or only missing values", call. = FALSE)
     return(x)
@@ -122,6 +151,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## did so because they were misspelt. An automatic fix will then be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
   nonSynonyms <- x[!x %in% .synonymRegions()]
+  
   region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
     lgas(x, warn = FALSE)                    # to allow creation of temporary,
   else if (any(is_state(nonSynonyms)))       # even with misspelt elements
@@ -135,8 +165,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       ),
       call. = FALSE
     )
-  zz <- region %>% fix_region %>% as.character
   
+  zz <- region %>% fix_region %>% as.character
   invisible(zz)
 }
 
@@ -153,7 +183,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ##
 ## This function is mapped to a vector of states/LGAs
 #' @importFrom magrittr %>%
-.fixRegionInternal <- function(x, region, ...)
+.fixRegionInternal <- function(x, region, interactive, ...)
 {
   stopifnot(is.character(x), is.character(region))
   cant.fix <- character()
@@ -164,11 +194,15 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## downstream.
   .getProperVal <- function(str, regions) {
     abbrFCT <- .fctOptions("abbrev")
+    
     if (!is.na(match(str, regions)))
       return(str)
+    
     if (inherits(regions, "states")) {
+      
       if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
           && identical(toupper(str), abbrFCT))
+        
         return(abbrFCT)
     }
     
@@ -183,20 +217,24 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     good <-
       grep(paste0('^', str, '$'), regions, value = TRUE, ignore.case = TRUE) %>% 
       unique()
+    
     if (length(good) == 1L) 
       return(good)
     
     ## Otherwise check for approximate matches.
     fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
     numFixed <- length(fixed)
+    
     if (numFixed == 1L) {
       fix.status <<- fix.status %>% 
         {
           structure(c(., fixed), names = c(names(.), str))
         }
+      
       return(fixed)
     }
-    if (numFixed > 1L)
+    
+    if (numFixed > 1L && !interactive)
       .warnOnMultipleMatches(str, fixed)
     
     # if we get to this point, return misspelt string unchanged
@@ -212,6 +250,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## unique instances to avoid repetitive printouts
   if (length(fix.status) > 1L) {
     allfix <- names(fix.status)
+    
     if (anyDuplicated(allfix)) {
       dups <- which(duplicated(allfix))
       fix.status <- fix.status[-dups]
@@ -219,9 +258,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   }
   
   attr(v, "regions.fixed") <- fix.status
-  return(v)
+  v
 }
-
 
 
 
@@ -229,40 +267,67 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 .warnOnMultipleMatches <- function(x, matches)
 {
   multimatch <- paste(matches, collapse = ", ")
+  
   warning(sprintf(
     "'%s' approximately matched more than one region - %s",
     x,
     multimatch
-  ), call. = FALSE)
+  ),
+  call. = FALSE)
 }
 
 
 
+
+#' @import utils
 .reportOnFixes <- function(obj)
 {
   ATTR_ <- attributes(obj)
   badspell <- ATTR_$misspelt
   hasBadspell <- !identical(badspell, character(0))
+  msg.bad <- msg.good <- ""
+  
   if (hasBadspell) {
-    hdr1 <- .messageHeader("Fix(es) not applied")
-    x <- sapply(badspell, function(x) paste0("* ", x, "\n"))
-    message(hdr1, paste0(x), appendLF = FALSE)
+    hdr.bad <- .messageHeader("Fix(es) not applied")
+    nofix.bullets <- sapply(badspell, function(x) paste0("* ", x))
+    msg.bad <- paste0(hdr.bad, paste(nofix.bullets, collapse = "\n"))
   }
+  
   fixes <- ATTR_$regions.fixed
+  
   if (!identical(fixes, character(0))) {
-    if (hasBadspell)
-      message("")    # just add newline
-    hdr2 <- .messageHeader("Successful fix(es)")
-    x <- 
-      mapply(function(a, b) sprintf("* %s => %s\n", a, b), names(fixes), fixes)
-    message(hdr2, paste0(x), appendLF = FALSE)
+    hdr.good <- .messageHeader("Successful fix(es)")
+    
+    fixed.bullets <-
+      mapply(function(a, z) {
+        sprintf("* %s => %s", a, z)
+      }, 
+      names(fixes), fixes)
+    
+    msg.good <- paste0(hdr.good, paste(fixed.bullets, collapse = "\n"))
+    
+    if (hasBadspell) {
+      msg.good <- paste0(msg.good, "\n")    # just add newline
+    }
   }
+  
+  if (!nchar(msg.good) && !nchar(msg.bad))
+    return()
+  
+  final.msg <- paste(msg.good, msg.bad, sep = "\n")
+  
+  if (onWindowsInteractive())
+    winDialog("ok", final.msg)
+  else
+    message(final.msg)
 }
 
 
 #' @importFrom magrittr %>%
 .messageHeader <- function(hdr)
 {
+  stopifnot(is.character(hdr))
+  
   hdr %>% 
     paste0(":") %>% 
     paste(strrep("-", nchar(.)), sep = '\n') %>% 
@@ -276,49 +341,91 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## @param lga.list The vector of LGA names that is being repaired. This vector
 ## is generated by `.fixRegionInternal` and has an attribute called `misspelt`,
 ## which is the collection of names needing repair.
-#' @importFrom utils menu
+#' @import utils
+#' @importFrom magrittr %>%
 #' @importFrom magrittr %<>%
 .fixLgasInteractively <- function(lga.list)
 {
   stopifnot(interactive())
+  
+  altopt <- list(
+    retry = "RETRY",
+    skip = "SKIP",
+    quit = "QUIT"
+  )
+  
   allLgas <- lgas()
-  opt <- NA
-  retry <- "RETRY"
-  quit <- "QUIT"
-  skip <- "SKIP"
+  menuopt <- integer()
   skipped <- character()
   bad.values <- attr(lga.list, "misspelt")
+  
   for (bad in bad.values) {
-    message("Fixing ", sQuote(bad))
+    msg.fixWhich <- paste("Fixing", sQuote(bad))
+    
     repeat {
-      choices <- readline("Search pattern: ") %>% 
+      prompt <- paste(msg.fixWhich, "Enter a search pattern: ", sep = ' - ')
+      
+      pattern <- if (onWindowsInteractive())
+        winDialogString(prompt, "")
+      else
+        readline(prompt)
+      
+      if (pattern == "" || is.null(pattern))
+        return()
+      
+      choices <- pattern %>%
+        grep(allLgas, value = TRUE, ignore.case = TRUE) %>%
+        sort() %>%
         {
-          rs <- grep(., allLgas, value = TRUE, ignore.case = TRUE)
-          c(retry, skip, quit, rs)
+          alt <- altopt %>% 
+            unlist() %>% 
+            unname()
+          
+          c(., alt)
         }
        
-      opt <- menu(choices, FALSE, "Select the LGA")
-      chosen <- choices[opt]
-      if (chosen != retry)
+      menuopt <-
+        menu(choices, graphics = onWindowsInteractive(), "Select the LGA")
+      chosen <- choices[menuopt]
+      
+      if (chosen != altopt$r)
         break
     }
-    if (chosen == quit)
+    
+    if (chosen == altopt$q)
       break
-    if (chosen == skip) {
+    
+    if (chosen == altopt$s) {
       skipped <- c(skipped, bad)
       next
     }
-    lga.list <- sub(bad, chosen, lga.list)
-    attr(lga.list, "misspelt") <- bad.values[bad.values != bad]
-    attr(lga.list, "regions.fixed") %<>% 
-    {
-      structure(c(., chosen), names = c(names(.), bad))
-    }
+    
+    lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
+    
+    attr(lga.list, "misspelt") %<>%
+      {
+        .[. != bad]
+      }
+    
+    attr(lga.list, "regions.fixed") %<>%
+      {
+        structure(c(., chosen), names = c(names(.), bad))
+      }
   }
-  if (length(skipped))
-    warning("The following items were skipped and should be fixed manually: ",
-            paste(skipped, collapse = ", "),
-            call. = FALSE)
+  
+  if (length(skipped)) {
+    msg <-
+      paste(
+        "The following items were skipped and should be fixed manually:",
+        paste(skipped, collapse = ", ")
+      )
+    
+    if (onWindowsInteractive())
+      winDialog("ok", msg)
+    else
+      message(msg)
+  }
+  
   lga.list
 }
 
@@ -346,12 +453,16 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 fix_region_manual <- function(x, wrong, correct)
 {
   arg <- substitute(x)
+  
   if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
+    
     if (!is.character(x))
       stop("The operation cannot be done on objects of type ", sQuote(typeof(x)))
   }
+  
   if ((length(wrong) != length(correct)) && length(correct) > 1L)
     stop("Substitutions must be single or the same number as targetted fixes")
+  
   if (length(correct) == 1L) {
     correct <- assertRegion(correct)
     x[x %in% wrong] <- correct
@@ -363,14 +474,18 @@ fix_region_manual <- function(x, wrong, correct)
   for (i in seq_along(wrong)) {
     iCorrect <- correct[i]
     iWrong <- wrong[i]
+    
     if (!match(iWrong, x, nomatch = 0))
       stop(sQuote(iWrong, q = FALSE),
            " is not an element of ",
            sQuote(arg, q = FALSE))
+    
     tryCatch({
       iCorrect <- assertRegion(iCorrect)
       x[x %in% iWrong] <- iCorrect
-    }, error = function(e) warning(conditionMessage(e), call. = FALSE))
+    }, error = function(e) {
+      warning(conditionMessage(e), call. = FALSE)
+    })
   }
   # TODO: Apply a correctness check and warn if mistakes remain?
   x
