@@ -52,8 +52,24 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     stop("'warn' is not logical")
   
   if (!missing(states) && is.character(states)) {
-    if (warn && !all(is_state(states)))
-      warning(.warnSpelling('state'), call. = FALSE)
+    num.missed <- sum(!is_state(states))
+    
+    if (num.missed) {
+      if (warn) {
+        abujas <- match("Abuja", states)
+        
+        if (!is.na(abujas))
+          warning(
+            "'Abuja' in position(s) ",
+            paste(abujas, collapse = ", "),
+            " is not a State. Use 'Federal Capital Territory' instead.",
+            call. = FALSE
+          )
+        
+        if (is.na(abujas) || num.missed > length(abujas))
+          .warnSpelling('state')
+      }
+    }
     
     return(new_states(states))
   }
@@ -93,7 +109,10 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     lga = "an LGA"
   )
   
-  sprintf("One or more items is not %s. Spelling error?", txt)
+  warning(
+    sprintf("One or more items is not %s. Spelling error?", txt),
+    call. = FALSE
+  )
 }
 
 
@@ -240,7 +259,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
       as.character()
     
     if (warn && funname != 'fix_region')
-      warning(.warnSpelling('lga'), call. = FALSE)
+      .warnSpelling('lga')
     
     ret <- region
     region <- as.null(region)  # set to NULL b/c of attribute in final output

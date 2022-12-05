@@ -223,6 +223,19 @@ test_that("missing values in 'regions' are handled", {
 })
 
 
+
+test_that("Warning is issued when 'Abuja' is used as a State", {
+  x <- c("Jigawa", "Kebbi", "Nasarawa", "Abuja")
+  y <- c(x, "Nassarawa")  # misspelt
+  
+  expect_warning(states(x), 
+                 "'Abuja' in position(s) 4 is not a State", 
+                 fixed = TRUE)
+  expect_length(capture_warnings(states(x)), 1)
+  expect_length(capture_warnings(states(y)), 2)
+})
+
+
 ## TODO: Export in next MINOR release.
 # test_that("LGA and States can be disambiguated where appropriate", {
 #   
