@@ -397,26 +397,19 @@
 
 
 
-#' @importFrom magrittr %>%
 .assertListElements <- function(x) {
   stopifnot(c('region', 'value', 'breaks') %in% names(x))
   
   region.valid <- .allAreRegions(x$region)
-  
-  value.valid <- 
-    x$value %>% 
-    {
-      is.numeric(.) || is.factor(.) || is.character(.)
-    }
+  v <- x$value
+  value.valid <- is.numeric(v) || is.factor(v) || is.character(v)
+  c <- x$categories
   
   cat.valid <-
-    x$categories %>%
-    {
-      if (!is.null(.))
-        is.character(.) || is.factor(.)
-      else
-        TRUE
-    }
+    if (!is.null(c))
+      is.character(c) || is.factor(c)
+  else
+    TRUE
   
   all(region.valid, value.valid, cat.valid)
 }
@@ -473,7 +466,6 @@
 
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom RColorBrewer brewer.pal.info
-#' @importFrom magrittr %>%
 #' @importFrom rlang abort
 #' @importFrom tools toTitleCase
 .processColouring <- function(col = NULL, n, ...)
@@ -485,9 +477,8 @@
   
   if (is.numeric(col)) {
     default.pal <- .get_R_palette()
-    all.cols <- default.pal %>% 
-      sub("(green)(3)", "\\1", .) %>% 
-      sub("gray", "grey", .)
+    all.cols <- sub("(green)(3)", "\\1", default.pal)
+    all.cols <- sub("gray", "grey", all.cols)
     
     if (!col %in% seq_along(all.cols))
       abort(sprintf("'color' must range between 1L and %iL", 
@@ -627,7 +618,6 @@
 
 # Rejigs text that is used for labeling a region that has more than 1 polygon
 # TODO: Quite a bit of hard-coding was used (v. 0.1.0) and should be reviewed
-#' @importFrom magrittr %>%
 .adjustLabels <- function(x) 
 {
   stopifnot(is.character(x))
@@ -638,12 +628,12 @@
       sub("\\:\\d*$", "", l)
   )
   
-  
   dd <- data.frame(state = c("Akwa Ibom", "Cross River"),
                    poly = c(2, 4))
+  
   ss <- dd[["state"]]
+  
   if (all(grepl(paste0(ss, collapse = "|"), x))) {
-    
     .fadj <- function(a, reg, pos) {
       ind <- grep(reg, a)
       finalPos <- ind[pos]
@@ -651,6 +641,7 @@
       a[finalPos] <- reg
       a
     }
+    
     for (i in seq_len(2))
       x <- .fadj(x, ss[i], dd[["poly"]][i])
   }

@@ -2,9 +2,6 @@
 #' 
 #' @param x A vector to be tested.
 #' 
-#' @importFrom magrittr %>%
-#' @import stats
-#' 
 #' @details An element-wise check of a supplied vector is carried out. To
 #' test an entire vector and return a single boolean value, functions 
 #' such as \code{base::all} or \code{base::any} should be used.
@@ -20,6 +17,8 @@
 #' @examples 
 #' all(is_state(naijR::states()))
 #' is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
+#' 
+#' @import stats
 #' 
 #' @export
 is_state <- function(x)
@@ -45,15 +44,10 @@ is_state <- function(x)
   if (length(x) == 0L)
     return(FALSE)
   
-  fctOpts <- .fctOptions()
-  
-  x %>%
-    .toggleFct("full") %>%
-    `%in%`(getAllStates(named = FALSE)) %>%
-    {
-      .[na.pos] <- NA
-      .
-    }
+  x <- .toggleFct(x, "full")
+  res <- x %in% getAllStates(named = FALSE)
+  res[na.pos] <- NA
+  res
 }
 
 

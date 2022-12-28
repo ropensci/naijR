@@ -105,7 +105,6 @@ globalVariables(c(".", "STATE"))
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom lifecycle deprecated
 #' @importFrom lifecycle is_present
-#' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
@@ -252,21 +251,16 @@ map_ng <- function(region = character(),
     txt <- .ngName()
     
     if (!identical(region, .ngName())) {
-      
-      txt <- database$name %>%
-        { 
-          # Account for multi-polygonic regions
-          # TODO: Scope this to parent environment
-          rgxRegions <-
-            function(x, nms) {
-              rgx <- paste0("^", x, "(\\:\\d*)?$")
-              grep(rgx, nms, value = TRUE)
-            }
-          
-          is <- lapply(region, rgxRegions, nms = .)
-          unlist(is)
+      # Account for multi-polygonic regions
+      # TODO: Scope this to parent environment
+      rgxRegions <-
+        function(x, nms) {
+          rgx <- paste0("^", x, "(\\:\\d*)?$")
+          grep(rgx, nms, value = TRUE)
         }
       
+      is <- lapply(region, rgxRegions, nms = database$name)
+      txt <- unlist(is)
       lbl <- .adjustLabels(txt)
       cex <- .setTextSize(dots$cex)
       

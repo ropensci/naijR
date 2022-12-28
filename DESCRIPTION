@@ -11,7 +11,6 @@ Depends:
 Imports:
     RColorBrewer (>= 1.1.2),
     lifecycle (>= 0.2.0),
-    magrittr (>= 1.5),
     mapdata (>= 2.3.0),
     maps (>= 3.3.0),
     rgdal (>= 1.4.4),
@@ -36,7 +35,7 @@ Description: A set of convenience functions as well as geographical/political
 License: GPL-3
 LazyData: TRUE
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://brovic.github.io/naijR/

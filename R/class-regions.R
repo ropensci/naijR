@@ -116,9 +116,6 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 }
 
 
-
-#' @importFrom magrittr %>%
-#' @importFrom magrittr %$%
 getAllStates <- function(named = TRUE)
 {
   stopifnot(
@@ -126,34 +123,35 @@ getAllStates <- function(named = TRUE)
     is.logical(named),
     !is.na(named)
   )
+  
   data("lgas_nigeria", package = "naijR", envir = environment())
-  
-  zones <- lgas_nigeria$gpz %>% 
-    unique %>% 
-    sort
-  
-  ss <- sapply(zones, function(zn) {
-    lgas_nigeria %$%
-      {
-        state[gpz == zn]
-      } %>% 
-      unique
-  })
-  
+  zones <- sort(unique(lgas_nigeria$gpz))
+  ss <- sapply(zones, .subsetStatesByZone)
   stopifnot(!is.null(ss))
   
   if (!named)
-    return({
-      ss %>% 
-        unlist %>% 
-        unname %>% 
-        sort
-    })
+    return( sort(unname(unlist(ss))) )
   
   names(ss) <- sub("\\.state", "", names(ss))
   ss
 }
 
+
+
+.subsetStatesByZone <- function(zone) 
+{
+  s <- with(lgas_nigeria, state[gpz == zone])
+  unique(s)
+}
+
+
+
+
+
+.subsetLgasByState <- function(s)
+{
+  with(lgas_nigeria, lga[state %in% s])
+}
 
 
 
@@ -208,9 +206,7 @@ new_states <- function(ss)
 #' how_many_lgas("Ekiti")
 #' 
 #' @importFrom utils data
-#' @importFrom magrittr %>%
-#' @importFrom magrittr extract2
-#'
+#' 
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
@@ -228,13 +224,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     return(new_lgas(lgas_nigeria$lga))
   
   lst <- if (all(is_state(region)) && !strict) {
-    sl <- lapply(region, function(s)
-      subset(
-        lgas_nigeria,
-        state %in% s,
-        select = lga,
-        drop = TRUE
-      ))
+    sl <- lapply(region, .subsetLgasByState)
     names(sl) <- region
     
     if (length(region) == 1L)
@@ -244,7 +234,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   }
   else if (all(is_lga(region))) {
     lg <- region
-    region <- unique(lgas_nigeria$state[lgas_nigeria$lga %in% lg])
+    region <- unique(with(lgas_nigeria, state[lga %in% lg]))
     
     if ((numSt <- length(region)) > 1L)
       warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
@@ -253,10 +243,8 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   }
   else if (.hasMisspeltLgas(region)) {
     # Do not warn if this function is used inside a call to `fix_region`
-    funname <- sys.call(1) %>% 
-      as.list() %>% 
-      extract2(1) %>% 
-      as.character()
+    funs <- as.list(sys.call(1))
+    funname <- as.character(funs[[1]])
     
     if (warn && funname != 'fix_region')
       .warnSpelling('lga')
@@ -272,6 +260,8 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 }
 
 
+
+
 .hasNonLgaMixed <- function(x) {
   stopifnot(is.character(x))
   matches <- .boolPartialLgaMatches(x)
@@ -282,10 +272,16 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   sum(matches) < length(x)
 }
 
+
+
+
 .hasNonLgaAll <- function(x) {
   stopifnot(is.character(x))
   sum(.boolPartialLgaMatches(x)) == 0L
 }
+
+
+
 
 .hasMisspeltLgas <- function(x) {
   stopifnot(is.character(x))
@@ -297,10 +293,15 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   sum(matches) < length(x)
 }
 
+
+
+
 .boolExactLgaMatches <- function(x) {
   stopifnot(is.character(x))
   grepl(.lgaRegex(x), lgas())
 }
+
+
 
 
 .boolPartialLgaMatches <- function(x) {
@@ -312,10 +313,17 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
          max.distance = .pkgLevDistance())
 }
 
+
+
+
 .lgaRegex <- function(x) {
   stopifnot(is.character(x))
   paste0("^", paste(x, collapse = "|"), "$")
 }
+
+
+
+
 
 # Low-level S3 constructor for lgas object
 new_lgas <- function(x)
@@ -439,18 +447,11 @@ as_lga <- function(x) {
 
 ## Returns those LGAs that share names with their State
 ## e.g. Bauchi, Ekiti
-#' @importFrom magrittr %>%
-#' @importFrom magrittr extract
 .synonymRegions <- function()
 {
-  ll <- lgas()
-  
-  ll %>% 
-    is_state %>% 
-    which %>% 
-    extract(ll, .) %>% 
-    unclass %>% 
-    unique       # because Nasarawa exists in 2 different States
+  ll <- unclass(lgas())
+  statelike <- which(is_state(ll))
+  unique(ll[statelike])
 }
 
 

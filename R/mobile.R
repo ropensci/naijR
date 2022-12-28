@@ -14,7 +14,6 @@
 #'
 #' @return The updated vector, usually the column of a data frame.
 #' 
-#' @importFrom magrittr %>%
 #' @importFrom stringi stri_trim_both
 #'
 #' @export
