@@ -241,7 +241,7 @@ map_ng <- function(region = character(),
   }, 
   error = function(e) stop(e))
   
-  if (!is.null(dots$plot) && !dots$plot)
+  if (!is.null(dots$plot) && isFALSE(dots$plot))
     return(database)
   
   if(!is_null(y) && !.xyWithinBounds(database, x, y))
