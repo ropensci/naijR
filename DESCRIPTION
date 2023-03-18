@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.5.1.9002
-Date: 2022-12-30
+Version: 0.5.1.9003
+Date: 2023-03-17
 Depends: 
     R (>= 3.6),
     grDevices,
@@ -19,11 +19,14 @@ Imports:
 Suggests: 
     covr,
     here,
+    jsonlite,
     knitr,
     readxl,
     rmarkdown,
     sp (>= 1.4.2),
     testthat,
+    tibble,
+    tidyr,
     usethis
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",
