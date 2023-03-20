@@ -1,17 +1,19 @@
 devtools::load_all()
 
-dataraw <- "data-raw"
+if (!requireNamespace("magrittr"))
+  install.packages("magrittr", repos = "https://cran.rstudio.com")
 
-lgadata <- 
-  dataraw |>
-  here::here("list_of_local_government_areas_of_nigeria-1729j.csv") |> 
-  read.csv() |> 
-  subset(select = -1) |> 
-  transform(State = sub(" State", "", State)) |>     # note whitespace removed
-  setNames(c("LGA", "State")) |> 
-  tidyr::nest(LGA = LGA, .by = State) |> 
-  transform(LGA = lapply(LGA, function(item) unname(unlist(item))))
+library(magrittr)
 
-with(lgadata, setNames(LGA, State)) |>
-  jsonlite:::toJSON(pretty = TRUE) |>
-  cat(file = here::here(dataraw, "lgas.json"))
+dir <- here::here("data-raw")
+
+lgalist <- 
+  read.csv(file.path(dir, "nglga.csv")) %>% 
+  transform(state = sub(" State", "", state)) %>%     # note whitespace removed
+  split(.[["state"]]) %>% 
+  lapply(extract2, i = "lga")
+
+lgajson <- lgalist %>%
+  jsonlite:::toJSON(pretty = TRUE)
+
+cat(lgajson, file = file.path(dir, "lgas.json"))
