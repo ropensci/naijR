@@ -48,10 +48,10 @@ globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
   if (!is.logical(all))
-    cli::cli_abort("'all' is not logical")
+    cli_abort("'all' is not logical")
   
   if (!is.logical(warn))
-    cli::cli_abort("'warn' is not logical")
+    cli_abort("'warn' is not logical")
   
   if (!missing(states) && is.character(states)) {
     num.missed <- sum(!is_state(states))
@@ -61,29 +61,27 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
         abujas <- match("Abuja", states)
         
         if (!is.na(abujas))
-          warning(
-            "'Abuja' in position(s) ",
-            paste(abujas, collapse = ", "),
-            " is not a State. Use 'Federal Capital Territory' instead.",
-            call. = FALSE
+          cli::cli_warn(
+            "'Abuja' in position(s) {paste(abujas, collapse = ', ')}
+             is not a State. Use 'Federal Capital Territory' instead."
           )
         
         if (is.na(abujas) || num.missed > length(abujas))
-          .warnSpelling('state')
+          .warn_on_misspelling('state')
       }
     }
     
     return(new_states(states))
   }
   
-  stl <- getAllStates()
+  stl <- get_all_states()
   
   if (!all)
     stl$fct <- NULL
   
   if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
-      cli::cli_abort("argument supplied 'gpz' is not of type 'character'")
+      cli_abort("argument supplied 'gpz' is not of type 'character'")
     
     gpz <- tolower(gsub("\\s+", "", gpz))
     x <- match.arg(gpz, names(stl), several.ok = TRUE)
@@ -92,7 +90,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
   
   ss <- as.vector(unlist(stl), mode = 'character')
   
-  if (is.null(gpz))
+  if (is.null(gpz)) 
     ss <- sort(ss)
   
   new_states(ss)
@@ -102,7 +100,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 
 ## Provides some uniformity in the messaging b/w States & LGAs
-.warnSpelling <- function(region.type) {
+.warn_on_misspelling <- function(region.type) {
   region.type <- match.arg(region.type, c("state", "lga"))
   
   txt <- switch(
@@ -111,14 +109,13 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     lga = "an LGA"
   )
   
-  warning(
-    sprintf("One or more items is not %s. Spelling error?", txt),
-    call. = FALSE
-  )
+  cli::cli_warn("One or more items is not {txt}. Spelling error?")
 }
 
 
-getAllStates <- function(named = TRUE)
+
+
+get_all_states <- function(named = TRUE)
 {
   stopifnot(
     length(named) == 1L,
@@ -126,52 +123,38 @@ getAllStates <- function(named = TRUE)
     !is.na(named)
   )
   
+  .subset_states_by_zone <- function(zone) {
+    zonalstates <- with(lgas_nigeria, state[gpz == zone])
+    unique(zonalstates)
+  }
+  
   data("lgas_nigeria", package = "naijR", envir = environment())
   zones <- sort(unique(lgas_nigeria$gpz))
-  ss <- sapply(zones, .subsetStatesByZone)
-  stopifnot(!is.null(ss))
+  states.by.zone <- sapply(zones, .subset_states_by_zone)
+  stopifnot(!is.null(states.by.zone))
   
   if (!named)
-    return( sort(unname(unlist(ss))) )
+    return( sort(unname(unlist(states.by.zone))) )
   
-  names(ss) <- sub("\\.state", "", names(ss))
-  ss
-}
-
-
-
-.subsetStatesByZone <- function(zone) 
-{
-  s <- with(lgas_nigeria, state[gpz == zone])
-  unique(s)
+  names(states.by.zone) <- sub("\\.state", "", names(states.by.zone))
+  states.by.zone
 }
 
 
 
 
-
-.subsetLgasByState <- function(s)
+.subset_lgas_by_state <- function(s)
 {
   with(lgas_nigeria, lga[state %in% s])
 }
 
 
 
-
-
-## Low-level constructor
+## Low-level S3 constructor
 new_states <- function(ss) 
 {
   structure(ss, class = c("states", "regions", class(ss)))
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -217,16 +200,16 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     region <- as.character(region)
   
   if (!is.character(region))
-    stop("Expected an object of type 'character'")
+    cli::cli_abort("Expected an object of type 'character'")
   
-  if (strict && !any(region %in% .synonymRegions()))
-    stop("strict can only be set to TRUE where State/LGA syonnyms exist")
+  if (strict && !any(region %in% .synonym_regions()))
+    cli::cli_abort("strict can only be set to TRUE where State/LGA syonnyms exist")
   
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
   
   lst <- if (all(is_state(region)) && !strict) {
-    sl <- lapply(region, .subsetLgasByState)
+    sl <- lapply(region, .subset_lgas_by_state)
     names(sl) <- region
     
     if (length(region) == 1L)
@@ -239,24 +222,24 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     region <- unique(with(lgas_nigeria, state[lga %in% lg]))
     
     if ((numSt <- length(region)) > 1L)
-      warning(sprintf("The LGA '%s' is found in %i States", lg, numSt))
+      cli::cli_warn("The LGA '{lg}' is found in {numSt} States")
     
     lg
   }
-  else if (.hasMisspeltLgas(region)) {
+  else if (.has_misspelt_lgas(region)) {
     # Do not warn if this function is used inside a call to `fix_region`
     funs <- as.list(sys.call(1))
     funname <- as.character(funs[[1]])
     
     if (warn && funname != 'fix_region')
-      .warnSpelling('lga')
+      .warn_on_misspelling('lga')
     
     ret <- region
     region <- as.null(region)  # set to NULL b/c of attribute in final output
     ret
   }
-  else if (.hasNonLgaAll(region))
-    stop("None of the items is a valid LGA")
+  else if (.all_are_not_lgas(region))
+    cli::cli_abort("None of the items is a valid LGA")
   
   structure(new_lgas(lst), State = region)
 }
@@ -264,11 +247,11 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 
 
-.hasNonLgaMixed <- function(x) {
+.has_mix_of_non_lga <- function(x) {
   stopifnot(is.character(x))
-  matches <- .boolPartialLgaMatches(x)
+  matches <- .bools_partial_lga_matches(x)
   
-  if (.hasNonLgaAll(x))
+  if (.all_are_not_lgas(x))
     return(FALSE)
   
   sum(matches) < length(x)
@@ -277,19 +260,19 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 
 
-.hasNonLgaAll <- function(x) {
+.all_are_not_lgas <- function(x) {
   stopifnot(is.character(x))
-  sum(.boolPartialLgaMatches(x)) == 0L
+  sum(.bools_partial_lga_matches(x)) == 0L
 }
 
 
 
 
-.hasMisspeltLgas <- function(x) {
+.has_misspelt_lgas <- function(x) {
   stopifnot(is.character(x))
-  matches <- .boolExactLgaMatches(x)
+  matches <- .bools_exact_lga_matches(x)
   
-  if (.hasNonLgaAll(x))
+  if (.all_are_not_lgas(x))
     return(FALSE)
   
   sum(matches) < length(x)
@@ -298,18 +281,18 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 
 
-.boolExactLgaMatches <- function(x) {
+.bools_exact_lga_matches <- function(x) {
   stopifnot(is.character(x))
-  grepl(.lgaRegex(x), lgas())
+  grepl(.lgas_regex(x), lgas())
 }
 
 
 
 
-.boolPartialLgaMatches <- function(x) {
+.bools_partial_lga_matches <- function(x) {
   stopifnot(is.character(x))
   
-  agrepl(.lgaRegex(x),
+  agrepl(.lgas_regex(x),
          lgas(),
          fixed = FALSE,
          max.distance = .pkgLevDistance())
@@ -318,7 +301,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 
 
-.lgaRegex <- function(x) {
+.lgas_regex <- function(x) {
   stopifnot(is.character(x))
   paste0("^", paste(x, collapse = "|"), "$")
 }
@@ -332,8 +315,6 @@ new_lgas <- function(x)
 {
   structure(x, class = c("lgas", "regions", class(x)))
 }
-
-
 
 
 
@@ -354,11 +335,7 @@ lgas_ng <- function(state = NA_character_) {
 
 
 
-
-
-
-# ----
-# Functions for coercion
+# ---- Functions for coercion ----
 #
 
 #' Explicit coercion between State and LGA names
@@ -406,10 +383,8 @@ lgas_ng <- function(state = NA_character_) {
 #' @export
 as_state <- function(x)
 {
-  states(.validateCoercible(x))
+  states(.assert_if_coercible(x))
 }
-
-
 
 
 
@@ -418,38 +393,40 @@ as_state <- function(x)
 #' 
 #' @export
 as_lga <- function(x) {
-  new_lgas(.validateCoercible(x))
+  new_lgas(.assert_if_coercible(x))
 }
 
 
 
-
-.validateCoercible <- function(obj)
+#' @importFrom cli cli_abort
+.assert_if_coercible <- function(obj)
 {
   if (is.factor(obj))
     obj <- as.character(obj)
   
   if (!is.character(obj))
-    stop("Expected a character vector")
+    cli_abort("Expected a character vector")
   
   if (length(obj) > 1L)
-    stop("To coerce a region with synonyms, use a vector of length 1L")
+    cli_abort("To coerce a region with synonyms, use a vector of length 1L")
   
-  if (!obj %in% .synonymRegions())
-    stop("The object does not possess State/LGA synonyms")
+  if (!obj %in% .synonym_regions())
+    cli_abort("The object does not possess State/LGA synonyms")
   
   if (inherits(obj, "regions")) {
     obj <- unclass(obj)
-    warning("Object was stripped down to mode 'character'", call. = FALSE)
+    cli::cli_warn("Object was stripped down to mode 'character'")
   }
+  
   obj
 }
 
 
 
+
 ## Returns those LGAs that share names with their State
 ## e.g. Bauchi, Ekiti
-.synonymRegions <- function()
+.synonym_regions <- function()
 {
   ll <- unclass(lgas())
   statelike <- which(is_state(ll))
@@ -459,10 +436,7 @@ as_lga <- function(x) {
 
 
 
-
-
-
-.stateSharedLgas <- function()
+.states_with_shared_lgas <- function()
 {
   list(
     Nasarawa = c("Nasarawa", "Kano"),
@@ -494,24 +468,25 @@ as_lga <- function(x) {
 # will signal an error.
 #
 # @importFrom utils menu
+#' @importFrom cli cli_abort
 # @export
 disambiguate_lga <- function(x, parent = NULL)
 {
   if (!is.character(x))
-    stop(sQuote(deparse(quote(x))), "must be a character vector")
+    cli::cli_abort("{sQuote(deparse(quote(x)))} must be a character vector")
   
   if (length(x) > 1L)
-    stop("Disambiguation is done only for single-length objects")
+    cli_abort("Disambiguation is done only for single-length objects")
   
   if (!is_lga(x))
-    stop("Expected an object of class 'lgas'")
+    cli_abort("Expected an object of class 'lgas'")
   
   ss <- attr(x, "State")
   
   if (is.null(parent)) {
     
     if (!interactive())
-      stop("Disambiguation can only be done in interactive mode")
+      cli_abort("Disambiguation can only be done in interactive mode")
     
     title <- sprintf("Which State does the LGA '%s' belong to?", x)
     parent <-
@@ -526,7 +501,7 @@ disambiguate_lga <- function(x, parent = NULL)
 
 
 
-# Methods for internal generics ####
+# Methods for internal generics ----
 
 ## Because 'regions' is an abstract class i.e. it does not have
 ## a constructor, we have to provide a means of creating the
@@ -578,10 +553,6 @@ print.regions <- function(x, ...) {
 
 
 
-
-
-
-
 #' Return the First or Last Parts of a Region Object
 #' 
 #' @rdname states
@@ -612,6 +583,8 @@ tail.regions <- function(x, ...)
 }
 
 
+
+
 #' @export
 c.regions <- function(...)
 {
@@ -624,6 +597,9 @@ c.regions <- function(...)
   .chooseRegionsMethod(NextMethod(), ls)
 }
 
+
+
+
 ## Extraction functions for 'regions' objects
 ## Note: The replacement versions already work adequately
 ## with their default methods
@@ -633,11 +609,16 @@ c.regions <- function(...)
   .chooseRegionsMethod(NextMethod(), x)
 }
 
+
+
+
 #' @export
 `[.regions` <- function(x, i)
 {
   .chooseRegionsMethod(NextMethod(), x)
 }
+
+
 
 
 #' @importFrom stats na.exclude

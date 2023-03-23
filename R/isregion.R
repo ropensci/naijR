@@ -45,7 +45,7 @@ is_state <- function(x)
     return(FALSE)
   
   x <- .toggleFct(x, "full")
-  res <- x %in% getAllStates(named = FALSE)
+  res <- x %in% get_all_states(named = FALSE)
   res[na.pos] <- NA
   res
 }
