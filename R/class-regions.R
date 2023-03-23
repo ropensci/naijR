@@ -42,14 +42,16 @@ globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
 #' states()  # lists names of all States
 #' states(gpz = "se")  # lists States in South-East zone
 #' 
+#' @importFrom cli cli_abort
+#' 
 #' @export
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
   if (!is.logical(all))
-    stop("'all' is not logical")
+    cli::cli_abort("'all' is not logical")
   
   if (!is.logical(warn))
-    stop("'warn' is not logical")
+    cli::cli_abort("'warn' is not logical")
   
   if (!missing(states) && is.character(states)) {
     num.missed <- sum(!is_state(states))
@@ -81,7 +83,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
   
   if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
-      stop("argument supplied 'gpz' is not of type 'character'")
+      cli::cli_abort("argument supplied 'gpz' is not of type 'character'")
     
     gpz <- tolower(gsub("\\s+", "", gpz))
     x <- match.arg(gpz, names(stl), several.ok = TRUE)
