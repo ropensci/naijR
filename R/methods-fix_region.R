@@ -36,9 +36,9 @@ fix_region <- function(x, ...)
 fix_region.states <- function(x, ...)
 {
   ## Process possible FCT values
-  abbrFCT <- .fctOptions("abbrev")
-  fullFCT <- .fctOptions("full")
-  sumFct <- sum(.fctOptions() %in% x)
+  abbrFCT <- .fct_options("abbrev")
+  fullFCT <- .fct_options("full")
+  sumFct <- sum(.fct_options() %in% x)
   
   if (sumFct == 2)
     x <- sub(abbrFCT, fullFCT, x)
@@ -84,19 +84,19 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   if (interactive) {
     prompt <- "Do you want to repair interactively?"
     
-    ans <- if (onWindowsInteractive())
+    ans <- if (on_windows_interactive())
       substr(winDialog("yesno", prompt), 0, 1)
     else
       readline(paste(prompt, " (Y/N): "))
     
     if (tolower(ans) == "y")
-      vals <- .fixLgasInteractively(vals)
+      vals <- .fix_lgas_interactive(vals)
   }
   
   if (is.null(vals)) {
     msg <- "The operation was cancelled"
     
-    if (onWindowsInteractive())
+    if (on_windows_interactive())
       winDialog("ok", msg)
     else
       message(msg)
@@ -105,7 +105,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   }
   
   if (!quietly)
-    .reportOnFixes(vals)
+    .report_on_fixes(vals)
   
   invisible(vals)
 }
@@ -122,6 +122,9 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## called internally to attempt to fix the input.
 #' @rdname fix_region
 #' 
+#' @importFrom cli cli_abort
+#' @importFrom cli cli_warn
+#' 
 #' @export
   fix_region.default <- function(x, ...)
 {
@@ -129,18 +132,18 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     x <- as.character(x)
   
   if (!is.character(x))
-    stop("'x' is not a character vector")
+    cli_abort("'x' is not a character vector")
   
   empty <- grepl("^$", x)
   
   if (length(empty) > 0L && all(empty))  ## diff character(0) and character(1)
-    stop("'x' only has empty strings")
+    cli_abort("'x' only has empty strings")
   
   if (any(empty))
-    warning("Tried to fix empty strings - may produce errors")
+    cli_warn("Tried to fix empty strings - may produce errors")
   
   if (all(is.na(x)) || !length(x)) {
-    warning("'x' has length 0L or only missing values", call. = FALSE)
+    cli_warn("'x' has length 0L or only missing values")
     return(x)
   }
   
@@ -149,20 +152,17 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## then one can safely assume that the other element(s) that fail the test
   ## did so because they were misspelt. An automatic fix will then be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
-  nonSynonyms <- x[!x %in% .synonymRegions()]
+  nonSynonyms <- x[!x %in% .lgas_like_states()]
   
   region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
     lgas(x, warn = FALSE)                    # to allow creation of temporary,
   else if (any(is_state(nonSynonyms)))       # even with misspelt elements
     states(x, warn = FALSE)
   else
-    stop(
-      paste(
-        "Incorrect region name(s);",
-        "consider reconstructing 'x' with",
-        "`states()` or `lgas()` for a more reliable fix"
-      ),
-      call. = FALSE
+    cli_abort(
+        "Incorrect region name(s);
+        consider reconstructing 'x' with
+        `states()` or `lgas()` for a more reliable fix"
     )
   
   invisible(as.character(fix_region(region)))
@@ -189,8 +189,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   ## Internal function to enable identification of entries that need to
   ## be fixed and preparing attributes that will enable further processing
   ## downstream.
-  .getProperVal <- function(str, regions) {
-    abbrFCT <- .fctOptions("abbrev")
+  get_proper_value <- function(str, regions) {
+    abbrFCT <- .fct_options("abbrev")
     
     if (!is.na(match(str, regions)))
       return(str)
@@ -204,6 +204,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     }
     
     ## First remove spaces around slashes and hyphens
+    ## Note: run `.__why_no_pipe()` for rationale behind this approach
     str <- gsub("\\s\\/", "/", str)
     str <- gsub("\\/\\s", "/", str)
     str <- sub("-\\s", "-", str)
@@ -227,17 +228,23 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       return(fixed)
     }
     
-    if (numFixed > 1L && !interactive)
-      .warnOnMultipleMatches(str, fixed)
+    if (numFixed > 1L && !interactive) {
+      multimatch <- paste(fixed, collapse = ", ")
+      
+      cli::cli_warn(
+        "'{str}' approximately matched more than one region - {multimatch}"
+      )
+    }
     
-    # if we get to this point, return misspelt string unchanged
+    # if we get to this point, return the misspelt string unchanged
     cant.fix <<- c(cant.fix, str)
     str
   }
   
-  v <-
-    vapply(x, .getProperVal, character(1), regions = region, USE.NAMES = FALSE)
-  attr(v, "misspelt") <- sort(unique(cant.fix))
+  spellchecked <-
+    vapply(x, get_proper_value, character(1), regions = region, USE.NAMES = FALSE)
+  
+  attr(spellchecked, "misspelt") <- sort(unique(cant.fix))
   
   ## Reduce data for reporting on fixes to only the 
   ## unique instances i.e. avoid redundant output
@@ -250,30 +257,15 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     }
   }
   
-  attr(v, "regions.fixed") <- fix.status
-  v
-}
-
-
-
-
-.warnOnMultipleMatches <- function(x, matches)
-{
-  multimatch <- paste(matches, collapse = ", ")
-  
-  warning(sprintf(
-    "'%s' approximately matched more than one region - %s",
-    x,
-    multimatch
-  ),
-  call. = FALSE)
+  attr(spellchecked, "regions.fixed") <- fix.status
+  spellchecked
 }
 
 
 
 
 #' @import utils
-.reportOnFixes <- function(obj)
+.report_on_fixes <- function(obj)
 {
   ATTR_ <- attributes(obj)
   badspell <- ATTR_$misspelt
@@ -309,10 +301,10 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   
   final.msg <- paste(msg.good, msg.bad, sep = "\n")
   
-  if (onWindowsInteractive())
+  if (on_windows_interactive())
     winDialog("ok", final.msg)
   else
-    message(final.msg)
+    cli::cli_alert_info(final.msg)
 }
 
 
@@ -336,7 +328,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## is generated by `.fixRegionInternal` and has an attribute called `misspelt`,
 ## which is the collection of names needing repair.
 #' @import utils
-.fixLgasInteractively <- function(lga.list)
+.fix_lgas_interactive <- function(lga.list)
 {
   stopifnot(interactive())
   allLgas <- lgas()
@@ -358,7 +350,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     repeat {
       prompt <- paste(msg.fixWhich, "Enter a search pattern: ", sep = ' - ')
       
-      pattern <- if (onWindowsInteractive())
+      pattern <- if (on_windows_interactive())
         winDialogString(prompt, "")
       else
         readline(prompt)
@@ -371,7 +363,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       choices <- c(used.lgas, unlist(unname(special.options)))
        
       menuopt <-
-        menu(choices, graphics = onWindowsInteractive(), "Select the LGA")
+        menu(choices, graphics = on_windows_interactive(), "Select the LGA")
       chosen <- choices[menuopt]
       
       if (chosen != special.options$r)
@@ -386,6 +378,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       next
     }
     
+    # Note: to see why intermediate variables are heavily used here,
+    # run `.__why_no_pipe()` 
     lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
     attr.misspelt <- attr(lga.list, "misspelt")
     attr.misspelt <- attr.misspelt[attr.misspelt != bad]
@@ -402,10 +396,10 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
         paste(skipped, collapse = ", ")
       )
     
-    if (onWindowsInteractive())
+    if (on_windows_interactive())
       winDialog("ok", msg)
     else
-      message(msg)
+      cli::cli_alert_info(msg)
   }
   
   lga.list
@@ -431,6 +425,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 #' @param wrong The misspelt element(s) of \code{x}.
 #' @param correct The correction that is to be applied to the misspelt element(s)
 #' 
+#' @importFrom cli cli_abort
 #' @export
 fix_region_manual <- function(x, wrong, correct)
 {
@@ -439,14 +434,18 @@ fix_region_manual <- function(x, wrong, correct)
   if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
     
     if (!is.character(x))
-      stop("The operation cannot be done on objects of type ", sQuote(typeof(x)))
+      cli_abort(
+        "The operation cannot be done on objects of type {sQuote(typeof(x))}"
+      )
   }
   
   if ((length(wrong) != length(correct)) && length(correct) > 1L)
-    stop("Substitutions must be single or the same number as targetted fixes")
+    cli_abort(
+      "Substitutions must be single or the same number as targetted fixes"
+    )
   
   if (length(correct) == 1L) {
-    correct <- assertRegion(correct)
+    correct <- .assert_region(correct)
     x[x %in% wrong] <- correct
     return(x)
   }
@@ -458,17 +457,25 @@ fix_region_manual <- function(x, wrong, correct)
     iWrong <- wrong[i]
     
     if (!match(iWrong, x, nomatch = 0))
-      stop(sQuote(iWrong, q = FALSE),
-           " is not an element of ",
-           sQuote(arg, q = FALSE))
+      cli_abort("{sQuote(iWrong, q = FALSE)} is not an element of
+                {sQuote(arg, q = FALSE)}")
     
     tryCatch({
-      iCorrect <- assertRegion(iCorrect)
+      iCorrect <- .assert_region(iCorrect)
       x[x %in% iWrong] <- iCorrect
     }, error = function(e) {
-      warning(conditionMessage(e), call. = FALSE)
+      cli::cli_warn(conditionMessage(e))
     })
   }
-  # TODO: Apply a correctness check and warn if mistakes remain?
+  # TODO: Check post-conditions and warn if mistakes remain?
+  x
+}
+
+
+
+
+.assert_region <- function(x) {
+  if (!is_state(x) && !is_lga(x))
+    cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
   x
 }

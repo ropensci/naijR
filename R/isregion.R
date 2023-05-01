@@ -19,24 +19,25 @@
 #' is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
 #' 
 #' @import stats
+#' @importFrom cli cli_warn
 #' 
 #' @export
 is_state <- function(x)
 {
   if (!is.atomic(x) || is.null(x)) # as is.atomic(NULL) == TRUE
-    stop("Expected a non-null atomic vector as input", call. = FALSE)
+    cli::cli_abort("Expected a non-null atomic vector as input")
   
   ## Return the object rather than stop execution for this condition.
   ## This is to enable unhindered traversal when this function
   ## is applied across an object.
   if (!is.character(x)) {
-    warning(sQuote(x), " is not a character vector. Nothing done")
+    cli_warn("{sQuote(x)} is not a character vector. Nothing done")
     return(x)
   }
   
   na.pos <- 0L
   if (anyNA(x)) {
-    warning("Invalid entries were replaced with NAs", call. = FALSE)
+    cli_warn("Invalid entries were replaced with NAs")
     excl <- na.exclude(x)
     na.pos <- na.action(excl)
   }
@@ -74,32 +75,24 @@ is_state <- function(x)
 is_lga <- function(x)
 {
   if (!is.character(x))
-    stop("x should be of type 'character'")
+    cli::cli_abort("x should be of type 'character'")
+  
   x %in% lgas()
 }
 
 
 
 
-
-assertRegion <- function(x) {
-  if (!is_state(x) && !is_lga(x))
-    stop(sQuote(x, q = FALSE), " is not a valid region")
-  x
-}
-
-
-
-
 # Checks whether an object has all its elements as States or LGAs
-.allAreRegions <- function(x) {
+.all_are_regions <- function(x) {
   stopifnot(isFALSE(is.null(x)))
   all(is_state(x)) || all(is_lga(x))
 }
 
 
 
-.someAreRegions <- function(x) {
+
+.some_are_regions <- function(x) {
   stopifnot(isFALSE(is.null(x)))
-  isFALSE(.allAreRegions(x)) && (any(is_state(x)) || any(is_lga(x)))
+  isFALSE(.all_are_regions(x)) && (any(is_state(x)) || any(is_lga(x)))
 }

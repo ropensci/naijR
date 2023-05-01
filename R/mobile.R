@@ -22,7 +22,7 @@ fix_mobile <- function(x) {
     x <- as.character(x)
   
   if (!is.character(x)) 
-    stop(sprintf("Objects of type %s are not supported", sQuote(typeof(x))))
+    cli::cli_abort("Objects of type {sQuote(typeof(x)))} are not supported")
 
   # Existing prefix is removed so we can focus on actual numbers
   x <- stringi::stri_trim_both(x)
@@ -35,10 +35,10 @@ fix_mobile <- function(x) {
     x <- sub(prefix.rgx, "\\2", x)
   }
   
-  x <- .removeLetterO(x)
+  x <- .remove_char_O(x)
   
   # Separators are checked and removed
-  x <- vapply(x, .processSeparators, character(1), USE.NAMES = TRUE)
+  x <- vapply(x, .process_separators, character(1), USE.NAMES = TRUE)
   
   # place prefix where necessary
   prefix <- if (hasprefix)
@@ -51,10 +51,8 @@ fix_mobile <- function(x) {
   like.mobile <- grepl("[7-9][0-1]\\d{8}$", x)
   
   if (getOption("verbose"))
-    warning(
-      "Additional original/transformed number removed: ",
-      paste(na.exclude(x)[!like.mobile], collapse = ", ")
-    )
+    cli::cli_warn("Additional original/transformed number removed: 
+                  {paste(na.exclude(x)[!like.mobile], collapse = ", ")}")
   
   ifelse(like.mobile, x, NA_character_)
 }
@@ -69,10 +67,16 @@ fix_mobile <- function(x) {
 # this has be jettisoned. However, with this function, working with these
 # separators becomes a lot easier, and if in future it is desirable to maintain 
 # the formatting, this could be done more easily.
-.processSeparators <- function(str) {
+#
+#' @importFrom cli cli_warn
+.process_separators <- function(str) {
   stopifnot(is.character(str))
   
-  verbose <- getOption("verbose")
+  warn_when_verbose <- function() {
+    if (getOption("verbose"))
+      cli_warn("{sQuote(str)} {msg}")
+  }
+  
   chars <- charToRaw(str)
   notd <- which(!(chars >= 0x30 & chars <= 0x39))
   sep <- chars[notd]
@@ -80,10 +84,9 @@ fix_mobile <- function(x) {
   # When the separators differ, the number is considered unusable. This may also
   # mean that other characters exist that have nothing to do with phone numbers.
   msg <- " was removed"
+  
   if (isFALSE(Reduce(identical, sep))) {
-    if (verbose)
-      warning(sQuote(str), msg, call. = FALSE)
-    
+    warn_when_verbose()
     return(NA_character_)
   }
   
@@ -94,9 +97,7 @@ fix_mobile <- function(x) {
   nlenmin <- nsep + 10L
   
   if (nchar(str) > nlenmax || nchar(str) < nlenmin) {
-    if (verbose)
-      warning(sQuote(str), msg, call. = FALSE)
-    
+    warn_when_verbose()
     return(NA_character_)
   }
   
@@ -110,18 +111,14 @@ fix_mobile <- function(x) {
 
 # Pre-empts situations where letter 'O' instead of zero,
 # making replacements where necessary
-.removeLetterO <- function(x) {
+.remove_char_O <- function(x) {
   stopifnot(is.character(x))
   orgx <- "O"
   
   if (getOption("verbose")) {
     remv <- x[grepl(orgx, x, ignore.case = TRUE)]
-    warning(
-      length(remv),
-      " numbers were removed: ", 
-      paste(remv, collapse = ", "),
-      call. = FALSE
-    )
+    removed.nums <- paste(remv, collapse = ', ')
+    cli::cli_warn("{length(remv)} numbers were removed: {removed.nums}")
   }
   
   gsub(orgx, "0", x, ignore.case = TRUE)

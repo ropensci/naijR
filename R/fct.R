@@ -1,6 +1,6 @@
 ## Get a vector with both the abbreviated and full versions of the 
 ## national capital's name, just return one of the two.
-.fctOptions <- function(opt = c("all", "full", "abbrev")) 
+.fct_options <- function(opt = c("all", "full", "abbrev")) 
 {
   opt <- match.arg(opt)
   versions <- c(full = "Federal Capital Territory", abbrev = "FCT")
@@ -18,7 +18,7 @@
   opts <- c("full", "abbrev")
   use <- match.arg(use, opts)
   i <- match(use, opts)
-  versions <- .fctOptions()
+  versions <- .fct_options()
   sub(versions[-i], versions[i], x, fixed = TRUE)
 }
 
@@ -33,5 +33,5 @@
   if (!abj %in% x)
     return(x)
   
-  sub(x, abj, .fctOptions(type), fixed = TRUE)
+  sub(x, abj, .fct_options(type), fixed = TRUE)
 }

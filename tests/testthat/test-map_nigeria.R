@@ -343,7 +343,7 @@ test_that("Number of LGAs matches the number extracted for mapping", {
     lg <- lgas(i)
     mplg <- map_ng(lg, plot = FALSE)$names
     
-    rgx <- .regexDuplicatedPolygons(lg)
+    rgx <- .regex_duplicated_poly(lg)
     expect_match(mplg, rgx)
     # expect_true(all(mplg %in% lg))
     # expect_true(all(lg %in% mplg))
