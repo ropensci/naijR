@@ -4,7 +4,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   fig.path = "man/figures/README-",
@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   comment = ""
 )
 ```
+
 # naijR <img src="man/figures/logo.png" width=120px align="right" />
 
 An R package on Nigeria and for Nigeria  
@@ -38,7 +39,7 @@ vignette('nigeria-maps', 'naijR')
 #### States
 To create a list of all the States of the Nigerian Federation, simply call `states()`.
 
-```{r, results='as-is'}
+```{r admin, results='as-is'}
 library(naijR, quietly = TRUE)
 ss <- states()
 head(ss)
@@ -47,7 +48,7 @@ cat(sprintf("\n...but Nigeria has %i States.", length(ss)))
 
 States from a given geo-political zone can also be selected:
 
-```{r}
+```{r states}
 states(gpz = "ne")  # i.e. North-East
 ```
 
@@ -56,20 +57,20 @@ For other capabilities of this function, see `?states()`.
 #### Local Government Areas
 This is a basic example that shows how to very quickly fetch the names of Local Government Areas within a given State:
 
-```{r example}
+```{r states-example}
 lgas("Imo")
 ```
 
 To list all the LGAs in Nigeria, call the same function without any parameters:
 
-```{r}
+```{r lgas}
 n <- length(lgas())
 sprintf("Nigeria has a total of %i Local Government Areas", n)
 ```
 
 Want to create a function to check how many LGAs a particular State has?
 
-```{r}
+```{r lgas-func}
 how_many_lgas <- function(state) {
   n <- length(lgas(state))
   cat(state, "State has", n, "LGAs\n")
@@ -87,7 +88,7 @@ fix_mobile("8032000000")
 
 The function works on vectors; thus an entire column of a table with phone numbers can be quickly processed. Illegible or irreparable numbers are turned into missing values, e.g.
 
-```{r mobile_vectorized_1}
+```{r mobile-vectorized-1}
 (dat <- data.frame(
   serialno = 1:8,
   phone = c(
@@ -103,7 +104,7 @@ The function works on vectors; thus an entire column of a table with phone numbe
 ))
 ```
 
-```{r mobile_vectorized_2}
+```{r mobile-vectorized-2}
 fix_mobile(dat$phone)
 ```
 
@@ -117,9 +118,9 @@ install.packages("naijR")
 
 The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
 
-``` {r install, eval = FALSE}
-# If necessary, 'install.packages("remotes")' first
-remotes::install_github("BroVic/naijR")
+``` {r dev-install, eval = FALSE}
+# install.packages("pak")  # if necessary
+pak::pkg_install("BroVic/naijR")
 ```
 
 ## Feedback/Contribution

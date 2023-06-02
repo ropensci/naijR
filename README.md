@@ -223,8 +223,8 @@ The development version can be obtained from
 [GitHub](https://github.com/BroVic/naijR) with:
 
 ``` r
-# If necessary, 'install.packages("remotes")' first
-remotes::install_github("BroVic/naijR")
+# install.packages("pak")  # if necessary
+pak::pkg_install("BroVic/naijR")
 ```
 
 ## Feedback/Contribution
