@@ -166,9 +166,9 @@ test_that("dealing with whitespace", {
 
 
 test_that("verbosity on number removal is activated", {
+  local_edition(2)
+  
   op <- options(verbose = TRUE)
-  
-  expect_warning(fix_mobile(init.numbers))
-  
+  expect_warning(fix_mobile(init.numbers), "2 numbers were removed") 
   options(op)
 })

@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.5.1.9007
-Date: 2023-05-02
+Version: 0.5.1.9008
+Date: 2023-06-08
 Depends: 
     R (>= 3.6),
     grDevices,
@@ -25,7 +25,7 @@ Suggests:
     readxl,
     rmarkdown,
     sp (>= 1.4.2),
-    testthat,
+    testthat (>= 3.0.0),
     tibble,
     tidyr,
     usethis
@@ -44,3 +44,4 @@ VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://brovic.github.io/naijR/
 BugReports: https://github.com/BroVic/naijR/issues
+Config/testthat/edition: 3

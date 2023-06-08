@@ -116,8 +116,6 @@ test_that("Mispelt LGA are discovered", {
   expect_error(is_lga(cars), err)
   expect_error(is_lga(c(TRUE, FALSE)), err)
   expect_type(xx, 'logical')
-  expect_is(matrix(is_lga(lgas())), 'matrix')
-  
 })
 
 
@@ -137,6 +135,7 @@ test_that("is_lga recognises LGAs", {
 
 test_that("State/LGA synonyms are discernible", {
   rr <- .lgas_like_states()
+  
   for (i in rr) {
     expect_true(is_state(i))
     expect_true(is_lga(i))

@@ -93,7 +93,7 @@ test_that("various cases for fixing state names", {
   ss.us <- c("kentucky", "Bornu", "Abia")
   fedcap <- "Federal Capital Territory"
   
-  expect_equivalent(fix_region(ss), ss)
+  expect_equal(fix_region(ss), ss, ignore_attr = TRUE)
   expect_error(fix_region('Fct'), totalerr, fixed = TRUE)
   expect_error(fix_region('Kane'), totalerr, fixed = TRUE)
   expect_error(fix_region('plateau'), totalerr, fixed = TRUE)
@@ -121,9 +121,10 @@ test_that("Misspelt LGA can be fixed (limited)", {
   
   expect_length(attr(fixed, "misspelt"), 1L)
   
-  expect_equivalent(
+  expect_equal(
     fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE)), 
-    c("Amuwo-Odofin", "Lagos Island")
+    c("Amuwo-Odofin", "Lagos Island"),
+    ignore_attr = TRUE
   )
   
 })

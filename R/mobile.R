@@ -22,7 +22,7 @@ fix_mobile <- function(x) {
     x <- as.character(x)
   
   if (!is.character(x)) 
-    cli::cli_abort("Objects of type {sQuote(typeof(x)))} are not supported")
+    cli::cli_abort("Objects of type {sQuote(typeof(x))} are not supported")
 
   # Existing prefix is removed so we can focus on actual numbers
   x <- stringi::stri_trim_both(x)
@@ -47,12 +47,12 @@ fix_mobile <- function(x) {
     "0"
   
   x <- sub("(^\\d{10}$)", paste0(prefix, "\\1"), x)
-  
   like.mobile <- grepl("[7-9][0-1]\\d{8}$", x)
   
-  if (getOption("verbose"))
-    cli::cli_warn("Additional original/transformed number removed: 
-                  {paste(na.exclude(x)[!like.mobile], collapse = ", ")}")
+  if (getOption("verbose")) {
+    outnums <- paste(na.exclude(x)[!like.mobile], collapse = ', ')
+    cli::cli_warn("Additional original/transformed number removed: {outnums}")
+  }
   
   ifelse(like.mobile, x, NA_character_)
 }

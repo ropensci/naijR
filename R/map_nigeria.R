@@ -145,7 +145,7 @@ map_ng <- function(region = character(),
   
   if (is.data.frame(data) && ncol(data) < 2L)
     cli_abort(
-      "Insufficient variables in '{deparse(quote(data)))}' to generate a plot"
+      "Insufficient variables in '{deparse(quote(data))}' to generate a plot"
     )
   
   if (!is.logical(show.neighbours))
@@ -159,7 +159,7 @@ map_ng <- function(region = character(),
   if (show.neighbours)
     cli::cli_alert("Display of neighbouring regions is temporarily disabled")
   
-  region <- .process_region_params(region)
+  region <- .process_region_params(region, call = caller_env())
   
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
@@ -250,9 +250,9 @@ map_ng <- function(region = character(),
     cli_abort("Coordinates are out of bounds of the map")
   
   if (show.text) {
-    txt <- .country_name()
+    txt <- country_name()
     
-    if (!identical(region, .country_name())) {
+    if (!identical(region, country_name())) {
       # Account for multi-polygonic regions
       # TODO: Scope this to parent environment
       rgxRegions <-

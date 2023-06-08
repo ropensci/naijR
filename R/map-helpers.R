@@ -8,27 +8,25 @@
 
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
-.process_region_params <- function(s)
+.process_region_params <- function(s, ...)
 {
   stopifnot(is.character(s))
+  len <- length(s)
   
-  if (length(s) == 0L)
+  if (len == 0L)
     return(states(all = TRUE))
   
-  isregion <- all(is_state(s)) || all(is_lga(s))
-  
-  if (!isregion) {
+  if (!(all(is_state(s)) || all(is_lga(s)))) {
     
-    if (length(s) > 1L) {
+    if (len > 1L) {
       cli::cli_abort(
-        "One or more elements of '{deparse(substitute(s))}'
-        is not a Nigerian region"
-      )
+        "One or more elements of '{deparse(substitute(s))}' is not a Nigerian region",
+        ...)
     }
-    else if (s != .country_name()) {
+    else if (isFALSE(identical(s, country_name()))) {
       cli::cli_abort(
-          "Single inputs for '{deparse(substitute(s))}'
-          only support the value '{.country_name()}'"
+          "Single inputs for '{deparse(substitute(s))}' only support the value '{country_name()}'",
+          ...
       )
     }
   }
@@ -39,15 +37,12 @@
 
 
 
-# Makes sure that all the elements required for making
-# a choropleth map are available. These are:
+# Makes sure that the elements required for making a choropleth map are available. 
+# These are:
 # - A data frame with a value and region column identified
 # - A 2-column data frame with one column of regions
 # - A region and value as separate vectors
-# 
-
-# - 
-
+#
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
@@ -118,8 +113,8 @@
     if (is.data.frame(data)) {
       
       if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
-        cli::cli_abort("The column '{.arg_str(val)}'
-                       does not exist in '{.arg_str(data)}'")
+        cli::cli_abort("The column '{(.arg_str(val))}'
+                       does not exist in '{(.arg_str(data))}'")
       }
     }
   }
@@ -231,8 +226,7 @@
     "Gombe",
     "Katsina",
     "Kogi",
-    "Nasarawa",
-    "Oyo")
+    "Nasarawa")
 }
 
 
@@ -807,7 +801,7 @@ new_shpfile_props <- function(dir, layer, namefield, spObj)
 
 
 ## Messages -----------------------------------------------------------------
-.country_name <- function()
+country_name <- function()
 {
   "Nigeria"
 }

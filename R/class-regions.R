@@ -103,13 +103,13 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 .warn_on_misspelling <- function(region.type) {
   region.type <- match.arg(region.type, c("state", "lga"))
   
-  txt <- switch(
+  regionstr <- switch(
     region.type, 
     state = "a State", 
     lga = "an LGA"
   )
   
-  cli::cli_warn("One or more items is not {txt}. Spelling error?")
+  cli::cli_warn("One or more items is not {regionstr}. Spelling error?")
 }
 
 
@@ -231,7 +231,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     funs <- as.list(sys.call(1))
     funname <- as.character(funs[[1]])
     
-    if (warn && funname != 'fix_region')
+    if (warn && isFALSE(identical(funname, 'fix_region')))
       .warn_on_misspelling('lga')
     
     ret <- region
