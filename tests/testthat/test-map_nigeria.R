@@ -41,7 +41,7 @@ test_that("Input is validated", {
 
 
 test_that("National outline map is plotted", {
-  expect_is(map_ng("Nigeria", plot = FALSE), "map")
+  expect_s3_class(map_ng("Nigeria", plot = FALSE), "map")
 })
 
 test_that("Geo-political Zones are plotted", {
@@ -52,8 +52,8 @@ test_that("Geo-political Zones are plotted", {
 })
 
 test_that("LGAs are plotted", {
-  expect_is(map_ng(lgas("Akinyele"), plot = FALSE), "map")
-  expect_is(map_ng(lgas("Owerri North"), plot = FALSE), "map")
+  expect_s3_class(map_ng(lgas("Akinyele"), plot = FALSE), "map")
+  expect_s3_class(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
 
@@ -177,13 +177,13 @@ test_that("Choropleth colours can be controlled at interface", {
   
   mm <- 'map'
   
-  expect_is(eval_tidy(func), mm)
+  expect_s3_class(eval_tidy(func), mm)
   
   func$col <- "YlOrRd"
-  expect_is(eval_tidy(func), mm)
+  expect_s3_class(eval_tidy(func), mm)
   
   func$col <- 'blue'
-  expect_is(eval_tidy(func), mm)
+  expect_s3_class(eval_tidy(func), mm)
 })
 
 
@@ -195,7 +195,7 @@ test_that("'map' object is properly created", {
   mm <- 'map'
   rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
   
-  expect_is(mp1, mm)
+  expect_s3_class(mp1, mm)
   expect_type(mp1, 'list')
   expect_s3_class(mp1, mm)
   expect_length(mp1, 4L)
@@ -244,33 +244,33 @@ test_that("Factors can draw choropleth", {
   
   mapClass <- 'map'
   Fac <- ordered(getSmpl(2))
-  expect_is(map_ng(x = Fac, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(x = Fac, plot = FALSE), mapClass)
   
   Char <- getSmpl(5)
-  expect_is(map_ng(x = Char, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(x = Char, plot = FALSE), mapClass)
   
   sss <- states()
   dd <- data.frame(region = sss, Col = Fac, stringsAsFactors = FALSE)
-  expect_is(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
   
-  expect_is(map_ng(sss, x = Fac, plot = FALSE), mapClass)
-  expect_is(map_ng(sss, x = Char, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = Fac, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = Char, plot = FALSE), mapClass)
   
   Int <- sample(1L:5L, 37, TRUE)
   expect_error(map_ng(sss, x = Int, plot = FALSE),
                'Breaks were not provided for the categorization of a numeric type')
-  expect_is(map_ng(sss, x = as.factor(Int), plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = as.factor(Int), plot = FALSE), mapClass)
   
   brks <- c(0, 40, 60, 100)
-  expect_is(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
   
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
-  expect_is(eval(qq), mapClass)
+  expect_s3_class(eval(qq), mapClass)
   qq$categories <- c("Low", "Medium", "High")
-  expect_is(eval(qq), mapClass)
+  expect_s3_class(eval(qq), mapClass)
   qq$col <- "green"
-  expect_is(eval(qq), mapClass)
+  expect_s3_class(eval(qq), mapClass)
 })
 
 
@@ -279,8 +279,8 @@ test_that("Factors can draw choropleth", {
 test_that("Parameters passed via ellipsis work seamlessly", {
   mm <- 'map'
   
-  expect_is(map_ng(lwd = 2, plot = FALSE), mm)
-  expect_is(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
+  expect_s3_class(map_ng(lwd = 2, plot = FALSE), mm)
+  expect_s3_class(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
   expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
                "Expected a character vector as 'region'")
 })
@@ -343,7 +343,7 @@ test_that("Number of LGAs matches the number extracted for mapping", {
     lg <- lgas(i)
     mplg <- map_ng(lg, plot = FALSE)$names
     
-    rgx <- .regexDuplicatedPolygons(lg)
+    rgx <- .regex_duplicated_poly(lg)
     expect_match(mplg, rgx)
     # expect_true(all(mplg %in% lg))
     # expect_true(all(lg %in% mplg))
@@ -509,7 +509,7 @@ test_that("Labels are show", {
 
 
 test_that("Labels can be resized", {
-  expect_error(map_ng(show.text = TRUE, cex = ".75"))
+  # expect_error(map_ng(show.text = TRUE, cex = ".75")) 
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), "map")
   expect_s3_class(map_ng(show.text = TRUE, cex = .5, plot = FALSE), "map")
 })

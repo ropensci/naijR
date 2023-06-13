@@ -99,13 +99,14 @@ globalVariables(c(".", "STATE"))
 #' other similar functions (e.g. \code{graphics::plot.default}).
 #' 
 #' @import rlang
+#' @importFrom cli cli_abort
+#' @importFrom cli cli_warn
 #' @importFrom graphics legend
 #' @importFrom graphics par
 #' @importFrom graphics points
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom lifecycle deprecated
 #' @importFrom lifecycle is_present
-#' @importFrom magrittr %>%
 #' @importFrom maps map
 #' @importFrom maps map.text
 #' 
@@ -135,30 +136,30 @@ map_ng <- function(region = character(),
     addmsg <- if (is.data.frame(region))
       "A data frame was passed; did you mean to use 'data' instead?"
     
-    stop(paste(msg, addmsg))
+    cli_abort("{msg} {addmsg}")
   }
   
   if (!is.null(data) && !is.data.frame(data))
-    stop(sprintf("A non-NULL input for '%s' must be a data frame",
+    cli_abort(sprintf("A non-NULL input for '%s' must be a data frame",
                  .arg_str(data)))
   
   if (is.data.frame(data) && ncol(data) < 2L)
-    stop(sprintf("Insufficient variables in '%s' to generate a plot",
-                 deparse(quote(data))))
+    cli_abort(
+      "Insufficient variables in '{deparse(quote(data))}' to generate a plot"
+    )
   
   if (!is.logical(show.neighbours))
-    stop(sprintf("'%s' should be a logical value", 
-                 .arg_str(show.neighbours)))
+    cli_abort("'{.arg_str(show.neighbours))}' should be a logical value")
   
   if (length(show.neighbours) > 1L) {
-    warning(.first_elem_warn(.arg_str(show.neighbours)))
+    cli_warn("{.first_elem_warn(.arg_str(show.neighbours))}")
     show.neighbours <- show.neighbours[1]
   }
   
   if (show.neighbours)
-    message("Display of neighbouring regions is temporarily disabled")
+    cli::cli_alert("Display of neighbouring regions is temporarily disabled")
   
-  region <- .processRegionParam(region)
+  region <- .process_region_params(region, call = caller_env())
   
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
@@ -166,22 +167,22 @@ map_ng <- function(region = character(),
     enexpr(x)
   
   use.choropleth <- if (is_null(value.x) || is_symbol(value.x)) {
-    .validateChoroplethParams(!!value.x, region, data)  # TODO: Refactor
+    .validate_choropleth_params(!!value.x, region, data)  # TODO: Refactor
   }
   else if (!is_null(y)) {
     FALSE
   }
   else {
     value.x <- eval_tidy(value.x)
-    .validateChoroplethParams(value.x, region, data)
+    .validate_choropleth_params(value.x, region, data)
   }
   
-  mapdata <- .getMapData(region)
+  mapdata <- .get_map_data(region)
   
   ## Create a regular expression for drawing regions so as 
   ## to account for situations where there are multiple polygons
   ## for the same State/LGA
-  region.regex <- .regexDuplicatedPolygons(region)
+  region.regex <- .regex_duplicated_poly(region)
   mapq <- quote(map(mapdata, regions = region.regex, ...))
   
   ## Capture 'dots'
@@ -206,7 +207,7 @@ map_ng <- function(region = character(),
     )
     
     if (!is.null(data)) {
-      region.col <- .regionColumnIndex(data, region)
+      region.col <- .region_column_index(data, region)
       
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
@@ -220,12 +221,12 @@ map_ng <- function(region = character(),
     }
     
     cOpts <-
-      .prepChoroplethOpts(mapdata, cParams, dots$col, excluded, exclude.fill)
+      .prep_choropleth_opts(mapdata, cParams, dots$col, excluded, exclude.fill)
     
     mapq$col <- cOpts$colors
     
     if (lifecycle::is_present(leg.orient))
-      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.orient))
+      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.orient))
   }
   
   ## Draw a `maps::map()` (with or without labels) or capture the object.
@@ -242,33 +243,28 @@ map_ng <- function(region = character(),
   }, 
   error = function(e) stop(e))
   
-  if (!is.null(dots$plot) && !dots$plot)
+  if (!is.null(dots$plot) && isFALSE(dots$plot))
     return(database)
   
-  if(!is_null(y) && !.xyWithinBounds(database, x, y))
-    stop("Coordinates are out of bounds of the map")
+  if(!is_null(y) && !.xy_within_bounds(database, x, y))
+    cli_abort("Coordinates are out of bounds of the map")
   
   if (show.text) {
-    txt <- .ngName()
+    txt <- country_name()
     
-    if (!identical(region, .ngName())) {
-      
-      txt <- database$name %>%
-        { 
-          # Account for multi-polygonic regions
-          # TODO: Scope this to parent environment
-          rgxRegions <-
-            function(x, nms) {
-              rgx <- paste0("^", x, "(\\:\\d*)?$")
-              grep(rgx, nms, value = TRUE)
-            }
-          
-          is <- lapply(region, rgxRegions, nms = .)
-          unlist(is)
+    if (!identical(region, country_name())) {
+      # Account for multi-polygonic regions
+      # TODO: Scope this to parent environment
+      rgxRegions <-
+        function(x, nms) {
+          rgx <- paste0("^", x, "(\\:\\d*)?$")
+          grep(rgx, nms, value = TRUE)
         }
       
-      lbl <- .adjustLabels(txt)
-      cex <- .setTextSize(dots$cex)
+      is <- lapply(region, rgxRegions, nms = database$name)
+      txt <- unlist(is)
+      lbl <- .adjust_labels(txt)
+      cex <- .set_text_size(dots$cex)
       
       map.text(
         database,
@@ -289,20 +285,20 @@ map_ng <- function(region = character(),
     if (is.null(categories))
       categories <- cOpts$bins
     
-    lp <- .setLegendParams(legend.text)
+    lp <- .set_legend_params(legend.text)
     
     if (is.character(lp$text)) {
       if (!identical(length(categories), length(lp$text)))
-        stop("Lengths of categories and provided legend do not match")
+        cli_abort("Lengths of categories and provided legend do not match")
       
       categories <- lp$text
     }
     
     if (lifecycle::is_present(leg.x))
-      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.x))
+      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.x))
     
     if (lifecycle::is_present(leg.y))
-      lifecycle::deprecate_warn(.nextMinorVer(), .deprecMsg(leg.y))
+      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.y))
     
     if (missing(leg.title)) {  # TODO: Change this construct.
       

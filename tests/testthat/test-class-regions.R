@@ -12,7 +12,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-library(naijR)
 
 ## Class names commonly used in this script
 st.cl <- "states"
@@ -73,9 +72,7 @@ test_that("LGAs are returned correctly", {
   expect_match(res, "Pankshin", all = FALSE)
   expect_length(res, 17L)
   expect_type(res, "character")
-  expect_is(res, "character")
   expect_null(names(res))
-  expect_is(res2, "list")
   expect_type(res2, "list")
   expect_named(res2, nam)
   expect_length(res2, 2L)
@@ -220,6 +217,19 @@ test_that("missing values in 'regions' are handled", {
   
   expect_false(inherits(states("Lagos"), ex.cl))
   expect_false(inherits(lgas("Shomolu"), ex.cl))
+})
+
+
+
+test_that("Warning is issued when 'Abuja' is used as a State", {
+  x <- c("Jigawa", "Kebbi", "Nasarawa", "Abuja")
+  y <- c(x, "Nassarawa")  # misspelt
+  
+  expect_warning(states(x), 
+                 "'Abuja' in position(s) 4 is not a State", 
+                 fixed = TRUE)
+  expect_length(capture_warnings(states(x)), 1)
+  expect_length(capture_warnings(states(y)), 2)
 })
 
 

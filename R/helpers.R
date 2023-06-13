@@ -8,6 +8,6 @@
 
 
 
-onWindowsInteractive <- function() {
+on_windows_interactive <- function() {
   .Platform$OS.type == "windows" && interactive()
 }
