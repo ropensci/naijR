@@ -689,53 +689,37 @@ new_shpfile_props <- function(dir, layer, namefield, spObj)
 
 
 ## Fetch the namefield
-## This is a generic function. The methods we have are for distinguishing
-## how namefields are retrieved, since this varies depending on the kind 
-## of region passed. The interesting case in point is when getting this 
-## field for LGA regions, since the spatial data also contains data on 
-## States. To avoid confusion, when iterating through the data frame, when
-## a column with States is encountered it is skipped as can be seen in the
-## `.fetch_namefield.lgas` method.
-.fetch_namefield <- function(x, ...)
-  UseMethod(".fetch_namefield")
-
-
-
-
-.fetch_namefield.lgas <- function(x, dt) {
-  nmfld <- NA
+.fetch_namefield <- function(x, dt) {
+  getfield <- function(index) names(dt)[[index]]
+  stopifnot(is.data.frame(dt))
+  nmfield <- NA
   
   for (i in seq_len(ncol(dt))) {
+    icolumn <- dt[[i]]
+    iregions <- x %in% icolumn
     
-    if (all(unique(dt[[i]]) %in% states()))  # skip column with States
-      next
-    
-    if (any(x %in% dt[[i]])) {   # just any LGAs will do, since some of them
-      nmfld <- colnames(dt)[i]   # also share names with their State
-      break
-    }
-  }
-  
-  nmfld
-}
-
-
-
-
-.fetch_namefield.states <- function(x, dt) {
-  # dt[[1]][dt[[1]] == "Nasarawa"] <- "Nassarawa" # Fix for 'ng_admin'
-  nmfld <- NA
-  
-  for (i in seq_len(ncol(dt))) {
-    
-    if (all(x %in% dt[[i]])) {   # all MUST be states
-      nmfld <- colnames(dt)[i]
+    if (inherits(x, "states") && all(iregions)) {
+      nmfield <- getfield(i)
       break
     }
     
+    if (inherits(x, "lgas")) {
+      # skip datafrane column with States
+      if (all(unique(icolumn) %in% states()))
+        next
+      
+      # just any LGAs will do, as some are synonymous with States
+      if (any(iregions)) {
+        nmfield <- getfield(i)
+        break
+      }
+    }
   }
   
-  nmfld
+  if (is.null(nmfield) || is.na(nmfield))
+    cli::cli_abort("Problem retrieving the namefield")
+  
+  nmfield
 }
 
 
