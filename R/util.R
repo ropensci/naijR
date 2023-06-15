@@ -1,17 +1,146 @@
+# Source file: util.R 
+# 
+# GPL-3 License
+# 
+# Copyright (c) 2020-2023 Victor Ordu
+
+
 ## ---- Utility function(s) - for maintenance use only ----
 ##      This file is not part of the build, but is being
-##      recorded by Git. Thus will be available to maintainers only
-##
+##      recorded by Git. Thus will be useful to developers only
+
+
+## Get the properties of shape files
+## First collect the path to the shapfile project directory
+## Then, read the shapefile
+## Collect the namefield from the data, based on the region
+ShapefileProps <- function(regions)
+{
+  shp <- .getShapefileDir(regions)
+  pkgdir <- "extdata"
+  
+  dsn <- system.file(file.path(pkgdir, shp),
+                     package = 'naijR',
+                     mustWork = TRUE)
+  
+  if (identical(dsn, character(1)))
+    cli::cli_abort("The map data could not be found in '{pkgdir}'")
+  
+  rgx <- "\\.shp$"
+  shpfl <- list.files(dsn, rgx)
+  lyr <- sub(pattern = paste0("(.+)(", rgx, ")"), "\\1", shpfl)
+  sp <- rgdal::readOGR(dsn, lyr, verbose = FALSE)
+  
+  ## Deal with bad data entries in the shapefiles
+  if (shp == "nigeria-lgas") 
+    sp <- subset(sp, STATE != "Lake")
+  
+  sp <- fix_nasarawa(sp, regions)
+  
+  
+  dt <- methods::slot(sp, "data")
+  
+  if (shp == "nigeria-lgas")
+    dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
+  
+  nmfld <- .find_namefield(regions, dt)
+  new_ShapefileProps(shp, lyr, nmfld, sp)
+}
+
+
+
+
+## Low-level constructor
+new_ShapefileProps <- function(dir, layer, namefield, spObj)
+{
+  structure(list(dir, layer, namefield, spObj),
+            names = c("shapefile", "layer", "namefield", "spatialObject"), 
+            class = "ShapefileProps")
+}
+
+
+
+
+
+## Retrieves the namefield
+.find_namefield <- function(x, dt, class = NA_character_) {
+  getfield <- function(index) names(dt)[[index]]
+  stopifnot(is.character(x), is.data.frame(dt))
+  nmfield <- NA_character_
+  
+  if (!is.na(class) && !is.object(x))
+    class(x) <- class
+  
+  for (i in seq_len(ncol(dt))) {
+    icolumn <- dt[[i]]
+    iregions <- x %in% icolumn
+    
+    if (inherits(x, "states") && all(iregions)) {
+      nmfield <- getfield(i)
+      break
+    }
+    
+    if (inherits(x, "lgas")) {
+      # skip datafrane column with States
+      if (all(is_state(unique(icolumn))))
+        next
+      
+      # just any LGAs will do, as some are synonymous with States
+      if (any(iregions)) {
+        nmfield <- getfield(i)
+        break
+      }
+    }
+  }
+  
+  if (is.null(nmfield) || is.na(nmfield))
+    cli::cli_abort("Problem retrieving the namefield")
+  
+  nmfield
+}
+
+
+
+
+fix_nasarawa <- function(obj, regions)
+{
+  statecol <-
+    if (inherits(regions, "states"))
+      "admin1Name"
+  else if (inherits(regions, "lgas"))
+    "STATE"
+  
+  .fix_bad_shpfile_region(obj, statecol, "Nassarawa", "Nasarawa")
+}
+
+
+
+
+.fix_bad_shpfile_region <- function(obj, hdr, old, new) 
+{
+  stopifnot({
+    isS4(obj)
+    is.character(hdr)
+    is.character(old)
+    is.character(new)
+  })
+  
+  obj@data[[hdr]] <- sub(old, new, obj@data[[hdr]])
+  obj
+}
+
+
+
 ## Inspects the data object of a shapefile.
 ## This function could be useful, for example, when trying to 
 ## determine the value for the 'namefield' parameter for
 ## for the function 'maps::SpatialPolygons2map'
-#' @importFrom utils head
 .__getShapefileData <- function(region)
 {
-  shp <- shpfile_props(region)
+  shp <- ShapefileProps(region)
   shp$sp@data
 }
+
 
 
 
@@ -33,15 +162,30 @@
 
 
 
-
-.__why_no_pipe <- function()
-{
-  cli::cli_alert_info(
-    "A decision was taken not to use pipes in this package, at least not for now.
-    This is because of the desire not to take a dependency on magrittr - this
-    presented some challenges when debugging earlier versions of the package. We
-    have an option of using native R pipes, and these will be introduced a little
-    later when their use matures in the ecosystem - this would necessitate 
-    depending on R >= 4.1."
-  )
+# checks whether there are name mismatches between the canonical file
+# used by the package and a shapefile. This, of course, presupposes
+# that the main entries are correct.'
+# Returns a character vector of the correct names found to be have
+# been misapplied in the shapefile and can be used for corrections.
+.__lga_mismatch <- function(state) {
+  spdata <- slot(shp.lga$spatialObject, "data")
+  splga <- spdata[spdata$STATE == state, 'LGA']
+  pklga <- as.character(lgas(state))
+  lenpak <- length(pklga)
+  lenshp <- length(splga)
+  
+  if (lenpak != lenshp) {
+    return(
+      sprintf("Number mismatch: %i (main) vs %i (shapefile)", 
+              lenpak, lenshp)
+    )
+  }
+  
+  if (setequal(splga, pklga))
+    return(NULL)
+  
+  correct <- paste(intersect(pklga, splga), collapse = ", ")
+  mismatched <- paste(setdiff(pklga, splga), collapse = ", ")
+  attr(mismatched, "correct") <- correct
+  mismatched
 }

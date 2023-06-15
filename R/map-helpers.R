@@ -8,30 +8,30 @@
 
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
-.process_region_params <- function(s, ...)
+.process_region_params <- function(x, ...)
 {
-  stopifnot(is.character(s))
-  len <- length(s)
+  stopifnot(is.character(x))
+  len <- length(x)
   
   if (len == 0L)
     return(states(all = TRUE))
   
-  if (!(all(is_state(s)) || all(is_lga(s)))) {
+  if (!(all(is_state(x)) || all(is_lga(x)))) {
     
     if (len > 1L) {
       cli::cli_abort(
-        "One or more elements of '{deparse(substitute(s))}' is not a Nigerian region",
+        "One or more elements of '{deparse(substitute(x))}' is not a Nigerian region",
         ...)
     }
-    else if (isFALSE(identical(s, country_name()))) {
+    else if (isFALSE(identical(x, country_name()))) {
       cli::cli_abort(
-          "Single inputs for '{deparse(substitute(s))}' only support the value '{country_name()}'",
+          "Single inputs for '{deparse(substitute(x))}' only support the value '{country_name()}'",
           ...
       )
     }
   }
   
-  s
+  x
 }
 
 
@@ -152,22 +152,33 @@
 
 .get_map_data.lgas <- function(x)
 {
-  spo <- .fix_nas_state(shp.lga[['spatialObject']], "STATE")
-  st.nm <- attr(x, 'State')
+  spo <- shp.lga$spatialObject
+  statename <- attr(x, 'State')
   
-  if (length(st.nm) > 1L)
+  if (length(statename) > 1L)
     cli::cli_abort("LGA-level maps for adjoining States are not yet supported")
   
-  lgaObj <- if (!is.null(st.nm)) {
+  if (!is.null(statename)) {
     
-    if (st.nm %in% .fct_options())  # peculiar to this scope
-      st.nm <- "Abuja"
-    spo[grep(.regex_subset_regions(st.nm), spo@data$STATE), ]
+    if (statename %in% .fct_options()) { # peculiar to this scope
+      statename <- "Abuja"
+    }
+    
+    statergx <- .regex_subset_regions(statename)
+    stateindex <- grep(statergx, spo@data$STATE)
+    lgaObj <- spo[stateindex, ]
   }
-  else
-    spo[grep(.regex_subset_regions(x), spo@data$LGA), ]
+  else {
+    lgaObj <- spo
+    
+    if (length(x) < length(lgas())) {
+      lgargx <- .regex_subset_regions(x)
+      lgaindex <- grep(lgargx, spo@data$LGA)
+      lgaObj <- spo[lgaindex, ]
+    }
+  }
   
-  .create_base_maps_object(lgaObj, shp.lga)
+  maps::SpatialPolygons2map(lgaObj, shp.lga$namefield)
 }
 
 
@@ -176,43 +187,14 @@
 
 .get_map_data.states <- function(x)
 {
-  spo <- .fix_nas_state(shp.state[['spatialObject']], "admin1Name")
-  
-  stateObj <- 
-    spo[grep(.regex_subset_regions(x), spo@data$admin1Name), ]
-  
-  .create_base_maps_object(stateObj, shp.state)
+  spo <- shp.state[['spatialObject']]
+  statergx <- .regex_subset_regions(x)
+  stateindex <- grep(statergx, spo@data$admin1Name)
+  stateObj <- spo[stateindex, ]
+  maps::SpatialPolygons2map(stateObj, shp.state$namefield)
 }
 
 
-
-
-
-#' @importFrom maps SpatialPolygons2map
-.create_base_maps_object <- function(obj, shapefileObj) {
-  SpatialPolygons2map(obj, namefield = shapefileObj[['namefield']])
-}
-
-
-.fix_nas_state <- function(obj, namefield)
-{
-  .fix_bad_shpfile_region(obj, namefield, "Nassarawa", "Nasarawa")
-}
-
-
-.fix_bad_shpfile_region <- function(obj, namefield, old, new) 
-{
-  # TODO: Consider using reference semantics for 'obj'
-  stopifnot({
-    isS4(obj)
-    is.character(namefield)
-    is.character(old)
-    is.character(new)
-  })
-  
-  obj@data[[namefield]] <- sub(old, new, obj@data[[namefield]])
-  obj
-}
 
 
 
@@ -630,96 +612,6 @@
   xx <- x >= rr[1] & x <= rr[2]
   yy <- y >= rr[3] & y <= rr[4]
   all(xx, yy)
-}
-
-
-
-
-
-## Get the properties of shape files
-## First collect the path to the shapfile project directory
-## Then, read the shapefile
-## Collect the namefield from the data, based on the region
-#' @importFrom methods slot
-shpfile_props <- function(regions)
-{
-  shp <- .getShapefileDir(regions)
-  pkgdir <- "extdata"
-  
-  dsn <- system.file(file.path(pkgdir, shp),
-                     package = 'naijR',
-                     mustWork = TRUE)
-  
-  if (identical(dsn, character(1)))
-    cli::cli_abort("The map data could not be found in '{pkgdir}'")
-  
-  rgx <- "\\.shp$"
-  shpfl <- list.files(dsn, rgx)
-  lyr <- sub(pattern = paste0("(.+)(", rgx, ")"), "\\1", shpfl)
-  sp <- rgdal::readOGR(dsn, lyr, verbose = FALSE)
-  
-  ## The following shapefile, has some unwanted data
-  if (shp == "nigeria-lgas") 
-    sp <- subset(sp, STATE != "Lake")
-  
-  dt <- slot(sp, "data")
-  
-  if (shp == "nigeria-lgas")
-    dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
-  
-  nmfld <- .fetch_namefield(regions, dt)
-  stopifnot(!is.na(nmfld))
-  new_shpfile_props(shp, lyr, nmfld, sp)
-}
-
-
-
-
-## Low-level constructor
-new_shpfile_props <- function(dir, layer, namefield, spObj)
-{
-  structure(list(dir, layer, namefield, spObj),
-            names = c("shapefile", "layer", "namefield", "spatialObject"), 
-            class = "shpfile_props")
-}
-
-
-
-
-
-
-## Fetch the namefield
-.fetch_namefield <- function(x, dt) {
-  getfield <- function(index) names(dt)[[index]]
-  stopifnot(is.data.frame(dt))
-  nmfield <- NA
-  
-  for (i in seq_len(ncol(dt))) {
-    icolumn <- dt[[i]]
-    iregions <- x %in% icolumn
-    
-    if (inherits(x, "states") && all(iregions)) {
-      nmfield <- getfield(i)
-      break
-    }
-    
-    if (inherits(x, "lgas")) {
-      # skip datafrane column with States
-      if (all(unique(icolumn) %in% states()))
-        next
-      
-      # just any LGAs will do, as some are synonymous with States
-      if (any(iregions)) {
-        nmfield <- getfield(i)
-        break
-      }
-    }
-  }
-  
-  if (is.null(nmfield) || is.na(nmfield))
-    cli::cli_abort("Problem retrieving the namefield")
-  
-  nmfield
 }
 
 

@@ -3,19 +3,6 @@
 # GPL-3 License
 #
 # Copyright (C) 2019-2022 Victor Ordu.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 globalVariables(c(".", "STATE"))
 
@@ -192,10 +179,8 @@ map_ng <- function(region = character(),
   if (use.choropleth) {
     mapq <- expr(map(mapdata, region.regex))  ## TODO: Consider rlang::call2
     
-    if (!is.null(dots$plot))
-      
-      if (!dots$plot)
-        mapq$plot <- FALSE
+    if (!is.null(dots$plot) && !dots$plot)  ## TODO: Reconsider
+      mapq$plot <- FALSE
     
     mapq$fill <- TRUE
     
@@ -211,7 +196,8 @@ map_ng <- function(region = character(),
       
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
-      value.x <- if (is.null(value.x) && ncol(data) == 2L)
+      value.x <- 
+        if (is.null(value.x) && ncol(data) == 2L)
         names(data)[-region.col]
       else
         as_name(value.x)
