@@ -1,5 +1,6 @@
 # Processing LGA dataset
-lgas_nigeria <- read.csv(here::here("data-raw", "nglga.csv"))
+suppressPackageStartupMessages(library(here))
+lgas_nigeria <- read.csv(here("data-raw", "nglga.csv"))
 
 ss <- list(
   nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
@@ -19,4 +20,5 @@ for (n in names(ss)) {
   lgas_nigeria$gpz[matched] <- n
 }
 
-usethis::use_data(lgas_nigeria, overwrite = file.exists("data/lgas_nigeria.rda"))
+dataexists <- file.exists(here("data", "lgas_nigeria.rda"))
+usethis::use_data(lgas_nigeria, overwrite = dataexists)
