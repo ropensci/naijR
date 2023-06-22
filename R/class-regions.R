@@ -324,7 +324,7 @@ lgas_ng <- function(state = NA_character_) {
 
 
 
-# ---- Functions for coercion ----
+# Functions for coercion ----
 #
 
 #' Explicit coercion between State and LGA names

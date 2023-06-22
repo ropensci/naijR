@@ -9,6 +9,7 @@ A dataframe with 774 rows and 2 columns
 \describe{
    \item{lga}{Local Government Area}
    \item{state}{State of the Federation}
+   \item{gpz}{Geo-political zone}
    }
 }
 \usage{

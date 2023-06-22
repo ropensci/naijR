@@ -6,6 +6,7 @@
 #' \describe{
 #'    \item{lga}{Local Government Area}
 #'    \item{state}{State of the Federation}
+#'    \item{gpz}{Geo-political zone}
 #'    }
 "lgas_nigeria"
 
@@ -17,7 +18,8 @@
 #' 
 #' @format A \code{data.frame} with 37 rows and 2 columns
 #' \describe{
-#'   \item{Code}{ISO 3661 Alpha 2 code}
-#'   \item{Name}{Name of the State or Territory}
+#'   \item{isocode}{ISO 3661 Alpha 2 code}
+#'   \item{state}{Name of the State or Territory}
+#'   \item{gpz}{Geo-political zone}
 #' }
 "states_nigeria"

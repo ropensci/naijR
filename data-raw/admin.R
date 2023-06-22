@@ -33,6 +33,8 @@ lgas_nigeria <- read.csv(file) |>
             sub("Nassarawa", "Nasarawa", x = _) |>
             sub("FCT", "Federal Capital Territory", x = _)
   ) |>
-  setNames(c("lga", "state"))
+  setNames(c("lga", "state")) |>
+  merge(states_nigeria, by = "state") |>
+  subset(select = -isocode)
 
 use_data(lgas_nigeria, overwrite =  check_exist(lgas_nigeria))
