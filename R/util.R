@@ -189,3 +189,66 @@ fix_nasarawa <- function(obj, regions)
   attr(mismatched, "correct") <- correct
   mismatched
 }
+
+
+
+# Scans for mismatches between LGAs in main data and the shapefile
+.__scan_lga_mismatch <- function() {
+    sapply(states(), \(x) try(.__lga_mismatch(x)), USE.NAMES = TRUE)
+}
+
+
+
+
+# Creates a list whose elements are the States
+# by their respective geo-political zones. 
+# The name of each elements is an abbreviated
+# form of the name of its zone - North-Central,
+# North-East, North-West, South-East, South-South
+# and South-West. The Federal Capital Territory, 
+# which doesn't belong to any zone is denoted
+# by its own abbreviation and its element is of
+# length 1L.
+.__stateList <- function()
+{
+  list(
+    nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
+    ne = c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
+    nw = c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
+    se = c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
+    ss = c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
+    sw = c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
+    fct = "Federal Capital Territory"
+  )
+}
+
+
+
+
+# Adds a column for the geo-political zones to an
+# existing data frame that has a character column
+# of the States.
+# Arguments:
+# - data: The data frame
+# - statehdr: The name of the column with the States.
+# - zonehdr: The proposed name of the column with the zones
+#
+# Returns the modified data frame
+.__addGPZ <- function(data, statehdr, zonehdr) {
+  stopifnot({
+    is.data.frame(data)
+    is.character(statehdr)
+    is.character(zonehdr)
+  })
+
+  data[[zonehdr]] <- NA_character_
+  statelist <- .__stateList()
+  
+  for (gpz in names(statelist)) {
+    rgx <- paste(statelist[[gpz]], collapse = "|")
+    index <- grep(rgx, data[[statehdr]])
+    data[[zonehdr]][index] <- gpz
+  }
+
+  data
+}
