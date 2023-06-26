@@ -155,7 +155,9 @@ fix_nasarawa <- function(obj, regions)
       message("Done")
     }, error = function(err) {
       message("Failed")
+      ret <- NULL
     })
+    ret
   }
   invisible(lapply(states(), doOneMap))
 }
