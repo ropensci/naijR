@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>nigeria-maps</h1>
             
-            <h4 data-toc-skip class="date">2022-12-02</h4>
+            <h4 data-toc-skip class="date">2023-06-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/vignettes/nigeria-maps.Rmd" class="external-link"><code>vignettes/nigeria-maps.Rmd</code></a></small>
       <div class="hidden name"><code>nigeria-maps.Rmd</code></div>
@@ -105,41 +105,27 @@
 
     
     
-<p>The need for relatively easy-to-use tools in the R statistical
-environment for mapping data on Nigeria was a motivation for the
-development of this package. Not so much of low-level programming needs
-to be done by the user; rather a collection of pre-existing packages and
-idioms are brought together to enable a focus on actual data
-visualization.</p>
-<p>The main function for drawing Nigeria maps is <code>map_ng</code>. It
-uses data from the CIA World Database provided by the
-<code>mapdata</code> package as well as ESRI shapefiles from the World
-Bank to draw a simple maps of Nigeria.</p>
+<p>The need for relatively easy-to-use tools in the R statistical environment for mapping data on Nigeria was a motivation for the development of this package. Not so much of low-level programming needs to be done by the user; rather a collection of pre-existing packages and idioms are brought together to enable a focus on actual data visualization.</p>
+<p>The main function for drawing Nigeria maps is <code>map_ng</code>. It uses data from the CIA World Database provided by the <code>mapdata</code> package as well as ESRI shapefiles from the World Bank to draw a simple maps of Nigeria.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brovic.github.io/naijR/" class="external-link">naijR</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: sp</span></span>
+<span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning this package</span></span>
+<span><span class="co">#&gt; will retire shortly. Please refer to R-spatial evolution reports on</span></span>
+<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html for details.</span></span>
+<span><span class="co">#&gt; This package is now running under evolution status 0</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/original-map-1.png" width="700"></p>
-<p>To show the map without the state borders, set the first argument
-(<code>region</code>) to <code>NULL</code>. Thus, with all other
-arguments set to default values, that would be</p>
+<p>To show the map without the state borders, set the first argument (<code>region</code>) to <code>NULL</code>. Thus, with all other arguments set to default values, that would be</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="st">"Nigeria"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/outline-map-1.png" width="700"></p>
-<p>All the Local Government Areas can equally be displayed, using a map
-that, by default, does not display text, so as to avoid cluttering. This
-kind of map is useful for charting choropleth maps, as shown below for
-the States. To this, we pass the value produced by
-<code><a href="../reference/lgas.html">lgas()</a></code>.</p>
+<p>All the Local Government Areas can equally be displayed, using a map that, by default, does not display text, so as to avoid cluttering. This kind of map is useful for charting choropleth maps, as shown below for the States. To this, we pass the value produced by <code><a href="../reference/lgas.html">lgas()</a></code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/all-lga-map-1.png" width="700"></p>
-<p>It is also possible to make maps of sub-national divisions by
-defining them via <code>region</code>. For example,
-<code>states("sw")</code> returns a character vector of the states in
-the South-West geopolitical zone (see <code><a href="../reference/states.html">?states</a></code>). To display
-them on a map with a few embellishments like labelling and colour,
-write</p>
+<p>It is also possible to make maps of sub-national divisions by defining them via <code>region</code>. For example, <code>states("sw")</code> returns a character vector of the states in the South-West geopolitical zone (see <code><a href="../reference/states.html">?states</a></code>). To display them on a map with a few embellishments like labelling and colour, write</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span>gpz <span class="op">=</span> <span class="st">"sw"</span><span class="op">)</span>, show.text <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/south-west-1.png" width="700"></p>
@@ -151,22 +137,13 @@ write</p>
 <div class="section level2">
 <h2 id="choropleth-maps">Choropleth maps<a class="anchor" aria-label="anchor" href="#choropleth-maps"></a>
 </h2>
-<p>Choropleth maps that display differences among regions can also be
-created with <code>map_ng</code>. There are a number of ways this can be
-done, depending on the kind of arguments supplied to the function:</p>
+<p>Choropleth maps that display differences among regions can also be created with <code>map_ng</code>. There are a number of ways this can be done, depending on the kind of arguments supplied to the function:</p>
 <ul>
-<li>A data frame containing a column for the regions and at least one
-other for the data to be displayed, or</li>
-<li>An atomic vector for the regions and another for the data to be
-displayed.</li>
+<li>A data frame containing a column for the regions and at least one other for the data to be displayed, or</li>
+<li>An atomic vector for the regions and another for the data to be displayed.</li>
 </ul>
-<p>This map is built on categorical data (i.e. <code>factor</code>s);
-atomic vectors that are coercible to this class are also accepted. In
-the case of numeric data, notably those of type <code>double</code>,
-they can be coaxed into categories only if class boundaries are provided
-via the <code>breaks</code> argument.</p>
-<p>To demonstrate this, we will create a data frame with some
-meaningless data:</p>
+<p>This map is built on categorical data (i.e. <code>factor</code>s); atomic vectors that are coercible to this class are also accepted. In the case of numeric data, notably those of type <code>double</code>, they can be coaxed into categories only if class boundaries are provided via the <code>breaks</code> argument.</p>
+<p>To demonstrate this, we will create a data frame with some meaningless data:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create variables</span></span>
 <span><span class="va">ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -178,71 +155,49 @@ meaningless data:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dd</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       state letter</span></span>
 <span><span class="co">#&gt; 1      Abia      E</span></span>
-<span><span class="co">#&gt; 2   Adamawa      E</span></span>
-<span><span class="co">#&gt; 3 Akwa Ibom      E</span></span>
+<span><span class="co">#&gt; 2   Adamawa      A</span></span>
+<span><span class="co">#&gt; 3 Akwa Ibom      C</span></span>
 <span><span class="co">#&gt; 4   Anambra      C</span></span>
-<span><span class="co">#&gt; 5    Bauchi      B</span></span>
+<span><span class="co">#&gt; 5    Bauchi      C</span></span>
 <span><span class="co">#&gt; 6   Bayelsa      E</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="using-a-data-frame">Using a data frame<a class="anchor" aria-label="anchor" href="#using-a-data-frame"></a>
 </h3>
-<p>The easiest way to draw the choropleth map is to pass a two-column
-data frame to the <code>data</code> argument. Thus if the data frame has
-more columns, it is trivial to subset it and extract the 2 columns of
-interest. Continuing with our example,</p>
+<p>The easiest way to draw the choropleth map is to pass a two-column data frame to the <code>data</code> argument. Thus if the data frame has more columns, it is trivial to subset it and extract the 2 columns of interest. Continuing with our example,</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dd</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/df-approach-1.png" width="700"></p>
 <p>Note the following:</p>
 <ul>
-<li>The argument <code>var</code> is the name of the column of our data
-frame that has the variable to be mapped. It is found via the mechanism
-called <em>quasiquotation</em>; to explore this further see
-<code><a href="https://rlang.r-lib.org/reference/topic-inject.html" class="external-link">?rlang::quasiquotation</a></code>.</li>
-<li>The colours darken sequentially from A through E and it follows the
-natural (alphabetical) ordering of the factor levels (i.e. category
-labels). To control this order upfront, create an <strong>ordered
-factor</strong> using any the various ways available in R. (See
-<code><a href="https://rdrr.io/r/base/factor.html" class="external-link">?ordered</a></code>)</li>
-<li>Our variable <code>var</code> is actually a character vector, but
-internally is converted to a factor.</li>
+<li>The argument <code>var</code> is the name of the column of our data frame that has the variable to be mapped. It is found via the mechanism called <em>quasiquotation</em>; to explore this further see <code><a href="https://rlang.r-lib.org/reference/topic-inject.html" class="external-link">?rlang::quasiquotation</a></code>.</li>
+<li>The colours darken sequentially from A through E and it follows the natural (alphabetical) ordering of the factor levels (i.e. category labels). To control this order upfront, create an <strong>ordered factor</strong> using any the various ways available in R. (See <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">?ordered</a></code>)</li>
+<li>Our variable <code>var</code> is actually a character vector, but internally is converted to a factor.</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="using-atomic-vectors">Using atomic vectors<a class="anchor" aria-label="anchor" href="#using-atomic-vectors"></a>
 </h3>
-<p>We can use the same data to make the same map, but with a different
-coding approach:</p>
+<p>We can use the same data to make the same map, but with a different coding approach:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">vv</span>, col <span class="op">=</span> <span class="st">"red"</span>, show.text <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/vec-approach-1.png" width="700"></p>
-<p>It’s exactly same map as before, but this time, we used 2 vectors to
-provide the data – one for the regions (in this case the 36 States and
-FCT) and another for the categorization. We have also introduced some
-colouring with the <code>col</code> argument. Although it has the same
-data, if we try to use the column name from <code>dd</code>, we have an
-error.</p>
+<p>It’s exactly same map as before, but this time, we used 2 vectors to provide the data – one for the regions (in this case the 36 States and FCT) and another for the categorization. We have also introduced some colouring with the <code>col</code> argument. Although it has the same data, if we try to use the column name from <code>dd</code>, we have an error.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `.prep_choropleth_opts()` at </span></span></span>
-<span><span class="co"><span style="font-weight: bold;">#&gt; </span><span style="color: #BBBB00; font-weight: bold;">!</span><span style="font-weight: bold;"> One or more inputs for generating choropleth options are invalid</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `.prep_choropleth_opts()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> One or more inputs for generating choropleth options are invalid</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="numerical-values">Numerical values<a class="anchor" aria-label="anchor" href="#numerical-values"></a>
 </h3>
-<p>When the data to be categorized are numeric vectors, the categories
-have to be defined. To achieve this, the <code>breaks</code> argument
-has to be supplied. This is a numeric vector that describes class limits
-for grouping the values. The number of classes is
-<code>length(breaks) - 1</code>.</p>
+<p>When the data to be categorized are numeric vectors, the categories have to be defined. To achieve this, the <code>breaks</code> argument has to be supplied. This is a numeric vector that describes class limits for grouping the values. The number of classes is <code>length(breaks) - 1</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">numStates</span>, max <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>  <span class="co"># random real numbers ranging from 0 - 100</span></span>
 <span><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">nn</span>, breaks <span class="op">=</span> <span class="va">bb</span>, col <span class="op">=</span> <span class="st">'YlOrRd'</span>, show.text <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/numeric-choropleth-1.png" width="700"></p>
-<p>To get a more meaningful and interpretable legend, use the
-<code>categories</code> argument.</p>
+<p>To get a more meaningful and interpretable legend, use the <code>categories</code> argument.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span></span>
 <span>  region <span class="op">=</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -253,44 +208,30 @@ for grouping the values. The number of classes is
 <span>  show.text <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/good-legend-1.png" width="700"></p>
-<p>Note that various colour arguments have been used, some of them kind
-of cryptic. More details on how to use the colouring schemes, check the
-help page of <code><a href="../reference/map_ng.html">?map_ng</a></code>.</p>
+<p>Note that various colour arguments have been used, some of them kind of cryptic. More details on how to use the colouring schemes, check the help page of <code><a href="../reference/map_ng.html">?map_ng</a></code>.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="mapping-of-point-data">Mapping of point data<a class="anchor" aria-label="anchor" href="#mapping-of-point-data"></a>
 </h2>
-<p>To show the distribution of point data on any the maps such as GIS
-location data, a different set of arguments is employed. Since point
-data requires a pair of coordinates to be accurate, both the
-<code>x</code> and <code>y</code> arguments MUST be provided. Once the
-function receives both coordinates, either as separate atomic vectors or
-as columns from a data frame, <code>map_ng</code> defaults to the
-mapping of points only in within the boundaries indicated by
-<code>region</code>. It looks like this:</p>
+<p>To show the distribution of point data on any the maps such as GIS location data, a different set of arguments is employed. Since point data requires a pair of coordinates to be accurate, both the <code>x</code> and <code>y</code> arguments MUST be provided. Once the function receives both coordinates, either as separate atomic vectors or as columns from a data frame, <code>map_ng</code> defaults to the mapping of points only in within the boundaries indicated by <code>region</code>. It looks like this:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.000</span>, <span class="fl">4.000</span>, <span class="fl">6.000</span>, <span class="fl">5.993</span>, <span class="fl">5.444</span>, <span class="fl">6.345</span>, <span class="fl">5.744</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8.000</span>, <span class="fl">9.000</span>, <span class="fl">9.300</span>, <span class="fl">10.432</span>, <span class="fl">8.472</span>, <span class="fl">6.889</span>, <span class="fl">9.654</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="st">"Nigeria"</span>, x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/pointmap-1.png" width="700"></p>
-<p>The function <code>map_ng</code> carries out a bounds check on point
-data and returns an error, and the points are not plotted, when the
-coordinates are beyond the region. For instance, using the same points
-provided earlier, if we try to plot them on a map of Kwara State,</p>
+<p>The function <code>map_ng</code> carries out a bounds check on point data and returns an error, and the points are not plotted, when the coordinates are beyond the region. For instance, using the same points provided earlier, if we try to plot them on a map of Kwara State,</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="st">"Kwara"</span>, x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in map_ng("Kwara", x = x, y = y): Coordinates are out of bounds of the map</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `map_ng()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Coordinates are out of bounds of the map</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/out-of-bounds-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
-<p>This vignette provided an initial look at the mapping facilities
-currently available in the <code>naijR</code> package. Additional
-development is going on to provide the user with more granular control.
-This is an open source project, and contributions are welcome.</p>
+<p>This vignette provided an initial look at the mapping facilities currently available in the <code>naijR</code> package. Additional development is going on to provide the user with more granular control. This is an open source project, and contributions are welcome.</p>
 </div>
   </div>
 
@@ -311,7 +252,7 @@ This is an open source project, and contributions are welcome.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
