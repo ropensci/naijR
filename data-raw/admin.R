@@ -3,6 +3,7 @@
 #
 # Dependencies ----
 library(usethis)
+library(cli)
 devtools::load_all()
 
 check_exist <- function(obj) {
@@ -12,7 +13,7 @@ check_exist <- function(obj) {
 
 getLGAlist <- function(state) {
   require(WikidataR)
-  cat(state, "\n")
+  cli_inform("* {state}")
   
   if (!identical(state, "Federal Capital Territory"))
     state <- paste(state, "State")
@@ -40,10 +41,12 @@ states_nigeria <- ISOcodes::ISO_3166_2 |>
   setNames(c("isocode", "state")) |>
   .__addGPZ("state", "gpz")
 
+cli_inform("Saving object with {nrow(states_nigeria)} States")
 use_data(states_nigeria, overwrite = check_exist(states_nigeria))
 
 
 # Local Government Areas ----
+cli_inform("Fething list of LGAs from external source:")
 lgas_by_state <-
   sapply(states_nigeria$state, getLGAlist, simplify = FALSE)
 lgadata <- purrr::list_rbind(lgas_by_state, names_to = "state")
@@ -52,4 +55,5 @@ lgas_nigeria <- lgadata |>
   merge(states_nigeria, by = "state") |>
   subset(select = -isocode)
 
+cli_inform("Saving object with {nrow(lgas_nigeria)} LGAs")
 use_data(lgas_nigeria, overwrite =  check_exist(lgas_nigeria))

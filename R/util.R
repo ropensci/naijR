@@ -9,138 +9,105 @@
 ##      This file is not part of the build, but is being
 ##      recorded by Git. Thus will be useful to developers only
 
-
-## Get the properties of shape files
-## First collect the path to the shapfile project directory
-## Then, read the shapefile
-## Collect the namefield from the data, based on the region
-ShapefileProps <- function(regions)
-{
-  shp <- .getShapefileDir(regions)
-  pkgdir <- "extdata"
-  
-  dsn <- system.file(file.path(pkgdir, shp),
-                     package = 'naijR',
-                     mustWork = TRUE)
-  
-  if (identical(dsn, character(1)))
-    cli::cli_abort("The map data could not be found in '{pkgdir}'")
-  
-  rgx <- "\\.shp$"
-  shpfl <- list.files(dsn, rgx)
-  lyr <- sub(pattern = paste0("(.+)(", rgx, ")"), "\\1", shpfl)
-  sp <- rgdal::readOGR(dsn, lyr, verbose = FALSE)
-  
-  ## Deal with bad data entries in the shapefiles
-  if (shp == "nigeria-lgas") 
-    sp <- subset(sp, STATE != "Lake")
-  
-  sp <- fix_nasarawa(sp, regions)
-  
-  
-  dt <- methods::slot(sp, "data")
-  
-  if (shp == "nigeria-lgas")
-    dt$STATE[dt$STATE == "Abuja"] <- "Federal Capital Territory"
-  
-  nmfld <- .find_namefield(regions, dt)
-  new_ShapefileProps(shp, lyr, nmfld, sp)
-}
-
-
-
-
-## Low-level constructor
-new_ShapefileProps <- function(dir, layer, namefield, spObj)
-{
-  structure(list(dir, layer, namefield, spObj),
-            names = c("shapefile", "layer", "namefield", "spatialObject"), 
-            class = "ShapefileProps")
-}
-
-
-
-
-
-## Retrieves the namefield
-.find_namefield <- function(x, dt, class = NA_character_) {
-  getfield <- function(index) names(dt)[[index]]
-  stopifnot(is.character(x), is.data.frame(dt))
-  nmfield <- NA_character_
-  
-  if (!is.na(class) && !is.object(x))
-    class(x) <- class
-  
-  for (i in seq_len(ncol(dt))) {
-    icolumn <- dt[[i]]
-    iregions <- x %in% icolumn
-    
-    if (inherits(x, "states") && all(iregions)) {
-      nmfield <- getfield(i)
-      break
-    }
-    
-    if (inherits(x, "lgas")) {
-      # skip datafrane column with States
-      if (all(is_state(unique(icolumn))))
-        next
-      
-      # just any LGAs will do, as some are synonymous with States
-      if (any(iregions)) {
-        nmfield <- getfield(i)
-        break
-      }
-    }
-  }
-  
-  if (is.null(nmfield) || is.na(nmfield))
-    cli::cli_abort("Problem retrieving the namefield")
-  
-  nmfield
-}
-
-
-
-
-fix_nasarawa <- function(obj, regions)
-{
-  statecol <-
-    if (inherits(regions, "states"))
-      "admin1Name"
-  else if (inherits(regions, "lgas"))
-    "STATE"
-  
-  .fix_bad_shpfile_region(obj, statecol, "Nassarawa", "Nasarawa")
-}
-
-
-
-
-.fix_bad_shpfile_region <- function(obj, hdr, old, new) 
-{
+# Fixes malformed state names in a shapefile
+# Arguments are:
+# - regiontype: This will determine the object to be modified
+# - old: The old (i.e. malformed) name
+# - new: The new (corrected) name
+#
+# Returns the modified object
+.__fix_bad_shpfile_state <- 
+  function(obj, regiontype = c("state", "lga"), old, new) {
   stopifnot({
     isS4(obj)
-    is.character(hdr)
     is.character(old)
     is.character(new)
   })
+  regiontype <- match.arg(regiontype)
   
-  obj@data[[hdr]] <- sub(old, new, obj@data[[hdr]])
+  hdr <- switch(regiontype,
+                state = "admin1Name",
+                lga = "STATE")
+  
+  isbad <- obj@data[[hdr]] %in% old
+  obj@data[[hdr]][isbad] <- new
   obj
 }
 
+
+
+# Fixed malformed shapefile LGA entries
+#
+# Arguments:
+# - state: The State whose LGAs are bre being fixed
+# - oldlga: The existing (i.e. malformed name)
+# - newlga: The new name used as replacement
+#
+# Returns nothing. Used for side-effect of modifying
+# the internally saved spatial data.
+.__fix_bad_shpfile_lga <- 
+  function(obj, state, oldlga, newlga, verbose = FALSE) {
+  stopifnot({
+    is.list(obj)
+    is_state(state)
+    is.character(oldlga)
+    is_lga(newlga)
+    length(oldlga) == 1L && length(newlga) == 1L
+    is.logical(verbose)
+  })
+
+  # Because of LGA synonyms between some States
+  # we will index into data frame cells that are
+  # specific to a State to make the replacement
+  isFocusState <- which(obj$spatialObject@data[["STATE"]] %in% state)
+  isFocusLga <- which(obj$spatialObject@data[["LGA"]] %in% oldlga)
+  rowreplaced <- intersect(isFocusState, isFocusLga)
+  numreplacement <- length(rowreplaced)
+  
+  if (!numreplacement) {
+    cli::cli_abort(
+      "Replacement not found: {newlga} => {oldlga} ({state} State)"
+    )
+  }
+  if (numreplacement > 1L) {
+    pos <- paste(rowreplaced, collapse = ", ")
+    cli::cli_abort("Multiple replacements at positions {pos}")
+  }
+  obj$spatialObject@data[rowreplaced, "LGA"] <- newlga
+  
+  if (verbose) {
+    pos <- paste(which(isFocusLga), collapse = ", ")
+    cli::cli_inform("Rows {pos} matched. Row {rowreplaced} was used")
+  }
+  obj
+}
 
 
 ## Inspects the data object of a shapefile.
 ## This function could be useful, for example, when trying to 
 ## determine the value for the 'namefield' parameter for
 ## for the function 'maps::SpatialPolygons2map'
-.__getShapefileData <- function(region)
-{
-  shp <- ShapefileProps(region)
-  shp$sp@data
+#' @importFrom methods slot
+.__getShapefileData <- function(regiontype = c("state", "lga")) {
+  regiontype <- match.arg(regiontype)
+  dt <- "data"
+  if (identical(regiontype, "state")) {
+    return(slot(shp.state$spatialObject, dt))
+  }
+  slot(shp.lga$spatialObject, dt)
 }
 
+
+
+
+# Prints out the LGAs for a given State in the shapefile
+.__show_shapefile_state_lgas <- function(state) {
+  stopifnot(is_state(state))
+  stateindex <- which(shp.lga$spatialObject$STATE == state)
+  lganames <- shp.lga$spatialObject$LGA[stateindex]
+  attr(lganames, "State") <- state
+  sort(lganames)
+}
 
 
 
@@ -170,25 +137,26 @@ fix_nasarawa <- function(obj, regions)
 # Returns a character vector of the correct names found to be have
 # been misapplied in the shapefile and can be used for corrections.
 .__lga_mismatch <- function(state) {
-  spdata <- slot(shp.lga$spatialObject, "data")
+  spdata <- .__getShapefileData("lga")
   splga <- spdata[spdata$STATE == state, 'LGA']
-  pklga <- as.character(lgas(state))
-  lenpak <- length(pklga)
+
+  if (anyDuplicated(splga)) {
+    cli::cli_abort("Fatal: {state} State has LGA duplication in shapefile")
+  }
+  pkglga <- as.character(lgas(state))
+  lenpkg <- length(pkglga)
   lenshp <- length(splga)
   
-  if (lenpak != lenshp) {
-    return(
-      sprintf("Number mismatch: %i (main) vs %i (shapefile)", 
-              lenpak, lenshp)
+  if (lenpkg != lenshp) {
+    cli::cli_abort(
+      "{state}: Number mismatch: {lenpkg} (main) vs {lenshp} (shapefile)"
     )
   }
-  
-  if (setequal(splga, pklga))
+  if (setequal(splga, pkglga))
     return(NULL)
   
-  correct <- paste(intersect(pklga, splga), collapse = ", ")
-  mismatched <- paste(setdiff(pklga, splga), collapse = ", ")
-  attr(mismatched, "correct") <- correct
+  mismatched <- setdiff(pkglga, splga)
+  attr(mismatched, "incorrect") <- setdiff(splga, pkglga)
   mismatched
 }
 
@@ -196,33 +164,12 @@ fix_nasarawa <- function(obj, regions)
 
 # Scans for mismatches between LGAs in main data and the shapefile
 .__scan_lga_mismatch <- function() {
-    sapply(states(), \(x) try(.__lga_mismatch(x)), USE.NAMES = TRUE)
+  sapply(states(), \(x) try(.__lga_mismatch(x)), USE.NAMES = TRUE)
 }
 
 
 
 
-# Creates a list whose elements are the States
-# by their respective geo-political zones. 
-# The name of each elements is an abbreviated
-# form of the name of its zone - North-Central,
-# North-East, North-West, South-East, South-South
-# and South-West. The Federal Capital Territory, 
-# which doesn't belong to any zone is denoted
-# by its own abbreviation and its element is of
-# length 1L.
-.__stateList <- function()
-{
-  list(
-    nc = c("Benue", "Kogi", "Kwara", "Nasarawa", "Niger", "Plateau"),
-    ne = c("Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"),
-    nw = c("Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Sokoto", "Zamfara"),
-    se = c("Abia", "Anambra", "Ebonyi", "Enugu", "Imo"),
-    ss = c("Akwa Ibom", "Bayelsa", "Cross River", "Delta", "Edo", "Rivers"),
-    sw = c("Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"),
-    fct = "Federal Capital Territory"
-  )
-}
 
 
 
@@ -244,7 +191,7 @@ fix_nasarawa <- function(obj, regions)
   })
 
   data[[zonehdr]] <- NA_character_
-  statelist <- .__stateList()
+  statelist <- stateList()
   
   for (gpz in names(statelist)) {
     rgx <- paste(statelist[[gpz]], collapse = "|")
