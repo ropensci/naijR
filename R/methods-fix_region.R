@@ -23,7 +23,6 @@
 #' 
 #' @return The transformed object. If all names are correct, the object is
 #' returned unchanged.
-#' @export
 fix_region <- function(x, ...)
   UseMethod("fix_region")
 
@@ -80,11 +79,12 @@ fix_region.states <- function(x, ...)
 fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 {
   vals <- .fixRegionInternal(x, lgas(), interactive, ...)
-  
+  onWindows <- .Platform$OS.type == "windows"
+
   if (interactive) {
     prompt <- "Do you want to repair interactively?"
     
-    ans <- if (on_windows_interactive())
+    ans <- if (onWindows)
       substr(winDialog("yesno", prompt), 0, 1)
     else
       readline(paste(prompt, " (Y/N): "))
@@ -96,7 +96,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   if (is.null(vals)) {
     msg <- "The operation was cancelled"
     
-    if (on_windows_interactive())
+    if (onWindows && interactive)
       winDialog("ok", msg)
     else
       message(msg)
@@ -105,7 +105,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   }
   
   if (!quietly)
-    .report_on_fixes(vals)
+    .report_on_fixes(vals, interactive)
   
   invisible(vals)
 }
@@ -265,7 +265,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 #' @import utils
-.report_on_fixes <- function(obj)
+.report_on_fixes <- function(obj, interactive = FALSE)
 {
   ATTR_ <- attributes(obj)
   badspell <- ATTR_$misspelt
@@ -301,7 +301,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   
   final.msg <- paste(msg.good, msg.bad, sep = "\n")
   
-  if (on_windows_interactive())
+  if (.Platform$OS.type == "windows" && interactive)
     winDialog("ok", final.msg)
   else
     cli::cli_alert_info(final.msg)
@@ -350,7 +350,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     repeat {
       prompt <- paste(msg.fixWhich, "Enter a search pattern: ", sep = ' - ')
       
-      pattern <- if (on_windows_interactive())
+      pattern <- if (.Platform$OS.type == "windows")
         winDialogString(prompt, "")
       else
         readline(prompt)
@@ -361,9 +361,13 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       used.lgas <- grep(pattern, allLgas, value = TRUE, ignore.case = TRUE)
       used.lgas <- sort(used.lgas)
       choices <- c(used.lgas, unlist(unname(special.options)))
-       
+      usingWindows <- .Platform$OS.type == "windows"
       menuopt <-
-        menu(choices, graphics = on_windows_interactive(), "Select the LGA")
+        menu(
+          choices,
+          graphics = usingWindows,
+          "Select the LGA"
+        )
       chosen <- choices[menuopt]
       
       if (chosen != special.options$r)
@@ -396,7 +400,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
         paste(skipped, collapse = ", ")
       )
     
-    if (on_windows_interactive())
+    if (usingWindows)
       winDialog("ok", msg)
     else
       cli::cli_alert_info(msg)

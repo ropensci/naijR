@@ -1,3 +1,14 @@
+# naijR 0.6.0
+* Added a new dataset for the States of Nigeria.
+* Improved on the accuracy of LGA naming in the light of spelling mistakes discovered in the earlier reference document.
+* Migration from RGDAL-based spatial data; the `{sf}` package is the new main dependency.
+
+## Fixes:
+* Unwanted display of dialogs when fixing LGA names on Windows OS was reversed (suggested by Laura DeCicco).
+
+# naijR 0.5.2
+* Quietened a verbose warning introduced via the soon-to-be-retired spatial data packages.
+
 # naijR 0.5.1
 * In nested calls with the function `fix_region`, the `lgas` constructor function does not warn if there are spelling mistakes, as this turned out to be a bit confusing when it was used. In earlier versions, warnings persisted even after fixes were applied.
 * In carrying out interactive fixes, particularly of LGA spellings, the more familiar and intuitive native Windows messaging and dialog system is used. Works only on Windows machines; on Linux and MacOs, the usual messaging and interaction occurs at the R console.

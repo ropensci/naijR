@@ -111,19 +111,13 @@ get_all_states <- function(named = TRUE)
     is.logical(named),
     !is.na(named)
   )
+
+  states.by.zone <- stateList()
   
-  .subset_states_by_zone <- function(zone) {
-    zonalstates <- with(lgas_nigeria, state[gpz == zone])
-    unique(zonalstates)
+  if (!named) {
+    s <- sort(unlist(states.by.zone, use.names = FALSE))
+    return(s)
   }
-  
-  data("lgas_nigeria", package = "naijR", envir = environment())
-  zones <- sort(unique(lgas_nigeria$gpz))
-  states.by.zone <- sapply(zones, .subset_states_by_zone)
-  stopifnot(!is.null(states.by.zone))
-  
-  if (!named)
-    return( sort(unname(unlist(states.by.zone))) )
   
   names(states.by.zone) <- sub("\\.state", "", names(states.by.zone))
   states.by.zone
@@ -287,6 +281,11 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
          max.distance = .pkgLevDistance())
 }
 
+
+
+# Sets the Levenshtein distance being used package-wide for functions that
+# carry out partial matching
+.pkgLevDistance <- function() {1L}
 
 
 
@@ -628,4 +627,24 @@ na.exclude.regions <- function(object, ...)
   class(object) <- c(class(na.attr$na.action), class(object))
   attr(object, "na.action") <- na.attr$na.action
   object
+}
+
+
+
+
+
+
+# Creates a list whose elements are the States
+# by their respective geo-political zones. 
+# The name of each elements is an abbreviated
+# form of the name of its zone - North-Central,
+# North-East, North-West, South-East, South-South
+# and South-West. The Federal Capital Territory, 
+# which doesn't belong to any zone is denoted
+# by its own abbreviation and its element is of
+# length 1L.
+stateList <- function()
+{
+  data("states_nigeria", package = "naijR", envir = environment())
+  with(states_nigeria, split(state, gpz))
 }
