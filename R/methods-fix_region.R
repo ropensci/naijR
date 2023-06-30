@@ -23,6 +23,7 @@
 #' 
 #' @return The transformed object. If all names are correct, the object is
 #' returned unchanged.
+#' @export
 fix_region <- function(x, ...)
   UseMethod("fix_region")
 
@@ -77,7 +78,7 @@ fix_region.states <- function(x, ...)
 #' 
 #' @export
 fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
-{
+{  # TODO: add a 'state' argument to fine-tune the matching
   vals <- .fixRegionInternal(x, lgas(), interactive, ...)
   onWindows <- .Platform$OS.type == "windows"
 
@@ -95,7 +96,6 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   
   if (is.null(vals)) {
     msg <- "The operation was cancelled"
-    
     if (onWindows && interactive)
       winDialog("ok", msg)
     else
@@ -103,7 +103,6 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     
     return(invisible(x))
   }
-  
   if (!quietly)
     .report_on_fixes(vals, interactive)
   
@@ -180,7 +179,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## matched value, which in the case of misspelling should be the correct one.
 ##
 ## This function is mapped to a vector of states/LGAs
-.fixRegionInternal <- function(x, region, interactive, ...)
+.fixRegionInternal <- function(x, region, interactive)
 {
   stopifnot(is.character(x), is.character(region))
   cant.fix <- character()
@@ -231,7 +230,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     if (numFixed > 1L && !interactive) {
       multimatch <- paste(fixed, collapse = ", ")
       
-      cli::cli_warn(
+      cli::cli_inform(
         "'{str}' approximately matched more than one region - {multimatch}"
       )
     }
@@ -483,3 +482,4 @@ fix_region_manual <- function(x, wrong, correct)
     cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
   x
 }
+

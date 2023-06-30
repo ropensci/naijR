@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-globalVariables(c("lgas_nigeria", "state", "lga", "gpz"))
+globalVariables(c("lgas_nigeria", "state", "lga", "gpz", "states_nigeria"))
 
 #' Create an Object for the States of Nigeria
 #' 

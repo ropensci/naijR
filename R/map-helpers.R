@@ -150,6 +150,8 @@
 }
 
 
+
+
 .get_map_data.lgas <- function(x)
 {
   spo <- shp.lga$spatialObject
@@ -159,11 +161,6 @@
     cli::cli_abort("LGA-level maps for adjoining States are not yet supported")
   
   if (!is.null(statename)) {
-    
-    if (statename %in% .fct_options()) { # peculiar to this scope
-      statename <- "Abuja"
-    }
-    
     statergx <- .regex_subset_regions(statename)
     stateindex <- grep(statergx, spo@data$STATE)
     lgaObj <- spo[stateindex, ]
@@ -183,13 +180,11 @@
 
 
 
-
-
 .get_map_data.states <- function(x)
 {
-  spo <- shp.state[['spatialObject']]
+  spo <- shp.state$spatialObject
   statergx <- .regex_subset_regions(x)
-  stateindex <- grep(statergx, spo@data$admin1Name)
+  stateindex <- grep(statergx, spo$admin1Name)
   stateObj <- spo[stateindex, ]
   maps::SpatialPolygons2map(stateObj, shp.state$namefield)
 }
@@ -210,32 +205,6 @@
     "Kogi",
     "Nasarawa")
 }
-
-
-
-## Returns the name currently used by the directory containing the
-## shapefile assets. This is found in inst/extdata.
-.getShapefileDir <- function(region)
-  UseMethod(".getShapefileDir")
-
-
-
-
-.getShapefileDir.states <- function(region)
-{
-  'ng_admin'
-}
-
-
-
-
-
-.getShapefileDir.lgas <- function(region)
-{
-  'nigeria-lgas'
-}
-
-
 
 
 # # For possible export later
@@ -419,8 +388,6 @@
 
 
 
-
-#' @importFrom RColorBrewer brewer.pal.info
 #' @importFrom cli cli_abort
 .process_colouring <- function(col = NULL, n, ...)
 {
@@ -441,7 +408,9 @@
   }
   
   among.def.cols <- col %in% .DefaultChoroplethColours
-  in.other.pal <- !among.def.cols && (col %in% rownames(brewer.pal.info))
+  in.other.pal <-
+    !among.def.cols &&
+    (col %in% rownames(RColorBrewer::brewer.pal.info))
   
   pal <- if (!among.def.cols) {
     if (!in.other.pal)
@@ -458,16 +427,15 @@
 
 
 
-#' @importFrom grDevices palette
 .get_R_palette <- function()
 {
   if (getRversion() < as.numeric_version('4.0.0'))
-    return(palette())
+    return(grDevices::palette())
   
-  palette('R3')
-  pp <- palette()
-  palette('R4')
-  pp
+  grDevices::palette('R3')
+  pal <- grDevices::palette()
+  grDevices::palette('R4')
+  pal
 }
 
 
@@ -477,7 +445,6 @@
 # polygon, ensuring that when the choropleth is drawn, the colours are 
 # properly applied to the respective regions and not recycled.
 #' @importFrom cli cli_abort
-#' @importFrom grDevices colours
 .reassign_colours <- 
   function(names, all.regions, in.colours, excl.region = NULL, excl.col = NULL)
   {
@@ -511,7 +478,7 @@
           cli_abort("Colour indicators of type '{typeof(excl.col)}'
                     are not supported")
         
-        if (!excl.col %in% colours())
+        if (!excl.col %in% grDevices::colours())
           cli_abort("The colour used for excluded regions must be valid
                      i.e. an element of the built-in set 'colours()'")
         
