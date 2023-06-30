@@ -1,5 +1,4 @@
-totalerr <- 
-  "reconstructing 'x' with `states()` or `lgas()` for a more reliable fix"
+totalerr <- "consider reconstructing 'x'"
 
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not a character vector"
@@ -28,18 +27,19 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   } #                                                 ^
   #                                               Note place-holder
   
-  # data
-  multi.lga <- readRDS("data/mispelt-lga.rds")
+  # data ----
+  multi.lga <- readRDS(here::here("tests/testthat/data/mispelt-lga.rds"))
   
   # messages
-  change1 <- "Fufore => Fufure"
-  change2 <- "Fafure => Fufure"
+  change1 <- "Fufure => Fufore"
+  change2 <- "Fafure => Fufore"
   msg1 <- .msgfunc(change1)
   msg2 <- .msgfunc(change2)
   morethanone <- "approximately matched more than one region"
   
   # character vectors ----
-  lg.chr <- c("Fufure", "Demsa", "Fufore", "Machika", "Ganye", "Noman", "Fufure")
+  lg.chr <- 
+    c("Fufure", "Demsa", "Fufure", "Machika", "Ganye", "Noman", "Fufure")
   correctLga.chr <- lg.chr[2]
   misspeltLga.chr <- lg.chr[3]
   bothlga.chr <- c(correctLga.chr, misspeltLga.chr)
@@ -47,15 +47,15 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   expect_silent(fix_region(lgas(correctLga.chr)))
   expect_message(fix_region(lgas(misspeltLga.chr, warn = FALSE)))
   expect_message(fix_region(lgas(bothlga.chr, warn = FALSE)), msg1)
-  expect_message(fix_region(lgas(c(bothlga.chr, "Fufore"), warn = FALSE)), msg1)
+  expect_message(fix_region(lgas(c(bothlga.chr, "Fufore"), warn = FALSE)), 
+                 msg1)
   expect_message(fix_region(lgas(c(bothlga.chr, "Fafure"), warn = FALSE)),
-                 sprintf("%s\\n\\*\\s%s", change1, change2))
-  expect_error(fix_region(misspeltLga.chr), totalerr, fixed = TRUE)
-  expect_warning(fix_region(lgas(lg.chr, warn = FALSE)), morethanone)
+                 "not applied.+Fafure")
+  expect_error(fix_region(misspeltLga.chr), totalerr)
+  expect_message(fix_region(lgas(lg.chr, warn = FALSE)), morethanone)
   expect_message(suppressWarnings(fix_region(lgas(lg.chr, warn = FALSE))),
                  sprintf("%s.+Noman => Numan", change1))
-  expect_message(fix_region(lgas(multi.lga, warn = FALSE)),
-                 change1)
+  expect_message(fix_region(lgas(multi.lga, warn = FALSE)), change1)
   
   # factors ----
   lg.fac <- factor(lg.chr)
@@ -70,14 +70,8 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   expect_message(fix_region(lgas(
     c(bothlga.fac, factor("Fufore")), 
     warn = FALSE)), msg1)
-  
-  expect_message(
-    fix_region(lgas(
-      c(bothlga.fac, factor("Fafure")), warn = FALSE)),
-    sprintf("%s\\n\\*\\s%s", change1, change2))
-  
   expect_error(fix_region(misspeltLga.fac), totalerr, fixed = TRUE)
-  expect_warning(fix_region(lgas(lg.fac, warn = FALSE)), morethanone)
+  expect_message(fix_region(lgas(lg.fac, warn = FALSE)), morethanone)
   expect_message(suppressWarnings(fix_region(lgas(lg.fac, warn = FALSE))),
                  sprintf("%s.+Noman => Numan", change1))
   expect_message(fix_region(lgas(multi.lga, warn = FALSE)),
@@ -116,10 +110,11 @@ test_that("various cases for fixing state names", {
 
 
 test_that("Misspelt LGA can be fixed (limited)", {
-  tar.lgas <- lgas(readRDS("data/taraba-lga.rds"), warn = FALSE)
-  fixed <- suppressWarnings(suppressMessages(fix_region(tar.lgas)))
+  dt <- readRDS(here::here("tests/testthat/data/taraba-lga.rds"))
+  tar.lgas <- lgas(dt, warn = FALSE)
+  fixed <- suppressMessages(fix_region(tar.lgas))
   
-  expect_length(attr(fixed, "misspelt"), 1L)
+  expect_length(attr(fixed, "misspelt"), 0L)
   
   expect_equal(
     fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE)), 

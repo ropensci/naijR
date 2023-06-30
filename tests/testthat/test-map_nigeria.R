@@ -26,7 +26,6 @@ test_that("Input is validated", {
   # TODO: Add test case for choropleths with too few regions
 })
 
-
 test_that("National outline map is plotted", {
   expect_s3_class(map_ng("Nigeria", plot = FALSE), "map")
 })
@@ -43,12 +42,8 @@ test_that("LGAs are plotted", {
   expect_s3_class(map_ng(lgas("Owerri North"), plot = FALSE), "map")
 })
 
-
-
 set.seed(4)
-df <-
-  data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE),
-             stringsAsFactors = FALSE)
+df <- data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE))
 mp <- map_ng(plot = FALSE)
 brks <- seq(0, 6, 2)
 vals <- df$value
@@ -60,12 +55,11 @@ lso <-
     category = LETTERS[seq_len(length(brks))]
   )
 
-
-
 test_that("Choropleth mapping succeeds", {
   pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
-  dat <- readRDS('data/pvc2015.rds')
-  baddat <- readRDS('data/pvc2015_badcolumn.rds')
+  dat <- readRDS(here::here('tests/testthat/data/pvc2015.rds'))
+  baddat <-
+    readRDS(here::here('tests/testthat/data/pvc2015_badcolumn.rds'))
   val <- dat$total.pop    # use name to test quasiquotation
   dat$alpha <- sample(LETTERS[1:5], nrow(dat), TRUE)  
   cat <- c("Small", "Moderate", "Large", "Mega")
@@ -140,7 +134,6 @@ test_that("Choropleth mapping succeeds", {
   ), "map")
 })
 
-
 test_that("Draw choropleth automatically with 2-column data frames", {
   ds <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
   dl <- data.frame(LGA = lgas(), value = sample(LETTERS[1:5], 774, TRUE))
@@ -149,9 +142,8 @@ test_that("Draw choropleth automatically with 2-column data frames", {
     expect_s3_class(try(map_ng(data = df, plot = FALSE)), "map")
 })
 
-
 test_that("Choropleth colours can be controlled at interface", {
-  dat <- readRDS('data/pvc2015.rds')
+  dat <- readRDS(here::here('tests/testthat/data/pvc2015.rds'))
   
   func <- expr(map_ng(
     data = dat,
@@ -172,9 +164,6 @@ test_that("Choropleth colours can be controlled at interface", {
   func$col <- 'blue'
   expect_s3_class(eval_tidy(func), mm)
 })
-
-
-
 
 test_that("'map' object is properly created", {
   mp1 <- map_ng(plot = FALSE)
@@ -200,9 +189,6 @@ test_that("'map' object is properly created", {
     expect_match(mp2$names, i, all = FALSE)
 })
 
-
-
-
 test_that("Points are mapped", {
   x <- c(3.000, 4.000, 6.000)
   y <- c(6.000, 9.000, 4.300)
@@ -214,9 +200,6 @@ test_that("Points are mapped", {
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Expected a character vector as 'region'")
 })
-
-
-
 
 test_that("Factors can draw choropleth", {
   getSmpl <- function(seed) { 
@@ -260,9 +243,6 @@ test_that("Factors can draw choropleth", {
   expect_s3_class(eval(qq), mapClass)
 })
 
-
-
-
 test_that("Parameters passed via ellipsis work seamlessly", {
   mm <- 'map'
   
@@ -272,20 +252,15 @@ test_that("Parameters passed via ellipsis work seamlessly", {
                "Expected a character vector as 'region'")
 })
 
-
-
-
 test_that("All individual plain State maps can be drawn", {
   for (s in states())
     expect_s3_class(map_ng(s, plot = FALSE), "map")
 })
 
-
 test_that("All LGAs within a given State are drawn", {
   for (s in states())
     expect_s3_class(map_ng(lgas(s), plot = FALSE), "map")
 })
-
 
 test_that("All individual LGA maps can be drawn", {
   for (s in states()) {
@@ -303,8 +278,6 @@ test_that("All individual LGA maps can be drawn", {
   }
 })
 
-
-
 test_that("Map LGAs together as individual blocs", {
   abLga <- lgas("Abia")
   expect_s3_class(map_ng(abLga, plot = FALSE), "map")
@@ -321,8 +294,6 @@ test_that("Map LGAs together as individual blocs", {
   expect_true(file.exists(testMap))
 })
 
-
-
 test_that("Number of LGAs matches the number extracted for mapping", {
   # This test case is created for bug fix that involved the creation
   # of wrong LGA coordinates for Borno State -> Kagarko is included
@@ -336,9 +307,6 @@ test_that("Number of LGAs matches the number extracted for mapping", {
     # expect_true(all(lg %in% mplg))
   }
 })
-
-
-
 
 test_that("Choropleth map can be formed with excluded regions", {
   mapClass <- "map"
@@ -429,16 +397,6 @@ test_that("Choropleth map can be formed with excluded regions", {
   )
 })
 
-
-
-
-# test_that("Mapping of adjoining States", {
-#   expect_error(map_ng(lgas(c("Imo", "Abia"))), 
-#                "LGA-level maps for adjoining States are not yet supported")
-# })
-
-
-
 test_that(
   "Mapping fails when choropleth is plotted with repetitive State levels",
   {
@@ -463,7 +421,6 @@ test_that(
     ) 
   })
 
-
 test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
   d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
   # 
@@ -480,7 +437,6 @@ test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
   # })
 })
 
-
 test_that("Labels are show", {
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), "map")
   expect_s3_class(map_ng(states(gpz = "sw"), show.text = TRUE, plot = FALSE),
@@ -493,7 +449,6 @@ test_that("Labels are show", {
   ), "map")
   
 })
-
 
 test_that("Labels can be resized", {
   # expect_error(map_ng(show.text = TRUE, cex = ".75")) 
