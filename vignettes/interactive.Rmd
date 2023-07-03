@@ -12,33 +12,26 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  results = 'hide'
+  comment = "#>"
 )
 ```
 
 ## Motivation
-Nigeria has 774 Local Government Areas (LGAs). There a number of factors that can make working with them challenging:
+Nigeria has 774 Local Government Areas (LGAs). There are a number of factors that can make working with them challenging:
 
 1. Some LGAs share the same name with their respective States e.g. Bauchi LGA in Bauchi State, and this can lead to wrong application of the data.
 2. Some LGAs bear the same name although they are in different States, e.g. Obi LGA in Benue and Nasarawa States.
 3. LGA spelling discrepancies are rife in the literature, and believe it or not, even in official government documents. 
 
 ## A proposed solution
-The function `fix_region` is designed to address spelling errors in the sub-national administrative regions of Nigeria, beginning with States and LGAs. 
-
-### States
-For the States this is straightforward; minor mistakes can be corrected automatically with this function and since there are only 36 of them, they can also be corrected via an inspection of the output from a call to `states()`.
-
-### LGAs
-Fixes to LGA spellings are designed to occur in 3 incremental phases. If the user cannot effect the corrections at a particular level s/he can proceed to the next stage. The phases are as follows:
+The function `fix_region` has methods that are designed to address spelling errors LGAs^[There is a method for repairing the names of States but the operation is more manageable since there are far fewer States]. These fixes can be carried out in 3 incremental phases; if the user cannot effect the corrections at a particular level s/he can proceed to the next stage. The phases are as follows:
 
 1. Automatic
 2. Interactive
 3. Manual
 
 #### 1. Automatic fixes
-When the spelling error is slight and unambiguous, the function automatically effects the repair. However, when there is only a single misspelt LGA, and especially if it is supplied as a string, the `fix_region` will signal an error.
+When the spelling error is slight and unambiguous, the function automatically effects the repair. However, when there is only a single misspelt LGA, and especially if it is supplied as a string, `fix_region` will signal an error.
 
 ```{r, error = TRUE}
 library(naijR)
@@ -48,70 +41,74 @@ fix_region("Legos Island")
 
 The thinking is that an automated solution may not be necessary for a single value that was probably provided interactively.
 
-We will now add another LGA so that the argument passed to the function is character vector with more that one element:
+When another LGA is added, such that the argument passed to the function is a character vector with more that one element:
 
 ```{r}
 fix_region(c("Legos Island", "Amuwo-Odofin"))
 ```
 
-Sometimes when we use a character vector to perform this check, the function `fix_region` may encounter difficulty deciding what fixes to apply. In such instances, the best thing is to convert the vector into an `lgas` object. 
+Sometimes when we use a character vector to perform this check, the function `fix_region` may find it difficult to decide on what fixes to apply. In such instances, the best thing is to convert the vector into an `lgas` object. 
 
 ```{r, error = TRUE}
-fix_region(c("Legos Island", "Amuwo Odofin"))
+chars <- c("Legos Island", "Amuwo Odofin")
+fix_region(chars)
+
+# Create an `lgas` object
+lgs <- lgas(c("Legos Island", "Amuwo Odofin"))
+fix_region(lgs)
+```
+
+Note that the constructor `lgas()`, by default, signals a warning when the vector we are supplying has misspelt LGAs. However, to avoid the unnecessary verbosity whilst attempting the fix, this warning is suppressed if `lgas()` is nested in `fix_region()`.
+
+```{r}
 fix_region(lgas(c("Legos Island", "Amuwo Odofin")))
 ```
 
-Note that the constructor `lgas()` should, by default, signal a warning when the vector we are supplying has misspelt LGAs; however, this warning is suppressed if `lgas()` is nested in `fix_region()`.
-
-When the spelling mistakes depart far from the available LGA spellings, the user is shown a message stating that the fixes that could not be applied. To carry out a fix, we proceed to the next stage.
+When the spelling mistakes depart far from the available LGA spellings, the user is shown a message stating what fixes could not be applied. To now carry out a fix, one can proceed to the next stage.
 
 ```{r}
 fix_region(lgas(c("Orange County", "Amuwo Odofin")))
 ```
 
-#### Interactive fixes
+#### 2. Interactive fixes
 When the automatic fix is not feasible, the user has the option of doing it interactively by calling `fix_region` and setting its `interactive` argument to `TRUE`. By following the prompts, the misspelt LGA as well as possible replacements are presented. All the user needs to do is to select the desired replacement value. This is particularly useful when the user is not sure of what the correct spelling might be.
 
-When a misspelt LGA has more than one match, the interactive approach is the viable option for effecting fixes.
+When a misspelt LGA has more than one match, the interactive approach is the viable option for effecting fixes. In the example below, not all the mispelt LGAs could be fixed automatically:
 
 ```{r}
-adamawa <- c("Fufure", "Demsa", "Machika", "Fufure", "Ganye", "Hong")
+mispelt.adamawa <- c("Fufure", "Demsa", "Machika", "Fufure", "Ganye", "Hong")
 
 # check for misspelt LGAs and, if necessary, attempt to fix
-if (!all(is_lga(adamawa)))
-  adamawa <- fix_region(adamawa)
+length(mispelt.adamawa)
+sum(is_lga(mispelt.adamawa))
+corrected.adamawa <- fix_region(mispelt.adamawa)
+sum(is_lga(corrected.adamawa))
 ```
 
-We see that the purported LGA 'Machika' matches more than one LGA in the country. The original intent was to use "Michika". To address it, we run `fix_region` interactively. This method is for class `lgas` so
+We see that the string 'Machika' is not an actual LGA and there are more than one possible candidate LGA that are considered as possible replacement. Our  original intent was to use "Michika LGA". To address this mistake, we can run `fix_region` interactively. Note that the `interactive` option is only available for use with objects of class `lgas`.
 
 ```{r, eval=FALSE}
-adamawa <- fix_region(lgas(adamawa), interactive = TRUE)
+adamawa <- fix_region(lgas(corrected.adamawa), interactive = TRUE)
+```
+
+Next, the user is provided with a prompt to provide a search item for likely LGAs that would be an appropriate replacement for the misspelt one. Possible replacements are presented and to select any value, the appropriate number should be entered at the prompt. The option `RETRY` allows the user to restart the query and provide another search term, `SKIP` is to try out a different misspelt item (where there are more than one) and to `QUIT` is to exit the prompt. On Windows machines, the user can use the native dialog boxes by setting `graphic` to `TRUE`.
+
+<!-- This chunk exists to make available the `adamawa` object which we are using in the subsequent chunk. The code will be replicated and executed with its output displayed in the chunk referring to manual fixes. -->
+```{r manual-fix, include = FALSE}
+adamawa <- fix_region_manual(corrected.adamawa,
+                             wrong = "Machika",
+                             correct = "Michika")
+adamawa
 ```
 
 
-Next, the user is provided with a prompt to provide a search item for likely LGAs that would be an appropriate replacement for the misspelt one:
-
-
-We now enter in the search term:
-
-Upon clicking "OK", a list of possible matches comes up; in this instance, only one option is provided. The option 'RETRY' allows the user to reset the search term, 'SKIP' is to try out another misspelt item (where there are more than one) and 'QUIT' is to exit the interactive session.
-
-When we broaden the search possibilities, more items are listed among the LGA candidates for the edit. In our example, we will provide *Mi* instead of *Mich*, so that more LGAs are matched:
-
-
-```{r manual-fix, include=FALSE}
-adamawa <- fix_region_manual(adamawa, "Machika", "Michika")
-```
-
-At the end of it all, the spellings are fixed.
-
-```{r, results = 'markup'}
+```{r confirm-fix}
+# Confirm that the spelling mistakes have been fixed.
 all(is_lga(adamawa))
 ```
 
-#### Manual fixes
-When spelling errors are identified and the correct one is known, then a manual fix can be applied. For this, we use the function `fix_region_manual` and its use is pretty straightforward:
+#### 3. Manual fixes
+When spelling errors are identified and the correct one is already known, then a manual fix can be applied. For this, we use the function `fix_region_manual` and its use is straightforward^[Works for both character vectors and `lgas` objects.]:
 
-
-```{r manual-fix, eval = FALSE}
+```{r manual-fix}
 ```
