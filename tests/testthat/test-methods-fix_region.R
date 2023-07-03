@@ -170,7 +170,7 @@ test_that("regions can be fixed manually", {
 
 
 test_that("No warning when constructors are nested with fix_* functions", {
-  expect_no_warning(fix_region(states('Fct')))
+  expect_error(fix_region(states('Fct')))
   expect_warning(states("Fct"))
   expect_no_warning(fix_region(lgas(c("Legos Island",  "Amuwo-Odofin"))))
   expect_warning(lgas(c("Legos Island",  "Amuwo-Odofin")))
