@@ -11,7 +11,7 @@ fix_region(x, ...)
 
 \method{fix_region}{states}(x, ...)
 
-\method{fix_region}{lgas}(x, interactive = FALSE, quietly = FALSE, ...)
+\method{fix_region}{lgas}(x, interactive = FALSE, quietly = FALSE, graphic = FALSE, ...)
 
 \method{fix_region}{default}(x, ...)
 }
@@ -27,6 +27,8 @@ to interactively select the correct LGA names from a list of available
 options.}
 
 \item{quietly}{Logical; default argument is \code{FALSE}.}
+
+\item{graphic}{Whether to make use of native GUI elements (on Windows only).}
 }
 \value{
 The transformed object. If all names are correct, the object is

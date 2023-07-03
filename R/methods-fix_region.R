@@ -34,31 +34,40 @@ fix_region <- function(x, ...)
 #' 
 #' @export
 fix_region.states <- function(x, ...)
-{
+{ # TODO: Consider reporting on fixes made
   ## Process possible FCT values
   abbrFCT <- .fct_options("abbrev")
   fullFCT <- .fct_options("full")
+  
+  ## Replace any 'Abuja' with FCT in full
+  x[x %in% "Abuja"] <- fullFCT
+  
+  ## Find and replace abbreviated with full version
   sumFct <- sum(.fct_options() %in% x)
   
+  ## Both full and abbreviated versions coexist
   if (sumFct == 2)
     x <- sub(abbrFCT, fullFCT, x)
   
-  if (sumFct == 1) {
-    i_abbr <- grep(abbrFCT, x)   # TODO: Warisdis?
-    i_full <- grep(fullFCT, x)
-  }
-  
-  iFct <- grep(sprintf("^%s$", abbrFCT), x, ignore.case = TRUE)
+  ## Allow use of abbreviated version before carrying
+  ## out the check
+  isFct <- x %in% abbrFCT
   ss <- states()
   
-  if (length(iFct)) 
+  if (sum(isFct)) 
     ss <- sub(fullFCT, abbrFCT, ss)
   
-  x <- .fixRegionInternal(x, ss)
-  x[iFct] <- fullFCT
+  x <- .fix_region_internal(x, ss)
+  nofix <- attr(x, "misspelt")
+  
+  if (length(nofix)) {
+    commasep <- paste(nofix, collapse = ", ")
+    cli::cli_abort("The following are not States: {commasep}")
+  }
+  ## After checking, reconstitute the 'states' object
+  # x[isFct] <- fullFCT   TODO: Think again.
   attributes(x) <- NULL
-  x <- states(x, warn = FALSE)
-  invisible(x)
+  states(x)
 }
 
 
@@ -71,43 +80,50 @@ fix_region.states <- function(x, ...)
 #' to interactively select the correct LGA names from a list of available
 #' options.
 #' @param quietly Logical; default argument is \code{FALSE}.
+#' @param graphic Whether to make use of native GUI elements (on Windows only).
 #' 
 #' @examples 
 #' try(fix_region("Owerri north")) # ERROR
 #' fix_region(c("Owerri north", "Owerri West"))
 #' 
 #' @export
-fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
-{  # TODO: add a 'state' argument to fine-tune the matching
-  vals <- .fixRegionInternal(x, lgas(), interactive, ...)
-  onWindows <- .Platform$OS.type == "windows"
-
-  if (interactive) {
-    prompt <- "Do you want to repair interactively?"
+fix_region.lgas <-
+  function(x,
+           interactive = FALSE,
+           quietly = FALSE,
+           graphic = FALSE,
+           ...)
+  {
+    # TODO: add a 'state' argument to fine-tune the matching
+    if (!is.logical(interactive) ||
+        !is.logical(quietly) ||
+        !is.logical(graphic)) {
+      cli::cli_abort("Invalid input where logical argument expected")
+    }
+    if (graphic) 
+      graphic <- interactive
     
-    ans <- if (onWindows)
-      substr(winDialog("yesno", prompt), 0, 1)
-    else
-      readline(paste(prompt, " (Y/N): "))
+    usedialog <- .Platform$OS.type == "windows" && graphic
+    vals <- .fix_region_internal(x, lgas(), interactive)
     
-    if (tolower(ans) == "y")
-      vals <- .fix_lgas_interactive(vals)
+    if (interactive)
+      vals <- .fix_lgas_interactive(vals, usedialog)
+    
+    if (is.null(vals)) {
+      msg <- "The operation was cancelled"
+      
+      if (usedialog)
+        winDialog("ok", msg)
+      else
+        cli::cli_alert_info(msg)
+      
+      return(invisible(x))
+    }
+    if (!quietly)
+      .report_on_fixes(vals, usedialog)
+    
+    vals
   }
-  
-  if (is.null(vals)) {
-    msg <- "The operation was cancelled"
-    if (onWindows && interactive)
-      winDialog("ok", msg)
-    else
-      message(msg)
-    
-    return(invisible(x))
-  }
-  if (!quietly)
-    .report_on_fixes(vals, interactive)
-  
-  invisible(vals)
-}
 
 
 
@@ -179,7 +195,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## matched value, which in the case of misspelling should be the correct one.
 ##
 ## This function is mapped to a vector of states/LGAs
-.fixRegionInternal <- function(x, region, interactive)
+.fix_region_internal <- function(x, region, interactive = FALSE)
 {
   stopifnot(is.character(x), is.character(region))
   cant.fix <- character()
@@ -262,12 +278,14 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 
 
 
-
+# Tells the user about what repairs have been made to the spellings
+# @param obj - the checked object, which has attributes with relevant details
+# @param usedialog Whether to display a dialog (on Windows only).
 #' @import utils
-.report_on_fixes <- function(obj, interactive = FALSE)
+.report_on_fixes <- function(obj, usedialog = FALSE)
 {
-  ATTR_ <- attributes(obj)
-  badspell <- ATTR_$misspelt
+  spell.details <- attributes(obj)
+  badspell <- spell.details$misspelt
   hasBadspell <- !identical(badspell, character(0))
   msg.bad <- msg.good <- ""
   
@@ -277,7 +295,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     msg.bad <- paste0(hdr.bad, paste(nofix.bullets, collapse = "\n"))
   }
   
-  fixes <- ATTR_$regions.fixed
+  # Put the message together
+  fixes <- spell.details$regions.fixed
   
   if (!identical(fixes, character(0))) {
     hdr.good <- .messageHeader("Successful fix(es)")
@@ -290,9 +309,8 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     
     msg.good <- paste0(hdr.good, paste(fixed.bullets, collapse = "\n"))
     
-    if (hasBadspell) {
+    if (hasBadspell)
       msg.good <- paste0(msg.good, "\n")    # just add newline
-    }
   }
   
   if (!nchar(msg.good) && !nchar(msg.bad))
@@ -300,7 +318,7 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
   
   final.msg <- paste(msg.good, msg.bad, sep = "\n")
   
-  if (.Platform$OS.type == "windows" && interactive)
+  if (usedialog)
     winDialog("ok", final.msg)
   else
     cli::cli_alert_info(final.msg)
@@ -324,10 +342,11 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
 ## Interactively fixes regions that are bad - this function is primarily
 ## used for repairing LGA names, since they are so many.
 ## @param lga.list The vector of LGA names that is being repaired. This vector
-## is generated by `.fixRegionInternal` and has an attribute called `misspelt`,
+## is generated by `.fix_region_internal` and has an attribute called `misspelt`,
 ## which is the collection of names needing repair.
+## @param usedialog Whether to use dialog in prompts (only on Windows)
 #' @import utils
-.fix_lgas_interactive <- function(lga.list)
+.fix_lgas_interactive <- function(lga.list, usedialog = FALSE)
 {
   stopifnot(interactive())
   allLgas <- lgas()
@@ -347,9 +366,9 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
     msg.fixWhich <- paste("Fixing", sQuote(bad))
     
     repeat {
-      prompt <- paste(msg.fixWhich, "Enter a search pattern: ", sep = ' - ')
+      prompt <- paste(msg.fixWhich, "Enter a search term: ", sep = ' - ')
       
-      pattern <- if (.Platform$OS.type == "windows")
+      pattern <- if (usedialog)
         winDialogString(prompt, "")
       else
         readline(prompt)
@@ -360,29 +379,27 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
       used.lgas <- grep(pattern, allLgas, value = TRUE, ignore.case = TRUE)
       used.lgas <- sort(used.lgas)
       choices <- c(used.lgas, unlist(unname(special.options)))
-      usingWindows <- .Platform$OS.type == "windows"
       menuopt <-
         menu(
           choices,
-          graphics = usingWindows,
+          graphics = usedialog,
           "Select the LGA"
         )
       chosen <- choices[menuopt]
       
-      if (chosen != special.options$r)
+      if (chosen != special.options$retry)
         break
     }
     
-    if (chosen == special.options$q)
+    if (chosen == special.options$quit)
       break
     
-    if (chosen == special.options$s) {
+    if (chosen == special.options$skip) {
       skipped <- c(skipped, bad)
       next
     }
     
-    # Note: to see why intermediate variables are heavily used here,
-    # run `.__why_no_pipe()` 
+    # Note that pipes were deliberately not used here.
     lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
     attr.misspelt <- attr(lga.list, "misspelt")
     attr.misspelt <- attr.misspelt[attr.misspelt != bad]
@@ -399,10 +416,10 @@ fix_region.lgas <- function(x, interactive = FALSE, quietly = FALSE, ...)
         paste(skipped, collapse = ", ")
       )
     
-    if (usingWindows)
+    if (usedialog)
       winDialog("ok", msg)
     else
-      cli::cli_alert_info(msg)
+      cli::cli_inform(msg)
   }
   
   lga.list

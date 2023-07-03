@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-globalVariables(c("lgas_nigeria", "state", "lga", "gpz", "states_nigeria"))
+globalVariables(c("lgas_nigeria", "state", "lga"))
 
 #' Create an Object for the States of Nigeria
 #' 
@@ -46,13 +46,14 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     num.missed <- sum(!is_state(states))
     
     if (num.missed) {
-      if (warn) {
+      if (warn && isFALSE(.is_nested_fix_dont_warn())) {
         abujas <- match("Abuja", states)
         
         if (!is.na(abujas))
           cli::cli_warn(
             "'Abuja' in position(s) {paste(abujas, collapse = ', ')}
-             is not a State. Use 'Federal Capital Territory' instead."
+             is not a State. Instead, use 'Federal Capital Territory'
+            or its acronym."
           )
         
         if (is.na(abujas) || num.missed > length(abujas))
@@ -210,11 +211,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     lg
   }
   else if (.has_misspelt_lgas(region)) {
-    # Do not warn if this function is used inside a call to `fix_region`
-    funs <- as.list(sys.call(1))
-    funname <- as.character(funs[[1]])
-    
-    if (warn && isFALSE(identical(funname, 'fix_region')))
+    if (warn && isFALSE(.is_nested_fix_dont_warn()))
       .warn_on_misspelling('lga')
     
     ret <- region
@@ -225,6 +222,25 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     cli::cli_abort("None of the items is a valid LGA")
   
   structure(new_lgas(lst), State = region)
+}
+
+
+
+
+
+# Do not warn if this function is used inside a call to `fix_region`
+.is_nested_fix_dont_warn <- function() {
+  found <-
+    vapply(
+      sys.calls(),
+      FUN.VALUE = logical(1),
+      FUN = function(funcall) {
+        funs <- as.list(funcall)
+        "fix_region" %in% funs
+      }
+    )
+  
+  any(found)
 }
 
 
@@ -577,11 +593,6 @@ tail.regions <- function(x, ...)
 c.regions <- function(...)
 {
   ls <- unlist(list(...), use.names = FALSE)
-  #
-  # if (!Reduce(identical, lapply(all, class)))
-  #   stop("All objects must be of the same class")
-  # ls <- lapply(list(...), unclass)
-  # new_states(unlist(ls, use.names = FALSE))
   .chooseRegionsMethod(NextMethod(), ls)
 }
 
@@ -627,24 +638,4 @@ na.exclude.regions <- function(object, ...)
   class(object) <- c(class(na.attr$na.action), class(object))
   attr(object, "na.action") <- na.attr$na.action
   object
-}
-
-
-
-
-
-
-# Creates a list whose elements are the States
-# by their respective geo-political zones. 
-# The name of each elements is an abbreviated
-# form of the name of its zone - North-Central,
-# North-East, North-West, South-East, South-South
-# and South-West. The Federal Capital Territory, 
-# which doesn't belong to any zone is denoted
-# by its own abbreviation and its element is of
-# length 1L.
-stateList <- function()
-{
-  data("states_nigeria", package = "naijR", envir = environment())
-  with(states_nigeria, split(state, gpz))
 }
