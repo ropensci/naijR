@@ -134,7 +134,7 @@ library(sfpack, character.only = TRUE)
   .fix_bad_shpfile_state <- 
     function(obj, regiontype = c("state", "lga"), old, new) {
       stopifnot(exprs = {
-        isS4(obj)
+        inherits(obj, "sf")
         is.character(old)
         is.character(new)
       })
@@ -144,8 +144,8 @@ library(sfpack, character.only = TRUE)
                     state = "admin1Name",
                     lga = "STATE")
       
-      isbad <- obj@data[[hdr]] %in% old
-      obj@data[[hdr]][isbad] <- new
+      isbad <- obj[[hdr]] %in% old
+      obj[[hdr]][isbad] <- new
       obj
     }
   
@@ -162,7 +162,7 @@ library(sfpack, character.only = TRUE)
   # the internally saved spatial data.
   .fix_bad_shpfile_lga <- 
     function(obj, state, oldlga, newlga, verbose = FALSE) {
-      stopifnot({
+      stopifnot(exprs = {
         is.list(obj)
         is_state(state)
         is.character(oldlga)
@@ -174,8 +174,8 @@ library(sfpack, character.only = TRUE)
       # Because of LGA synonyms between some States
       # we will index into data frame cells that are
       # specific to a State to make the replacement
-      isFocusState <- which(obj$spatialObject@data[["STATE"]] %in% state)
-      isFocusLga <- which(obj$spatialObject@data[["LGA"]] %in% oldlga)
+      isFocusState <- which(obj$spatialObject[["STATE"]] %in% state)
+      isFocusLga <- which(obj$spatialObject[["LGA"]] %in% oldlga)
       rowreplaced <- intersect(isFocusState, isFocusLga)
       numreplacement <- length(rowreplaced)
       
@@ -188,7 +188,7 @@ library(sfpack, character.only = TRUE)
         pos <- paste(rowreplaced, collapse = ", ")
         cli::cli_abort("Multiple replacements at positions {pos}")
       }
-      obj$spatialObject@data[rowreplaced, "LGA"] <- newlga
+      obj$spatialObject[rowreplaced, "LGA"] <- newlga
       
       if (verbose) {
         pos <- paste(which(isFocusLga), collapse = ", ")
@@ -233,7 +233,7 @@ library(sfpack, character.only = TRUE)
   # Now, check the LGA object for bad entries and try to fix automatically
   shp.lga <- .strip_ws(shp.lga, "\\s/", "/")
   
-  cli_inform("Attempting automatic fixes for LGAs by State:")
+  cli::cli_inform("Attempting automatic fixes for LGAs by State:")
   remnant <- NULL
   scan.result <- .__scan_lga_mismatch()
   
@@ -298,24 +298,24 @@ library(sfpack, character.only = TRUE)
     )
   )
   
-  cli_inform("\nApplying additional fixes:")
+  cli::cli_inform("\nApplying additional fixes:")
   
   for (i in seq(nrow(mat))) {
     x <- mat[i, "state"]
     y <- mat[i, "old"]
     z <- mat[i, "new"]
-    cli_inform("* {x} State: {y} => {z}")
+    cli::cli_inform("* {x} State: {y} => {z}")
     shp.lga <- .fix_bad_shpfile_lga(shp.lga, x, y, z)
   }
   
   scan.result2 <- .__scan_lga_mismatch()
   
   if (!all(sapply(scan.result2, is.null)))
-    cli_abort("There are still bad LGA entries in the shapefile")
+    cli::cli_abort("There are still bad LGA entries in the shapefile")
   
   # Save objects ----
   # Using RDA format; to be loaded alongside exported objects
-  cli_inform("Saving fixed objects")
+  cli::cli_inform("Saving fixed objects")
   shpobjs <- grep("^shp\\.", ls(), value = TRUE)
   save(list = shpobjs, file = datafile)
   

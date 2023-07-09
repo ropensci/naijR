@@ -17,9 +17,9 @@
   regiontype <- match.arg(regiontype)
   dt <- "data"
   if (identical(regiontype, "state")) {
-    return(slot(shp.state$spatialObject, dt))
+    return(shp.state$spatialObject)
   }
-  slot(shp.lga$spatialObject, dt)
+  shp.lga$spatialObject
 }
 
 
@@ -62,7 +62,7 @@
 # Returns a character vector of the correct names found to be have
 # been misapplied in the shapefile and can be used for corrections.
 .__lga_mismatch <- function(state) {
-  spdata <- .__getShapefileData("lga")
+  spdata <- as.data.frame(.__getShapefileData("lga"))
   splga <- spdata[spdata$STATE == state, 'LGA']
 
   if (anyDuplicated(splga)) {
