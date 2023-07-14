@@ -39,9 +39,10 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' @param leg.x,leg.y Numeric. Position of the legend (deprecated).
 #' @param leg.title String. The legend title. If missing, a default value is
 #' acquired from the data. To turn off the legend title, pass \code{NULL}.
+#' @param plot Logical. Turn actual plotting of the map off or on.
 #' @param leg.orient The orientation of the legend i.e. whether horizontal or
 #' vertical (deprecated). 
-#' @param ... Further arguments passed to \code{\link[maps]{map}}
+#' @param ... Further arguments passed to \code{\link[sf]{plot}}
 #' 
 #' @details The default value for \code{region} is to print all State boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
@@ -81,9 +82,9 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' map_ng("Kano")
 #' }
 #'
-#' @return An object of class \code{maps} containing the data used to draw the
-#' map and which can be used for additional calls to \code{\link[maps]{map}} or
-#' other similar functions (e.g. \code{graphics::plot.default}).
+#' @return An object of class \code{sf}, which is a standard format containing 
+#' the data used to draw the map and thus can be used by this and other 
+#' popular R packages to visualize the spatial data.
 #' 
 #' @import rlang
 #' @importFrom cli cli_abort
@@ -112,6 +113,7 @@ map_ng <- function(region = character(),
                    leg.x = deprecated(),
                    leg.y = deprecated(),
                    leg.title,
+                   plot = TRUE,
                    leg.orient = deprecated(),
                    ...)
 {    ## TODO: Allow this function to accept a matrix e.g. for plotting points
@@ -163,17 +165,11 @@ map_ng <- function(region = character(),
   }
   
   mapdata <- .get_map_data(region)
-  mapq <- expr(.mymap(mapdata, regions = region, ...))
+  mapq <- expr(.mymap(mapdata, regions = region, plot = plot, ...))
   dots <- list(...)
   
   if (use.choropleth) {
-    mapq <- expr(.mymap(mapdata, region))
-    
-    if (!is.null(dots$plot) && !dots$plot)  ## TODO: Reconsider
-      mapq$plot <- FALSE
-    
-    mapq$fill <- TRUE
-    
+    # mapq <- expr(.mymap(mapdata, region, plot = plot))
     cParams <- list(
       region = region,
       value = value.x,
@@ -198,7 +194,6 @@ map_ng <- function(region = character(),
     
     cOpts <-
       .prep_choropleth_opts(mapdata, cParams, dots$col, excluded, exclude.fill)
-    
     mapq$col <- cOpts$colors
     
     if (lifecycle::is_present(leg.orient))
@@ -206,32 +201,31 @@ map_ng <- function(region = character(),
   }
   
   tryCatch({
-    database <- eval(mapq)
+    sfdata <- eval(mapq)
   }, 
   error = function(e) stop(e))
   
-  if(!is_null(y) && !.xy_within_bounds(database, x, y))
+  if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
     cli_abort("Coordinates are out of bounds of the map")
   
-  if ("plot" %in% names(dots) && isFALSE(dots$plot))
-    return(database)
+  if (!plot)
+    return(sfdata)
   
   if (show.text) {
     txt <- country_name()
+    df.only <- as.data.frame(sfdata)
     
-    if (!identical(region, country_name())) {
-      # Account for multi-polygonic regions
-      # TODO: Scope this to parent environment
-      rgxRegions <-
-        function(x, nms) {
-          rgx <- paste0("^", x, "(\\:\\d*)?$")
-          grep(rgx, nms, value = TRUE)
-        }
+    if (inherits(region, "regions")) {
+      rtype <- sub("(.+)(s$)", "\\1", class(region)[1])
+      nmf <- get(paste0("shp.", rtype))$namefield
+      txt <- df.only[[nmf]]
       
-      is <- lapply(region, rgxRegions, nms = database$name)
-      txt <- unlist(is)
-      lbl <- .adjust_labels(txt)
+      if (all(is_state(region))) 
+        txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
+      
       cex <- .set_text_size(dots$cex)
+      xycoord <- .get_point_coords(sfdata)
+      text(x = xycoord[, 'x'], y = xycoord[, 'y'], labels = txt, cex = cex)
     }
   }
   
@@ -277,11 +271,11 @@ map_ng <- function(region = character(),
       )
     }
   }
-  else if (!is_null(y)) {
-    points(x, y) 
-  }
+  # else if (!is_null(y)) {
+  #   points(x, y) 
+  # }
   
-  invisible(database)
+  invisible(sfdata)
 }
 
 
@@ -297,23 +291,22 @@ map_ng <- function(region = character(),
 # @param plot If FALSE, the 'sf' object is returned without plotting
 # @param ... Arguments passed on to internal methods
 #' @import sf
-.mymap <- function(sfdata, regions, plot = TRUE, ...)
+.mymap <- function(sf, regions, plot = TRUE, ...)
 {
   stopifnot(exprs = {
-    inherits(sfdata, "sf")
+    inherits(sf, "sf")
     is.logical(plot)
   })
   
-  if (!plot)
-    return(sfdata)
-  
-  if (!inherits(regions, "regions")) {
-    plot(st_geometry(sfdata), ...)
-    return()
+  if (plot) {
+    if (inherits(regions, "regions")) {
+      namefield <- .get_shpfileprop_element(regions, "namefield")
+      plot(st_geometry(sf, namefield), ...)
+    } 
+    else
+      plot(st_geometry(sf), ...)
   }
-  
-  namefield <- .get_shpfileprop_element(regions, "namefield")
-  plot(st_geometry(sfdata, namefield), ...)
+  sf
 }
 
 
@@ -457,7 +450,11 @@ map_ng <- function(region = character(),
   
   if (identical(x, ngstr)) {
     mapdata <- maps::map("mapdata::worldHires", ngstr, plot = FALSE)
-    return(sf::st_as_sf(mapdata))
+    mapdata <- sf::st_as_sf(mapdata)
+    geomname <- attr(mapdata, "sf_column")
+    names(mapdata)[match(geomname, names(mapdata))] <- "geometry"
+    attr(mapdata, "sf_column") <- "geometry"
+    return(mapdata)
   }
   
   if ((length(x) == 1L && (x %in% .lgas_like_states())) || 
@@ -864,46 +861,6 @@ map_ng <- function(region = character(),
 
 
 
-
-# Rejigs text that is used for labeling a region that has more than 1 polygon
-# TODO: Quite a bit of hard-coding was used (v. 0.1.0) and should be reviewed
-.adjust_labels <- function(x) 
-{
-  stopifnot(is.character(x))
-  x <- vapply(
-    x,
-    FUN.VALUE = character(1L),
-    FUN = function(l)
-      sub("\\:\\d*$", "", l)
-  )
-  
-  dd <- data.frame(state = c("Akwa Ibom", "Cross River"),
-                   poly = c(2, 4))
-  
-  ss <- dd[["state"]]
-  
-  if (all(grepl(paste0(ss, collapse = "|"), x))) {
-    .fadj <- function(a, reg, pos) {
-      ind <- grep(reg, a)
-      finalPos <- ind[pos]
-      a[ind] <- ""
-      a[finalPos] <- reg
-      a
-    }
-    
-    for (i in seq_len(2))
-      x <- .fadj(x, ss[i], dd[["poly"]][i])
-  }
-  
-  dup <- which(duplicated(x))
-  x[dup] <- character(1L)
-  .toggleFct(x, use = "abbrev") # when FCT is labelled
-}
-
-
-
-
-
 # Checks that x and y coordinates are within the bounds of given map
 # Note: This check is probably too expensive. Consider passing just the range
 # though the loss of typing may make this less reliable down the line
@@ -964,14 +921,37 @@ map_ng <- function(region = character(),
 
 
 
-
-.set_text_size <- function(cex = NULL)
+.set_text_size <- function(cex)
 {
-  if (is.null(cex)) {
-    cex <- 0.75  # default for maps::map.text
-    return(cex)
-  }
+  if (is.null(cex))
+    cex <- 0.7
   
-  stopifnot(is.numeric(cex))
+  if (!is.numeric(cex))
+    cli::cli_abort("'cex' is not of class 'numeric'")
+  
   cex
+}
+
+
+
+
+.get_point_coords <- function(sfobj) {
+  stopifnot(inherits(sfobj, "sf"))
+  geom <- sf::st_centroid(sfobj$geometry)
+  pointstr <- sf::st_as_text(geom)
+  numstr <- sub("(POINT \\()(.+)(\\))", "\\2", pointstr)
+  .extract_coords_from_str(numstr)
+}
+
+
+
+
+.extract_coords_from_str <- function(str) {
+  f <- function(rgx, pos) {
+    pos <- paste0("\\", pos)
+    as.double(sub(rgx, pos, str))
+  }
+  x <- f("(^.+)( .+$)", 1L)
+  y <- f("(^.+ )(.+$)", 2L)
+  cbind(x, y)
 }

@@ -260,8 +260,9 @@ test_that("All individual plain State maps can be drawn", {
 })
 
 test_that("All LGAs within a given State are drawn", {
-  for (s in states())
+  for (s in states()) {
     expect_s3_class(map_ng(lgas(s), plot = FALSE), maptype)
+  }
 })
 
 test_that("All individual LGA maps can be drawn", {
@@ -439,7 +440,7 @@ test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
   # })
 })
 
-test_that("Labels are show", {
+test_that("Labels are shown", {
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
   expect_s3_class(map_ng(states(gpz = "sw"), show.text = TRUE, plot = FALSE),
                   maptype)
@@ -449,7 +450,6 @@ test_that("Labels are show", {
     col = 4,
     plot = FALSE
   ), maptype)
-  
 })
 
 test_that("Labels can be resized", {

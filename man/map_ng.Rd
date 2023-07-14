@@ -21,6 +21,7 @@ map_ng(
   leg.x = deprecated(),
   leg.y = deprecated(),
   leg.title,
+  plot = TRUE,
   leg.orient = deprecated(),
   ...
 )
@@ -65,15 +66,17 @@ provided by \code{categories}, giving the user additional control.}
 \item{leg.title}{String. The legend title. If missing, a default value is
 acquired from the data. To turn off the legend title, pass \code{NULL}.}
 
+\item{plot}{Logical. Turn actual plotting of the map off or on.}
+
 \item{leg.orient}{The orientation of the legend i.e. whether horizontal or
 vertical (deprecated).}
 
-\item{...}{Further arguments passed to \code{\link[maps]{map}}}
+\item{...}{Further arguments passed to \code{\link[sf]{plot}}}
 }
 \value{
-An object of class \code{maps} containing the data used to draw the
-map and which can be used for additional calls to \code{\link[maps]{map}} or
-other similar functions (e.g. \code{graphics::plot.default}).
+An object of class \code{sf}, which is a standard format containing 
+the data used to draw the map and thus can be used by this and other 
+popular R packages to visualize the spatial data.
 }
 \description{
 Maps of the Federal Republic of Nigeria that are based on the basic
