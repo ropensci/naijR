@@ -109,7 +109,7 @@
 #
 # Returns the modified data frame
 .__addGPZ <- function(data, statehdr, zonehdr) {
-  stopifnot({
+  stopifnot(exprs = {
     is.data.frame(data)
     is.character(statehdr)
     is.character(zonehdr)

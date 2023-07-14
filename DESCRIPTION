@@ -1,8 +1,8 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.5.2.9005
-Date: 2023-07-03
+Version: 0.5.2.9007
+Date: 2023-07-11
 Depends: 
     R (>= 3.6),
     grDevices,
@@ -14,21 +14,17 @@ Imports:
     mapdata (>= 2.3.0),
     maps (>= 3.3.0),
     rlang (>= 0.4.0),
+    sf (>= 1.0.13),
     stringi (>= 1.7.6)
 Suggests: 
     ISOcodes,
     covr,
     here,
-    jsonlite,
     knitr,
     purrr,
     readxl,
-    rgdal (>= 1.4.4),
     rmarkdown,
-    sp (>= 2.0-0),
     testthat (>= 3.0.0),
-    tibble,
-    tidyr,
     usethis
 Authors@R: person("Victor", "Ordu", 
               email = "victorordu@outlook.com",

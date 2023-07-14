@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2019-2022 Victor Ordu.
 
-globalVariables(c(".", "STATE"))
+globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 
 # Exported function(s) ---------------------------------------------------------
 
@@ -94,8 +94,6 @@ globalVariables(c(".", "STATE"))
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom lifecycle deprecated
 #' @importFrom lifecycle is_present
-#' @importFrom maps map
-#' @importFrom maps map.text
 #' 
 #' @export
 map_ng <- function(region = character(),
@@ -165,19 +163,11 @@ map_ng <- function(region = character(),
   }
   
   mapdata <- .get_map_data(region)
-  
-  ## Create a regular expression for drawing regions so as 
-  ## to account for situations where there are multiple polygons
-  ## for the same State/LGA
-  region.regex <- .regex_duplicated_poly(region)
-  mapq <- quote(map(mapdata, regions = region.regex, ...))
-  
-  ## Capture 'dots'
+  mapq <- expr(.mymap(mapdata, regions = region, ...))
   dots <- list(...)
   
-  ## Prepare to draw choropleth 
   if (use.choropleth) {
-    mapq <- expr(map(mapdata, region.regex))  ## TODO: Consider rlang::call2
+    mapq <- expr(.mymap(mapdata, region))
     
     if (!is.null(dots$plot) && !dots$plot)  ## TODO: Reconsider
       mapq$plot <- FALSE
@@ -215,25 +205,16 @@ map_ng <- function(region = character(),
       lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.orient))
   }
   
-  ## Draw a `maps::map()` (with or without labels) or capture the object.
-  ##
-  ## NOTE: In the call to map.text, the name 'database' is actually
-  ## required. This is because, internally, there is a call to `eval()`
-  ## which uses its default argument for `envir` i.e. `parent.frame()`.
-  ## An object of any other name is not seen by the quoted call to
-  ## `maps::map()` used by the evaluator function. For more details,
-  ## inspect the source code for `maps::map.text()`. This is actually a 
-  ## bug in the 'maps' package.
   tryCatch({
-    database <- eval(mapq)    # DO NOT CHANGE THE NAME OF THIS VARIABLE!
+    database <- eval(mapq)
   }, 
   error = function(e) stop(e))
   
-  if (!is.null(dots$plot) && isFALSE(dots$plot))
-    return(database)
-  
   if(!is_null(y) && !.xy_within_bounds(database, x, y))
     cli_abort("Coordinates are out of bounds of the map")
+  
+  if ("plot" %in% names(dots) && isFALSE(dots$plot))
+    return(database)
   
   if (show.text) {
     txt <- country_name()
@@ -251,15 +232,6 @@ map_ng <- function(region = character(),
       txt <- unlist(is)
       lbl <- .adjust_labels(txt)
       cex <- .set_text_size(dots$cex)
-      
-      map.text(
-        database,
-        regions = txt,
-        exact = TRUE,
-        labels = lbl,
-        add = TRUE,
-        cex = cex
-      )
     }
   }
   
@@ -319,6 +291,35 @@ map_ng <- function(region = character(),
 
 
 # Internal helper function(s) ---------------------------------------------------
+# Creates the map to be plotted
+# @param sfdata An objecct of class 'sf'
+# @param region An object of class 'regions'
+# @param plot If FALSE, the 'sf' object is returned without plotting
+# @param ... Arguments passed on to internal methods
+#' @import sf
+.mymap <- function(sfdata, regions, plot = TRUE, ...)
+{
+  stopifnot(exprs = {
+    inherits(sfdata, "sf")
+    is.logical(plot)
+  })
+  
+  if (!plot)
+    return(sfdata)
+  
+  if (!inherits(regions, "regions")) {
+    plot(st_geometry(sfdata), ...)
+    return()
+  }
+  
+  namefield <- .get_shpfileprop_element(regions, "namefield")
+  plot(st_geometry(sfdata, namefield), ...)
+}
+
+
+
+
+
 
 ## Processes character input, presumably States, and when empty
 ## character vector, provide all the States as a default value.
@@ -452,9 +453,12 @@ map_ng <- function(region = character(),
     x <- as.character(x)
   
   stopifnot(is.character(x))
+  ngstr <- "Nigeria"
   
-  if (identical(x, 'Nigeria'))
-    return("mapdata::worldHires")
+  if (identical(x, ngstr)) {
+    mapdata <- maps::map("mapdata::worldHires", ngstr, plot = FALSE)
+    return(sf::st_as_sf(mapdata))
+  }
   
   if ((length(x) == 1L && (x %in% .lgas_like_states())) || 
       all(is_state(x)))
@@ -468,42 +472,70 @@ map_ng <- function(region = character(),
 
 .get_map_data.lgas <- function(x)
 {
-  spo <- shp.lga$spatialObject
   statename <- attr(x, 'State')
-  
+
   if (length(statename) > 1L)
     cli::cli_abort("LGA-level maps for adjoining States are not yet supported")
   
-  if (!is.null(statename)) {
-    statergx <- .regex_subset_regions(statename)
-    stateindex <- grep(statergx, spo@data$STATE)
-    lgaObj <- spo[stateindex, ]
-  }
-  else {
-    lgaObj <- spo
-    
-    if (length(x) < length(lgas())) {
-      lgargx <- .regex_subset_regions(x)
-      lgaindex <- grep(lgargx, spo@data$LGA)
-      lgaObj <- spo[lgaindex, ]
-    }
+  full.spo <- .get_shpfileprop_element(x, "spatialObject")
+  
+  if (isFALSE(is.null(statename))) {
+    statelgas <- lgas(statename)
+    return(.subset_spatial_by_region(full.spo, statelgas))
   }
   
-  maps::SpatialPolygons2map(lgaObj, shp.lga$namefield)
+  if (length(x) < length(lgas()))
+    return(.subset_spatial_by_region(full.spo, x))
+  
+  full.spo
 }
 
 
 
 .get_map_data.states <- function(x)
 {
-  spo <- shp.state$spatialObject
-  statergx <- .regex_subset_regions(x)
-  stateindex <- grep(statergx, spo$admin1Name)
-  stateObj <- spo[stateindex, ]
-  maps::SpatialPolygons2map(stateObj, shp.state$namefield)
+  spo <- .get_shpfileprop_element(x, "spatialObject")
+  .subset_spatial_by_region(spo, x)
 }
 
 
+
+# Subsets the spatial object when only a select number of
+# regions are about to be plotted in the map
+# @param spatialobject The spatialObject, which originally is an element
+# of the ShapefileProps objects loaded by the package
+# @param regions A regions object e.g. states, lgas
+.subset_spatial_by_region <- function(spatialobject, regions) 
+{
+  stopifnot(exprs = {
+    inherits(spatialobject, "sf")
+    inherits(regions, "regions")
+  })
+  # Because of duplicated LGA names, when dealing with an `lgas` object
+  # first subset the spatial object by its State
+  if (inherits(regions, "lgas")) {
+    state <- attr(regions, "State")
+    spatialobject <- spatialobject[spatialobject$STATE == state, ]
+  }
+  reg.rgx <- paste0(regions, collapse = "|")
+  reg.col <- .get_shpfileprop_element(regions, "namefield")
+  reg.index <- grep(reg.rgx, spatialobject[[reg.col]])
+  spatialobject[reg.index, ]
+}
+
+
+
+
+# Extracts an element of the ShapefileProps internal object by name
+# @param regiontype A character vector of length 1 stating the type of region
+# @param element A character vector of length 1 naming the element extracted
+.get_shpfileprop_element <- function(region, element)
+{
+  stopifnot(inherits(region, "regions"), length(element) == 1L)
+  suff <- sub("(.)(s$)", "\\1", class(region)[1])
+  shpfileprop <- paste("shp", suff, sep = ".")
+  getElement(object = get(shpfileprop), name = element)
+}
 
 
 
@@ -589,7 +621,7 @@ map_ng <- function(region = character(),
   {
     # TODO: Set limits for variables and brk
     # TODO: Accept numeric input for col
-    stopifnot(inherits(map, 'map'))
+    stopifnot(inherits(map, 'sf'))
     
     if(!.assert_list_elements(opts))
       cli::cli_abort(
@@ -613,22 +645,22 @@ map_ng <- function(region = character(),
     # interest is definitely a factor
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
-    rgx <- "(^.+)(:.+$)"
-    indexMultiPolygons <- grep(rgx, map$names)
-    mapregions <- sub(rgx, "\\1", map$names)
-    m <- mapregions[indexMultiPolygons]
-    m <-  m[!duplicated(m)]
-    mapregions <- mapregions[-indexMultiPolygons]
-    mapregions <- c(mapregions, m)
+    # rgx <- "(^.+)(:.+$)"
+    # indexMultiPolygons <- grep(rgx, map$names)
+    # mapregions <- sub(rgx, "\\1", map$names)
+    # m <- mapregions[indexMultiPolygons]
+    # m <-  m[!duplicated(m)]
+    # mapregions <- mapregions[-indexMultiPolygons]
+    # mapregions <- c(mapregions, m)
+    # 
+    # if (nrow(df) < length(mapregions))
+    #   mapregions <- mapregions[mapregions %in% df$region]
     
-    if (nrow(df) < length(mapregions))
-      mapregions <- mapregions[mapregions %in% df$region]
+    # new.ind <- order(as.character(df$region), mapregions)
+    # ord.df <- df[new.ind, ]    # This is why a data frame was made
+    # colors <- .reassign_colours(map$names, ord.df$region, ord.df$color, ...)
     
-    new.ind <- order(as.character(df$region), mapregions)
-    ord.df <- df[new.ind, ]    # This is why a data frame was made
-    colors <- .reassign_colours(map$names, ord.df$region, ord.df$color, ...)
-    
-    list(colors = colors,
+    list(# colors = colors,
          scheme = colrange,
          bins = cats)
   }
@@ -762,7 +794,7 @@ map_ng <- function(region = character(),
 .reassign_colours <- 
   function(names, all.regions, in.colours, excl.region = NULL, excl.col = NULL)
   {
-    stopifnot({
+    stopifnot(exprs = {
       is.character(names)
       all(is_state(all.regions))
       .isHexColor(in.colours)
@@ -813,21 +845,12 @@ map_ng <- function(region = character(),
 
 # Provides a regex pattern for checking polygons for jurisdictions that
 # are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
+# TODO: Deprecate
 .regex_duplicated_poly <- function(x)
 {
   stopifnot(is.character(x))
   paste0("^(", paste0(x, collapse = "|"),")(\\:\\d)?$")
 }
-
-
-
-
-.regex_subset_regions <- function(x) {
-  stopifnot(is.character(x))
-  paste0(x, collapse = "|")
-}
-
-
 
 
 

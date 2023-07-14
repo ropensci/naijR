@@ -107,12 +107,12 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 get_all_states <- function(named = TRUE)
 {
-  stopifnot(
-    length(named) == 1L,
-    is.logical(named),
-    !is.na(named)
-  )
-
+  stopifnot(exprs = {
+    length(named) == 1L
+    is.logical(named)
+    ! is.na(named)
+  })
+  
   states.by.zone <- stateList()
   
   if (!named) {

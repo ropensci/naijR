@@ -45,7 +45,7 @@ country_name <- function()
 
 .first_elem_warn <- function(arg)
 {
-  stopifnot(is.character(arg) && length(arg) == 1L)
+  stopifnot(exprs = {is.character(arg) && length(arg) == 1L})
   sprintf("Only the first element of '%s' was used", arg)
 }
 
