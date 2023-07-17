@@ -1,7 +1,8 @@
 # naijR 0.6.0
 * Added a new dataset for the States of Nigeria.
 * Improved on the accuracy of LGA naming in the light of spelling mistakes discovered in the earlier reference document.
-* Migration from RGDAL-based spatial data; the `{sf}` package is the new main dependency.
+* Migration from RGDAL-based spatial data; the `{sf}` package is now the main dependency.
+* `map_ng` gains a newly documented argument `plot`, which hitherto was passed internally to `maps::map()` via `...`.
 
 ## Fixes:
 * Unwanted display of dialogs when fixing LGA names on Windows OS was reversed (suggested by Laura DeCicco).
@@ -92,3 +93,4 @@
 * Added a `NEWS.md` file to track changes to the package.
 * Recognise abbreviations of 'Federal Capital Territory' i.e. FCT.
 * Disable error-check on character type for `is_state` so it can be used more effectively for functional programming constructs.
+

@@ -85,13 +85,11 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' @return An object of class \code{sf}, which is a standard format containing 
 #' the data used to draw the map and thus can be used by this and other 
 #' popular R packages to visualize the spatial data.
-#' 
+#'
+#' @import graphics
 #' @import rlang
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
-#' @importFrom graphics legend
-#' @importFrom graphics par
-#' @importFrom graphics points
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom lifecycle deprecated
 #' @importFrom lifecycle is_present
@@ -169,7 +167,7 @@ map_ng <- function(region = character(),
   dots <- list(...)
   
   if (use.choropleth) {
-    # mapq <- expr(.mymap(mapdata, region, plot = plot))
+    mapq <- expr(.mymap(mapdata, region, plot = plot))
     cParams <- list(
       region = region,
       value = value.x,
@@ -206,7 +204,7 @@ map_ng <- function(region = character(),
   error = function(e) stop(e))
   
   if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
-    cli_abort("Coordinates are out of bounds of the map")
+    cli_abort("Coordinates are beyond the bounds of the plotted area")
   
   if (!plot)
     return(sfdata)
@@ -271,9 +269,9 @@ map_ng <- function(region = character(),
       )
     }
   }
-  # else if (!is_null(y)) {
-  #   points(x, y) 
-  # }
+  else if (!is_null(y)) {
+    points(x, y, ...)
+  }
   
   invisible(sfdata)
 }
@@ -291,7 +289,7 @@ map_ng <- function(region = character(),
 # @param plot If FALSE, the 'sf' object is returned without plotting
 # @param ... Arguments passed on to internal methods
 #' @import sf
-.mymap <- function(sf, regions, plot = TRUE, ...)
+.mymap <- function(sf, regions, plot = TRUE, col = NA, ...)
 {
   stopifnot(exprs = {
     inherits(sf, "sf")
@@ -299,17 +297,17 @@ map_ng <- function(region = character(),
   })
   
   if (plot) {
-    if (inherits(regions, "regions")) {
+    geom <- if (inherits(regions, "regions")) {
       namefield <- .get_shpfileprop_element(regions, "namefield")
-      plot(st_geometry(sf, namefield), ...)
+      st_geometry(sf, namefield)
     } 
     else
-      plot(st_geometry(sf), ...)
+      st_geometry(sf)
+    
+    plot(geom, col = col, ...)
   }
   sf
 }
-
-
 
 
 
@@ -433,10 +431,11 @@ map_ng <- function(region = character(),
 
 
 
-
 ## S3 Class and methods for internal use:
 .get_map_data <- function(x)
   UseMethod(".get_map_data")
+
+
 
 
 #' @import mapdata
@@ -489,11 +488,13 @@ map_ng <- function(region = character(),
 
 
 
+
 .get_map_data.states <- function(x)
 {
   spo <- .get_shpfileprop_element(x, "spatialObject")
   .subset_spatial_by_region(spo, x)
 }
+
 
 
 
@@ -519,51 +520,6 @@ map_ng <- function(region = character(),
   reg.index <- grep(reg.rgx, spatialobject[[reg.col]])
   spatialobject[reg.index, ]
 }
-
-
-
-
-# Extracts an element of the ShapefileProps internal object by name
-# @param regiontype A character vector of length 1 stating the type of region
-# @param element A character vector of length 1 naming the element extracted
-.get_shpfileprop_element <- function(region, element)
-{
-  stopifnot(inherits(region, "regions"), length(element) == 1L)
-  suff <- sub("(.)(s$)", "\\1", class(region)[1])
-  shpfileprop <- paste("shp", suff, sep = ".")
-  getElement(object = get(shpfileprop), name = element)
-}
-
-
-
-
-# States that are also the names of LGAs
-.lgas_like_states <- function()
-{
-  c("Bauchi",
-    "Ebonyi",
-    "Ekiti",
-    "Gombe",
-    "Katsina",
-    "Kogi",
-    "Nasarawa")
-}
-
-
-# # For possible export later
-# .shpLayer <- function(level) {
-#   
-#   if (level == 'state')
-#     "nga_admbnda_adm1_osgof_20161215"
-#   else if (level == 'lga')
-#     "new_lga_nigeria_2003"
-#   # "NIGERIA_LGA"
-#   # "Nigeria_census_2006_WGS84"
-#   else
-#     stop("An appropriate layer is not avaiable")
-# }
-
-
 
 
 
@@ -620,49 +576,21 @@ map_ng <- function(region = character(),
     # TODO: Accept numeric input for col
     stopifnot(inherits(map, 'sf'))
     
-    if(!.assert_list_elements(opts))
+    if (!.assert_list_elements(opts))
       cli::cli_abort(
         "One or more inputs for generating choropleth options are invalid"
       )
     
     brks <- opts$breaks
-    
-    df <-
-      data.frame(
-        region = opts$region,
-        value = opts$value,
-        stringsAsFactors = FALSE
-      )
-    
+    df <- data.frame(region = opts$region, value = opts$value)
     df$cat <- .create_categorized(df$value, brks)
     cats <- levels(df$cat)
     colrange <- .process_colouring(col, length(cats))
     
-    # At this point, our value of 
-    # interest is definitely a factor
-    df$ind <- as.integer(df$cat)
-    df$color <- colrange[df$ind]
-    # rgx <- "(^.+)(:.+$)"
-    # indexMultiPolygons <- grep(rgx, map$names)
-    # mapregions <- sub(rgx, "\\1", map$names)
-    # m <- mapregions[indexMultiPolygons]
-    # m <-  m[!duplicated(m)]
-    # mapregions <- mapregions[-indexMultiPolygons]
-    # mapregions <- c(mapregions, m)
-    # 
-    # if (nrow(df) < length(mapregions))
-    #   mapregions <- mapregions[mapregions %in% df$region]
-    
-    # new.ind <- order(as.character(df$region), mapregions)
-    # ord.df <- df[new.ind, ]    # This is why a data frame was made
-    # colors <- .reassign_colours(map$names, ord.df$region, ord.df$color, ...)
-    
-    list(# colors = colors,
-         scheme = colrange,
-         bins = cats)
+    # At this point, our value of interest is definitely a factor
+    ind <- as.integer(df$cat)
+    list(colors = colrange[ind], scheme = colrange, bins = cats)
   }
-
-
 
 
 
@@ -683,10 +611,6 @@ map_ng <- function(region = character(),
   
   all(region.valid, value.valid, cat.valid)
 }
-
-
-
-
 
 
 
@@ -726,7 +650,6 @@ map_ng <- function(region = character(),
   
   cut(val, brks, include.lowest = TRUE)
 }
-
 
 
 
@@ -838,8 +761,6 @@ map_ng <- function(region = character(),
 
 
 
-
-
 # Provides a regex pattern for checking polygons for jurisdictions that
 # are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
 # TODO: Deprecate
@@ -867,11 +788,11 @@ map_ng <- function(region = character(),
 #' @importFrom rlang is_double
 .xy_within_bounds <- function(map, x, y)
 { 
-  stopifnot(inherits(map, 'map'), is_double(x), is_double(y))
+  stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
   
-  rr <- map$range
-  xx <- x >= rr[1] & x <= rr[2]
-  yy <- y >= rr[3] & y <= rr[4]
+  rr <- sf::st_bbox(map)
+  xx <- x >= rr[1] & x <= rr[3]
+  yy <- y >= rr[2] & y <= rr[4]
   all(xx, yy)
 }
 
@@ -899,7 +820,6 @@ map_ng <- function(region = character(),
   
   cli::cli_abort("'{arg}' must be of type character or logical")
 }
-
 
 
 

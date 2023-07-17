@@ -25,6 +25,35 @@ stateList <- function()
 
 
 
+# States that are also the names of LGAs
+.lgas_like_states <- function()
+{
+  c("Bauchi",
+    "Ebonyi",
+    "Ekiti",
+    "Gombe",
+    "Katsina",
+    "Kogi",
+    "Nasarawa")
+}
+
+
+
+
+# Extracts an element of the ShapefileProps internal object by name
+# @param regiontype A character vector of length 1 stating the type of region
+# @param element A character vector of length 1 naming the element extracted
+.get_shpfileprop_element <- function(region, element)
+{
+  stopifnot(inherits(region, "regions"), length(element) == 1L)
+  suff <- sub("(.)(s$)", "\\1", class(region)[1])
+  shpfileprop <- paste("shp", suff, sep = ".")
+  getElement(object = get(shpfileprop), name = element)
+}
+
+
+
+
 
 ## Messages -----------------------------------------------------------------
 country_name <- function()

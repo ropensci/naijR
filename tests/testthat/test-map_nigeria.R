@@ -109,12 +109,12 @@ test_that("Choropleth mapping succeeds", {
       breaks = pop.groups,
       plot = FALSE,
       fill = FALSE
-    ), 'map')
+    ), maptype)
   
   expect_s3_class(map_ng(data = dat,
                          x = alpha,
                          plot = FALSE),
-                  'map')
+                  maptype)
   
   ss <- states()
   expect_s3_class(map_ng(
@@ -125,7 +125,7 @@ test_that("Choropleth mapping succeeds", {
     show.text = FALSE,
     plot = FALSE
   ),
-  'map')
+  maptype)
   
   expect_s3_class(map_ng(
     region = ss,
@@ -156,7 +156,7 @@ test_that("Choropleth colours can be controlled at interface", {
     col = NULL
   ))
   
-  mm <- 'map'
+  mm <- maptype
   
   expect_s3_class(eval_tidy(func), mm)
   
@@ -165,30 +165,6 @@ test_that("Choropleth colours can be controlled at interface", {
   
   func$col <- 'blue'
   expect_s3_class(eval_tidy(func), mm)
-})
-
-test_that("'map' object is properly created", {
-  mp1 <- map_ng(plot = FALSE)
-  mp2 <- suppressWarnings(map_ng(show.neighbours = TRUE, plot = FALSE))
-  mm <- 'map'
-  rng <- c(2.668534, 14.678820, 4.273007, 13.894420)
-  
-  expect_s3_class(mp1, mm)
-  expect_type(mp1, 'list')
-  expect_s3_class(mp1, mm)
-  expect_length(mp1, 4L)
-  expect_identical(names(mp1), c("x", "y", 'range', 'names'))
-  expect_length(mp1$names, 41)
-  expect_true(identical(mp1$x, mp2$x))
-  expect_true(identical(mp1$y, mp2$y))
-  expect_false(length(mp1$x) < length(mp2$x))
-  expect_false(length(mp1$y) < length(mp2$y))
-  expect_true(all(mp1$x %in% mp2$x))
-  expect_true(all(mp1$y %in% mp2$y))
-  expect_equal(signif(mp1$range, 7), rng)
-  expect_equal(signif(mp2$range, 7), rng)
-  for (i in states()) 
-    expect_match(mp2$names, i, all = FALSE)
 })
 
 test_that("Points are mapped", {
@@ -214,42 +190,39 @@ test_that("Factors can draw choropleth", {
     runif(37, max = 100)
   }
   
-  mapClass <- 'map'
   Fac <- ordered(getSmpl(2))
-  expect_s3_class(map_ng(x = Fac, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(x = Fac, plot = FALSE), maptype)
   
   Char <- getSmpl(5)
-  expect_s3_class(map_ng(x = Char, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(x = Char, plot = FALSE), maptype)
   
   sss <- states()
   dd <- data.frame(region = sss, Col = Fac, stringsAsFactors = FALSE)
-  expect_s3_class(map_ng(data = dd, x = Col, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(data = dd, x = Col, plot = FALSE), maptype)
   
-  expect_s3_class(map_ng(sss, x = Fac, plot = FALSE), mapClass)
-  expect_s3_class(map_ng(sss, x = Char, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = Fac, plot = FALSE), maptype)
+  expect_s3_class(map_ng(sss, x = Char, plot = FALSE), maptype)
   
   Int <- sample(1L:5L, 37, TRUE)
   expect_error(map_ng(sss, x = Int, plot = FALSE),
                'Breaks were not provided for the categorization of a numeric type')
-  expect_s3_class(map_ng(sss, x = as.factor(Int), plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = as.factor(Int), plot = FALSE), maptype)
   
   brks <- c(0, 40, 60, 100)
-  expect_s3_class(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), mapClass)
+  expect_s3_class(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), maptype)
   
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
-  expect_s3_class(eval(qq), mapClass)
+  expect_s3_class(eval(qq), maptype)
   qq$categories <- c("Low", "Medium", "High")
-  expect_s3_class(eval(qq), mapClass)
+  expect_s3_class(eval(qq), maptype)
   qq$col <- "green"
-  expect_s3_class(eval(qq), mapClass)
+  expect_s3_class(eval(qq), maptype)
 })
 
 test_that("Parameters passed via ellipsis work seamlessly", {
-  mm <- 'map'
-  
-  expect_s3_class(map_ng(lwd = 2, plot = FALSE), mm)
-  expect_s3_class(map_ng(lwd = 2, col = 2, plot = FALSE), mm)
+  expect_s3_class(map_ng(lwd = 2, plot = FALSE), maptype)
+  expect_s3_class(map_ng(lwd = 2, col = 2, plot = FALSE), maptype)
   expect_error(map_ng(NULL, lwd = 2, col = 2, plot = FALSE), 
                "Expected a character vector as 'region'")
 })
@@ -297,148 +270,115 @@ test_that("Map LGAs together as individual blocs", {
   expect_true(file.exists(testMap))
 })
 
-test_that("Number of LGAs matches the number extracted for mapping", {
-  # This test case is created for bug fix that involved the creation
-  # of wrong LGA coordinates for Borno State -> Kagarko is included
-  for (i in states(all = FALSE)) {
-    lg <- lgas(i)
-    mplg <- map_ng(lg, plot = FALSE)$names
-    
-    rgx <- .regex_duplicated_poly(lg)
-    expect_match(mplg, rgx)
-    # expect_true(all(mplg %in% lg))
-    # expect_true(all(lg %in% mplg))
-  }
-})
+## TODO: Review these tests after polygon exclusion is properly redefined
+# test_that("Choropleth map can be formed with excluded regions", {
+#   colpal <- "YlOrRd"
+#   excluded.reg <- c("Abia", "Jigawa")
+#   green <- "green"
+#   d <- data.frame(state = states(),
+#                   total = sample(LETTERS[1:4], 37, TRUE))
+#   
+#   expect_s3_class(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       plot = FALSE
+#     ),
+#     maptype
+#   )
+#   
+#   expect_s3_class(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       exclude.fill = green,
+#       plot = FALSE
+#     ),
+#     maptype
+#   )
+#   
+#   expect_s3_class(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       exclude.fill = green,
+#       leg.title = "Legend title",
+#       plot = FALSE
+#     ),
+#     maptype
+#   )
+#   
+#   expect_error(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       exclude.fill = c(green, "grey"),
+#       leg.title = "Legend title",
+#       plot = FALSE
+#     ),
+#     paste("Only one colour can be used to denote regions excluded", 
+#           "from the choropleth colouring scheme"),
+#     fixed = TRUE
+#   )
+#   
+#   expect_error(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       exclude.fill = "notacolour",
+#       leg.title = "Legend title",
+#       plot = FALSE
+#     ),
+#     paste("The colour used for excluded regions must be valid",
+#           "i.e. an element of the built-in set 'colours()'"),
+#     fixed = TRUE
+#   )
+#   
+#   expect_error(
+#     map_ng(
+#       data = d,
+#       x = total,
+#       col = colpal,
+#       excluded = excluded.reg,
+#       exclude.fill = 99L,
+#       leg.title = "Legend title",
+#       plot = FALSE
+#     )
+#   )
+# })
+# 
+# test_that(
+# "Mapping fails when choropleth is plotted with repetitive State levels",
+#   {
+#     data("esoph")
+#     set.seed(87)
+#     ng.esoph <- transform(esoph, state = sample(states(), nrow(esoph), TRUE))
+#     expect_error(map_ng(data = ng.esoph, x = agegp, plot = FALSE), 
+#                  "argument lengths differ")
+#     
+#     # One record per State (although there are missing states)
+#     ng.esoph <- ng.esoph[!duplicated(ng.esoph$state), ]
+#     
+#     expect_s3_class(
+#       map_ng(ng.esoph$state, x = ng.esoph$agegp, plot = FALSE),
+#       maptype
+#     )
+#     expect_s3_class(
+#       map_ng(data = ng.esoph, x = agegp, plot = FALSE),
+#       maptype
+#     ) 
+#   })
 
-test_that("Choropleth map can be formed with excluded regions", {
-  mapClass <- maptype
-  colpal <- "YlOrRd"
-  excluded.reg <- c("Abia", "Jigawa")
-  green <- "green"
-  d <- data.frame(state = states(),
-                  total = sample(LETTERS[1:4], 37, TRUE))
-  
-  expect_s3_class(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      plot = FALSE
-    ),
-    mapClass
-  )
-  
-  expect_s3_class(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      exclude.fill = green,
-      plot = FALSE
-    ),
-    mapClass
-  )
-  
-  expect_s3_class(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      exclude.fill = green,
-      leg.title = "Legend title",
-      plot = FALSE
-    ),
-    mapClass
-  )
-  
-  expect_error(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      exclude.fill = c(green, "grey"),
-      leg.title = "Legend title",
-      plot = FALSE
-    ),
-    paste("Only one colour can be used to denote regions excluded", 
-          "from the choropleth colouring scheme"),
-    fixed = TRUE
-  )
-  
-  expect_error(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      exclude.fill = "notacolour",
-      leg.title = "Legend title",
-      plot = FALSE
-    ),
-    paste("The colour used for excluded regions must be valid",
-          "i.e. an element of the built-in set 'colours()'"),
-    fixed = TRUE
-  )
-  
-  expect_error(
-    map_ng(
-      data = d,
-      x = total,
-      col = colpal,
-      excluded = excluded.reg,
-      exclude.fill = 99L,
-      leg.title = "Legend title",
-      plot = FALSE
-    ),
-    "Colour indicators of type 'integer' are not supported",
-    fixed = TRUE
-  )
-})
-
-test_that(
-  "Mapping fails when choropleth is plotted with repetitive State levels",
-  {
-    data("esoph")
-    set.seed(87)
-    ng.esoph <-  
-      transform(esoph, state = sample(states(), nrow(esoph), TRUE))
-    
-    expect_error(map_ng(data = ng.esoph, x = agegp, plot = FALSE), 
-                 "argument lengths differ")
-    
-    # One record per State (although there are missing states)
-    ng.esoph <- ng.esoph[!duplicated(ng.esoph$state), ]
-    
-    expect_s3_class(
-      map_ng(ng.esoph$state, x = ng.esoph$agegp, plot = FALSE),
-      maptype
-    )
-    expect_s3_class(
-      map_ng(data = ng.esoph, x = agegp, plot = FALSE),
-      maptype
-    ) 
-  })
-
-test_that("Deprecation messages ahead of next release (current - 0.4.4)", {
-  d <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
-  # 
-  # rlang::with_options(lifecycle_verbosity = "warning", {
-  #   expect_warning(map_ng(data = d, leg.x = 8L, plot = FALSE))
-  # })
-  # 
-  # rlang::with_options(lifecycle_verbosity = "warning", {
-  #   expect_warning(map_ng(data = d, leg.y = 94L, plot = FALSE))
-  # }) 
-  # 
-  # rlang::with_options(lifecycle_verbosity = "warning", {
-  #   expect_warning(map_ng(data = d, leg.orient = "horiz", plot = FALSE))
-  # })
-})
 
 test_that("Labels are shown", {
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)

@@ -139,4 +139,4 @@ map_ng("Kwara", x = x, y = y)
 ```
 
 ## Conclusion
-This vignette provided an initial look at the mapping facilities currently available in the `naijR` package. Additional development is going on to provide the user with more granular control. This is an open source project, and contributions are welcome.
+This vignette provided an initial look at the mapping facilities currently available in the `naijR` package. Additional development is going on to provide the user with more granular control, as well make the maps to be extendible by more established geospatial R packages.
