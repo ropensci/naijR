@@ -86,7 +86,6 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' the data used to draw the map and thus can be used by this and other 
 #' popular R packages to visualize the spatial data.
 #'
-#' @import graphics
 #' @import rlang
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
@@ -223,12 +222,12 @@ map_ng <- function(region = character(),
       
       cex <- .set_text_size(dots$cex)
       xycoord <- .get_point_coords(sfdata)
-      text(x = xycoord[, 'x'], y = xycoord[, 'y'], labels = txt, cex = cex)
+      graphics::text(xycoord[['x']], xycoord[['y']], labels = txt, cex = cex)
     }
   }
   
   ## Annotate
-  title(main = title, sub = caption)
+  graphics::title(main = title, sub = caption)
   
   if (use.choropleth) {
     
@@ -259,7 +258,7 @@ map_ng <- function(region = character(),
     }
     
     if (lp$show) {
-      legend(
+      graphics::legend(
         x = lp$x,
         y = lp$y,
         legend = categories,
@@ -270,7 +269,7 @@ map_ng <- function(region = character(),
     }
   }
   else if (!is_null(y)) {
-    points(x, y, ...)
+    graphics::points(x, y, ...)
   }
   
   invisible(sfdata)
@@ -581,15 +580,78 @@ map_ng <- function(region = character(),
         "One or more inputs for generating choropleth options are invalid"
       )
     
+    if (anyDuplicated(opts$region)) {
+      if (all(is_state(opts$region)))
+      cli::cli_abort(
+        "Data cannot be matched with map. Aggregate them by States"
+      )
+      
+      if (all(is_lga(opts$region)))
+        cli::cli_warn("Duplicated LGAs found, but may or may not need a review")
+    }
+    
     brks <- opts$breaks
     df <- data.frame(region = opts$region, value = opts$value)
+    
     df$cat <- .create_categorized(df$value, brks)
     cats <- levels(df$cat)
     colrange <- .process_colouring(col, length(cats))
     
-    # At this point, our value of interest is definitely a factor
-    ind <- as.integer(df$cat)
-    list(colors = colrange[ind], scheme = colrange, bins = cats)
+    # At this point, our value of 
+    # interest is definitely a factor
+    df$ind <- as.integer(df$cat)
+    df$color <- colrange[df$ind]
+    # rgx <- "(^.+)(:.+$)"
+    # indexMultiPolygons <- grep(rgx, map$names)
+    # mapregions <- sub(rgx, "\\1", map$names)
+    # m <- mapregions[indexMultiPolygons]
+    # m <-  m[!duplicated(m)]
+    # mapregions <- mapregions[-indexMultiPolygons]
+    # mapregions <- c(mapregions, m)
+    # 
+    # if (nrow(df) < length(mapregions))
+    #   mapregions <- mapregions[mapregions %in% df$region]
+    
+    # new.ind <- order(as.character(df$region), mapregions)
+    # ord.df <- df[new.ind, ]    # This is why a data frame was made
+    colors <- .reassign_colours(df$region, df$color, ...)
+    list(colors = colors, scheme = colrange, bins = cats)
+  }
+
+
+
+
+# Reassigns colours to polygons that refer to similar regions i.e. duplicated
+# polygon, ensuring that when the choropleth is drawn, the colours are 
+# properly applied to the respective regions and not recycled.
+#' @importFrom cli cli_abort
+.reassign_colours <- 
+  function(all.regions, polygon.colors, excl.region = NULL, excl.col = NULL)
+  {
+    stopifnot(is.character(all.regions), .isHexColor(polygon.colors))
+    
+    if (!is.null(excl.region)) {
+      off.color <- "grey"
+      
+      if (!is.null(excl.col)) {
+        if (length(excl.col) > 1L)
+          cli_abort("Only one colour can be used to denote regions excluded
+                     from the choropleth colouring scheme")
+        
+        if (!is.character(excl.col))
+          cli_abort("Colour indicators of type '{typeof(excl.col)}'
+                    are not supported")
+        
+        if (!excl.col %in% grDevices::colours())
+          cli_abort("The colour used for excluded regions must be valid
+                     i.e. an element of the built-in set 'colours()'")
+        
+        off.color <- excl.col
+      }
+      excluded <- which(all.regions %in% excl.region)
+      polygon.colors[excluded] <- off.color
+    }
+    structure(polygon.colors, names = all.regions)
   }
 
 
@@ -703,60 +765,6 @@ map_ng <- function(region = character(),
   grDevices::palette('R4')
   pal
 }
-
-
-
-
-# Reassigns colours to polygons that refer to similar regions i.e. duplicated
-# polygon, ensuring that when the choropleth is drawn, the colours are 
-# properly applied to the respective regions and not recycled.
-#' @importFrom cli cli_abort
-.reassign_colours <- 
-  function(names, all.regions, in.colours, excl.region = NULL, excl.col = NULL)
-  {
-    stopifnot(exprs = {
-      is.character(names)
-      all(is_state(all.regions))
-      .isHexColor(in.colours)
-    })
-    
-    out.colours <- new.names <- rep(NA, length(names))
-    
-    for (i in seq_along(all.regions)) {
-      regx <- .regex_duplicated_poly(all.regions[i])
-      ind <- grep(regx, names)
-      out.colours[ind] <- in.colours[i]
-      new.names[ind] <- sub(regx, "\\1", names[ind])[1]
-    }
-    
-    ## Take care of situations where a region is not to be part of
-    ## the choropleth and should be given an 'off-colour'
-    if (!is.null(excl.region)) {
-      off.color <- "grey"
-      
-      if (!is.null(excl.col)) {
-        
-        if (length(excl.col) > 1L)
-          cli_abort("Only one colour can be used to denote regions excluded
-                     from the choropleth colouring scheme")
-        
-        if (!is.character(excl.col))
-          cli_abort("Colour indicators of type '{typeof(excl.col)}'
-                    are not supported")
-        
-        if (!excl.col %in% grDevices::colours())
-          cli_abort("The colour used for excluded regions must be valid
-                     i.e. an element of the built-in set 'colours()'")
-        
-        off.color <- excl.col
-      }
-      
-      excluded <- match(excl.region, new.names)
-      out.colours[excluded] <- off.color
-    }
-    
-    structure(out.colours, names = new.names)
-  }
 
 
 

@@ -27,7 +27,7 @@
 
 # Prints out the LGAs for a given State in the shapefile
 .__show_shapefile_state_lgas <- function(state) {
-  stopifnot(is_state(state))
+  stopifnot(sum(is_state(state)) == 1L)
   stateindex <- which(shp.lga$spatialObject$STATE == state)
   lganames <- shp.lga$spatialObject$LGA[stateindex]
   attr(lganames, "State") <- state

@@ -140,8 +140,10 @@ test_that("Draw choropleth automatically with 2-column data frames", {
   ds <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
   dl <- data.frame(LGA = lgas(), value = sample(LETTERS[1:5], 774, TRUE))
   
-  for (df in list(ds, dl)) 
-    expect_s3_class(try(map_ng(data = df, plot = FALSE)), maptype)
+  expect_s3_class(map_ng(data = ds, plot = FALSE), maptype)
+  expect_s3_class(suppressWarnings(map_ng(data = dl, plot = FALSE)), maptype)
+  expect_warning(map_ng(data = dl, plot = FALSE),
+                 "Duplicated LGAs found, but may or may not need a review")
 })
 
 test_that("Choropleth colours can be controlled at interface", {
@@ -255,129 +257,130 @@ test_that("All individual LGA maps can be drawn", {
 })
 
 test_that("Map LGAs together as individual blocs", {
-  abLga <- lgas("Abia")
-  expect_s3_class(map_ng(abLga, plot = FALSE), maptype)
-  
-  ## Do actual plot
+  abiaLga <- lgas("Abia")
   testMap <- "data/test-map.png"
+  
   if (file.exists(testMap))
     file.remove(testMap)
+  
   png(testMap)
-  val <- try(map_ng(abLga), silent = TRUE)
+  val <- try(map_ng(abiaLga), silent = TRUE)
   dev.off()
   
+  expect_s3_class(map_ng(abiaLga, plot = FALSE), maptype)
   expect_false(inherits(val, "try-error"))
   expect_true(file.exists(testMap))
+  
+  file.remove(testMap)
 })
 
-## TODO: Review these tests after polygon exclusion is properly redefined
-# test_that("Choropleth map can be formed with excluded regions", {
-#   colpal <- "YlOrRd"
-#   excluded.reg <- c("Abia", "Jigawa")
-#   green <- "green"
-#   d <- data.frame(state = states(),
-#                   total = sample(LETTERS[1:4], 37, TRUE))
-#   
-#   expect_s3_class(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       plot = FALSE
-#     ),
-#     maptype
-#   )
-#   
-#   expect_s3_class(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       exclude.fill = green,
-#       plot = FALSE
-#     ),
-#     maptype
-#   )
-#   
-#   expect_s3_class(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       exclude.fill = green,
-#       leg.title = "Legend title",
-#       plot = FALSE
-#     ),
-#     maptype
-#   )
-#   
-#   expect_error(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       exclude.fill = c(green, "grey"),
-#       leg.title = "Legend title",
-#       plot = FALSE
-#     ),
-#     paste("Only one colour can be used to denote regions excluded", 
-#           "from the choropleth colouring scheme"),
-#     fixed = TRUE
-#   )
-#   
-#   expect_error(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       exclude.fill = "notacolour",
-#       leg.title = "Legend title",
-#       plot = FALSE
-#     ),
-#     paste("The colour used for excluded regions must be valid",
-#           "i.e. an element of the built-in set 'colours()'"),
-#     fixed = TRUE
-#   )
-#   
-#   expect_error(
-#     map_ng(
-#       data = d,
-#       x = total,
-#       col = colpal,
-#       excluded = excluded.reg,
-#       exclude.fill = 99L,
-#       leg.title = "Legend title",
-#       plot = FALSE
-#     )
-#   )
-# })
-# 
-# test_that(
-# "Mapping fails when choropleth is plotted with repetitive State levels",
-#   {
-#     data("esoph")
-#     set.seed(87)
-#     ng.esoph <- transform(esoph, state = sample(states(), nrow(esoph), TRUE))
-#     expect_error(map_ng(data = ng.esoph, x = agegp, plot = FALSE), 
-#                  "argument lengths differ")
-#     
-#     # One record per State (although there are missing states)
-#     ng.esoph <- ng.esoph[!duplicated(ng.esoph$state), ]
-#     
-#     expect_s3_class(
-#       map_ng(ng.esoph$state, x = ng.esoph$agegp, plot = FALSE),
-#       maptype
-#     )
-#     expect_s3_class(
-#       map_ng(data = ng.esoph, x = agegp, plot = FALSE),
-#       maptype
-#     ) 
-#   })
+test_that("Choropleth map can be formed with excluded regions", {
+  colpal <- "YlOrRd"
+  excluded.reg <- c("Abia", "Jigawa")
+  exclusion.color <- "green"
+  d <- data.frame(state = states(),
+                  total = sample(LETTERS[1:4], 37, TRUE))
+
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      plot = FALSE
+    ),
+    maptype
+  )
+
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = exclusion.color,
+      plot = FALSE
+    ),
+    maptype
+  )
+
+  expect_s3_class(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = exclusion.color,
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    maptype
+  )
+
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = c(exclusion.color, "grey"),
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    paste("Only one colour can be used to denote regions excluded",
+          "from the choropleth colouring scheme"),
+    fixed = TRUE
+  )
+
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = "notacolour",
+      leg.title = "Legend title",
+      plot = FALSE
+    ),
+    paste("The colour used for excluded regions must be valid",
+          "i.e. an element of the built-in set 'colours()'"),
+    fixed = TRUE
+  )
+
+  expect_error(
+    map_ng(
+      data = d,
+      x = total,
+      col = colpal,
+      excluded = excluded.reg,
+      exclude.fill = 99L,
+      leg.title = "Legend title",
+      plot = FALSE
+    )
+  )
+})
+
+test_that(
+"Mapping fails when choropleth is plotted with repetitive State levels",
+  {
+    data("esoph")
+    set.seed(87)
+    ng.esoph <- transform(esoph, state = sample(states(), nrow(esoph), TRUE))
+    expect_error(map_ng(data = ng.esoph, x = agegp, plot = FALSE),
+                 "Data cannot be matched with map. Aggregate them by States")
+
+    # One record per State (although there are missing states)
+    ng.esoph <- ng.esoph[!duplicated(ng.esoph$state), ]
+
+    expect_s3_class(
+      map_ng(ng.esoph$state, x = ng.esoph$agegp, plot = FALSE),
+      maptype
+    )
+    expect_s3_class(
+      map_ng(data = ng.esoph, x = agegp, plot = FALSE),
+      maptype
+    )
+  })
 
 
 test_that("Labels are shown", {

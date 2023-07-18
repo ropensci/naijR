@@ -150,7 +150,7 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
 # Fixed malformed shapefile LGA entries
 #
 # Arguments:
-# - state: The State whose LGAs are bre being fixed
+# - state: The State whose LGAs are being fixed
 # - oldlga: The existing (i.e. malformed name)
 # - newlga: The new name used as replacement
 #
@@ -160,7 +160,7 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
   function(obj, state, oldlga, newlga, verbose = FALSE) {
     stopifnot(exprs = {
       is.list(obj)
-      is_state(state)
+      sum(is_state(state)) == 1L
       is.character(oldlga)
       is_lga(newlga)
       length(oldlga) == 1L && length(newlga) == 1L
