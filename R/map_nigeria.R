@@ -222,7 +222,7 @@ map_ng <- function(region = character(),
       
       cex <- .set_text_size(dots$cex)
       xycoord <- .get_point_coords(sfdata)
-      graphics::text(xycoord[['x']], xycoord[['y']], labels = txt, cex = cex)
+      graphics::text(xycoord[, 'x'], xycoord[, 'y'], labels = txt, cex = cex)
     }
   }
   
