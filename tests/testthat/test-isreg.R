@@ -134,7 +134,7 @@ test_that("is_lga recognises LGAs", {
 
 
 test_that("State/LGA synonyms are discernible", {
-  rr <- .lgas_like_states()
+  rr <- lgas_like_states()
   
   for (i in rr) {
     expect_true(is_state(i))

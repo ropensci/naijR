@@ -1,3 +1,9 @@
+# Source file: regdata.R
+#
+# GPL-3 License
+#
+# Copyright (C) 2019-2022 Victor Ordu.
+
 #' Local Government Areas of Nigeria
 #'
 #' A dataset containing the 774 Local Government Areas of Nigeria

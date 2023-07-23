@@ -1,3 +1,7 @@
+# Source file: isreg.R
+#
+# Copyright (C) 2019-2023 Victor Ordu.
+
 #' Test an Object for States
 #' 
 #' @param x A vector to be tested.
@@ -50,11 +54,6 @@ is_state <- function(x)
   res[na.pos] <- NA
   res
 }
-
-
-
-
-
 
 
 

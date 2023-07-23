@@ -1,3 +1,7 @@
+# Source file: fixmob.R
+#
+# Copyright (C) 2019-2023 Victor Ordu.
+
 #' Fix mobile numbers
 #'
 #' Fixes up local mobile phone numbers to a uniform text format.

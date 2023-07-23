@@ -1,4 +1,4 @@
-# Source file: map-helpers.R
+# Source file: helpers.R
 #
 # GPL-3 License
 #
@@ -25,31 +25,30 @@ stateList <- function()
 
 
 
-# States that are also the names of LGAs
-.lgas_like_states <- function()
+## Returns those LGAs that share names with their State or, in other words,
+## States that are also the names of LGAs e.g. Bauchi, Ekiti
+lgas_like_states <- function()
 {
-  c("Bauchi",
-    "Ebonyi",
-    "Ekiti",
-    "Gombe",
-    "Katsina",
-    "Kogi",
-    "Nasarawa")
+  ll <- unclass(lgas())
+  statelike <- which(is_state(ll))
+  unique(ll[statelike])
 }
 
 
 
 
-# Extracts an element of the ShapefileProps internal object by name
-# @param regiontype A character vector of length 1 stating the type of region
-# @param element A character vector of length 1 naming the element extracted
-.get_shpfileprop_element <- function(region, element)
+states_with_shared_lgas <- function()
 {
-  stopifnot(inherits(region, "regions"), length(element) == 1L)
-  suff <- sub("(.)(s$)", "\\1", class(region)[1])
-  shpfileprop <- paste("shp", suff, sep = ".")
-  getElement(object = get(shpfileprop), name = element)
+  findStates <- function(dup.lga) {
+    patt <- paste0("^", dup.lga, "$")
+    index <- grep(patt, lgas, fixed = TRUE)
+    lgas_nigeria$state[index]
+  }
+  lgas <- lgas_nigeria$lga
+  lganames <- lgas[duplicated(lgas)]
+  sapply(lganames, findStates, simplify = FALSE)
 }
+
 
 
 

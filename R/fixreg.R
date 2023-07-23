@@ -1,3 +1,6 @@
+# Source file: fixreg.R
+#
+# Copyright (C) 2019-2023 Victor Ordu.
 
 #' Fix Region Names
 #' 
@@ -167,7 +170,7 @@ fix_region.lgas <-
   ## then one can safely assume that the other element(s) that fail the test
   ## did so because they were misspelt. An automatic fix will then be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
-  nonSynonyms <- x[!x %in% .lgas_like_states()]
+  nonSynonyms <- x[!x %in% lgas_like_states()]
   
   region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
     lgas(x, warn = FALSE)                    # to allow creation of temporary,
