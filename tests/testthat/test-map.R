@@ -249,7 +249,7 @@ test_that("All individual LGA maps can be drawn", {
       state <- attr(x, "State")
 
       if (length(state) > 1L)
-        x <- disambiguate_lga(x, parent = s)
+        x <- disambiguate_lga(x, state = s)
 
       expect_s3_class(map_ng(x, plot = FALSE), maptype)
     }

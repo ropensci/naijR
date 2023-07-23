@@ -1,10 +1,12 @@
 # naijR 0.6.0
-* Added a new dataset for the States of Nigeria.
-* Improved on the accuracy of LGA naming in the light of spelling mistakes discovered in the earlier reference document.
-* Migration from RGDAL-based spatial data; the `{sf}` package is now the main dependency.
-* `map_ng` gains a newly documented argument `plot`, which hitherto was passed internally to `maps::map()` via `...`.
+## New Features:
+* Added a new dataset `states_nigeria` for the States of Nigeria.
+* Migrated from RGDAL-based spatial data; the `{sf}` package is now the main dependency.
+* `map_ng` gained a newly documented argument `plot`, which hitherto was passed internally to `maps::map()` via `...`.
+* Added a new function `disambiguate_lga`, which takes a single-element `lgas` object for handling the names of Local Government Areas that are shared between separate States. This function enables the (re)setting of the `State` attribute of such objects; this can be done interactively, where the replicated States' names are presented for selection by users.
 
 ## Fixes:
+* Improved on the accuracy of LGA naming in the light of spelling mistakes discovered in the earlier reference document.
 * Unwanted display of dialogs when fixing LGA names on Windows OS was reversed (suggested by Laura DeCicco).
 
 # naijR 0.5.2

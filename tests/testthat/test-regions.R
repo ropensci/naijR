@@ -100,12 +100,15 @@ test_that("State/LGAs synonyms are handled", {
   expect_length(lgas("Bauchi", strict = TRUE), 1L)
 })
 
-
-test_that("LGA objects' attributes are set when appropriate", {
+test_that("LGA objects' attributes appropriately", {
   expect_identical(attr(lgas("Abia"), "State"), "Abia")
   expect_length(attr(lgas(c("Kebbi", "Jigawa")), "State"), 2L)
   expect_length(attributes(lgas("Rivers")), 2L)
   expect_length(attributes(lgas()), 1L)
+  
+  benuelgafun <- quote(lgas(c("Obi", "Tarka")))
+  expect_length(attr(suppressWarnings(eval(benuelgafun)), "State"), 2L)
+  expect_warning(eval(benuelgafun), "'Obi' LGA is found in 2 States")
 })
 
 ## ---- Internal generics ----
@@ -184,9 +187,3 @@ test_that("Warning is issued when 'Abuja' is used as a State", {
   expect_length(capture_warnings(states(x)), 1)
   expect_length(capture_warnings(states(y)), 2)
 })
-
-
-## TODO: Export in next MINOR release.
-# test_that("LGA and States can be disambiguated where appropriate", {
-#   
-# })
