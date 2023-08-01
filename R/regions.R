@@ -128,11 +128,44 @@ get_all_states <- function(named = TRUE)
 
 
 
+# Subsets the table of LGAs, returning a data frame 
+# with rows filtered by only the given LGAs
+.subset_states_by_lga <- function(l)
+{
+  stopifnot(is.character(l))
+  with(lgas_nigeria, state[lga %in% l])
+}
+
+
+
+
+.list_states_by_lga <- function(l)
+{
+  stopifnot(all(is_lga(l)))
+  ss <- lapply(l, .subset_states_by_lga)
+  names(ss) <- l
+  ss
+}
+
+
+
 
 .subset_lgas_by_state <- function(s)
 {
+  stopifnot(is.character(s))
   with(lgas_nigeria, lga[state %in% s])
 }
+
+
+
+
+.list_lgas_by_state <- function(s) {
+  stopifnot(all(is_state(s)))
+  ll <- lapply(s, .subset_lgas_by_state)
+  names(ll) <- s
+  ll
+}
+
 
 
 
@@ -176,52 +209,66 @@ new_states <- function(ss)
 #' how_many_lgas("Sokoto")
 #' how_many_lgas("Ekiti")
 #' 
+#' @importFrom cli cli_abort
+#' @importFrom cli cli_warn
 #' @importFrom utils data
 #' 
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
   
-  if (is.factor(region))
+  if (is.factor(region))  # TODO: Perhaps implement methods.
     region <- as.character(region)
   
   if (!is.character(region))
-    cli::cli_abort("Expected an object of type 'character'")
+    cli_abort("Expected an object of type 'character'")
   
-  if (strict && !any(region %in% lgas_like_states()))
-    cli::cli_abort("strict can only be set to TRUE where State/LGA syonnyms exist")
+  if (strict) {
+    not.synonymous <- !(region %in% lgas_like_states())
+    
+    if (any(not.synonymous)) {
+      nouns <- paste(region[not.synonymous], collapse = ", ")
+      verb <- 
+        sprintf(ngettext(sum(not.synonymous), "is %s", "are %ss"), "no LGA")
+      cli_abort("There {verb} {nouns} sharing State names")
+    }
+  }
   
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
   
-  lst <- if (all(is_state(region)) && !strict) {
-    sl <- lapply(region, .subset_lgas_by_state)
-    names(sl) <- region
+  if (all(is_state(region)) && !strict) {
+    lst <- .list_lgas_by_state(region)
     
     if (length(region) == 1L)
-      sl <- unname(unlist(sl))
-    
-    sl
+      lst <- unname(unlist(lst))
   }
   else if (all(is_lga(region))) {
-    lg <- region
-    region <- unique(with(lgas_nigeria, state[lga %in% lg]))
+    lst <- .list_states_by_lga(region)
+    lst.names <- names(lst)
+    stt.num <- vapply(lst, length, integer(1))
     
-    if ((numSt <- length(region)) > 1L)
-      cli::cli_warn("The LGA '{lg}' is found in {numSt} States")
-    
-    lg
+    if (any(stt.num > 1L)) {
+      multi <- which(stt.num > 1L)
+      
+      for (elem in multi) {
+        stts <- lst[[elem]]
+        nm <- lst.names[elem]
+        stts.msg <- paste(stts, collapse = ", ")
+        cli_warn("'{nm}' LGA is found in {length(stts)} States: {stts.msg}")
+      }
+    }
+    lst <- unique(lst.names)
+    region <- NULL
   }
   else if (.has_misspelt_lgas(region)) {
     if (warn && isFALSE(.is_nested_fix_dont_warn()))
       .warn_on_misspelling('lga')
     
-    ret <- region
-    region <- as.null(region)  # set to NULL b/c of attribute in final output
-    ret
+    region <- NULL
   }
   else if (.all_are_not_lgas(region))
-    cli::cli_abort("None of the items is a valid LGA")
+    cli_abort("None of the items is a valid LGA")
   
   structure(new_lgas(lst), State = region)
 }
@@ -232,16 +279,17 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
 # Do not warn if this function is used inside a call to `fix_region`
 .is_nested_fix_dont_warn <- function() {
-  found <-
-    vapply(
-      sys.calls(),
-      FUN.VALUE = logical(1),
-      FUN = function(funcall) {
-        funs <- as.list(funcall)
-        "fix_region" %in% funs
-      }
-    )
+  check_nesting_func <- function(funcall) {
+    funs <- as.list(funcall)
+    any(nest.func %in% funs)
+  }
+  nest.func <- c("fix_region", "disambiguate_lga")
   
+  ## Check to pre-empt any future removal of these functions
+  if (!sum(vapply(nest.func, exists, logical(1))))  
+    cli::cli_abort("The nesting function does not exist")
+  
+  found <- vapply(sys.calls(), check_nesting_func, logical(1))
   any(found)
 }
 

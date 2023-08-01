@@ -93,9 +93,11 @@ test_that("Correct number of LGAs are returned for each State", {
 
 
 test_that("State/LGAs synonyms are handled", {
+  eklga <- lgas("Ekiti", strict = T)
+
   expect_length(lgas("Oyo"), 33L)
   expect_error(lgas("Oyo", strict = TRUE),
-               "strict can only be set to TRUE where State/LGA syonnyms exist")
+               "There is no LGA Oyo sharing State names")
   expect_length(lgas("Bauchi"), 20L)
   expect_length(lgas("Bauchi", strict = TRUE), 1L)
 })
