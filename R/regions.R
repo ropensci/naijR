@@ -237,6 +237,8 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
   
+  lst <- region
+  
   if (all(is_state(region)) && !strict) {
     lst <- .list_lgas_by_state(region)
     

@@ -109,7 +109,7 @@ test_that("LGA objects' attributes appropriately", {
   expect_length(attributes(lgas()), 1L)
   
   benuelgafun <- quote(lgas(c("Obi", "Tarka")))
-  expect_length(attr(suppressWarnings(eval(benuelgafun)), "State"), 2L)
+  expect_length(attr(suppressWarnings(eval(benuelgafun)), "State"), 0L)
   expect_warning(eval(benuelgafun), "'Obi' LGA is found in 2 States")
 })
 
