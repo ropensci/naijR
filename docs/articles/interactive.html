@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -108,94 +108,119 @@ Areas</h1>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>Nigeria has 774 Local Government Areas (LGAs). There a number of
-factors that can make working with them particularly challenging:</p>
+<p>Nigeria has 774 Local Government Areas (LGAs). There are a number of
+factors that can make working with them challenging:</p>
 <ol style="list-style-type: decimal">
-<li>Some LGAs share the same name with the State to which they belong to
-e.g. Bauchi LGA in Bauchi State and this can lead to wrong use of the
-data.</li>
-<li>Some LGAs are in different States, but they bear the same name
-e.g. Obi LGAs in both Benue and Nasarawa States.</li>
-<li>Common LGA spelling errors in the literature, even in official
-documents.</li>
+<li>Some LGAs share the same name with their respective States
+e.g. Bauchi LGA in Bauchi State, and this can lead to wrong application
+of the data.</li>
+<li>Some LGAs bear the same name although they are in different States,
+e.g. Obi LGA in Benue and Nasarawa States.</li>
+<li>LGA spelling discrepancies are rife in the literature, and believe
+it or not, even in official government documents.</li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="the-solution">The solution<a class="anchor" aria-label="anchor" href="#the-solution"></a>
+<h2 id="a-proposed-solution">A proposed solution<a class="anchor" aria-label="anchor" href="#a-proposed-solution"></a>
 </h2>
-<p>The function <code>fix_region</code> is designed to address spelling
-errors in sub-national administrative regions of Nigeria, with an
-emphasis on States and LGAs.</p>
-<div class="section level3">
-<h3 id="states">States<a class="anchor" aria-label="anchor" href="#states"></a>
-</h3>
-<p>For the States this is quite straightforward; common minor mistakes
-can be corrected automatically by this function and since there are only
-36 of them, they can otherwise be corrected via an inspection of the
-output of the function <code><a href="../reference/states.html">states()</a></code>.</p>
-</div>
-<div class="section level3">
-<h3 id="lgas">LGAs<a class="anchor" aria-label="anchor" href="#lgas"></a>
-</h3>
-<p>LGA spelling fixes are designed to occur in 3 incremental phases. If
-the user cannot effect the corrections at a particular level s/he can
-proceed to the next stage. The phases are as follows:</p>
+<p>The function <code>fix_region</code> has methods that are designed to
+address spelling errors LGAs<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. These fixes can be carried out in 3
+incremental phases; if the user cannot effect the corrections at a
+particular level s/he can proceed to the next stage. The phases are as
+follows:</p>
 <ol style="list-style-type: decimal">
 <li>Automatic</li>
 <li>Interactive</li>
 <li>Manual</li>
 </ol>
 <div class="section level4">
-<h4 id="automatic-fix">Automatic fix<a class="anchor" aria-label="anchor" href="#automatic-fix"></a>
+<h4 id="automatic-fixes">1. Automatic fixes<a class="anchor" aria-label="anchor" href="#automatic-fixes"></a>
 </h4>
 <p>When the spelling error is slight and unambiguous, the function
-automatically effects the repair of the name.</p>
+automatically effects the repair. However, when there is only a single
+misspelt LGA, and especially if it is supplied as a string,
+<code>fix_region</code> will signal an error.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brovic.github.io/naijR/" class="external-link">naijR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="st">"Legos Island"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: Incorrect region name(s); consider reconstructing 'x' with `states()` or `lgas()` for a more reliable fix</span></span></code></pre></div>
-<p>When there is only a single misspelt LGA, and especially if it is
-supplied to the function as a plain string, the function will signal an
-error. The thinking is that for a single value that is probably provided
-interactively, an automated solution may not be necessary.</p>
-<p>We will now add another LGA to the function:</p>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `fix_region()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Incorrect region name(s); consider reconstructing 'x' with `states()`</span></span>
+<span><span class="co">#&gt;   or `lgas()` for a more reliable fix</span></span></code></pre></div>
+<p>The thinking is that an automated solution may not be necessary for a
+single value that was probably provided interactively.</p>
+<p>When another LGA is added, such that the argument passed to the
+function is a character vector with more that one element:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo-Odofin"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Successful fix(es):</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Successful fix(es):</span></span>
 <span><span class="co">#&gt; -------------------</span></span>
 <span><span class="co">#&gt; * Legos Island =&gt; Lagos Island</span></span></code></pre></div>
-<p>On Windows machines and during an interactive R session, the function
-preferentially utilizes the native graphics interface for messaging and
-user interaction. The above line of code would appear like this:</p>
-<p><img src="img/interactive-1.png"></p>
 <p>Sometimes when we use a character vector to perform this check, the
-function <code>fix_region</code> may encounter difficulty deciding what
-fixes to apply. In such instances, the best thing to try first is to
-convert the vector into an <code>lgas</code> object. Note that
-<code><a href="../reference/lgas.html">lgas()</a></code> will by default signal a warning when the vector we
-are supplying has misspelt strings, but if the function is nested in a
-function like <code><a href="../reference/fix_region.html">fix_region()</a></code>, this warning is suppressed.
-This is to reduce the tautology warnings even after fixes have been duly
-applied.</p>
+function <code>fix_region</code> may find it difficult to decide on what
+fixes to apply. In such instances, the best thing is to convert the
+vector into an <code>lgas</code> object.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: Incorrect region name(s); consider reconstructing 'x' with `states()` or `lgas()` for a more reliable fix</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">chars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="va">chars</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `fix_region()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Incorrect region name(s); consider reconstructing 'x' with `states()`</span></span>
+<span><span class="co">#&gt;   or `lgas()` for a more reliable fix</span></span>
+<span></span>
+<span><span class="co"># Create an `lgas` object</span></span>
+<span><span class="va">lgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: One or more items is not an LGA. Spelling error?</span></span>
+<span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="va">lgs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Successful fix(es):</span></span>
+<span><span class="co">#&gt; -------------------</span></span>
+<span><span class="co">#&gt; * Legos Island =&gt; Lagos Island</span></span>
+<span><span class="co">#&gt; * Amuwo Odofin =&gt; Amuwo-Odofin</span></span>
+<span><span class="co">#&gt; [1] "Lagos Island" "Amuwo-Odofin"</span></span>
+<span><span class="co">#&gt; attr(,"misspelt")</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; attr(,"regions.fixed")</span></span>
+<span><span class="co">#&gt;   Legos Island   Amuwo Odofin </span></span>
+<span><span class="co">#&gt; "Lagos Island" "Amuwo-Odofin"</span></span></code></pre></div>
+<p>Note that the constructor <code><a href="../reference/lgas.html">lgas()</a></code>, by default, signals a
+warning when the vector we are supplying has misspelt LGAs. However, to
+avoid the unnecessary verbosity whilst attempting the fix, this warning
+is suppressed if <code><a href="../reference/lgas.html">lgas()</a></code> is nested in
+<code><a href="../reference/fix_region.html">fix_region()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>This displays the following dialog:</p>
-<p><img src="img/interactive-2.png"></p>
-<p>When the spelling mistakes depart very far from the function’s
-partial matching capability, the user is told the fixes that could not
-be made. A possible solution lies in the next level of name repair.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legos Island"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Successful fix(es):</span></span>
+<span><span class="co">#&gt; -------------------</span></span>
+<span><span class="co">#&gt; * Legos Island =&gt; Lagos Island</span></span>
+<span><span class="co">#&gt; * Amuwo Odofin =&gt; Amuwo-Odofin</span></span>
+<span><span class="co">#&gt; [1] "Lagos Island" "Amuwo-Odofin"</span></span>
+<span><span class="co">#&gt; attr(,"misspelt")</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
+<span><span class="co">#&gt; attr(,"regions.fixed")</span></span>
+<span><span class="co">#&gt;   Legos Island   Amuwo Odofin </span></span>
+<span><span class="co">#&gt; "Lagos Island" "Amuwo-Odofin"</span></span></code></pre></div>
+<p>When the spelling mistakes depart far from the available LGA
+spellings, the user is shown a message stating what fixes could not be
+applied. To now carry out a fix, one can proceed to the next stage.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Orange County"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="img/interactive-3.png"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Orange County"</span>, <span class="st">"Amuwo Odofin"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Successful fix(es):</span></span>
+<span><span class="co">#&gt; -------------------</span></span>
+<span><span class="co">#&gt; * Amuwo Odofin =&gt; Amuwo-Odofin</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fix(es) not applied:</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; * Orange County</span></span>
+<span><span class="co">#&gt; [1] "Orange County" "Amuwo-Odofin" </span></span>
+<span><span class="co">#&gt; attr(,"misspelt")</span></span>
+<span><span class="co">#&gt; [1] "Orange County"</span></span>
+<span><span class="co">#&gt; attr(,"regions.fixed")</span></span>
+<span><span class="co">#&gt;   Amuwo Odofin </span></span>
+<span><span class="co">#&gt; "Amuwo-Odofin"</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="interactive-fix">Interactive fix<a class="anchor" aria-label="anchor" href="#interactive-fix"></a>
+<h4 id="interactive-fixes">2. Interactive fixes<a class="anchor" aria-label="anchor" href="#interactive-fixes"></a>
 </h4>
-<p>When the automatic fixes are not feasible, the user has the option of
+<p>When the automatic fix is not feasible, the user has the option of
 doing it interactively by calling <code>fix_region</code> and setting
 its <code>interactive</code> argument to <code>TRUE</code>. By following
 the prompts, the misspelt LGA as well as possible replacements are
@@ -203,56 +228,72 @@ presented. All the user needs to do is to select the desired replacement
 value. This is particularly useful when the user is not sure of what the
 correct spelling might be.</p>
 <p>When a misspelt LGA has more than one match, the interactive approach
-is the viable option for effecting fixes.</p>
+is the viable option for effecting fixes. In the example below, not all
+the mispelt LGAs could be fixed automatically:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fufore"</span>, <span class="st">"Demsa"</span>, <span class="st">"Machika"</span>, <span class="st">"Fufure"</span>, <span class="st">"Ganye"</span>, <span class="st">"Hong"</span><span class="op">)</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## # check for misspelt LGAs and, if necessary, attempt to fix</span></span>
-<span><span class="co">## if (!all(is_lga(adamawa)))</span></span>
-<span><span class="co">##   adamawa &lt;- fix_region(adamawa)</span></span></code></pre></div>
-<p><img src="img/interactive-4.png"></p>
-<p>We see that the purported LGA ‘Machika’ matches more than one LGA in
-the country. The original intent was to use “Michika”. To address it, we
-run <code>fix_region</code> interactively. This method of the function
-is for class <code>lgas</code> so</p>
+<code class="sourceCode R"><span><span class="va">mispelt.adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fufure"</span>, <span class="st">"Demsa"</span>, <span class="st">"Machika"</span>, <span class="st">"Fufure"</span>, <span class="st">"Ganye"</span>, <span class="st">"Hong"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># check for misspelt LGAs and, if necessary, attempt to fix</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3</span></span>
+<span><span class="va">corrected.adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 'Machika' approximately matched more than one region - Michika, Machina</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Successful fix(es):</span></span>
+<span><span class="co">#&gt; -------------------</span></span>
+<span><span class="co">#&gt; * Fufure =&gt; Fufore</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fix(es) not applied:</span></span>
+<span><span class="co">#&gt; --------------------</span></span>
+<span><span class="co">#&gt; * Machika</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">corrected.adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
+<p>We see that the string ‘Machika’ is not an actual LGA and there are
+more than one possible candidate LGA that are considered as possible
+replacement. Our original intent was to use “Michika LGA”. To address
+this mistake, we can run <code>fix_region</code> interactively. Note
+that the <code>interactive</code> option is only available for use with
+objects of class <code>lgas</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="va">adamawa</span><span class="op">)</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="img/interactive-5.png"></p>
+<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">lgas</a></span><span class="op">(</span><span class="va">corrected.adamawa</span><span class="op">)</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Next, the user is provided with a prompt to provide a search item for
 likely LGAs that would be an appropriate replacement for the misspelt
-one:</p>
-<p><img src="img/interactive-6.png"></p>
-<p>We now enter in the search term:</p>
-<p><img src="img/interactive-7.png"></p>
-<p>Upon clicking “OK”, a list of possible matches comes up; in this
-instance, only one option is provided. The option ‘RETRY’ allows the
-user to reset the search term, ‘SKIP’ is to try out another misspelt
-item (where there are more than one) and ‘QUIT’ is to exit the
-interactive session.</p>
-<p><img src="img/interactive-8.png"></p>
-<p><img src="img/interactive-9.png"></p>
-<p>When we broaden the search possibilities, more items are listed among
-the LGA candidates for the edit. In our example, we will provide
-<em>Mi</em> instead of <em>Mich</em>, so that more LGAs are matched:</p>
-<p><img src="img/interactive-10.png"></p>
-<p><img src="img/interactive-11.png"></p>
-<p><img src="img/interactive-12.png"></p>
-<p>At the end of it all, the spellings are fixed.</p>
+one. Possible replacements are presented and to select any value, the
+appropriate number should be entered at the prompt. The option
+<code>RETRY</code> allows the user to restart the query and provide
+another search term, <code>SKIP</code> is to try out a different
+misspelt item (where there are more than one) and to <code>QUIT</code>
+is to exit the prompt. On Windows machines, the user can use the native
+dialog boxes by setting <code>graphic</code> to <code>TRUE</code>.</p>
+<!-- This chunk exists to make available the `adamawa` object which we are using in the subsequent chunk. The code will be replicated and executed with its output displayed in the chunk referring to manual fixes. -->
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Confirm that the spelling mistakes have been fixed.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">adamawa</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="manual-fixes">Manual fixes<a class="anchor" aria-label="anchor" href="#manual-fixes"></a>
+<h4 id="manual-fixes">3. Manual fixes<a class="anchor" aria-label="anchor" href="#manual-fixes"></a>
 </h4>
-<p>When spelling errors are identified and the correct one is known,
-then a manual fix can be applied. For this, we use the function
-<code>fix_region_manual</code> and its use is pretty
-straightforward:</p>
+<p>When spelling errors are identified and the correct one is already
+known, then a manual fix can be applied. For this, we use the function
+<code>fix_region_manual</code> and its use is straightforward<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region_manual.html">fix_region_manual</a></span><span class="op">(</span><span class="va">adamawa</span>, <span class="st">"Machika"</span>, <span class="st">"Michika"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region_manual.html">fix_region_manual</a></span><span class="op">(</span><span class="va">corrected.adamawa</span>,</span>
+<span>                             wrong <span class="op">=</span> <span class="st">"Machika"</span>,</span>
+<span>                             correct <span class="op">=</span> <span class="st">"Michika"</span><span class="op">)</span></span>
+<span><span class="va">adamawa</span></span>
+<span><span class="co">#&gt; [1] "Fufore"  "Demsa"   "Michika" "Fufore"  "Ganye"   "Hong"</span></span></code></pre></div>
 </div>
 </div>
+<div class="footnotes footnotes-end-of-document">
+<hr>
+<ol>
+<li id="fn1"><p>There is a method for repairing the names of States but
+the operation is more manageable since there are far fewer States<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Works for both character vectors and <code>lgas</code>
+objects.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
   </div>
 
@@ -273,7 +314,7 @@ straightforward:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

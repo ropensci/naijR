@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -96,7 +96,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>nigeria-maps</h1>
             
-            <h4 data-toc-skip class="date">2022-12-02</h4>
+            <h4 data-toc-skip class="date">2023-08-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/vignettes/nigeria-maps.Rmd" class="external-link"><code>vignettes/nigeria-maps.Rmd</code></a></small>
       <div class="hidden name"><code>nigeria-maps.Rmd</code></div>
@@ -113,8 +113,8 @@ idioms are brought together to enable a focus on actual data
 visualization.</p>
 <p>The main function for drawing Nigeria maps is <code>map_ng</code>. It
 uses data from the CIA World Database provided by the
-<code>mapdata</code> package as well as ESRI shapefiles from the World
-Bank to draw a simple maps of Nigeria.</p>
+<code>{mapdata}</code> package as well as ESRI shapefiles from the World
+Bank to draw simple maps of Nigeria.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brovic.github.io/naijR/" class="external-link">naijR</a></span><span class="op">)</span></span>
 <span></span>
@@ -177,12 +177,12 @@ meaningless data:</p>
 <span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">ss</span>, letter <span class="op">=</span> <span class="va">vv</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dd</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       state letter</span></span>
-<span><span class="co">#&gt; 1      Abia      E</span></span>
-<span><span class="co">#&gt; 2   Adamawa      E</span></span>
+<span><span class="co">#&gt; 1      Abia      C</span></span>
+<span><span class="co">#&gt; 2   Adamawa      D</span></span>
 <span><span class="co">#&gt; 3 Akwa Ibom      E</span></span>
-<span><span class="co">#&gt; 4   Anambra      C</span></span>
-<span><span class="co">#&gt; 5    Bauchi      B</span></span>
-<span><span class="co">#&gt; 6   Bayelsa      E</span></span></code></pre></div>
+<span><span class="co">#&gt; 4   Anambra      A</span></span>
+<span><span class="co">#&gt; 5    Bauchi      A</span></span>
+<span><span class="co">#&gt; 6   Bayelsa      B</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="using-a-data-frame">Using a data frame<a class="anchor" aria-label="anchor" href="#using-a-data-frame"></a>
 </h3>
@@ -224,8 +224,8 @@ data, if we try to use the column name from <code>dd</code>, we have an
 error.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="../reference/states.html">states</a></span><span class="op">(</span><span class="op">)</span>, x <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `.prep_choropleth_opts()` at </span></span></span>
-<span><span class="co"><span style="font-weight: bold;">#&gt; </span><span style="color: #BBBB00; font-weight: bold;">!</span><span style="font-weight: bold;"> One or more inputs for generating choropleth options are invalid</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `.prep_choropleth_opts()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> One or more inputs for generating choropleth options are invalid</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="numerical-values">Numerical values<a class="anchor" aria-label="anchor" href="#numerical-values"></a>
@@ -281,7 +281,8 @@ coordinates are beyond the region. For instance, using the same points
 provided earlier, if we try to plot them on a map of Kwara State,</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_ng.html">map_ng</a></span><span class="op">(</span><span class="st">"Kwara"</span>, x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in map_ng("Kwara", x = x, y = y): Coordinates are out of bounds of the map</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `map_ng()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Coordinates are beyond the bounds of the plotted area</span></span></code></pre></div>
 <p><img src="nigeria-maps_files/figure-html/out-of-bounds-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -289,8 +290,9 @@ provided earlier, if we try to plot them on a map of Kwara State,</p>
 </h2>
 <p>This vignette provided an initial look at the mapping facilities
 currently available in the <code>naijR</code> package. Additional
-development is going on to provide the user with more granular control.
-This is an open source project, and contributions are welcome.</p>
+development is going on to provide the user with more granular control,
+as well make the maps to be extendible by more established geospatial R
+packages.</p>
 </div>
   </div>
 
@@ -311,7 +313,7 @@ This is an open source project, and contributions are welcome.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

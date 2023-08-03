@@ -25,7 +25,13 @@
     <loc>http://brovic.github.io/naijR/news/index.html</loc>
   </url>
   <url>
+    <loc>http://brovic.github.io/naijR/reference/coerce.html</loc>
+  </url>
+  <url>
     <loc>http://brovic.github.io/naijR/reference/coercion.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/reference/disambiguate_lga.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/fix_mobile.html</loc>
@@ -65,5 +71,8 @@
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/states.html</loc>
+  </url>
+  <url>
+    <loc>http://brovic.github.io/naijR/reference/states_nigeria.html</loc>
   </url>
 </urlset>

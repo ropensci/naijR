@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -63,7 +63,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fix Region Names</h1>
-    <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/R/methods-fix_region.R" class="external-link"><code>R/methods-fix_region.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/R/fixreg.R" class="external-link"><code>R/fixreg.R</code></a></small>
     <div class="hidden name"><code>fix_region.Rd</code></div>
     </div>
 
@@ -78,7 +78,7 @@
 <span><span class="fu">fix_region</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for lgas</span></span>
-<span><span class="fu">fix_region</span><span class="op">(</span><span class="va">x</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, quietly <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fix_region</span><span class="op">(</span><span class="va">x</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, quietly <span class="op">=</span> <span class="cn">FALSE</span>, graphic <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
 <span><span class="fu">fix_region</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -104,6 +104,10 @@ options.</p></dd>
 
 <dt>quietly</dt>
 <dd><p>Logical; default argument is <code>FALSE</code>.</p></dd>
+
+
+<dt>graphic</dt>
+<dd><p>Whether to make use of native GUI elements (on Windows only).</p></dd>
 
 </dl></div>
     <div id="value">
@@ -134,7 +138,9 @@ for fixing the mistakes are available via mode <code>interactive</code>.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">fix_region</span><span class="op">(</span><span class="st">"Owerri north"</span><span class="op">)</span><span class="op">)</span> <span class="co"># ERROR</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Error : Incorrect region name(s); consider reconstructing 'x' with `states()` or `lgas()` for a more reliable fix</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in fix_region("Owerri north") : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Incorrect region name(s); consider reconstructing 'x' with `states()` or</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> `lgas()` for a more reliable fix</span>
 <span class="r-in"><span><span class="fu">fix_region</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Owerri north"</span>, <span class="st">"Owerri West"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -151,7 +157,7 @@ for fixing the mistakes are available via mode <code>interactive</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
