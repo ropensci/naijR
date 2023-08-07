@@ -447,10 +447,12 @@ map_ng <- function(region = character(),
   ngstr <- "Nigeria"
   
   if (identical(x, ngstr)) {
-    mapdata <- maps::map("mapdata::worldHires", ngstr, plot = FALSE)
+    # NB: For some reason, setting `fill` to TRUE solved a problem with the rendering of the polygons.
+    # See https://gis.stackexchange.com/questions/230608/creating-an-sf-object-from-the-maps-package
+    mapdata <- maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
     mapdata <- sf::st_as_sf(mapdata)
-    geomname <- attr(mapdata, "sf_column")
-    names(mapdata)[match(geomname, names(mapdata))] <- "geometry"
+    geom.name <- attr(mapdata, "sf_column")
+    names(mapdata)[match(geom.name, names(mapdata))] <- "geometry"
     attr(mapdata, "sf_column") <- "geometry"
     return(mapdata)
   }
