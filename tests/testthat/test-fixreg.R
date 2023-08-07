@@ -31,7 +31,7 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   #                                               Note place-holder
   
   # data ---
-  multi.lga <- readRDS(here::here("tests/testthat/data/mispelt-lga.rds"))
+  multi.lga <- readRDS("data/mispelt-lga.rds")
   
   # messages ---
   change1 <- "Fufure => Fufore"
@@ -114,7 +114,7 @@ test_that("various cases for fixing state names", {
 
 
 test_that("Misspelt LGAs can be fixed (limited)", {
-  dt <- readRDS(here::here("tests/testthat/data/taraba-lga.rds"))
+  dt <- readRDS("data/taraba-lga.rds")
   tar.lgas <- lgas(dt, warn = FALSE)
   fixed <- suppressMessages(fix_region(tar.lgas))
   

@@ -59,9 +59,8 @@ lso <-
 
 test_that("Choropleth mapping succeeds", {
   pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
-  dat <- readRDS(here::here('tests/testthat/data/pvc2015.rds'))
-  baddat <-
-    readRDS(here::here('tests/testthat/data/pvc2015_badcolumn.rds'))
+  dat <- readRDS("data/pvc2015.rds")
+  baddat <- readRDS('data/pvc2015_badcolumn.rds')
   val <- dat$total.pop    # use name to test quasiquotation
   dat$alpha <- sample(LETTERS[1:5], nrow(dat), TRUE)  
   cat <- c("Small", "Moderate", "Large", "Mega")
@@ -147,7 +146,7 @@ test_that("Draw choropleth automatically with 2-column data frames", {
 })
 
 test_that("Choropleth colours can be controlled at interface", {
-  dat <- readRDS(here::here('tests/testthat/data/pvc2015.rds'))
+  dat <- readRDS('data/pvc2015.rds')
   
   func <- expr(map_ng(
     data = dat,
