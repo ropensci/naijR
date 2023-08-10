@@ -1,3 +1,17 @@
+# naijR 0.6.0
+## New Features:
+* Added a new dataset `states_nigeria` for the States of Nigeria.
+* Migrated from RGDAL-based spatial data; the `{sf}` package is now the main dependency.
+* `map_ng` gained a newly documented argument `plot`, which hitherto was passed internally to `maps::map()` via `...`.
+* Added a new function `disambiguate_lga`, which takes a single-element `lgas` object for handling the names of Local Government Areas that are shared between separate States. This function enables the (re)setting of the `State` attribute of such objects; this can be done interactively, where the replicated States' names are presented for selection by users.
+
+## Fixes:
+* Improved on the accuracy of LGA naming in the light of spelling mistakes discovered in the earlier reference document.
+* Unwanted display of dialogs when fixing LGA names on Windows OS was reversed (suggested by Laura DeCicco).
+
+# naijR 0.5.2
+* Quietened a verbose warning introduced via the soon-to-be-retired spatial data packages.
+
 # naijR 0.5.1
 * In nested calls with the function `fix_region`, the `lgas` constructor function does not warn if there are spelling mistakes, as this turned out to be a bit confusing when it was used. In earlier versions, warnings persisted even after fixes were applied.
 * In carrying out interactive fixes, particularly of LGA spellings, the more familiar and intuitive native Windows messaging and dialog system is used. Works only on Windows machines; on Linux and MacOs, the usual messaging and interaction occurs at the R console.
@@ -81,3 +95,4 @@
 * Added a `NEWS.md` file to track changes to the package.
 * Recognise abbreviations of 'Federal Capital Territory' i.e. FCT.
 * Disable error-check on character type for `is_state` so it can be used more effectively for functional programming constructs.
+

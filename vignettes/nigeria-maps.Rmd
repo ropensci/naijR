@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 The need for relatively easy-to-use tools in the R statistical environment for mapping data on Nigeria was a motivation for the development of this package. Not so much of low-level programming needs to be done by the user; rather a collection of pre-existing packages and idioms are brought together to enable a focus on actual data visualization.
 
-The main function for drawing Nigeria maps is `map_ng`. It uses data from the CIA World Database provided by the `mapdata` package as well as ESRI shapefiles from the World Bank to draw a simple maps of Nigeria.
+The main function for drawing Nigeria maps is `map_ng`. It uses data from the CIA World Database provided by the `{mapdata}` package as well as ESRI shapefiles from the World Bank to draw simple maps of Nigeria.
 
 ```{r original-map}
 library(naijR)
@@ -139,4 +139,4 @@ map_ng("Kwara", x = x, y = y)
 ```
 
 ## Conclusion
-This vignette provided an initial look at the mapping facilities currently available in the `naijR` package. Additional development is going on to provide the user with more granular control. This is an open source project, and contributions are welcome.
+This vignette provided an initial look at the mapping facilities currently available in the `naijR` package. Additional development is going on to provide the user with more granular control, as well make the maps to be extendible by more established geospatial R packages.

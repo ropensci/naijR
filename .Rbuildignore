@@ -1,4 +1,5 @@
 ^.*\.Rproj$
+^\.vscode$
 ^\.Rproj\.user$
 ^data-raw$
 ^LICENSE\.md$

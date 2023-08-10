@@ -27,7 +27,7 @@
 ## Repairs the use of Abuja in a vector that is intended to be States
 .fixAbujaFct <- function(x, type = c("full", "abbrev"))
 {
-  stopifnot({any(is_state(x)) && length(unique(x)) > 1L})
+  stopifnot(exprs = {any(is_state(x)) && length(unique(x)) > 1L})
   abj <- "Abuja"
   
   if (!abj %in% x)

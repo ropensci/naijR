@@ -1,16 +1,37 @@
+# Source file: util.R 
+# 
+# GPL-3 License
+# 
+# Copyright (c) 2020-2023 Victor Ordu
+
 ## ---- Utility function(s) - for maintenance use only ----
 ##      This file is not part of the build, but is being
-##      recorded by Git. Thus will be available to maintainers only
-##
+##      recorded by Git. Thus will be useful to developers only
+
 ## Inspects the data object of a shapefile.
 ## This function could be useful, for example, when trying to 
 ## determine the value for the 'namefield' parameter for
 ## for the function 'maps::SpatialPolygons2map'
-#' @importFrom utils head
-.__getShapefileData <- function(region)
-{
-  shp <- shpfile_props(region)
-  shp$sp@data
+#' @importFrom methods slot
+.__getShapefileData <- function(regiontype = c("state", "lga")) {
+  regiontype <- match.arg(regiontype)
+  dt <- "data"
+  if (identical(regiontype, "state")) {
+    return(shp.state$spatialObject)
+  }
+  shp.lga$spatialObject
+}
+
+
+
+
+# Prints out the LGAs for a given State in the shapefile
+.__show_shapefile_state_lgas <- function(state) {
+  stopifnot(sum(is_state(state)) == 1L)
+  stateindex <- which(shp.lga$spatialObject$STATE == state)
+  lganames <- shp.lga$spatialObject$LGA[stateindex]
+  attr(lganames, "State") <- state
+  sort(lganames)
 }
 
 
@@ -26,22 +47,82 @@
       message("Done")
     }, error = function(err) {
       message("Failed")
+      ret <- NULL
     })
+    ret
   }
   invisible(lapply(states(), doOneMap))
 }
 
 
 
+# checks whether there are name mismatches between the canonical file
+# used by the package and a shapefile. This, of course, presupposes
+# that the main entries are correct.'
+# Returns a character vector of the correct names found to be have
+# been misapplied in the shapefile and can be used for corrections.
+.__lga_mismatch <- function(state) {
+  spdata <- as.data.frame(.__getShapefileData("lga"))
+  splga <- spdata[spdata$STATE == state, 'LGA']
 
-.__why_no_pipe <- function()
-{
-  cli::cli_alert_info(
-    "A decision was taken not to use pipes in this package, at least not for now.
-    This is because of the desire not to take a dependency on magrittr - this
-    presented some challenges when debugging earlier versions of the package. We
-    have an option of using native R pipes, and these will be introduced a little
-    later when their use matures in the ecosystem - this would necessitate 
-    depending on R >= 4.1."
-  )
+  if (anyDuplicated(splga)) {
+    cli::cli_abort("Fatal: {state} State has LGA duplication in shapefile")
+  }
+  pkglga <- as.character(lgas(state))
+  lenpkg <- length(pkglga)
+  lenshp <- length(splga)
+  
+  if (lenpkg != lenshp) {
+    cli::cli_abort(
+      "{state}: Number mismatch: {lenpkg} (main) vs {lenshp} (shapefile)"
+    )
+  }
+  if (setequal(splga, pkglga))
+    return(NULL)
+  
+  mismatched <- setdiff(pkglga, splga)
+  attr(mismatched, "incorrect") <- setdiff(splga, pkglga)
+  mismatched
+}
+
+
+
+# Scans for mismatches between LGAs in main data and the shapefile
+.__scan_lga_mismatch <- function() {
+  sapply(states(), \(x) try(.__lga_mismatch(x)), USE.NAMES = TRUE)
+}
+
+
+
+
+
+
+
+
+# Adds a column for the geo-political zones to an
+# existing data frame that has a character column
+# of the States.
+# Arguments:
+# - data: The data frame
+# - statehdr: The name of the column with the States.
+# - zonehdr: The proposed name of the column with the zones
+#
+# Returns the modified data frame
+.__addGPZ <- function(data, statehdr, zonehdr) {
+  stopifnot(exprs = {
+    is.data.frame(data)
+    is.character(statehdr)
+    is.character(zonehdr)
+  })
+
+  data[[zonehdr]] <- NA_character_
+  statelist <- stateList()
+  
+  for (gpz in names(statelist)) {
+    rgx <- paste(statelist[[gpz]], collapse = "|")
+    index <- grep(rgx, data[[statehdr]])
+    data[[zonehdr]][index] <- gpz
+  }
+
+  data
 }
