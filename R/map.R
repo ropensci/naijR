@@ -17,7 +17,8 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' States or Local Government Areas.
 #' @param data An object containing data, principally the variables required to
 #' plot in a map.
-#' @param x,y Numeric object or factor (or coercible to one). See \emph{Details}.
+#' @param x,y Numeric object or factor (or coercible to one). See 
+#' \emph{Details}.
 #' @param breaks Numeric. A vector of length >= 1. If a single value i.e.
 #' scalar, it denotes the expected number of breaks. Internally, the function
 #' will attempt to compute appropriate category sizes or fail if out-of bounds. 
@@ -44,10 +45,11 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' vertical (deprecated). 
 #' @param ... Further arguments passed to \code{\link[sf]{plot}}
 #' 
-#' @details The default value for \code{region} is to print all State boundaries.
+#' @details The default value for \code{region} is to print all State 
+#' boundaries.
 #' \code{data} enables the extraction of data for plotting from an object
-#' of class \code{data.frame}. Columns containing regions (i.e. States as well as
-#' supported sub-national jurisdictions) are identified. The argument also
+#' of class \code{data.frame}. Columns containing regions (i.e. States as well
+#' as supported sub-national jurisdictions) are identified. The argument also
 #' provides context for quasiquotation when providing the \code{x} and
 #' \code{y} arguments.
 #' 
@@ -86,12 +88,22 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' the data used to draw the map and thus can be used by this and other 
 #' popular R packages to visualize the spatial data.
 #'
-#' @import rlang
+#' @import sf
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
 #' @importFrom lifecycle deprecate_warn
 #' @importFrom lifecycle deprecated
 #' @importFrom lifecycle is_present
+#' @importFrom rlang !!
+#' @importFrom rlang as_name
+#' @importFrom rlang caller_env
+#' @importFrom rlang enexpr
+#' @importFrom rlang enquo
+#' @importFrom rlang expr
+#' @importFrom rlang eval_tidy
+#' @importFrom rlang is_null
+#' @importFrom rlang is_symbol
+#' 
 #' 
 #' @export
 map_ng <- function(region = character(),
@@ -174,13 +186,12 @@ map_ng <- function(region = character(),
       categories = categories
     )
     
-    if (!is.null(data)) {
+    if (!is_null(data)) {
       region.col <- .region_column_index(data, region)
       
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
-      value.x <- 
-        if (is.null(value.x) && ncol(data) == 2L)
+      value.x <- if (is_null(value.x) && ncol(data) == 2L)
         names(data)[-region.col]
       else
         as_name(value.x)
@@ -231,7 +242,7 @@ map_ng <- function(region = character(),
   
   if (use.choropleth) {
     
-    if (is.null(categories))
+    if (is_null(categories))
       categories <- cOpts$bins
     
     lp <- .set_legend_params(legend.text)
@@ -251,7 +262,7 @@ map_ng <- function(region = character(),
     
     if (missing(leg.title)) {  # TODO: Change this construct.
       
-      leg.title <- if (is.null(data))
+      leg.title <- if (is_null(data))
         deparse(substitute(x))
       else
         value.x
@@ -281,13 +292,12 @@ map_ng <- function(region = character(),
 
 
 
-# Internal helper function(s) ---------------------------------------------------
+# Internal helper function(s) -------------
 # Creates the map to be plotted
 # @param sfdata An objecct of class 'sf'
 # @param region An object of class 'regions'
 # @param plot If FALSE, the 'sf' object is returned without plotting
 # @param ... Arguments passed on to internal methods
-#' @import sf
 .mymap <- function(sf, regions, plot = TRUE, col = NA, ...)
 {
   stopifnot(exprs = {
@@ -298,10 +308,10 @@ map_ng <- function(region = character(),
   if (plot) {
     geom <- if (inherits(regions, "regions")) {
       namefield <- .get_shpfileprop_element(regions, "namefield")
-      st_geometry(sf, namefield)
+      sf::st_geometry(sf, namefield)
     } 
     else
-      st_geometry(sf)
+      sf::st_geometry(sf)
     
     plot(geom, col = col, ...)
   }
@@ -322,18 +332,18 @@ map_ng <- function(region = character(),
     return(states(all = TRUE))
   
   if (!(all(is_state(x)) || all(is_lga(x)))) {
+    str <-  deparse(substitute(x))
     
-    if (len > 1L) {
+    if (len > 1L)
       cli::cli_abort(
-        "One or more elements of '{deparse(substitute(x))}' is not a Nigerian region",
-        ...)
-    }
-    else if (isFALSE(identical(x, country_name()))) {
-      cli::cli_abort(
-        "Single inputs for '{deparse(substitute(x))}' only support the value '{country_name()}'",
+        "One or more elements of '{str}' is not a Nigerian region", 
         ...
       )
-    }
+    else if (isFALSE(identical(x, country_name())))
+      cli::cli_abort(
+        "Single inputs for '{str}' only support the value '{country_name()}'",
+        ...
+      )
   }
   
   x
@@ -342,7 +352,7 @@ map_ng <- function(region = character(),
 
 
 
-# Makes sure that the elements required for making a choropleth map are available. 
+# Makes sure that elements required for making a choropleth map are available. 
 # These are:
 # - A data frame with a value and region column identified
 # - A 2-column data frame with one column of regions
@@ -384,7 +394,9 @@ map_ng <- function(region = character(),
     }
   }
   else if (!is.null(data))
-    cli::cli_warn("'{.arg_str(data)}' is invalid for choropleths but was ignored")
+    cli::cli_warn(
+      "'{.arg_str(data)}' is invalid for choropleths but was ignored"
+    )
   
   ## If 'region' is NULL, it must be found automatically in 'data'
   if (is.null(region)) {
@@ -437,7 +449,6 @@ map_ng <- function(region = character(),
 
 
 
-#' @import mapdata
 .get_map_data.default <- function(x) 
 {
   if (is.factor(x))
@@ -447,9 +458,11 @@ map_ng <- function(region = character(),
   ngstr <- "Nigeria"
   
   if (identical(x, ngstr)) {
-    # NB: For some reason, setting `fill` to TRUE solved a problem with the rendering of the polygons.
+    # NB: For some reason, setting `fill` to TRUE solved a 
+    # problem with the rendering of the polygons.
     # See https://gis.stackexchange.com/questions/230608/creating-an-sf-object-from-the-maps-package
-    mapdata <- maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
+    mapdata <- 
+      maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
     mapdata <- sf::st_as_sf(mapdata)
     geom.name <- attr(mapdata, "sf_column")
     names(mapdata)[match(geom.name, names(mapdata))] <- "geometry"
@@ -472,7 +485,9 @@ map_ng <- function(region = character(),
   statename <- attr(x, 'State')
 
   if (length(statename) > 1L)
-    cli::cli_abort("LGA-level maps for adjoining States are not yet supported")
+    cli::cli_abort(
+      "LGA-level maps for adjoining States are not yet supported"
+    )
   
   full.spo <- .get_shpfileprop_element(x, "spatialObject")
   
@@ -603,7 +618,9 @@ map_ng <- function(region = character(),
       )
       
       if (all(is_lga(opts$region)))
-        cli::cli_warn("Duplicated LGAs found, but may or may not need a review")
+        cli::cli_warn(
+          "Duplicated LGAs found, but may or may not need a review"
+          )
     }
     
     brks <- opts$breaks

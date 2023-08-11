@@ -104,7 +104,13 @@ When the data to be categorized are numeric vectors, the categories have to be d
 nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100
 bb <- c(0, 40, 60, 100)
 
-map_ng(region = states(), x = nn, breaks = bb, col = 'YlOrRd', show.text = FALSE)
+map_ng(
+  region = states(),
+  x = nn,
+  breaks = bb,
+  col = 'YlOrRd',
+  show.text = FALSE
+)
 ```
 
 To get a more meaningful and interpretable legend, use the `categories` argument.

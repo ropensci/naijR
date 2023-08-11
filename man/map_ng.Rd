@@ -33,7 +33,8 @@ States or Local Government Areas.}
 \item{data}{An object containing data, principally the variables required to
 plot in a map.}
 
-\item{x, y}{Numeric object or factor (or coercible to one). See \emph{Details}.}
+\item{x, y}{Numeric object or factor (or coercible to one). See 
+\emph{Details}.}
 
 \item{breaks}{Numeric. A vector of length >= 1. If a single value i.e.
 scalar, it denotes the expected number of breaks. Internally, the function
@@ -83,10 +84,11 @@ Maps of the Federal Republic of Nigeria that are based on the basic
 plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 }
 \details{
-The default value for \code{region} is to print all State boundaries.
+The default value for \code{region} is to print all State 
+boundaries.
 \code{data} enables the extraction of data for plotting from an object
-of class \code{data.frame}. Columns containing regions (i.e. States as well as
-supported sub-national jurisdictions) are identified. The argument also
+of class \code{data.frame}. Columns containing regions (i.e. States as well
+as supported sub-national jurisdictions) are identified. The argument also
 provides context for quasiquotation when providing the \code{x} and
 \code{y} arguments.
 

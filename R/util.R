@@ -89,7 +89,8 @@
 
 # Scans for mismatches between LGAs in main data and the shapefile
 .__scan_lga_mismatch <- function() {
-  sapply(states(), \(x) try(.__lga_mismatch(x)), USE.NAMES = TRUE)
+  # Use `sapply` without simplification so as to return a named list
+  sapply(states(), function(x) try(.__lga_mismatch(x)), simplify = FALSE)
 }
 
 

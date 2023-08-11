@@ -36,16 +36,21 @@ lgas_like_states <- function()
 
 
 
-
+# Returns a named list whose elements are character vectors of
+# States that have LGAs that share the same name, the name of
+# each element being the respective LGAs.
 states_with_shared_lgas <- function()
 {
   findStates <- function(dup.lga) {
-    patt <- paste0("^", dup.lga, "$")
-    index <- grep(patt, lgas, fixed = TRUE)
+    pattern <- paste0("^", dup.lga, "$")
+    index <- grep(pattern, lgas)
     lgas_nigeria$state[index]
   }
   lgas <- lgas_nigeria$lga
   lganames <- lgas[duplicated(lgas)]
+  
+  # Use of `sapply` without simplification is to 
+  # ensure that we return a named list
   sapply(lganames, findStates, simplify = FALSE)
 }
 
@@ -82,7 +87,7 @@ country_name <- function()
 
 .next_minor_version <- function()
 {
-  values <- unlist(packageVersion("naijR"))
+  values <- unlist(utils::packageVersion("naijR"))
   nextver <- paste(values[1], values[2] + 1, "0", sep = ".")
   numeric_version(nextver)
 }

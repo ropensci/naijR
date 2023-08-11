@@ -505,7 +505,6 @@ c.regions <- function(...)
 
 
 
-
 #' @importFrom stats na.exclude
 #' @export
 na.exclude.regions <- function(object, ...)
