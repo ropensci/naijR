@@ -1,3 +1,6 @@
+# naijR 0.6.1
+Minor fixes, preparatory to rOpenSci code review.
+
 # naijR 0.6.0
 ## New Features:
 * Added a new dataset `states_nigeria` for the States of Nigeria.

@@ -22,7 +22,6 @@
 #' all(is_state(naijR::states()))
 #' is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
 #' 
-#' @import stats
 #' @importFrom cli cli_warn
 #' 
 #' @export
@@ -42,8 +41,8 @@ is_state <- function(x)
   na.pos <- 0L
   if (anyNA(x)) {
     cli_warn("Invalid entries were replaced with NAs")
-    excl <- na.exclude(x)
-    na.pos <- na.action(excl)
+    excl <- stats::na.exclude(x)
+    na.pos <- stats::na.action(excl)
   }
   
   if (length(x) == 0L)

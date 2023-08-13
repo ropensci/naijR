@@ -11,7 +11,8 @@ fix_region_manual(x, wrong, correct)
 
 \item{wrong}{The misspelt element(s) of \code{x}.}
 
-\item{correct}{The correction that is to be applied to the misspelt element(s)}
+\item{correct}{The correction that is to be applied to the misspelt 
+element(s)}
 }
 \description{
 Enable users to interactively and directly change to spelling of States

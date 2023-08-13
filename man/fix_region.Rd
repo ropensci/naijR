@@ -39,9 +39,9 @@ Correct any misspelt names of administrative regions i.e. States and LGAs
 }
 \details{
 The function will look through a character vector and try to 
-determine if State or LGA names have been wrongly entered. This presupposes that
-the atomic vector is of type \code{character}. It does not test any missing
-values in the vector, leaving them untouched.
+determine if State or LGA names have been wrongly entered. This presupposes
+that the atomic vector is of type \code{character}. It does not test any
+missing values in the vector, leaving them untouched.
 }
 \note{
 When passed a character vector of length \code{1L}, in the case of a

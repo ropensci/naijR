@@ -205,12 +205,20 @@ test_that("Factors can draw choropleth", {
   expect_s3_class(map_ng(sss, x = Char, plot = FALSE), maptype)
   
   Int <- sample(1L:5L, 37, TRUE)
-  expect_error(map_ng(sss, x = Int, plot = FALSE),
-               'Breaks were not provided for the categorization of a numeric type')
+  expect_error(
+    map_ng(sss, x = Int, plot = FALSE),
+    'Breaks were not provided for the categorization of a numeric type'
+  )
   expect_s3_class(map_ng(sss, x = as.factor(Int), plot = FALSE), maptype)
   
   brks <- c(0, 40, 60, 100)
-  expect_s3_class(map_ng(sss, x = getDblSmpl(), breaks = brks, plot = FALSE), maptype)
+  expect_s3_class(
+    map_ng(sss,
+           x = getDblSmpl(),
+           breaks = brks,
+           plot = FALSE
+    ), 
+    maptype)
   
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))

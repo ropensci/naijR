@@ -175,9 +175,11 @@ new_ShapefileProps <- function(dir, layer, namefield, spObj)
     rowreplaced <- intersect(isFocusState, isFocusLga)
     numreplacement <- length(rowreplaced)
     
-    if (!numreplacement) {
-      cli::cli_abort("Replacement not found: {newlga} => {oldlga} ({state} State)")
-    }
+    if (!numreplacement)
+      cli::cli_abort(
+        "Replacement not found: {newlga} => {oldlga} ({state} State)"
+      )
+      
     if (numreplacement > 1L) {
       pos <- paste(rowreplaced, collapse = ", ")
       cli::cli_abort("Multiple replacements at positions {pos}")
@@ -298,7 +300,7 @@ for (i in seq(nrow(mat))) {
 }
 scan.result2 <- .__scan_lga_mismatch()
 
-if (!all(sapply(scan.result2, is.null)))
+if (!all(vapply(scan.result2, is.null, logical(1))))
   cli::cli_abort("There are still bad LGA entries in the shapefile")
 
 # Save objects ----

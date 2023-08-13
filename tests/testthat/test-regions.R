@@ -154,14 +154,14 @@ test_that("missing values in 'regions' are handled", {
   sel.st[4] <- "Jigawa"
   sel.st[5] <- states("Kwara")
   sel.st[2:3] <- NA
-  nomiss.st <- na.exclude(sel.st)
+  nomiss.st <- stats::na.exclude(sel.st)
   
   sel.lg <- lgas("Ebonyi")
   sel.lg[[2]] <- "Hawul"
   sel.lg[4] <- "Kwaya Kusar"
   sel.lg[5] <- lgas("Shani")
   sel.lg[c(2, 4:5)] <- NA
-  nomiss.lg <- na.exclude(sel.lg)
+  nomiss.lg <- stats::na.exclude(sel.lg)
   
   ex.cl <- "exclude"
   expect_s3_class(nomiss.st, ex.cl)
