@@ -382,7 +382,8 @@ fix_region.lgas <-
       if (pattern == "" || is.null(pattern))
         return()
       
-      used.lgas <- sort(grep(pattern, allLgas, value = TRUE, ignore.case = TRUE))
+      used.lgas <- 
+        sort(grep(pattern, allLgas, value = TRUE, ignore.case = TRUE))
       choices <- c(used.lgas, unlist(unname(special.options)))
       menuopt <- utils::menu(choices, graphics = usedialog, "Select the LGA")
       chosen <- choices[menuopt]

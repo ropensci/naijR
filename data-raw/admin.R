@@ -48,7 +48,7 @@ use_data(states_nigeria, overwrite = check_exist(states_nigeria))
 # Local Government Areas ----
 cli_inform("Fetching list of LGAs from external source:")
 
-# use `sapply` without simplification so we can capture the names
+# used `sapply` without simplification so we can capture the names
 lgas_by_state <-
   sapply(states_nigeria$state, getLGAlist, simplify = FALSE)
 lgadata <- purrr::list_rbind(lgas_by_state, names_to = "state")

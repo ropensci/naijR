@@ -49,8 +49,7 @@ states_with_shared_lgas <- function()
   lgas <- lgas_nigeria$lga
   lganames <- lgas[duplicated(lgas)]
   
-  # Use of `sapply` without simplification is to 
-  # ensure that we return a named list
+  # Use `sapply` without simplification ensuring return of a named list
   sapply(lganames, findStates, simplify = FALSE)
 }
 

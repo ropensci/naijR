@@ -161,7 +161,7 @@
 
 
 
-
+#' @import mapdata
 .get_map_data.default <- function(x) 
 {
   if (is.factor(x))
@@ -171,23 +171,26 @@
   ngstr <- "Nigeria"
   
   if (identical(x, ngstr)) {
-    # NB: For some reason, setting `fill` to TRUE solved a 
-    # problem with the rendering of the polygons.
+    # Setting `fill` to TRUE solved problematic rendering of the polygons.
     # See https://gis.stackexchange.com/questions/230608/creating-an-sf-object-from-the-maps-package
-    mapdata <- 
+    map.data <- 
       maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
-    mapdata <- sf::st_as_sf(mapdata)
-    geom.name <- attr(mapdata, "sf_column")
-    names(mapdata)[match(geom.name, names(mapdata))] <- "geometry"
-    attr(mapdata, "sf_column") <- "geometry"
-    return(mapdata)
+    map.data <- sf::st_as_sf(map.data)
+    sfc <- "sf_column"
+    old.geom.name <- attr(map.data, sfc)
+    pos <- match(old.geom.name, names(map.data))
+    new.geom.name <- "geometry"
+    names(map.data)[pos] <- new.geom.name
+    attr(map.data, sfc) <- new.geom.name
+    return(map.data)
   }
+  region.data <- lgas(x)
+  single.like.state <- length(x) == 1L && (x %in% lgas_like_states())
   
-  if ((length(x) == 1L && (x %in% lgas_like_states())) || 
-      all(is_state(x)))
-    return(.get_map_data(states(x)))
-  
-  .get_map_data(lgas(x))
+  if (single.like.state || all(is_state(x)))
+     region.data <- states(x)
+    
+  .get_map_data(region.data)
 }
 
 
