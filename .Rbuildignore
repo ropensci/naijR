@@ -18,3 +18,4 @@
 ^inst/extdata/ng_admin$
 ^inst/extdata/nigeria-lgas$
 ^vignettes/img/interactive-\db.png$
+^\.covrignore$

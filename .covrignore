@@ -1,0 +1,6 @@
+R/zzz.R
+R/helpers.R
+R/mapint.R
+R/util.R
+data/admin.R
+data/shpfileobj.R
