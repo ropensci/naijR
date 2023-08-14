@@ -1,5 +1,6 @@
 # naijR 0.6.1
-Minor fixes, preparatory to rOpenSci code review.
+* Added more function examples and other documentation improvements.
+* Increased compression for internal data.
 
 # naijR 0.6.0
 ## New Features:
