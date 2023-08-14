@@ -307,4 +307,4 @@ if (!all(vapply(scan.result2, is.null, logical(1))))
 # Using RDA format; to be loaded alongside exported objects
 cli::cli_inform("Saving fixed objects")
 shpobjs <- grep("^shp\\.", ls(), value = TRUE)
-save(list = shpobjs, file = datafile)
+save(list = shpobjs, file = datafile, compress = "xz")
