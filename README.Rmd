@@ -122,6 +122,3 @@ The development version can be obtained from [GitHub](https://github.com/BroVic/
 # install.packages("pak")  # if necessary
 pak::pkg_install("BroVic/naijR")
 ```
-
-## Feedback/Contribution
-Contributions are welcome and pull requests for R code or documentation will be gladly entertained. For bug reports or feature requests, kindly submit an [issue](https://github.com/BroVic/naijR/issues/new).

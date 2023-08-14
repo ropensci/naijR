@@ -14,7 +14,21 @@ fix_region_manual(x, wrong, correct)
 \item{correct}{The correction that is to be applied to the misspelt 
 element(s)}
 }
+\value{
+The (possibly) modified object of class \code{regions} i.e. a
+\code{states} or \code{lgas} object.
+}
 \description{
 Enable users to interactively and directly change to spelling of States
 and/or Local Government Areas (LGAs)
+}
+\examples{
+x <- c("Pankshen", "Pankshin", "Q'uan Pam")
+is_lga(x)
+x <- fix_region(x, quietly = TRUE)
+is_lga(x)
+fix_region_manual(x, "Q'uan Pam", "Qua'an Pan")
+all(is_lga(x))
+
+
 }

@@ -1,0 +1,291 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "naijR",
+  "description": "A set of convenience functions as well as geographical/political data about Nigeria, aimed at simplifying work with data and information that are specific to the country.",
+  "name": "naijR: Operations to Ease Data Analyses Specific to Nigeria",
+  "codeRepository": "https://github.com/BroVic/naijR",
+  "issueTracker": "https://github.com/BroVic/naijR/issues",
+  "license": "https://spdx.org/licenses/GPL-3.0",
+  "version": "0.6.1",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.3.1 (2023-06-16 ucrt)",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Victor",
+      "familyName": "Ordu",
+      "email": "victorordu@outlook.com",
+      "@id": "https://orcid.org/0000-0003-3716-0668"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Victor",
+      "familyName": "Ordu",
+      "email": "victorordu@outlook.com",
+      "@id": "https://orcid.org/0000-0003-3716-0668"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "ISOcodes",
+      "name": "ISOcodes",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=ISOcodes"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "covr",
+      "name": "covr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=covr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "here",
+      "name": "here",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=here"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "purrr",
+      "name": "purrr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=purrr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "readxl",
+      "name": "readxl",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=readxl"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "usethis",
+      "name": "usethis",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=usethis"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 3.6"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "RColorBrewer",
+      "name": "RColorBrewer",
+      "version": ">= 1.1.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=RColorBrewer"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "version": ">= 3.6.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "lifecycle",
+      "name": "lifecycle",
+      "version": ">= 0.2.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=lifecycle"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "grDevices",
+      "name": "grDevices"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "graphics",
+      "name": "graphics"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "mapdata",
+      "name": "mapdata",
+      "version": ">= 2.3.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mapdata"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
+      "identifier": "maps",
+      "name": "maps",
+      "version": ">= 3.3.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=maps"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "version": ">= 0.4.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "sf",
+      "name": "sf",
+      "version": ">= 1.0.13",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=sf"
+    },
+    "11": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "12": {
+      "@type": "SoftwareApplication",
+      "identifier": "stringi",
+      "name": "stringi",
+      "version": ">= 1.7.6",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=stringi"
+    },
+    "13": {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "1923.066KB",
+  "relatedLink": ["https://brovic.github.io/naijR/", "https://CRAN.R-project.org/package=naijR"],
+  "releaseNotes": "https://github.com/BroVic/naijR/blob/master/NEWS.md",
+  "readme": "https://github.com/BroVic/naijR/blob/master/README.md",
+  "contIntegration": ["https://app.codecov.io/gh/BroVic/naijR?branch=master", "https://github.com/BroVic/naijR/actions"],
+  "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#stable"
+}

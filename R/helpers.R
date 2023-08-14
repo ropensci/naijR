@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2022 Victor Ordu.
+# Copyright (C) 2019-2023 Victor Ordu.
 #
 #
 globalVariables("states_nigeria")

@@ -1,5 +1,7 @@
 # Source file: isreg.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 #' Test an Object for States
@@ -70,6 +72,10 @@ is_state <- function(x)
 #' \code{FALSE}.
 #' 
 #' @export
+#' 
+#' @examples
+#' is_lga(c("Pankshen", "Pankshin"))
+#' 
 is_lga <- function(x)
 {
   if (!is.character(x))

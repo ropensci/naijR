@@ -1,3 +1,8 @@
+# Source file: zzz.R
+#
+# GPL-3 License
+#
+# Copyright (C) 2019-2023 Victor Ordu.
 .onLoad <- function(libname, pkgname)
 {
   options(
