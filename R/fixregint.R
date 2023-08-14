@@ -238,3 +238,12 @@
   }
   lga.list
 }
+
+
+
+
+.assert_region <- function(x) {
+  if (!is_state(x) && !is_lga(x))
+    cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
+  x
+}

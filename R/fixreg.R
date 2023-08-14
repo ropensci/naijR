@@ -259,13 +259,3 @@ fix_region_manual <- function(x, wrong, correct)
   # TODO: Check post-conditions and warn if mistakes remain?
   x
 }
-
-
-
-
-.assert_region <- function(x) {
-  if (!is_state(x) && !is_lga(x))
-    cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
-  x
-}
-
