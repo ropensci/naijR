@@ -94,53 +94,53 @@ Ahiazu Mbaise
 
 Ehime Mbano
 
-Ezinihitte
+Ihitte/Uboma
 
 Ideato North
 
 Ideato South
 
-Ihitte/Uboma
-
-Ikeduru
-
-Isiala Mbano
+Ezinihitte-Mbaise
 
 Isu
 
-Mbaitoli
-
-Ngor Okpala
-
-Njaba
-
-Nkwerre
-
-Nwangele
+Oguta
 
 Obowo
 
-Oguta
+Nwangele
 
-Ohaji/Egbema
+Njaba
 
-Okigwe
+Ngor Okpala
 
-Orlu
+Mbaitoli
+
+Nkwerre
 
 Orsu
 
+Orlu
+
+Onuimo
+
+Okigwe
+
+Ohaji/Egbema
+
 Oru East
 
-Oru West
+Isiala Mbano
+
+Ikeduru
 
 Owerri Municipal
 
-Owerri North
-
 Owerri West
 
-Unuimo
+Owerri North
+
+Oru West
 ```
 
 To list all the LGAs in Nigeria, call the same function without any
@@ -226,9 +226,3 @@ The development version can be obtained from
 # install.packages("pak")  # if necessary
 pak::pkg_install("BroVic/naijR")
 ```
-
-## Feedback/Contribution
-
-Contributions are welcome and pull requests for R code or documentation
-will be gladly entertained. For bug reports or feature requests, kindly
-submit an [issue](https://github.com/BroVic/naijR/issues/new).
