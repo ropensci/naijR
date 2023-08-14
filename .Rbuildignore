@@ -19,3 +19,4 @@
 ^vignettes/img/interactive-\db.png$
 ^CONTRIBUTING\.md$
 ^codemeta\.json$
+^\.covrignore$
