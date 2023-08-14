@@ -19,3 +19,7 @@ element that is not a valid Local Government Area will evaluate to
 Checks a given object for Local Government Areas, represented as
 strings.
 }
+\examples{
+is_lga(c("Pankshen", "Pankshin"))
+
+}

@@ -1,9 +1,10 @@
 # Source file: asreg.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 # Functions for coercion ----
-#
 
 #' Explicit coercion between State and LGA names
 #' 

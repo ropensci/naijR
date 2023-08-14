@@ -1,5 +1,7 @@
 # Source file: regions.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 globalVariables(c("lgas_nigeria", "state", "lga"))

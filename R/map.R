@@ -4,9 +4,7 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
-
-# Exported function(s) ---------------------------------------------------------
+globalVariables(c("STATE", "shp.state", "shp.lga"))
 
 #' Map of Nigeria
 #'
@@ -103,7 +101,6 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' @importFrom rlang eval_tidy
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
-#' 
 #' 
 #' @export
 map_ng <- function(region = character(),

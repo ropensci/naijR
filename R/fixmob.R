@@ -1,5 +1,7 @@
 # Source file: fixmob.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 #' Fix mobile numbers
@@ -19,6 +21,10 @@
 #' @return The updated vector, usually the column of a data frame.
 #' 
 #' @export
+#' 
+#' @examples
+#' fix_mobile("803-123-4567")    # Adds leading '0" and removes separators
+#' 
 fix_mobile <- function(x) {
   if (!is.null(x) && all(is.na(x)) || is.numeric(x))
     x <- as.character(x)
