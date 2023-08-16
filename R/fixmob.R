@@ -20,6 +20,7 @@
 #'
 #' @return The updated vector, usually the column of a data frame.
 #' 
+#' @importFrom stats na.exclude
 #' @export
 #' 
 #' @examples
@@ -58,7 +59,7 @@ fix_mobile <- function(x) {
   like.mobile <- grepl("[7-9][0-1]\\d{8}$", x)
   
   if (getOption("verbose")) {
-    outnums <- paste(stats::na.exclude(x)[!like.mobile], collapse = ', ')
+    outnums <- paste(na.exclude(x)[!like.mobile], collapse = ', ')
     cli::cli_warn("Additional original/transformed number removed: {outnums}")
   }
   

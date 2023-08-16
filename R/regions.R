@@ -344,13 +344,15 @@ c.regions <- function(...)
 
 
 
+
+#' @importFrom stats na.exclude
 #' @export
 na.exclude.regions <- function(object, ...)
 {
   if (!anyNA(object))
     return(object)
   
-  object <- stats::na.exclude(unclass(object), ...)
+  object <- na.exclude(unclass(object), ...)
   obj.attrs <- attributes(object)
   
   object <- if (all(is_state(object)))
