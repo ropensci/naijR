@@ -92,37 +92,37 @@ fix_region.states <- function(x, ...)
 #' fix_region(c("Owerri north", "Owerri West"))
 #' 
 #' @export
-fix_region.lgas <-
-  function(x,
-           interactive = FALSE,
-           quietly = FALSE,
-           graphic = FALSE,
-           ...)
+fix_region.lgas <- 
+  function(x, interactive = FALSE, quietly = FALSE, graphic = FALSE, ...)
   {
-    # TODO: add a 'state' argument to fine-tune the matching
+    # TODO: add an optional 'state' argument to fine-tune the matching
     if (!is.logical(interactive) ||
         !is.logical(quietly) ||
         !is.logical(graphic)) {
       cli::cli_abort("Invalid input where logical argument expected")
     }
-    if (graphic) 
+    if (graphic) {
+      if (!interactive)
+        cli::cli_warn("'graphic' was reset to FALSE in non-interactive mode")
+      
       graphic <- interactive
-    
-    usedialog <- .Platform$OS.type == "windows" && graphic
+    }
     vals <- .fix_region_internal(x, lgas(), interactive)
+    usedialog <- .Platform$OS.type == "windows" && graphic
     
-    if (interactive)
+    if (interactive) {
       vals <- .fix_lgas_interactive(vals, usedialog)
     
-    if (is.null(vals)) {
-      msg <- "The operation was cancelled"
-      
-      if (usedialog)
-        utils::winDialog("ok", msg)
-      else
-        cli::cli_alert_info(msg)
-      
-      return(invisible(x))
+      if (is.null(vals)) {
+        msg <- "The operation was cancelled"
+        
+        if (usedialog)
+          utils::winDialog("ok", msg)
+        else
+          cli::cli_alert_info(msg)
+        
+        return(invisible(x))
+      }
     }
     if (!quietly)
       .report_on_fixes(vals, usedialog)

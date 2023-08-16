@@ -108,7 +108,7 @@
   }
   else if (!is.null(data))
     cli::cli_warn(
-      "'{.arg_str(data)}' is invalid for choropleths but was ignored"
+      "'{arg_str(data)}' is invalid for choropleths but was ignored"
     )
   
   ## If 'region' is NULL, it must be found automatically in 'data'
@@ -143,8 +143,8 @@
     if (is.data.frame(data)) {
       
       if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
-        cli::cli_abort("The column '{(.arg_str(val))}'
-                       does not exist in '{(.arg_str(data))}'")
+        cli::cli_abort("The column '{(arg_str(val))}'
+                       does not exist in '{(arg_str(data))}'")
       }
     }
   }
@@ -567,7 +567,7 @@
   
   if (is.logical(val)) {
     if (length(val) > 1L)
-      cli::cli_warn(.first_elem_warn(arg))
+      cli::cli_warn(first_elem_warn(arg))
     
     return(val[1])
   }

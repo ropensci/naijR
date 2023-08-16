@@ -19,6 +19,14 @@ test_that("Input is validated", {
   #                "Only the first element of 'show.neighbours' was used")
   expect_message(map_ng(plot = FALSE, show.neighbours = TRUE), 
                  "Display of neighbouring regions is temporarily disabled")
+  
+  expect_warning(suppressMessages(map_ng(
+    plot = FALSE, show.neighbours = c(TRUE, FALSE)
+  )),
+  "Only the first element of 'show.neighbours' was used")
+  
+  expect_error(map_ng(plot = FALSE, show.neighbours = 42),
+               "'show.neighbours' should be a logical value")
   expect_error(map_ng(data = vector()), 
                "A non-NULL input for 'data' must be a data frame")
   expect_error(map_ng(data = data.frame(col = runif(10))),
@@ -178,6 +186,9 @@ test_that("Points are mapped", {
   x[4] <- -3; y[4] <- 1000
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Expected a character vector as 'region'")
+  
+  expect_error(map_ng(x = 15, y = 45, plot = FALSE),
+               "Coordinates are beyond the bounds of the plotted area")
 })
 
 test_that("Factors can draw choropleth", {

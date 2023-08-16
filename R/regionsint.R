@@ -6,7 +6,6 @@
 
 # Internal functions for regions.R
 
-# For States ----
 ## Provides some uniformity in the messaging b/w States & LGAs
 .warn_on_misspelling <- function(region.type) {
   region.type <- match.arg(region.type, c("state", "lga"))
@@ -23,19 +22,20 @@
 
 
 
+# For States ----
 get_all_states <- function(named = TRUE)
 {
   stopifnot(exprs = {
     length(named) == 1L
     is.logical(named)
-    ! is.na(named)
+    !is.na(named)
   })
-  
-  states.by.zone <- stateList()
+  data("states_nigeria", package = "naijR", envir = environment())
+  states.by.zone <- with(states_nigeria, split(state, gpz))
   
   if (!named) {
-    s <- sort(unlist(states.by.zone, use.names = FALSE))
-    return(s)
+    s <- unlist(states.by.zone, use.names = FALSE)
+    return(sort(s))
   }
   
   names(states.by.zone) <- sub("\\.state", "", names(states.by.zone))

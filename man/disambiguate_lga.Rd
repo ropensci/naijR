@@ -33,6 +33,8 @@ obi.lga <- lgas("Obi")    # Warning
 try(map_ng(obi.lga))      # Error
 
 obi.benue <- disambiguate_lga(obi.lga, "Benue")
-map_ng(obi.benue)
+
+if (interactive())
+  map_ng(obi.benue)
 
 }

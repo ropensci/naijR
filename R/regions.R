@@ -40,27 +40,24 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' @export
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
-  if (!is.logical(all))
-    cli_abort("'all' is not logical")
-  
-  if (!is.logical(warn))
-    cli_abort("'warn' is not logical")
+  assert.lgl.arg(all)
+  assert.lgl.arg(warn)
   
   if (!missing(states) && is.character(states)) {
     num.missed <- sum(!is_state(states))
     
     if (num.missed) {
       if (warn && isFALSE(.is_nested_fix_dont_warn())) {
-        abujas <- match("Abuja", states)
+        abujas <- which(states %in% "Abuja")
+        num.abuja <- length(abujas)
         
-        if (!is.na(abujas))
+        if (num.abuja)
           cli::cli_warn(
             "'Abuja' in position(s) {paste(abujas, collapse = ', ')}
-             is not a State. Instead, use 'Federal Capital Territory'
-            or its acronym."
+             is not a State. Use 'Federal Capital Territory' or 'FCT'"
           )
         
-        if (is.na(abujas) || num.missed > length(abujas))
+        if (!num.abuja || num.missed > num.abuja)
           .warn_on_misspelling('state')
       }
     }
@@ -68,21 +65,21 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     return(new_states(states))
   }
   
-  stl <- get_all_states()
+  state.list <- get_all_states()
   
   if (!all)
-    stl$fct <- NULL
+    state.list$fct <- NULL
   
   if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
-      cli_abort("argument supplied 'gpz' is not of type 'character'")
+      cli_abort("argument 'gpz' is not of type 'character'")
     
     gpz <- tolower(gsub("\\s+", "", gpz))
-    x <- match.arg(gpz, names(stl), several.ok = TRUE)
-    stl <- stl[x]
+    x <- match.arg(gpz, names(state.list), several.ok = TRUE)
+    state.list <- state.list[x]
   }
   
-  ss <- as.vector(unlist(stl), mode = 'character')
+  ss <- as.vector(unlist(state.list), mode = 'character')
   
   if (is.null(gpz)) 
     ss <- sort(ss)
@@ -195,7 +192,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   }
   else if (.all_are_not_lgas(region))
     cli_abort("None of the items is a valid LGA")
-  
+  # TODO: An object that belongs to more than one State should 
+  # have a State attribute that lists the States and this should
+  # apply to lgas objects that have just one element so that 
+  # there is no confusion.
   structure(new_lgas(lst), State = region)
 }
 
@@ -256,17 +256,20 @@ lgas_ng <- function(state = NA_character_) {
 #' 
 #' @export
 print.regions <- function(x, ...) {
-  if (!interactive())
-    return(x)
-  
   st <- "States"
   lg <- "LGAs"
   
   hdr <- if (length(x) > 1L) {
-    if (all(is_state(x)) || inherits(x, "states")) st else lg
+    if (all(is_state(x)) || inherits(x, "states"))
+      st
+    else
+      lg
   }
   else {
-    if (inherits(x, "lgas")) lg else st
+    if (inherits(x, "lgas"))
+      lg
+    else
+      st
   }
   
   dash <- "-"
@@ -341,22 +344,21 @@ c.regions <- function(...)
 
 
 
-#' @importFrom stats na.exclude
 #' @export
 na.exclude.regions <- function(object, ...)
 {
   if (!anyNA(object))
     return(object)
   
-  object <- na.exclude(unclass(object), ...)
-  na.attr <- attributes(object)
+  object <- stats::na.exclude(unclass(object), ...)
+  obj.attrs <- attributes(object)
   
   object <- if (all(is_state(object)))
     new_states(object)
   else
     new_lgas(object)
   
-  class(object) <- c(class(na.attr$na.action), class(object))
-  attr(object, "na.action") <- na.attr$na.action
+  class(object) <- c(class(obj.attrs$na.action), class(object))
+  attr(object, "na.action") <- obj.attrs$na.action
   object
 }

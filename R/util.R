@@ -96,10 +96,6 @@
 
 
 
-
-
-
-
 # Adds a column for the geo-political zones to an
 # existing data frame that has a character column
 # of the States.
@@ -117,7 +113,7 @@
   })
 
   data[[zonehdr]] <- NA_character_
-  statelist <- stateList()
+  statelist <- get_all_states()
   
   for (gpz in names(statelist)) {
     rgx <- paste(statelist[[gpz]], collapse = "|")
