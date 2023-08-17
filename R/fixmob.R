@@ -1,5 +1,7 @@
 # Source file: fixmob.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 #' Fix mobile numbers
@@ -18,7 +20,12 @@
 #'
 #' @return The updated vector, usually the column of a data frame.
 #' 
+#' @importFrom stats na.exclude
 #' @export
+#' 
+#' @examples
+#' fix_mobile("803-123-4567")    # Adds leading '0" and removes separators
+#' 
 fix_mobile <- function(x) {
   if (!is.null(x) && all(is.na(x)) || is.numeric(x))
     x <- as.character(x)
@@ -52,7 +59,7 @@ fix_mobile <- function(x) {
   like.mobile <- grepl("[7-9][0-1]\\d{8}$", x)
   
   if (getOption("verbose")) {
-    outnums <- paste(stats::na.exclude(x)[!like.mobile], collapse = ', ')
+    outnums <- paste(na.exclude(x)[!like.mobile], collapse = ', ')
     cli::cli_warn("Additional original/transformed number removed: {outnums}")
   }
   
@@ -75,18 +82,17 @@ fix_mobile <- function(x) {
   stopifnot(is.character(str))
   
   warn_when_verbose <- function() {
-    if (getOption("verbose"))
-      cli_warn("{sQuote(str)} {msg}")
+    if (getOption("verbose"))  # TODO: Give user control over verbosity
+      cli_warn("{sQuote(str)} was removed")
   }
   
   chars <- charToRaw(str)
   notd <- which(!(chars >= 0x30 & chars <= 0x39))
   sep <- chars[notd]
   
-  # When the separators differ, the number is considered unusable. This may also
-  # mean that other characters exist that have nothing to do with phone numbers.
-  msg <- " was removed"
-  
+  # When the separators differ, the number is considered unusable.
+  # This may also mean that other characters exist that have
+  # nothing to do with phone numbers.
   if (isFALSE(Reduce(identical, sep))) {
     warn_when_verbose()
     return(NA_character_)

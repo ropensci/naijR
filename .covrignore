@@ -2,5 +2,10 @@ R/zzz.R
 R/helpers.R
 R/mapint.R
 R/util.R
+R/fct.R
+R/fixregint.R
+R/isregint.R
+R/asregint.R
+R/regionsint.R
 data/admin.R
 data/shpfileobj.R

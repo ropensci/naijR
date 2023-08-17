@@ -4,9 +4,7 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
-
-# Exported function(s) ---------------------------------------------------------
+globalVariables(c("STATE", "shp.state", "shp.lga"))
 
 #' Map of Nigeria
 #'
@@ -76,13 +74,15 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
 #' \code{RColorBrewer::display.brewer.all}.
+#' 
+#' @seealso \code{vignette("nigeria-maps")} for additional ways to use this 
+#' function.
 #'
 #' @examples
 #' \dontrun{
 #' map_ng() # Draw a map with default settings
 #' map_ng(states("sw"))
-#' map_ng("Kano")
-#' }
+#' map_ng("Kano")}
 #'
 #' @return An object of class \code{sf}, which is a standard format containing 
 #' the data used to draw the map and thus can be used by this and other 
@@ -103,7 +103,6 @@ globalVariables(c(".", "STATE", "shp.state", "shp.lga"))
 #' @importFrom rlang eval_tidy
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
-#' 
 #' 
 #' @export
 map_ng <- function(region = character(),
@@ -127,7 +126,7 @@ map_ng <- function(region = character(),
                    ...)
 {    ## TODO: Allow this function to accept a matrix e.g. for plotting points
   if (!is.character(region)) {
-    msg <- sprintf("Expected a character vector as '%s'.", .arg_str(region))
+    msg <- sprintf("Expected a character vector as '%s'.", arg_str(region))
     
     addmsg <- if (is.data.frame(region))
       "A data frame was passed; did you mean to use 'data' instead?"
@@ -137,7 +136,7 @@ map_ng <- function(region = character(),
   
   if (!is.null(data) && !is.data.frame(data))
     cli_abort(sprintf("A non-NULL input for '%s' must be a data frame",
-                 .arg_str(data)))
+                 arg_str(data)))
   
   if (is.data.frame(data) && ncol(data) < 2L)
     cli_abort(
@@ -145,11 +144,11 @@ map_ng <- function(region = character(),
     )
   
   if (!is.logical(show.neighbours))
-    cli_abort("'{.arg_str(show.neighbours))}' should be a logical value")
+    cli_abort("'{arg_str(show.neighbours)}' should be a logical value")
   
   if (length(show.neighbours) > 1L) {
-    cli_warn("{.first_elem_warn(.arg_str(show.neighbours))}")
     show.neighbours <- show.neighbours[1]
+    cli_warn("{first_elem_warn(arg_str(show.neighbours))}")
   }
   
   if (show.neighbours)
@@ -225,8 +224,8 @@ map_ng <- function(region = character(),
     
     if (inherits(region, "regions")) {
       rtype <- sub("(.+)(s$)", "\\1", class(region)[1])
-      nmf <- get(paste0("shp.", rtype))$namefield
-      txt <- df.only[[nmf]]
+      namefield <- get(paste0("shp.", rtype))$namefield
+      txt <- df.only[[namefield]]
       
       if (all(is_state(region))) 
         txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
@@ -261,7 +260,6 @@ map_ng <- function(region = character(),
       lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.y))
     
     if (missing(leg.title)) {  # TODO: Change this construct.
-      
       leg.title <- if (is_null(data))
         deparse(substitute(x))
       else

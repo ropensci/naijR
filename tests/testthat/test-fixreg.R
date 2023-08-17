@@ -131,7 +131,12 @@ test_that("Misspelt LGAs can be fixed (limited)", {
 
 
 test_that("outputs", {
-  expect_invisible(fix_region(c("Fufore", "Demsa")))
+  lgs <- c("Fufore", "Demsa")
+  
+  expect_invisible(fix_region(lgs))
+  expect_warning(fix_region(lgs, interactive = FALSE, graphic = TRUE),
+                 "'graphic' was reset to FALSE in non-interactive mode")
+  expect_silent(fix_region(lgs, quietly = TRUE))
 })
 
 
@@ -165,7 +170,10 @@ test_that("regions can be fixed manually", {
       c("Hawul", "FakeLG")),
     regexp = "'shank' is not an element of 'bl'"
   )   
-  
+  expect_error(
+    fix_region_manual(bl, "Hawl", c("Hawul", "FakeLG")),
+    "Substitutions must be single or the same number as targetted fixes"
+  )
 })
 
 

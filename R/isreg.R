@@ -1,5 +1,7 @@
 # Source file: isreg.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
 #' Test an Object for States
@@ -70,27 +72,14 @@ is_state <- function(x)
 #' \code{FALSE}.
 #' 
 #' @export
+#' 
+#' @examples
+#' is_lga(c("Pankshen", "Pankshin"))
+#' 
 is_lga <- function(x)
 {
   if (!is.character(x))
     cli::cli_abort("x should be of type 'character'")
   
   x %in% lgas()
-}
-
-
-
-
-# Checks whether an object has all its elements as States or LGAs
-.all_are_regions <- function(x) {
-  stopifnot(isFALSE(is.null(x)))
-  all(is_state(x)) || all(is_lga(x))
-}
-
-
-
-
-.some_are_regions <- function(x) {
-  stopifnot(isFALSE(is.null(x)))
-  isFALSE(.all_are_regions(x)) && (any(is_state(x)) || any(is_lga(x)))
 }

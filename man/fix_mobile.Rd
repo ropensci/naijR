@@ -25,3 +25,7 @@ There is an option for producing warnings on any mobile number entries
 that may have been removed from the vector, by setting the option
 \code{verbose} to \code{TRUE}.
 }
+\examples{
+fix_mobile("803-123-4567")    # Adds leading '0" and removes separators
+
+}

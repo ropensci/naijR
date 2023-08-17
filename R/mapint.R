@@ -108,7 +108,7 @@
   }
   else if (!is.null(data))
     cli::cli_warn(
-      "'{.arg_str(data)}' is invalid for choropleths but was ignored"
+      "'{arg_str(data)}' is invalid for choropleths but was ignored"
     )
   
   ## If 'region' is NULL, it must be found automatically in 'data'
@@ -143,8 +143,8 @@
     if (is.data.frame(data)) {
       
       if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
-        cli::cli_abort("The column '{(.arg_str(val))}'
-                       does not exist in '{(.arg_str(data))}'")
+        cli::cli_abort("The column '{(arg_str(val))}'
+                       does not exist in '{(arg_str(data))}'")
       }
     }
   }
@@ -171,8 +171,10 @@
   ngstr <- "Nigeria"
   
   if (identical(x, ngstr)) {
+    # nolint start:
     # Setting `fill` to TRUE solved problematic rendering of the polygons.
     # See https://gis.stackexchange.com/questions/230608/creating-an-sf-object-from-the-maps-package
+    # nolint end
     map.data <- 
       maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
     map.data <- sf::st_as_sf(map.data)
@@ -350,19 +352,6 @@
     # interest is definitely a factor
     df$ind <- as.integer(df$cat)
     df$color <- colrange[df$ind]
-    # rgx <- "(^.+)(:.+$)"
-    # indexMultiPolygons <- grep(rgx, map$names)
-    # mapregions <- sub(rgx, "\\1", map$names)
-    # m <- mapregions[indexMultiPolygons]
-    # m <-  m[!duplicated(m)]
-    # mapregions <- mapregions[-indexMultiPolygons]
-    # mapregions <- c(mapregions, m)
-    # 
-    # if (nrow(df) < length(mapregions))
-    #   mapregions <- mapregions[mapregions %in% df$region]
-    
-    # new.ind <- order(as.character(df$region), mapregions)
-    # ord.df <- df[new.ind, ]    # This is why a data frame was made
     colors <- .reassign_colours(df$region, df$color, ...)
     list(colors = colors, scheme = colrange, bins = cats)
   }
@@ -567,7 +556,7 @@
   
   if (is.logical(val)) {
     if (length(val) > 1L)
-      cli::cli_warn(.first_elem_warn(arg))
+      cli::cli_warn(first_elem_warn(arg))
     
     return(val[1])
   }
