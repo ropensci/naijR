@@ -82,18 +82,17 @@ fix_mobile <- function(x) {
   stopifnot(is.character(str))
   
   warn_when_verbose <- function() {
-    if (getOption("verbose"))
-      cli_warn("{sQuote(str)} {msg}")
+    if (getOption("verbose"))  # TODO: Give user control over verbosity
+      cli_warn("{sQuote(str)} was removed")
   }
   
   chars <- charToRaw(str)
   notd <- which(!(chars >= 0x30 & chars <= 0x39))
   sep <- chars[notd]
   
-  # When the separators differ, the number is considered unusable. This may also
-  # mean that other characters exist that have nothing to do with phone numbers.
-  msg <- " was removed"
-  
+  # When the separators differ, the number is considered unusable.
+  # This may also mean that other characters exist that have
+  # nothing to do with phone numbers.
   if (isFALSE(Reduce(identical, sep))) {
     warn_when_verbose()
     return(NA_character_)

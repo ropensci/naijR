@@ -31,7 +31,7 @@ get_all_states <- function(named = TRUE)
     !is.na(named)
   })
   data("states_nigeria", package = "naijR", envir = environment())
-  states.by.zone <- with(states_nigeria, split(state, gpz))
+  states.by.zone <- split(states_nigeria$state, states_nigeria$gpz)
   
   if (!named) {
     s <- unlist(states.by.zone, use.names = FALSE)

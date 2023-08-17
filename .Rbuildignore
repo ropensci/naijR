@@ -20,3 +20,4 @@
 ^CONTRIBUTING\.md$
 ^codemeta\.json$
 ^\.covrignore$
+^\.lintr$

@@ -291,7 +291,7 @@ mat <- cbind(
   )
 )
 
-for (i in seq(nrow(mat))) {
+for (i in seq_len(nrow(mat))) {
   x <- mat[i, "state"]
   y <- mat[i, "old"]
   z <- mat[i, "new"]
