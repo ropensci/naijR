@@ -74,13 +74,15 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' advisable to use one of the sequential palettes. For a list of of available
 #' palettes, especially for more advanced use, review 
 #' \code{RColorBrewer::display.brewer.all}.
+#' 
+#' @seealso \code{vignette("nigeria-maps")} for additional ways to use this 
+#' function.
 #'
 #' @examples
 #' \dontrun{
 #' map_ng() # Draw a map with default settings
 #' map_ng(states("sw"))
-#' map_ng("Kano")
-#' }
+#' map_ng("Kano")}
 #'
 #' @return An object of class \code{sf}, which is a standard format containing 
 #' the data used to draw the map and thus can be used by this and other 

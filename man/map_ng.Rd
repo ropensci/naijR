@@ -121,7 +121,10 @@ palettes, especially for more advanced use, review
 \dontrun{
 map_ng() # Draw a map with default settings
 map_ng(states("sw"))
-map_ng("Kano")
-}
+map_ng("Kano")}
 
+}
+\seealso{
+\code{vignette("nigeria-maps")} for additional ways to use this 
+function.
 }
