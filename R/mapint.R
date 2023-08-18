@@ -548,23 +548,21 @@
 # Returns either a logical(1) or character(n)
 .set_legend_text <- function(val)
 {
-  arg <- "legend.text"
-  
   # The default setting of 'legend.text' is to return TRUE
   if (is.null(val))
     return(TRUE)
   
+  arg <- "legend.text"
+  
+  if (!is.character(val) && !is.logical(val))
+    cli::cli_abort("'{arg}' must be of type character or logical")
+  
   if (is.logical(val)) {
     if (length(val) > 1L)
       cli::cli_warn(first_elem_warn(arg))
-    
     return(val[1])
   }
-  
-  if (is.character(val))
-    return(val)
-  
-  cli::cli_abort("'{arg}' must be of type character or logical")
+  val
 }
 
 
@@ -572,6 +570,7 @@
 
 .set_legend_params <- function(leg.arg)
 {
+  stopifnot(is.character(leg.arg) || is.logical(leg.arg) || is.null(leg.arg))
   result <- .set_legend_text(leg.arg)
   obj <- list(x = 13L, y = 7L, text = NULL, show = TRUE, xpd = NA)
   

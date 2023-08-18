@@ -4,7 +4,6 @@
 #
 # Copyright (c) 2020-2023 Victor Ordu
 
-
 # Preparation of the `ShapefileProps` objects used in the package
 #
 # The spatial data used in this packages is prepared before hand by

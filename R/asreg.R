@@ -113,11 +113,11 @@ disambiguate_lga <- function(lga, state = NULL, ...)
     if (!interactive())
       cli_abort("This operation can only be done in interactive mode")
     
-    if (length(lgattr) > 1L) {
+    if (length(lgattr) > 1L) { # nocov start
       title <- sprintf("Which State does '%s LGA' belong to?", lga)
       opt <- utils::menu(lgattr, title = title, ...)
       state <- lgattr[opt]
-    }
+    } # nocov end
   }
   attr(lga, "State") <- state
   

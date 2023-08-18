@@ -35,12 +35,9 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' @param legend.text Logical (whether to show the legend) or character vector
 #' (actual strings for the legend). The latter will override whatever is 
 #' provided by \code{categories}, giving the user additional control.
-#' @param leg.x,leg.y Numeric. Position of the legend (deprecated).
 #' @param leg.title String. The legend title. If missing, a default value is
 #' acquired from the data. To turn off the legend title, pass \code{NULL}.
 #' @param plot Logical. Turn actual plotting of the map off or on.
-#' @param leg.orient The orientation of the legend i.e. whether horizontal or
-#' vertical (deprecated). 
 #' @param ... Further arguments passed to \code{\link[sf]{plot}}
 #' 
 #' @details The default value for \code{region} is to print all State 
@@ -118,11 +115,8 @@ map_ng <- function(region = character(),
                    show.neighbours = FALSE,
                    show.text = FALSE,
                    legend.text = NULL,
-                   leg.x = deprecated(),
-                   leg.y = deprecated(),
                    leg.title,
                    plot = TRUE,
-                   leg.orient = deprecated(),
                    ...)
 {    ## TODO: Allow this function to accept a matrix e.g. for plotting points
   if (!is.character(region)) {
@@ -152,9 +146,10 @@ map_ng <- function(region = character(),
   }
   
   if (show.neighbours)
-    cli::cli_alert("Display of neighbouring regions is temporarily disabled")
+    cli::cli_abort("Display of neighbouring regions is temporarily disabled")
   
   region <- .process_region_params(region, call = caller_env())
+  legend.params <- .set_legend_params(legend.text)
   
   value.x <- if (is_null(data) && !is_null(x))
     enquo(x) 
@@ -178,7 +173,8 @@ map_ng <- function(region = character(),
   
   if (use.choropleth) {
     mapq <- expr(.mymap(mapdata, region, plot = plot))
-    cParams <- list(
+    
+    cpleth.inputs <- list(
       region = region,
       value = value.x,
       breaks = breaks,
@@ -195,16 +191,28 @@ map_ng <- function(region = character(),
       else
         as_name(value.x)
       
-      cParams$value <-  data[[value.x]]
-      cParams$region <- data[[region.col]]
+      cpleth.inputs$value <-  data[[value.x]]
+      cpleth.inputs$region <- data[[region.col]]
     }
     
-    cOpts <-
-      .prep_choropleth_opts(mapdata, cParams, dots$col, excluded, exclude.fill)
-    mapq$col <- cOpts$colors
+    cpleth.opts <- .prep_choropleth_opts(
+      mapdata,
+      cpleth.inputs,
+      dots$col,
+      excluded,
+      exclude.fill
+    )
+    mapq$col <- cpleth.opts$colors
     
-    if (lifecycle::is_present(leg.orient))
-      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.orient))
+    if (is_null(categories))
+      categories <- cpleth.opts$bins
+    
+    if (is.character(legend.params$text)) {
+      if (length(categories) != length(legend.params$text))
+        cli_abort("Lengths of 'categories' and provided legend do not match")
+      
+      categories <- legend.params$text
+    }
   }
   
   tryCatch({
@@ -215,71 +223,46 @@ map_ng <- function(region = character(),
   if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   
-  if (!plot)
-    return(sfdata)
-  
-  if (show.text) {
-    txt <- country_name()
-    df.only <- as.data.frame(sfdata)
+  ## Annotation
+  if (plot) { 
+    graphics::title(main = title, sub = caption) # nocov start
     
-    if (inherits(region, "regions")) {
-      rtype <- sub("(.+)(s$)", "\\1", class(region)[1])
-      namefield <- get(paste0("shp.", rtype))$namefield
-      txt <- df.only[[namefield]]
+    if (use.choropleth && legend.params$show) {
+      if (missing(leg.title)) {
+        leg.title <- value.x
+        
+        if (is_null(data))
+          leg.title <- deparse(substitute(x))
+      }
+      graphics::legend(
+        x = legend.params$x,
+        y = legend.params$y,
+        legend = categories,
+        fill = cpleth.opts$scheme,
+        xpd = legend.params$xpd,
+        title = leg.title
+      )
+    }
+    else if (!is_null(y))
+      graphics::points(x, y, ...)
+    
+    if (show.text) {
+      txt <- country_name()
+      df.only <- as.data.frame(sfdata)
       
-      if (all(is_state(region))) 
-        txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
-      
+      if (inherits(region, "regions")) {
+        region.type <- sub("(.+)(s$)", "\\1", class(region)[1])
+        shpfileprop <- paste0("shp.", region.type)
+        namefield <- get(shpfileprop)$namefield
+        txt <- df.only[[namefield]]
+        # nocov end
+        if (all(is_state(region)))
+          txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
+      }
       cex <- .set_text_size(dots$cex)
       xycoord <- .get_point_coords(sfdata)
       graphics::text(xycoord[, 'x'], xycoord[, 'y'], labels = txt, cex = cex)
     }
   }
-  
-  ## Annotate
-  graphics::title(main = title, sub = caption)
-  
-  if (use.choropleth) {
-    
-    if (is_null(categories))
-      categories <- cOpts$bins
-    
-    lp <- .set_legend_params(legend.text)
-    
-    if (is.character(lp$text)) {
-      if (!identical(length(categories), length(lp$text)))
-        cli_abort("Lengths of categories and provided legend do not match")
-      
-      categories <- lp$text
-    }
-    
-    if (lifecycle::is_present(leg.x))
-      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.x))
-    
-    if (lifecycle::is_present(leg.y))
-      lifecycle::deprecate_warn(.next_minor_version(), .deprec_msg(leg.y))
-    
-    if (missing(leg.title)) {  # TODO: Change this construct.
-      leg.title <- if (is_null(data))
-        deparse(substitute(x))
-      else
-        value.x
-    }
-    
-    if (lp$show) {
-      graphics::legend(
-        x = lp$x,
-        y = lp$y,
-        legend = categories,
-        fill = cOpts$scheme,
-        xpd = lp$xpd,
-        title = leg.title
-      )
-    }
-  }
-  else if (!is_null(y)) {
-    graphics::points(x, y, ...)
-  }
-  
   invisible(sfdata)
 }

@@ -255,7 +255,7 @@ lgas_ng <- function(state = NA_character_) {
 #' @param ... Additional arguments, though not set. Left for future use
 #' 
 #' @export
-print.regions <- function(x, ...) {
+print.regions <- function(x, ...) { # nocov start
   st <- "States"
   lg <- "LGAs"
   
@@ -277,7 +277,7 @@ print.regions <- function(x, ...) {
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
   cat(paste(dash, x, collapse = newline), newline)
-}
+} # nocov end
 
 
 
@@ -293,7 +293,7 @@ print.regions <- function(x, ...) {
 #' @export
 head.regions <- function(x, ...)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  .chooseRegionsMethod(NextMethod(), x) # nocov
 }
 
 
@@ -308,7 +308,7 @@ head.regions <- function(x, ...)
 #' @export
 tail.regions <- function(x, ...)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  .chooseRegionsMethod(NextMethod(), x) # nocov
 }
 
 
