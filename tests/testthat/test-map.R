@@ -432,7 +432,8 @@ test_that("Labels are shown", {
 })
 
 test_that("Labels can be resized", {
-  # expect_error(map_ng(show.text = TRUE, cex = ".75")) 
+  expect_error(map_ng(show.text = TRUE, cex = ".75"),
+               "'cex' is not of class 'numeric'") 
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
   expect_s3_class(map_ng(show.text = TRUE, cex = .5, plot = FALSE), maptype)
 })

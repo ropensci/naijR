@@ -211,22 +211,6 @@ new_lgas <- function(x)
 
 
 
-#' @rdname lgas
-#' @param state Character; State(s) in the Federation of Nigeria. Default is
-#' \code{NA_character_}.
-#' 
-#' @note \code{lga_ng} stands deprecated and will be removed in the next minor
-#' version. New code should use \code{lgas} instead.
-#' 
-#' @export
-lgas_ng <- function(state = NA_character_) {
-  .Deprecated("lgas")
-  as.character(lgas(region = state))
-}
-
-
-
-
 # Methods for internal generics ----
 
 ## Because 'regions' is an abstract class i.e. it does not have
