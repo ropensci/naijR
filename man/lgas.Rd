@@ -2,12 +2,9 @@
 % Please edit documentation in R/regions.R
 \name{lgas}
 \alias{lgas}
-\alias{lgas_ng}
 \title{Create on Object for Local Government Areas}
 \usage{
 lgas(region = NA_character_, strict = FALSE, warn = TRUE)
-
-lgas_ng(state = NA_character_)
 }
 \arguments{
 \item{region}{Context-dependent. Either State(s) of the Federation 
@@ -22,9 +19,6 @@ return only the specified LGA when this argument is set to \code{TRUE}.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
 actually Local Government Areas (or were misspelt).}
-
-\item{state}{Character; State(s) in the Federation of Nigeria. Default is
-\code{NA_character_}.}
 }
 \value{
 If length of \code{ng.state} == 1L, a character vector containing 
@@ -37,9 +31,6 @@ Create on Object for Local Government Areas
 \note{
 There are six (6) LGAs that share names with their State - Bauchi, 
 Ebonyi, Gombe, Katsina, Kogi and Ekiti.
-
-\code{lga_ng} stands deprecated and will be removed in the next minor
-version. New code should use \code{lgas} instead.
 }
 \examples{
 how_many_lgas <- function(state) {

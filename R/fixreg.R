@@ -110,7 +110,7 @@ fix_region.lgas <-
     vals <- .fix_region_internal(x, lgas(), interactive)
     usedialog <- .Platform$OS.type == "windows" && graphic
     
-    if (interactive) {
+    if (interactive) { # nocov start
       vals <- .fix_lgas_interactive(vals, usedialog)
     
       if (is.null(vals)) {
@@ -122,7 +122,7 @@ fix_region.lgas <-
           cli::cli_alert_info(msg)
         
         return(invisible(x))
-      }
+      } # nocov end
     }
     if (!quietly)
       .report_on_fixes(vals, usedialog)

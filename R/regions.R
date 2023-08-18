@@ -211,22 +211,6 @@ new_lgas <- function(x)
 
 
 
-#' @rdname lgas
-#' @param state Character; State(s) in the Federation of Nigeria. Default is
-#' \code{NA_character_}.
-#' 
-#' @note \code{lga_ng} stands deprecated and will be removed in the next minor
-#' version. New code should use \code{lgas} instead.
-#' 
-#' @export
-lgas_ng <- function(state = NA_character_) {
-  .Deprecated("lgas")
-  as.character(lgas(region = state))
-}
-
-
-
-
 # Methods for internal generics ----
 
 ## Because 'regions' is an abstract class i.e. it does not have
@@ -255,7 +239,7 @@ lgas_ng <- function(state = NA_character_) {
 #' @param ... Additional arguments, though not set. Left for future use
 #' 
 #' @export
-print.regions <- function(x, ...) {
+print.regions <- function(x, ...) { # nocov start
   st <- "States"
   lg <- "LGAs"
   
@@ -277,7 +261,7 @@ print.regions <- function(x, ...) {
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
   cat(paste(dash, x, collapse = newline), newline)
-}
+} # nocov end
 
 
 
@@ -293,7 +277,7 @@ print.regions <- function(x, ...) {
 #' @export
 head.regions <- function(x, ...)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  .chooseRegionsMethod(NextMethod(), x) # nocov
 }
 
 
@@ -308,7 +292,7 @@ head.regions <- function(x, ...)
 #' @export
 tail.regions <- function(x, ...)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  .chooseRegionsMethod(NextMethod(), x) # nocov
 }
 
 
