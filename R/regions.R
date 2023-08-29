@@ -8,7 +8,7 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 
 # States ----
 
-#' Create an Object for the States of Nigeria
+#' Objects for Representing the Federal States of Nigeria
 #' 
 #' @param states A character vector with strings representing one or more
 #' States of Nigeria. If missing, the function will return a \code{states}
@@ -172,7 +172,7 @@ as_state <- function(x)
 
 # LGAs ----
 
-#' Create an Object for Local Government Areas
+#' Objects for Representing the Local Government Areas (LGAs) of Nigeria
 #'
 #' @param region Context-dependent. Either State(s) of the Federation
 #' or Local Government Area(s) - internal checks are performed to determine

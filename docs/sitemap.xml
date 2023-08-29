@@ -16,6 +16,9 @@
     <loc>http://brovic.github.io/naijR/authors.html</loc>
   </url>
   <url>
+    <loc>http://brovic.github.io/naijR/CONTRIBUTING.html</loc>
+  </url>
+  <url>
     <loc>http://brovic.github.io/naijR/index.html</loc>
   </url>
   <url>
@@ -26,9 +29,6 @@
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/coerce.html</loc>
-  </url>
-  <url>
-    <loc>http://brovic.github.io/naijR/reference/coercion.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/disambiguate_lga.html</loc>
@@ -43,9 +43,6 @@
     <loc>http://brovic.github.io/naijR/reference/fix_region_manual.html</loc>
   </url>
   <url>
-    <loc>http://brovic.github.io/naijR/reference/fix_state.html</loc>
-  </url>
-  <url>
     <loc>http://brovic.github.io/naijR/reference/index.html</loc>
   </url>
   <url>
@@ -56,9 +53,6 @@
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/lgas.html</loc>
-  </url>
-  <url>
-    <loc>http://brovic.github.io/naijR/reference/lgas_ng.html</loc>
   </url>
   <url>
     <loc>http://brovic.github.io/naijR/reference/lgas_nigeria.html</loc>
