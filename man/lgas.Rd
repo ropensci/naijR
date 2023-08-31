@@ -45,6 +45,13 @@ actually Local Government Areas (or were misspelt).}
 dimension object classes like \code{matrix} and \code{array}. For
 \code{as_lga}, a string representing a Local Government Area that shares its
 name with one of its States.}
+
+\item{...}{Arguments used for methods. See documentation of generic
+for details.}
+
+\item{i, exact}{See help file for \code{?Extract}}
+
+\item{object}{An object of class \code{regions}}
 }
 \value{
 If length of \code{ng.state} == 1L, a character vector containing

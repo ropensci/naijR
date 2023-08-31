@@ -22,6 +22,8 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' @param x For \code{is_state} a vector to be tested. For \code{as_state}, a
 #' string representing a State that shares its name with one of its Local
 #' Government Areas.
+#' @param ... Arguments used for methods. See documentation of generic
+#' for details.
 #' 
 #' @return The States of Nigeria as a whole or by zones, as an S3 object
 #' of class \code{states}. \code{is_state} returns a logical vector.of same
@@ -188,6 +190,8 @@ as_state <- function(x)
 #' dimension object classes like \code{matrix} and \code{array}. For
 #' \code{as_lga}, a string representing a Local Government Area that shares its
 #' name with one of its States.
+#' @param ... Arguments used for methods. See documentation of generic
+#' for details.
 #' 
 #' @note There are six (6) LGAs that share names with their State - Bauchi,
 #' Ebonyi, Gombe, Katsina, Kogi and Ekiti.
@@ -425,16 +429,6 @@ print.lgas <- function(x, ...) { # nocov start
 
 #' @rdname states
 #' @export
-`[[.states` <- function(x, i, exact = TRUE)
-{
-  new_states(NextMethod())
-}
-
-
-
-
-#' @rdname states
-#' @export
 c.states <- function(...)
 {
   ls <- .unlistDots(...)
@@ -459,7 +453,21 @@ c.lgas <- function(...)
 }
 
 
+
+
+#' @rdname states
+#' @param i,exact See help file for \code{?Extract}
+#' @export
+`[[.states` <- function(x, i, exact = TRUE)
+{
+  new_states(NextMethod())
+}
+
+
+
+
 #' @rdname lgas
+#' @param i,exact See help file for \code{?Extract}
 #' @export
 `[[.lgas` <- function(x, i, exact = TRUE)
 {
@@ -488,6 +496,7 @@ c.lgas <- function(...)
 
 
 #' @rdname states
+#' @param object An object of class \code{regions}
 #' @export
 na.exclude.states <- function(object, ...)
 {
@@ -501,6 +510,7 @@ na.exclude.states <- function(object, ...)
 
 
 #' @rdname lgas
+#' @param object An object of class \code{regions}
 #' @export 
 na.exclude.lgas <- function(object, ...)
 {

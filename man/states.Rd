@@ -5,8 +5,8 @@
 \alias{is_state}
 \alias{as_state}
 \alias{print.states}
-\alias{[[.states}
 \alias{c.states}
+\alias{[[.states}
 \alias{[.states}
 \alias{na.exclude.states}
 \title{Objects for Representing the Federal States of Nigeria}
@@ -19,9 +19,9 @@ as_state(x)
 
 \method{print}{states}(x, ...)
 
-\method{[[}{states}(x, i, exact = TRUE)
-
 \method{c}{states}(...)
+
+\method{[[}{states}(x, i, exact = TRUE)
 
 \method{[}{states}(x, i)
 
@@ -44,6 +44,13 @@ actually States (i.e. they were misspelt).}
 \item{x}{For \code{is_state} a vector to be tested. For \code{as_state}, a
 string representing a State that shares its name with one of its Local
 Government Areas.}
+
+\item{...}{Arguments used for methods. See documentation of generic
+for details.}
+
+\item{i, exact}{See help file for \code{?Extract}}
+
+\item{object}{An object of class \code{regions}}
 }
 \value{
 The States of Nigeria as a whole or by zones, as an S3 object
