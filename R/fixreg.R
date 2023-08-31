@@ -4,14 +4,17 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-#' Fix Region Names
+#' Fix Misspelling of Adminstrative Regions
 #' 
-#' Correct any misspelt names of administrative regions i.e. States and LGAs
+#' Correct any misspelt names of administrative regions e.g. States and LGAs.
 #' 
-#' @details The function will look through a character vector and try to 
+#' @details \code{fix_region} will look through a character vector and try to 
 #' determine if State or LGA names have been wrongly entered. This presupposes
 #' that the atomic vector is of type \code{character}. It does not test any
 #' missing values in the vector, leaving them untouched.
+#' 
+#' \code{fix_region_manual} allows users to interactively and directly change
+#' update the spelling.
 #' 
 #' @note When passed a character vector of length \code{1L}, in the case of a
 #' misspelt LGA, the function signals an error; the presumption is that a fix
@@ -39,7 +42,8 @@ fix_region <- function(x, ...)
 #' 
 #' @export
 fix_region.states <- function(x, ...)
-{ # TODO: Consider reporting on fixes made
+{ 
+  # TODO: Consider reporting on fixes made
   ## Process possible FCT values
   abbrFCT <- .fct_options("abbrev")
   fullFCT <- .fct_options("full")
@@ -191,21 +195,11 @@ fix_region.lgas <-
 
 
 
-#' Fix Spelling of Regions Manually
+#' @rdname fix_region
 #' 
-#' Enable users to interactively and directly change to spelling of States
-#' and/or Local Government Areas (LGAs)
-#' 
-#' @param x The object to be modified
 #' @param wrong The misspelt element(s) of \code{x}.
 #' @param correct The correction that is to be applied to the misspelt 
 #' element(s)
-#' 
-#' @return The (possibly) modified object of class \code{regions} i.e. a
-#' \code{states} or \code{lgas} object.
-#' 
-#' @importFrom cli cli_abort
-#' @export
 #' 
 #' @examples
 #' x <- c("Pankshen", "Pankshin", "Q'uan Pam")
@@ -215,7 +209,8 @@ fix_region.lgas <-
 #' fix_region_manual(x, "Q'uan Pam", "Qua'an Pan")
 #' all(is_lga(x))
 #' 
-#' 
+#' @importFrom cli cli_abort
+#' @export
 fix_region_manual <- function(x, wrong, correct)
 {
   arg <- substitute(x)

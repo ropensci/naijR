@@ -8,7 +8,7 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 
 # States ----
 
-#' Create an Object for the States of Nigeria
+#' Objects for Representing the Federal States of Nigeria
 #' 
 #' @param states A character vector with strings representing one or more
 #' States of Nigeria. If missing, the function will return a \code{states}
@@ -119,9 +119,9 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 
 ## Low-level S3 constructor
-new_states <- function(ss) 
+new_states <- function(x) 
 {
-  structure(ss, class = c("states", "regions", class(ss)))
+  structure(x, class = c("states", "regions", class(x)))
 }
 
 
@@ -172,7 +172,7 @@ as_state <- function(x)
 
 # LGAs ----
 
-#' Create an Object for Local Government Areas
+#' Objects for Representing the Local Government Areas (LGAs) of Nigeria
 #'
 #' @param region Context-dependent. Either State(s) of the Federation
 #' or Local Government Area(s) - internal checks are performed to determine
@@ -391,128 +391,136 @@ as_lga <- function(x) {
 }
 
 
+
+
 # Methods for internal generics ----
 
-## Because 'regions' is an abstract class i.e. it does not have
-## a constructor, we have to provide a means of creating the
-## states/lgas objects post-method-dispatch. The behaviour we are
-## trying to establish is for both States and LGA data, and thus
-## it would be redundant to create distinct methods for them.
-## Perhaps there might be a cleaner approach, but this is as far
-## current skills can go.
-.chooseRegionsMethod <- function(m, obj)
-{
-  if (all(is_state(obj)))
-    new_states(m)
-  else
-    new_lgas(m)
-}
-
-
-
-
 #' @rdname states
-#' 
 #' @export
-print.regions <- function(x, ...) { # nocov start
-  st <- "States"
-  lg <- "LGAs"
-  
-  hdr <- if (length(x) > 1L) {
-    if (all(is_state(x)) || inherits(x, "states"))
-      st
-    else
-      lg
-  }
-  else {
-    if (inherits(x, "lgas"))
-      lg
-    else
-      st
-  }
-  
+print.states <- function(x, ...) { # nocov start
+  .printoutRegion(x, "States")
+} # nocov end
+
+
+#' @rdname lgas
+#' @export
+print.lgas <- function(x, ...) { # nocov start
+  .printoutRegion(x, "LGAs")
+} # nocov end
+
+
+
+# Creates the formatted printout for 'regions' objects
+.printoutRegion <- function(x, regiontype = c("States", "LGAs")) {
+  hdr <- match.arg(regiontype)
   dash <- "-"
   underline <- strrep(dash, nchar(hdr))
   newline <- "\n"
   cat(paste(hdr, underline, sep = newline), newline)
   cat(paste(dash, x, collapse = newline), newline)
-} # nocov end
-
-
-
-
-#' @rdname states
-#' 
-#' @importFrom utils head
-#' @export
-head.regions <- function(x, ...)
-{
-  .chooseRegionsMethod(NextMethod(), x) # nocov
 }
 
 
 
 
 #' @rdname states
-#' 
-#' @importFrom utils tail
-#' 
 #' @export
-tail.regions <- function(x, ...)
+`[[.states` <- function(x, i, exact = TRUE)
 {
-  .chooseRegionsMethod(NextMethod(), x) # nocov
+  new_states(NextMethod())
 }
 
 
 
 
+#' @rdname states
 #' @export
-c.regions <- function(...)
+c.states <- function(...)
 {
-  ls <- unlist(list(...), use.names = FALSE)
-  .chooseRegionsMethod(NextMethod(), ls)
+  ls <- .unlistDots(...)
+  new_states(NextMethod())
 }
 
 
 
 
-## Extraction functions for 'regions' objects
-## Note: The replacement versions already work adequately
-## with their default methods
-#' @export
-`[[.regions` <- function(x, i, exact = TRUE)
+#' @rdname lgas
+#' @export 
+c.lgas <- function(...)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  ls <- .unlistDots(...)
+  new_lgas(NextMethod())
+}
+
+
+
+.unlistDots <- function(...) {
+  unlist(list(...), use.names = FALSE)
+}
+
+
+#' @rdname lgas
+#' @export
+`[[.lgas` <- function(x, i, exact = TRUE)
+{
+  new_lgas(NextMethod())
 }
 
 
 
 
+#' @rdname states
 #' @export
-`[.regions` <- function(x, i)
+`[.states` <- function(x, i)
 {
-  .chooseRegionsMethod(NextMethod(), x)
+  new_states(NextMethod())
+}
+
+
+#' @rdname lgas
+#' @export
+`[.lgas` <- function(x, i)
+{
+  new_lgas(NextMethod())
 }
 
 
 
 
-#' @importFrom stats na.exclude
+#' @rdname states
 #' @export
-na.exclude.regions <- function(object, ...)
+na.exclude.states <- function(object, ...)
 {
   if (!anyNA(object))
     return(object)
   
-  object <- na.exclude(unclass(object), ...)
-  obj.attrs <- attributes(object)
-  
-  object <- if (all(is_state(object)))
-    new_states(object)
-  else
-    new_lgas(object)
-  
-  class(object) <- c(class(obj.attrs$na.action), class(object))
-  attr(object, "na.action") <- obj.attrs$na.action
-  object
+  .excluderForNas(object, "states", ...)
 }
+
+
+
+
+#' @rdname lgas
+#' @export 
+na.exclude.lgas <- function(object, ...)
+{
+  if (!anyNA(object))
+    return(object)
+  
+  .excluderForNas(object, "lgas", ...)
+}
+
+
+
+#' @importFrom stats na.exclude
+.excluderForNas <- function(obj, regiontype = c("states", "lgas"), ...) {
+  regiontype <- match.arg(regiontype)
+  obj <- stats::na.exclude(unclass(obj), ...)
+  obj.attrs <- attributes(obj)
+  constructor <- paste("new", regiontype, sep = "_")
+  obj <- do.call(constructor, args = list(x = obj))
+  class(obj) <- c(class(obj.attrs$na.action), class(obj))
+  attr(obj, "na.action") <- obj.attrs$na.action
+  obj
+  }
+  

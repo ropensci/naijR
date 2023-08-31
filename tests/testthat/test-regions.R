@@ -172,7 +172,7 @@ test_that("missing values in 'regions' are handled", {
   # State tests
   staat <- states(c("Imo", "Kaduna", "Adamawa"))
   staat[2:3] <- NA
-  nomiss.st <- stats::na.exclude(staat)
+  nomiss.st <- na.exclude(staat)
   
   expect_identical(states(), stats::na.exclude(states()))
   expect_s3_class(nomiss.st, classname)
