@@ -4,10 +4,12 @@
 \alias{states}
 \alias{is_state}
 \alias{as_state}
-\alias{print.regions}
-\alias{head.regions}
-\alias{tail.regions}
-\title{Create an Object for the States of Nigeria}
+\alias{print.states}
+\alias{[[.states}
+\alias{c.states}
+\alias{[.states}
+\alias{na.exclude.states}
+\title{Objects for Representing the Federal States of Nigeria}
 \usage{
 states(states, gpz = NULL, all = TRUE, warn = TRUE)
 
@@ -15,11 +17,15 @@ is_state(x)
 
 as_state(x)
 
-\method{print}{regions}(x, ...)
+\method{print}{states}(x, ...)
 
-\method{head}{regions}(x, ...)
+\method{[[}{states}(x, i, exact = TRUE)
 
-\method{tail}{regions}(x, ...)
+\method{c}{states}(...)
+
+\method{[}{states}(x, i)
+
+\method{na.exclude}{states}(object, ...)
 }
 \arguments{
 \item{states}{A character vector with strings representing one or more
@@ -47,7 +53,7 @@ length as the input. If the input object is not even of type
 of \code{as_state}, an object of class \code{states}
 }
 \description{
-Create an Object for the States of Nigeria
+Objects for Representing the Federal States of Nigeria
 }
 \details{
 \code{gpz} represents a geopolitical zone which, in the Nigerian

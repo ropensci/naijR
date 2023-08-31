@@ -4,13 +4,28 @@
 \alias{lgas}
 \alias{is_lga}
 \alias{as_lga}
-\title{Create an Object for Local Government Areas}
+\alias{print.lgas}
+\alias{c.lgas}
+\alias{[[.lgas}
+\alias{[.lgas}
+\alias{na.exclude.lgas}
+\title{Objects for Representing the Local Government Areas (LGAs) of Nigeria}
 \usage{
 lgas(region = NA_character_, strict = FALSE, warn = TRUE)
 
 is_lga(x)
 
 as_lga(x)
+
+\method{print}{lgas}(x, ...)
+
+\method{c}{lgas}(...)
+
+\method{[[}{lgas}(x, i, exact = TRUE)
+
+\method{[}{lgas}(x, i)
+
+\method{na.exclude}{lgas}(object, ...)
 }
 \arguments{
 \item{region}{Context-dependent. Either State(s) of the Federation
@@ -40,7 +55,7 @@ are character vectors of the LGAs in each state.
 \code{FALSE}); with \code{as_lga}, an object of class \code{lgas}.
 }
 \description{
-Create an Object for Local Government Areas
+Objects for Representing the Local Government Areas (LGAs) of Nigeria
 }
 \note{
 There are six (6) LGAs that share names with their State - Bauchi,
