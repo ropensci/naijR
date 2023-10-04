@@ -48,7 +48,7 @@ A single state can also be drawn:
 
 ```{r, singleton, warning=FALSE}
 kk <- "Kebbi"
-map_ng(kk, col = 6, fill = TRUE, title = paste(kk, "State"))
+map_ng(kk, col = 6, title = paste(kk, "State"))
 ```
 
 ## Choropleth maps
@@ -98,7 +98,7 @@ map_ng(region = states(), x = var)
 ```
 
 ### Numerical values
-When the data to be categorized are numeric vectors, the categories have to be defined. To achieve this, the `breaks` argument has to be supplied. This is a numeric vector that describes class limits for grouping the values. The number of classes is `length(breaks) - 1`.
+When the data to be categorized are `numeric` vectors, the categories have to be defined. To achieve this, the `breaks` argument has to be supplied. This is a numeric vector that describes class limits for grouping the values. The number of classes is `length(breaks) - 1`.
 
 ```{r numeric-choropleth} 
 nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100

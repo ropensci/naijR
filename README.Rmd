@@ -120,6 +120,8 @@ install.packages("naijR")
 The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
 
 ``` {r dev-install, eval = FALSE}
-# install.packages("pak")  # if necessary
-pak::pkg_install("BroVic/naijR")
+# install.packages("remotes")
+remotes::install_github("BroVic/naijR",
+                        dependencies = TRUE,
+                        build_vignettes = TRUE)
 ```

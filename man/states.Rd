@@ -30,13 +30,14 @@ as_state(x)
 \arguments{
 \item{states}{A character vector with strings representing one or more
 States of Nigeria. If missing, the function will return a \code{states}
-all the States, with or without the Federal Capital Territory (FCT).}
+object containing all the States.}
 
 \item{gpz}{\code{NULL} (the default) or, case insensitively, one or more of
 the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"}
 (see "Details").}
 
-\item{all}{logical; whether to include the FCT in the result.}
+\item{all}{logical; whether to include the Federal Capital Territory (FCT)
+in the result.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
 actually States (i.e. they were misspelt).}
@@ -57,7 +58,7 @@ The States of Nigeria as a whole or by zones, as an S3 object
 of class \code{states}. \code{is_state} returns a logical vector.of same
 length as the input. If the input object is not even of type
 \code{character}, return the object unaltered, with a warning. In the case
-of \code{as_state}, an object of class \code{states}
+of \code{as_state}, an object of class \code{states}.
 }
 \description{
 Objects for Representing the Federal States of Nigeria
@@ -70,6 +71,7 @@ from sub-national administrative divisions known as 'Regions' that existed
 at the time of the country's independence. There are at present 6 such
 zones - North-Central, North-East, North-West, South-East,South-South and
 South-West.
+
 For \code{is_state}, An element-wise check of a supplied vector is carried
 out. To test an entire vector and return a single boolean value, functions
 such as \code{base::all} or \code{base::any} should be used (see examples).
@@ -77,7 +79,9 @@ such as \code{base::all} or \code{base::any} should be used (see examples).
 \note{
 \code{is_state} throws a warning, when a missing value is among the
 elements. It works only for atomic vectors, throwing an error when this
-is not the case or when \code{NULL} is passed to it.
+is not the case or when \code{NULL} is passed to it. This design decision
+was made to allow rapid iteration through data frames without interruption,
+since spelling mistakes tend to be common.
 }
 \examples{
 states()  # lists names of all States
