@@ -12,7 +12,7 @@ Imports:
     mapdata (>= 2.3.0),
     maps (>= 3.3.0),
     rlang (>= 0.4.0),
-    sf (>= 1.0.13),
+    sf (>= 1.0.12),
     stats,
     stringi (>= 1.7.6),
     utils
