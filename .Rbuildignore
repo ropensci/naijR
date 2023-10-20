@@ -3,7 +3,6 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^LICENSE\.md$
-^\.travis\.yml$
 ^README\.Rmd$
 ^codecov\.yml$
 ^\.git*
@@ -15,7 +14,10 @@
 ^\.github$
 ^R/util\.R$
 ^tests/testthat/data/test-map.png$
-^inst/extdata/ng_admin$
-^inst/extdata/nigeria-lgas$
+^inst/extdata/ng_admin*$
+^inst/extdata/nigeria-lgas*$
 ^vignettes/img/interactive-\db.png$
+^CONTRIBUTING\.md$
+^codemeta\.json$
 ^\.covrignore$
+^\.lintr$

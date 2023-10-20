@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">naijR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.1</span>
       </span>
     </div>
 
@@ -204,7 +204,7 @@
 <span><span class="co"># check for misspelt LGAs and, if necessary, attempt to fix</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">is_lga</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 3</span></span>
 <span><span class="va">corrected.adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region.html">fix_region</a></span><span class="op">(</span><span class="va">mispelt.adamawa</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'Machika' approximately matched more than one region - Michika, Machina</span></span>
@@ -215,7 +215,7 @@
 <span><span class="co">#&gt; Fix(es) not applied:</span></span>
 <span><span class="co">#&gt; --------------------</span></span>
 <span><span class="co">#&gt; * Machika</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">corrected.adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">is_lga</a></span><span class="op">(</span><span class="va">corrected.adamawa</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 5</span></span></code></pre></div>
 <p>We see that the string ‘Machika’ is not an actual LGA and there are more than one possible candidate LGA that are considered as possible replacement. Our original intent was to use “Michika LGA”. To address this mistake, we can run <code>fix_region</code> interactively. Note that the <code>interactive</code> option is only available for use with objects of class <code>lgas</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -224,7 +224,7 @@
 <!-- This chunk exists to make available the `adamawa` object which we are using in the subsequent chunk. The code will be replicated and executed with its output displayed in the chunk referring to manual fixes. -->
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Confirm that the spelling mistakes have been fixed.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="../reference/is_lga.html">is_lga</a></span><span class="op">(</span><span class="va">adamawa</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="../reference/lgas.html">is_lga</a></span><span class="op">(</span><span class="va">adamawa</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -232,7 +232,7 @@
 </h4>
 <p>When spelling errors are identified and the correct one is already known, then a manual fix can be applied. For this, we use the function <code>fix_region_manual</code> and its use is straightforward<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region_manual.html">fix_region_manual</a></span><span class="op">(</span><span class="va">corrected.adamawa</span>,</span>
+<code class="sourceCode R"><span><span class="va">adamawa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_region.html">fix_region_manual</a></span><span class="op">(</span><span class="va">corrected.adamawa</span>,</span>
 <span>                             wrong <span class="op">=</span> <span class="st">"Machika"</span>,</span>
 <span>                             correct <span class="op">=</span> <span class="st">"Michika"</span><span class="op">)</span></span>
 <span><span class="va">adamawa</span></span>

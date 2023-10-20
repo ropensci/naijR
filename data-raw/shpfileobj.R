@@ -4,7 +4,6 @@
 #
 # Copyright (c) 2020-2023 Victor Ordu
 
-
 # Preparation of the `ShapefileProps` objects used in the package
 #
 # The spatial data used in this packages is prepared before hand by
@@ -291,7 +290,7 @@ mat <- cbind(
   )
 )
 
-for (i in seq(nrow(mat))) {
+for (i in seq_len(nrow(mat))) {
   x <- mat[i, "state"]
   y <- mat[i, "old"]
   z <- mat[i, "new"]
@@ -307,4 +306,4 @@ if (!all(vapply(scan.result2, is.null, logical(1))))
 # Using RDA format; to be loaded alongside exported objects
 cli::cli_inform("Saving fixed objects")
 shpobjs <- grep("^shp\\.", ls(), value = TRUE)
-save(list = shpobjs, file = datafile)
+save(list = shpobjs, file = datafile, compress = "xz")

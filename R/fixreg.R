@@ -1,15 +1,20 @@
 # Source file: fixreg.R
 #
+# GPL-3 License
+#
 # Copyright (C) 2019-2023 Victor Ordu.
 
-#' Fix Region Names
+#' Fix Misspelling of Adminstrative Regions
 #' 
-#' Correct any misspelt names of administrative regions i.e. States and LGAs
+#' Correct any misspelt names of administrative regions e.g. States and LGAs.
 #' 
-#' @details The function will look through a character vector and try to 
+#' @details \code{fix_region} will look through a character vector and try to 
 #' determine if State or LGA names have been wrongly entered. This presupposes
 #' that the atomic vector is of type \code{character}. It does not test any
 #' missing values in the vector, leaving them untouched.
+#' 
+#' \code{fix_region_manual} allows users to interactively and directly change
+#' update the spelling.
 #' 
 #' @note When passed a character vector of length \code{1L}, in the case of a
 #' misspelt LGA, the function signals an error; the presumption is that a fix
@@ -37,7 +42,8 @@ fix_region <- function(x, ...)
 #' 
 #' @export
 fix_region.states <- function(x, ...)
-{ # TODO: Consider reporting on fixes made
+{ 
+  # TODO: Consider reporting on fixes made
   ## Process possible FCT values
   abbrFCT <- .fct_options("abbrev")
   fullFCT <- .fct_options("full")
@@ -90,37 +96,37 @@ fix_region.states <- function(x, ...)
 #' fix_region(c("Owerri north", "Owerri West"))
 #' 
 #' @export
-fix_region.lgas <-
-  function(x,
-           interactive = FALSE,
-           quietly = FALSE,
-           graphic = FALSE,
-           ...)
+fix_region.lgas <- 
+  function(x, interactive = FALSE, quietly = FALSE, graphic = FALSE, ...)
   {
-    # TODO: add a 'state' argument to fine-tune the matching
+    # TODO: add an optional 'state' argument to fine-tune the matching
     if (!is.logical(interactive) ||
         !is.logical(quietly) ||
         !is.logical(graphic)) {
       cli::cli_abort("Invalid input where logical argument expected")
     }
-    if (graphic) 
+    if (graphic) {
+      if (!interactive)
+        cli::cli_warn("'graphic' was reset to FALSE in non-interactive mode")
+      
       graphic <- interactive
-    
-    usedialog <- .Platform$OS.type == "windows" && graphic
+    }
     vals <- .fix_region_internal(x, lgas(), interactive)
+    usedialog <- .Platform$OS.type == "windows" && graphic
     
-    if (interactive)
+    if (interactive) { # nocov start
       vals <- .fix_lgas_interactive(vals, usedialog)
     
-    if (is.null(vals)) {
-      msg <- "The operation was cancelled"
-      
-      if (usedialog)
-        utils::winDialog("ok", msg)
-      else
-        cli::cli_alert_info(msg)
-      
-      return(invisible(x))
+      if (is.null(vals)) {
+        msg <- "The operation was cancelled"
+        
+        if (usedialog)
+          utils::winDialog("ok", msg)
+        else
+          cli::cli_alert_info(msg)
+        
+        return(invisible(x))
+      } # nocov end
     }
     if (!quietly)
       .report_on_fixes(vals, usedialog)
@@ -183,268 +189,25 @@ fix_region.lgas <-
         `states()` or `lgas()` for a more reliable fix"
     )
   
-  invisible(as.character(fix_region(region)))
+  invisible(as.character(fix_region(region, ...)))
 }
 
 
 
 
-  
-## Approximately matches a string on a list of regions i.e States or LGAs.
-## @param str A string to be matched
-## @param regions The values to be matched against, specifically from regions
-##
-## @return A vector of the same length as str with the approximately
-## matched value, which in the case of misspelling should be the correct one.
-##
-## This function is mapped to a vector of states/LGAs
-.fix_region_internal <- function(x, region, interactive = FALSE)
-{
-  stopifnot(is.character(x), is.character(region))
-  cant.fix <- character()
-  fix.status <- character()
-  
-  ## Internal function to enable identification of entries that need to
-  ## be fixed and preparing attributes that will enable further processing
-  ## downstream.
-  get_proper_value <- function(str, regions) {
-    abbrFCT <- .fct_options("abbrev")
-    
-    if (!is.na(match(str, regions)))
-      return(str)
-    
-    if (inherits(regions, "states")) {
-      
-      if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
-          && identical(toupper(str), abbrFCT))
-        
-        return(abbrFCT)
-    }
-    
-    ## First remove spaces around slashes and hyphens
-    ## Note: run `.__why_no_pipe()` for rationale behind this approach
-    str <- gsub("\\s\\/", "/", str)
-    str <- gsub("\\/\\s", "/", str)
-    str <- sub("-\\s", "-", str)
-    str <- sub("^Egbado/", "", str) ## TODO: Address hard-coding
-    
-    ## Now, check for exact matching.
-    rgx <- paste0('^', str, '$')
-    good <- unique(grep(rgx, regions, value = TRUE, ignore.case = TRUE))
-    
-    if (length(good) == 1L) 
-      return(good)
-    
-    ## Otherwise check for approximate matches.
-    fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
-    numFixed <- length(fixed)
-    
-    if (numFixed == 1L) {
-      fs <- c(fix.status, fixed)
-      names(fs) <- c(names(fix.status), str)
-      fix.status <<- fs
-      return(fixed)
-    }
-    
-    if (numFixed > 1L && !interactive) {
-      multimatch <- paste(fixed, collapse = ", ")
-      
-      cli::cli_inform(
-        "'{str}' approximately matched more than one region - {multimatch}"
-      )
-    }
-    
-    # if we get to this point, return the misspelt string unchanged
-    cant.fix <<- c(cant.fix, str)
-    str
-  }
-  
-  spellchecked <-
-    vapply(x,
-           get_proper_value,
-           character(1),
-           regions = region,
-           USE.NAMES = FALSE)
-  
-  attr(spellchecked, "misspelt") <- sort(unique(cant.fix))
-  
-  ## Reduce data for reporting on fixes to only the 
-  ## unique instances i.e. avoid redundant output
-  if (length(fix.status) > 1L) {
-    allfix <- names(fix.status)
-    
-    if (anyDuplicated(allfix)) {
-      dups <- which(duplicated(allfix))
-      fix.status <- fix.status[-dups]
-    }
-  }
-  
-  attr(spellchecked, "regions.fixed") <- fix.status
-  spellchecked
-}
-
-
-
-# Tells the user about what repairs have been made to the spellings
-# @param obj - the checked object, which has attributes with relevant details
-# @param usedialog Whether to display a dialog (on Windows only).
-.report_on_fixes <- function(obj, usedialog = FALSE)
-{
-  spell.details <- attributes(obj)
-  badspell <- spell.details$misspelt
-  hasBadspell <- !identical(badspell, character(0))
-  msg.bad <- msg.good <- ""
-  
-  if (hasBadspell) {
-    hdr.bad <- .messageHeader("Fix(es) not applied")
-    nofix.bullets <-
-      vapply(badspell, function(x) paste("*", x), character(1))
-    msg.bad <- paste0(hdr.bad, paste(nofix.bullets, collapse = "\n"))
-  }
-  
-  # Put the message together
-  fixes <- spell.details$regions.fixed
-  
-  if (!identical(fixes, character(0))) {
-    hdr.good <- .messageHeader("Successful fix(es)")
-    
-    fixed.bullets <-
-      mapply(function(a, z) {
-        sprintf("* %s => %s", a, z)
-      }, 
-      names(fixes), fixes)
-    
-    msg.good <- paste0(hdr.good, paste(fixed.bullets, collapse = "\n"))
-    
-    if (hasBadspell)
-      msg.good <- paste0(msg.good, "\n")    # just add newline
-  }
-  
-  if (!nchar(msg.good) && !nchar(msg.bad))
-    return()
-  
-  final.msg <- paste(msg.good, msg.bad, sep = "\n")
-  
-  if (usedialog)
-    utils::winDialog("ok", final.msg)
-  else
-    cli::cli_alert_info(final.msg)
-}
-
-
-
-
-.messageHeader <- function(hdr)
-{
-  stopifnot(is.character(hdr))
-  
-  hdr <- paste0(hdr, ":")
-  dashes <- strrep("-", nchar(hdr))
-  hdr <- paste(hdr, dashes, sep = '\n')
-  paste0(hdr, "\n")
-}
-
-
-
-## Interactively fixes regions that are bad - this function is primarily
-## used for repairing LGA names, since they are so many.
-## @param lga.list The vector of LGA names that is being repaired. This vector
-## is generated by `.fix_region_internal` and has an attribute called
-## `misspelt`, which is the collection of names needing repair.
-## @param usedialog Whether to use dialog in prompts (only on Windows)
-.fix_lgas_interactive <- function(lga.list, usedialog = FALSE)
-{
-  stopifnot(interactive())
-  allLgas <- lgas()
-  menuopt <- integer()
-  skipped <- character()
-  bad.values <- attr(lga.list, "misspelt")
-  
-  # This list doesn't need to be re-created with each loop iteration
-  # that's why it's been created here.
-  special.options <- list(
-    retry = "RETRY",
-    skip = "SKIP",
-    quit = "QUIT"
-  )
-  
-  for (bad in bad.values) {
-    msg.fixWhich <- paste("Fixing", sQuote(bad))
-    
-    repeat {
-      prompt <- paste(msg.fixWhich, "Enter a search term: ", sep = ' - ')
-      
-      pattern <- if (usedialog)
-        utils::winDialogString(prompt, "")
-      else
-        readline(prompt)
-      
-      if (pattern == "" || is.null(pattern))
-        return()
-      
-      used.lgas <- 
-        sort(grep(pattern, allLgas, value = TRUE, ignore.case = TRUE))
-      choices <- c(used.lgas, unlist(unname(special.options)))
-      menuopt <- utils::menu(choices, graphics = usedialog, "Select the LGA")
-      chosen <- choices[menuopt]
-      
-      if (chosen != special.options$retry)
-        break
-    }
-    
-    if (chosen == special.options$quit)
-      break
-    
-    if (chosen == special.options$skip) {
-      skipped <- c(skipped, bad)
-      next
-    }
-    
-    # Note that pipes were deliberately not used here.
-    lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
-    attr.misspelt <- attr(lga.list, "misspelt")
-    attr.misspelt <- attr.misspelt[attr.misspelt != bad]
-    attr(lga.list, "misspelt") <- attr.misspelt
-    attr.regfixed <- attr(lga.list, "regions.fixed")
-    attr.regfixed <- c(attr.regfixed, chosen)
-    names(attr.regfixed) <- c(names(attr.regfixed), bad)
-  }
-  
-  if (length(skipped)) {
-    msg <-
-      paste(
-        "The following items were skipped and should be fixed manually:",
-        paste(skipped, collapse = ", ")
-      )
-    
-    if (usedialog)
-      utils::winDialog("ok", msg)
-    else
-      cli::cli_inform(msg)
-  }
-  lga.list
-}
-
-
-
-
-
-
-
-
-
-
-
-
-#' Fix Spelling of Regions Manually
+#' @rdname fix_region
 #' 
-#' Enable users to interactively and directly change to spelling of States
-#' and/or Local Government Areas (LGAs)
-#' 
-#' @param x The object to be modified
 #' @param wrong The misspelt element(s) of \code{x}.
 #' @param correct The correction that is to be applied to the misspelt 
 #' element(s)
+#' 
+#' @examples
+#' x <- c("Pankshen", "Pankshin", "Q'uan Pam")
+#' is_lga(x)
+#' x <- fix_region(x, quietly = TRUE)
+#' is_lga(x)
+#' fix_region_manual(x, "Q'uan Pam", "Qua'an Pan")
+#' all(is_lga(x))
 #' 
 #' @importFrom cli cli_abort
 #' @export
@@ -491,13 +254,3 @@ fix_region_manual <- function(x, wrong, correct)
   # TODO: Check post-conditions and warn if mistakes remain?
   x
 }
-
-
-
-
-.assert_region <- function(x) {
-  if (!is_state(x) && !is_lga(x))
-    cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
-  x
-}
-

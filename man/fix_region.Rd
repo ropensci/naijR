@@ -5,7 +5,8 @@
 \alias{fix_region.states}
 \alias{fix_region.lgas}
 \alias{fix_region.default}
-\title{Fix Region Names}
+\alias{fix_region_manual}
+\title{Fix Misspelling of Adminstrative Regions}
 \usage{
 fix_region(x, ...)
 
@@ -14,6 +15,8 @@ fix_region(x, ...)
 \method{fix_region}{lgas}(x, interactive = FALSE, quietly = FALSE, graphic = FALSE, ...)
 
 \method{fix_region}{default}(x, ...)
+
+fix_region_manual(x, wrong, correct)
 }
 \arguments{
 \item{x}{An S3 object of class \code{states} or \code{lgas}. For 
@@ -29,19 +32,27 @@ options.}
 \item{quietly}{Logical; default argument is \code{FALSE}.}
 
 \item{graphic}{Whether to make use of native GUI elements (on Windows only).}
+
+\item{wrong}{The misspelt element(s) of \code{x}.}
+
+\item{correct}{The correction that is to be applied to the misspelt 
+element(s)}
 }
 \value{
 The transformed object. If all names are correct, the object is
 returned unchanged.
 }
 \description{
-Correct any misspelt names of administrative regions i.e. States and LGAs
+Correct any misspelt names of administrative regions e.g. States and LGAs.
 }
 \details{
-The function will look through a character vector and try to 
+\code{fix_region} will look through a character vector and try to 
 determine if State or LGA names have been wrongly entered. This presupposes
 that the atomic vector is of type \code{character}. It does not test any
 missing values in the vector, leaving them untouched.
+
+\code{fix_region_manual} allows users to interactively and directly change
+update the spelling.
 }
 \note{
 When passed a character vector of length \code{1L}, in the case of a
@@ -55,5 +66,12 @@ for fixing the mistakes are available via mode \code{interactive}.
 \examples{
 try(fix_region("Owerri north")) # ERROR
 fix_region(c("Owerri north", "Owerri West"))
+
+x <- c("Pankshen", "Pankshin", "Q'uan Pam")
+is_lga(x)
+x <- fix_region(x, quietly = TRUE)
+is_lga(x)
+fix_region_manual(x, "Q'uan Pam", "Qua'an Pan")
+all(is_lga(x))
 
 }

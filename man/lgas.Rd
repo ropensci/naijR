@@ -2,44 +2,71 @@
 % Please edit documentation in R/regions.R
 \name{lgas}
 \alias{lgas}
-\alias{lgas_ng}
-\title{Create on Object for Local Government Areas}
+\alias{is_lga}
+\alias{as_lga}
+\alias{print.lgas}
+\alias{c.lgas}
+\alias{[[.lgas}
+\alias{[.lgas}
+\alias{na.exclude.lgas}
+\title{Objects for Representing the Local Government Areas (LGAs) of Nigeria}
 \usage{
 lgas(region = NA_character_, strict = FALSE, warn = TRUE)
 
-lgas_ng(state = NA_character_)
+is_lga(x)
+
+as_lga(x)
+
+\method{print}{lgas}(x, ...)
+
+\method{c}{lgas}(...)
+
+\method{[[}{lgas}(x, i, exact = TRUE)
+
+\method{[}{lgas}(x, i)
+
+\method{na.exclude}{lgas}(object, ...)
 }
 \arguments{
-\item{region}{Context-dependent. Either State(s) of the Federation 
+\item{region}{Context-dependent. Either State(s) of the Federation
 or Local Government Area(s) - internal checks are performed to determine
-what applies. In cases where States are synonymous to LGAs, the default 
+what applies. In cases where States are synonymous to LGAs, the default
 behaviour is to use the State as a basis for selecting the LGAs. This
-can be modified with \code{strict}. The default value is 
+can be modified with \code{strict}. The default value is
 \code{NA_character_} and will return all 774 LGAs.}
 
-\item{strict}{logical; in the event of a name clash between State/LGA, 
+\item{strict}{logical; in the event of a name clash between State/LGA,
 return only the specified LGA when this argument is set to \code{TRUE}.}
 
 \item{warn}{logical; issue a warning when one or more elements are not
 actually Local Government Areas (or were misspelt).}
 
-\item{state}{Character; State(s) in the Federation of Nigeria. Default is
-\code{NA_character_}.}
+\item{x}{An object of type \code{character}. This includes higher
+dimension object classes like \code{matrix} and \code{array}. For
+\code{as_lga}, a string representing a Local Government Area that shares its
+name with one of its States.}
+
+\item{...}{Arguments used for methods. See documentation of generic
+for details.}
+
+\item{i, exact}{See help file for \code{?Extract}}
+
+\item{object}{An object of class \code{regions}}
 }
 \value{
-If length of \code{ng.state} == 1L, a character vector containing 
-the names of Local Government Areas; otherwise a named list, whose elements 
+If length of \code{ng.state} == 1L, a character vector containing
+the names of Local Government Areas; otherwise a named list, whose elements
 are character vectors of the LGAs in each state.
+\code{is_lga} returms a vector the same length as the input object
+(each element that is not a valid Local Government Area will evaluate to
+\code{FALSE}); with \code{as_lga}, an object of class \code{lgas}.
 }
 \description{
-Create on Object for Local Government Areas
+Objects for Representing the Local Government Areas (LGAs) of Nigeria
 }
 \note{
-There are six (6) LGAs that share names with their State - Bauchi, 
+There are six (6) LGAs that share names with their State - Bauchi,
 Ebonyi, Gombe, Katsina, Kogi and Ekiti.
-
-\code{lga_ng} stands deprecated and will be removed in the next minor
-version. New code should use \code{lgas} instead.
 }
 \examples{
 how_many_lgas <- function(state) {
@@ -51,5 +78,19 @@ how_many_lgas <- function(state) {
 }
 how_many_lgas("Sokoto")
 how_many_lgas("Ekiti")
+is_lga(c("Pankshen", "Pankshin"))
+
+# With coercion
+kt.st <- states("Katsina")  # Ensure this is a State, not an LGA.
+kt.lg <- suppressWarnings(as_lga(kt.st))
+is_state(kt.st)             # TRUE
+is_lga(kt.lg)               # TRUE
+
+## Where there's no ambiguity, it doesn't make sense to coerce
+## This kind of operation ends with an error
+\dontrun{
+as_state("Kano")
+as_lga("Michika")
+}
 
 }

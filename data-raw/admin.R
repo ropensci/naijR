@@ -1,9 +1,12 @@
-# admin.R
+# Source file: admin.R
+#
+# GPL-3 License
+#
+# Copyright (c) 2020-2023 Victor Ordu
+
 # Create package data for administrative regions from raw data
 #
 # Dependencies ----
-library(usethis)
-library(cli)
 devtools::load_all()
 
 check_exist <- function(obj) {
@@ -12,17 +15,16 @@ check_exist <- function(obj) {
 }
 
 getLGAlist <- function(state) {
-  require(WikidataR)
-  cli_inform("* {state}")
+  cli::cli_inform("* {state}")
   
   if (!identical(state, "Federal Capital Territory"))
     state <- paste(state, "State")
   
-  stateitem <- find_item(state)
+  stateitem <- WikidataR::find_item(state)
   stateid <- stateitem[[1]]$id
-  statedata <- get_item(stateid)
+  statedata <- WikidataR::get_item(stateid)
   lgids <- statedata[[1]]$claims$P150$mainsnak$datavalue$value$id
-  lgaobjlist <- get_item(lgids)
+  lgaobjlist <- WikidataR::get_item(lgids)
   
   statelgas <-
     vapply(lgaobjlist, 
@@ -41,12 +43,12 @@ states_nigeria <- ISOcodes::ISO_3166_2 |>
   setNames(c("isocode", "state")) |>
   .__addGPZ("state", "gpz")
 
-cli_inform("Saving object with {nrow(states_nigeria)} States")
-use_data(states_nigeria, overwrite = check_exist(states_nigeria))
+cli::cli_inform("Saving object with {nrow(states_nigeria)} States")
+usethis::use_data(states_nigeria, overwrite = check_exist(states_nigeria))
 
 
 # Local Government Areas ----
-cli_inform("Fetching list of LGAs from external source:")
+cli::cli_inform("Fetching list of LGAs from external source:")
 
 # used `sapply` without simplification so we can capture the names
 lgas_by_state <-
@@ -57,5 +59,5 @@ lgas_nigeria <- lgadata |>
   merge(states_nigeria, by = "state") |>
   subset(select = -isocode)
 
-cli_inform("Saving object with {nrow(lgas_nigeria)} LGAs")
-use_data(lgas_nigeria, overwrite =  check_exist(lgas_nigeria))
+cli::cli_inform("Saving object with {nrow(lgas_nigeria)} LGAs")
+usethis::use_data(lgas_nigeria, overwrite =  check_exist(lgas_nigeria))

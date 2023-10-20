@@ -2,26 +2,38 @@
 % Please edit documentation in R/regions.R
 \name{states}
 \alias{states}
-\alias{print.regions}
-\alias{head.regions}
-\alias{tail.regions}
-\title{Create an Object for the States of Nigeria}
+\alias{is_state}
+\alias{as_state}
+\alias{print.states}
+\alias{c.states}
+\alias{[[.states}
+\alias{[.states}
+\alias{na.exclude.states}
+\title{Objects for Representing the Federal States of Nigeria}
 \usage{
 states(states, gpz = NULL, all = TRUE, warn = TRUE)
 
-\method{print}{regions}(x, ...)
+is_state(x)
 
-\method{head}{regions}(x, ...)
+as_state(x)
 
-\method{tail}{regions}(x, ...)
+\method{print}{states}(x, ...)
+
+\method{c}{states}(...)
+
+\method{[[}{states}(x, i, exact = TRUE)
+
+\method{[}{states}(x, i)
+
+\method{na.exclude}{states}(object, ...)
 }
 \arguments{
-\item{states}{A character vector with strings representing one or more 
-States of Nigeria. If missing, the function will return a \code{states} 
+\item{states}{A character vector with strings representing one or more
+States of Nigeria. If missing, the function will return a \code{states}
 all the States, with or without the Federal Capital Territory (FCT).}
 
 \item{gpz}{\code{NULL} (the default) or, case insensitively, one or more of
-the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"} 
+the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"}
 (see "Details").}
 
 \item{all}{logical; whether to include the FCT in the result.}
@@ -29,32 +41,61 @@ the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"}
 \item{warn}{logical; issue a warning when one or more elements are not
 actually States (i.e. they were misspelt).}
 
-\item{x}{The object of class \code{region}}
+\item{x}{For \code{is_state} a vector to be tested. For \code{as_state}, a
+string representing a State that shares its name with one of its Local
+Government Areas.}
 
-\item{...}{Arguments to \code{tail.default}}
+\item{...}{Arguments used for methods. See documentation of generic
+for details.}
+
+\item{i, exact}{See help file for \code{?Extract}}
+
+\item{object}{An object of class \code{regions}}
 }
 \value{
-The States of Nigeria as a whole or by zones, as an S3 object 
-of class \code{states}.
+The States of Nigeria as a whole or by zones, as an S3 object
+of class \code{states}. \code{is_state} returns a logical vector.of same
+length as the input. If the input object is not even of type
+\code{character}, return the object unaltered, with a warning. In the case
+of \code{as_state}, an object of class \code{states}
 }
 \description{
-Create an Object for the States of Nigeria
-
-Print regions
-
-Return the First or Last Parts of a Region Object
+Objects for Representing the Federal States of Nigeria
 }
 \details{
-\code{gpz} represents a geopolitical zone which, in the Nigerian 
+\code{gpz} represents a geopolitical zone which, in the Nigerian
 context, is a national subdivision that groups contiguous states that bear
 certain socio-cultural and political similarities. Historically, they arise
-from sub-national administrative divisions known as 'Regions' that existed 
-at the time of the country's independence. There are at present 6 such 
-zones - North-Central, North-East, North-West, South-East,South-South and 
+from sub-national administrative divisions known as 'Regions' that existed
+at the time of the country's independence. There are at present 6 such
+zones - North-Central, North-East, North-West, South-East,South-South and
 South-West.
+For \code{is_state}, An element-wise check of a supplied vector is carried
+out. To test an entire vector and return a single boolean value, functions
+such as \code{base::all} or \code{base::any} should be used (see examples).
+}
+\note{
+\code{is_state} throws a warning, when a missing value is among the
+elements. It works only for atomic vectors, throwing an error when this
+is not the case or when \code{NULL} is passed to it.
 }
 \examples{
 states()  # lists names of all States
 states(gpz = "se")  # lists States in South-East zone
+all(is_state(naijR::states()))
+is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
+
+# With coercion
+kt.st <- states("Katsina")  # Ensure this is a State, not an LGA.
+kt.lg <- suppressWarnings(as_lga(kt.st))
+is_state(kt.st)             # TRUE
+is_lga(kt.lg)               # TRUE
+
+## Where there's no ambiguity, it doesn't make sense to coerce
+## This kind of operation ends with an error
+\dontrun{
+as_state("Kano")
+as_lga("Michika")
+}
 
 }

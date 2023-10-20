@@ -15,7 +15,7 @@
 #' @importFrom methods slot
 .__getShapefileData <- function(regiontype = c("state", "lga")) {
   regiontype <- match.arg(regiontype)
-  dt <- "data"
+  
   if (identical(regiontype, "state")) {
     return(shp.state$spatialObject)
   }
@@ -41,14 +41,16 @@
 .__displayStateMaps <- function(verbose = FALSE)
 {
   doOneMap <- function(s) {
+    ret <- NULL
+    
     tryCatch({
       message("Drawing map of ", s, " State ... ", appendLF = FALSE)
       ret <- map_ng(lgas(s), title = paste("Map of", s, "State"))
       message("Done")
     }, error = function(err) {
       message("Failed")
-      ret <- NULL
     })
+    
     ret
   }
   invisible(lapply(states(), doOneMap))
@@ -96,10 +98,6 @@
 
 
 
-
-
-
-
 # Adds a column for the geo-political zones to an
 # existing data frame that has a character column
 # of the States.
@@ -117,7 +115,7 @@
   })
 
   data[[zonehdr]] <- NA_character_
-  statelist <- stateList()
+  statelist <- get_all_states()
   
   for (gpz in names(statelist)) {
     rgx <- paste(statelist[[gpz]], collapse = "|")

@@ -3,6 +3,7 @@ test_that("input is validated", {
   expect_warning(is_state(pi))
   expect_error(is_state(NULL), "Expected a non-null atomic vector as input")
   expect_length(suppressWarnings(is_state(pi)), 1L)
+  expect_false(is_state(character()))
 })
 
 test_that("States can be identified in an object", {

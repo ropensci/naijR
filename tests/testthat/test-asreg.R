@@ -44,18 +44,18 @@ test_that("Regions without synonyms are not treated after validation", {
 
 test_that("LGA and States can be disambiguated", {
   ## Input validation
-  expect_error(disambiguate_lga(42L))
-  expect_error(disambiguate_lga(NULL))
-  expect_error(disambiguate_lga(pi))
-  expect_error(disambiguate_lga(TRUE))
-  expect_error(disambiguate_lga(list()))
-  expect_error(disambiguate_lga(data.frame()))
-  expect_error(disambiguate_lga(matrix(letters, 2)))
+  err.typecheck <- "Expected an object of class `lgas`"
   
-  err <- "Expected an object of class `lgas`"
-  expect_error(disambiguate_lga("FCT"), err)
-  expect_error(disambiguate_lga("Ekiti"), err)
-  expect_error(disambiguate_lga(states("Ekiti")))
+  expect_error(disambiguate_lga(42L), err.typecheck)
+  expect_error(disambiguate_lga(NULL), err.typecheck)
+  expect_error(disambiguate_lga(pi), err.typecheck)
+  expect_error(disambiguate_lga(TRUE), err.typecheck)
+  expect_error(disambiguate_lga(list()), err.typecheck)
+  expect_error(disambiguate_lga(data.frame()), err.typecheck)
+  expect_error(disambiguate_lga(matrix(letters, 2)), err.typecheck)
+  expect_error(disambiguate_lga("FCT"), err.typecheck)
+  expect_error(disambiguate_lga("Ekiti"), err.typecheck)
+  expect_error(disambiguate_lga(states("Ekiti")), err.typecheck)
   
   ## Logic
   nasstr <- "Nasarawa"
@@ -64,6 +64,7 @@ test_that("LGA and States can be disambiguated", {
   obiben <- disambiguate_lga(obilga, benstr)
   obinas <- disambiguate_lga(obilga, nasstr)
   myattr <- "State"
+  
   expect_s3_class(obiben, "lgas")
   expect_identical(attr(obiben, myattr), benstr)
   expect_error(disambiguate_lga(c(obilga, "Tarka")),
