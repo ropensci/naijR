@@ -69,7 +69,8 @@ get_all_states <- function(named = TRUE)
 .subset_lgas_by_state <- function(s)
 {
   stopifnot(is.character(s))
-  with(lgas_nigeria, lga[state %in% s])
+  stateInd <- lgas_nigeria$state %in% s
+  lgas_nigeria$lga[stateInd]
 }
 
 

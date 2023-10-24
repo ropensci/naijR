@@ -31,26 +31,6 @@ lgas_like_states <- function()
 
 
 
-# Returns a named list whose elements are character vectors of
-# States that have LGAs that share the same name, the name of
-# each element being the respective LGAs.
-states_with_shared_lgas <- function()
-{
-  findStates <- function(dup.lga) {
-    pattern <- paste0("^", dup.lga, "$")
-    index <- grep(pattern, lgas)
-    lgas_nigeria$state[index]
-  }
-  lgas <- lgas_nigeria$lga
-  lganames <- lgas[duplicated(lgas)]
-  
-  # Use `sapply` without simplification ensuring return of a named list
-  sapply(lganames, findStates, simplify = FALSE)
-}
-
-
-
-
 
 
 ## Messages -----------------------------------------------------------------
