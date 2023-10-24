@@ -151,7 +151,7 @@ map_ng <- function(region = character(),
   region <- .process_region_params(region, call = caller_env())
   legend.params <- .set_legend_params(legend.text)
   
-  value.x <- if (is_null(data) && !is_null(x))
+  value.x <- if (is_null(data) && !is_null(x)) 
     enquo(x) 
   else 
     enexpr(x)
@@ -223,7 +223,6 @@ map_ng <- function(region = character(),
   if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   
-  ## Annotation
   if (plot) { 
     graphics::title(main = title, sub = caption) # nocov start
     
@@ -234,6 +233,7 @@ map_ng <- function(region = character(),
         if (is_null(data))
           leg.title <- deparse(substitute(x))
       }
+      
       graphics::legend(
         x = legend.params$x,
         y = legend.params$y,
@@ -243,8 +243,30 @@ map_ng <- function(region = character(),
         title = leg.title
       )
     }
-    else if (!is_null(y))
-      graphics::points(x, y, ...)
+    
+    if (!is_null(y)) {
+      # sets args to default values when not supplied via interface
+      if_null_1 <- function(arg) if (is.null(arg)) 1 else arg
+      
+      st.pts <- st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
+      st_crs(st.pts) <- st_crs(sfdata)
+
+      pch <- dots$pch
+      lwd <- dots$lwd
+      lty <- dots$lty
+      
+      suppressWarnings({
+        plot(
+          st.pts,
+          add = TRUE,
+          pch = if_null_1(pch),
+          lwd = if_null_1(lwd),
+          lty = if_null_1(lty)
+        )
+        
+        sfdata <- st_union(sfdata, st.pts)
+      })
+    }
     
     if (show.text) {
       txt <- country_name()
@@ -256,6 +278,7 @@ map_ng <- function(region = character(),
         namefield <- get(shpfileprop)$namefield
         txt <- df.only[[namefield]]
         # nocov end
+        
         if (all(is_state(region)))
           txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
       }

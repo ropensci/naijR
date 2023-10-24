@@ -22,10 +22,10 @@ Suggests:
     here,
     knitr,
     purrr,
-    readxl,
     rmarkdown,
     testthat (>= 3.0.0),
-    usethis
+    usethis,
+    WikidataR
 Authors@R: 
 	c(person(given = "Victor", 
 	         family = "Ordu",
