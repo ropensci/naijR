@@ -22,6 +22,7 @@ Suggests:
     here,
     knitr,
     purrr,
+    readxl,
     rmarkdown,
     testthat (>= 3.0.0),
     usethis,
