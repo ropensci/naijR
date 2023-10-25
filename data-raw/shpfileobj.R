@@ -353,6 +353,6 @@ local({
   # Save objects ----
   # Using RDA format; to be loaded alongside exported objects; note compression
   cli_inform("Saving fixed objects")
-  shpobjs <- grep("^shp\\.", ls(), value = TRUE)
+  shpobjs <- grep("^shp\\.", ls(envir = globalenv()), value = TRUE)
   save(list = shpobjs, file = datafile, compress = "xz")
 })
