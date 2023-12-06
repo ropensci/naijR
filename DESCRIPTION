@@ -58,5 +58,5 @@ RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://brovic.github.io/naijR/
-BugReports: https://github.com/BroVic/naijR/issues
+BugReports: https://github.com/ropensci/naijR/issues
 Config/testthat/edition: 3
