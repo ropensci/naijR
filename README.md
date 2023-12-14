@@ -12,7 +12,7 @@ status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/
 [![Codecov test
 coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/BroVic/naijR?branch=master)
 [![R build
-status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
+status](https://github.com/ropensci/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/naijR/actions)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Status at rOpenSci Software Peer
@@ -195,6 +195,12 @@ The development version can be obtained from
 [GitHub](https://github.com/BroVic/naijR) with:
 
 ``` r
-# install.packages("pak")  # if necessary
-pak::pkg_install("BroVic/naijR")
+# install.packages("remotes")
+remotes::install_github("BroVic/naijR",
+                        dependencies = TRUE,
+                        build_vignettes = TRUE)
 ```
+
+Please note that this package is released with a [Contributor Code of
+Conduct](https://ropensci.org/code-of-conduct/). By contributing to this
+project, you agree to abide by its terms.

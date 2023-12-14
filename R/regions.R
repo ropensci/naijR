@@ -9,14 +9,15 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 # States ----
 
 #' Objects for Representing the Federal States of Nigeria
-#' 
+#'
 #' @param states A character vector with strings representing one or more
 #' States of Nigeria. If missing, the function will return a \code{states}
-#' all the States, with or without the Federal Capital Territory (FCT).
+#' object containing all the States.
 #' @param gpz \code{NULL} (the default) or, case insensitively, one or more of
 #' the following strings: \code{"nc", "ne", "nw", "se", "ss"} and \code{"sw"}
 #' (see "Details").
-#' @param all logical; whether to include the FCT in the result.
+#' @param all logical; whether to include the Federal Capital Territory (FCT)
+#' in the result.
 #' @param warn logical; issue a warning when one or more elements are not
 #' actually States (i.e. they were misspelt).
 #' @param x For \code{is_state} a vector to be tested. For \code{as_state}, a
@@ -24,13 +25,13 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' Government Areas.
 #' @param ... Arguments used for methods. See documentation of generic
 #' for details.
-#' 
+#'
 #' @return The States of Nigeria as a whole or by zones, as an S3 object
 #' of class \code{states}. \code{is_state} returns a logical vector.of same
 #' length as the input. If the input object is not even of type
 #' \code{character}, return the object unaltered, with a warning. In the case
-#' of \code{as_state}, an object of class \code{states}
-#' 
+#' of \code{as_state}, an object of class \code{states}.
+#'
 #' @details \code{gpz} represents a geopolitical zone which, in the Nigerian
 #' context, is a national subdivision that groups contiguous states that bear
 #' certain socio-cultural and political similarities. Historically, they arise
@@ -38,82 +39,91 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' at the time of the country's independence. There are at present 6 such
 #' zones - North-Central, North-East, North-West, South-East,South-South and
 #' South-West.
+#'
 #' For \code{is_state}, An element-wise check of a supplied vector is carried
 #' out. To test an entire vector and return a single boolean value, functions
 #' such as \code{base::all} or \code{base::any} should be used (see examples).
-#' 
+#'
 #' @note \code{is_state} throws a warning, when a missing value is among the
 #' elements. It works only for atomic vectors, throwing an error when this
-#' is not the case or when \code{NULL} is passed to it.
-#' 
+#' is not the case or when \code{NULL} is passed to it. This design decision
+#' was made to allow rapid iteration through data frames without interruption,
+#' since spelling mistakes tend to be common.
+#'
 #' @examples
 #' states()  # lists names of all States
 #' states(gpz = "se")  # lists States in South-East zone
 #' all(is_state(naijR::states()))
 #' is_state(c("Maryland", "Baden-Baden", "Plateau", "Sussex"))
-#' 
+#'
 #' # With coercion
 #' kt.st <- states("Katsina")  # Ensure this is a State, not an LGA.
 #' kt.lg <- suppressWarnings(as_lga(kt.st))
 #' is_state(kt.st)             # TRUE
 #' is_lga(kt.lg)               # TRUE
-#' 
+#'
 #' ## Where there's no ambiguity, it doesn't make sense to coerce
 #' ## This kind of operation ends with an error
 #' \dontrun{
 #' as_state("Kano")
 #' as_lga("Michika")
 #' }
-#' 
+#'
 #' @importFrom cli cli_abort
-#' 
+#' @importFrom cli cli_warn
+#'
 #' @export
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
   assert.lgl.arg(all)
   assert.lgl.arg(warn)
-  
+
+  state.list <- get_all_states()
+  localGpz <- names(state.list)
+
   if (!missing(states) && is.character(states)) {
+    if (length(states) == 1L && (states %in% localGpz))
+      cli_abort("'{states}' represents a geopolitical zone, not a State.
+                Use the `gpz` argument to get the relevant States")
+
     num.missed <- sum(!is_state(states))
-    
+
     if (num.missed) {
       if (warn && isFALSE(.is_nested_fix_dont_warn())) {
         abujas <- which(states %in% "Abuja")
         num.abuja <- length(abujas)
-        
+
         if (num.abuja)
-          cli::cli_warn(
+          cli_warn(
             "'Abuja' in position(s) {paste(abujas, collapse = ', ')}
              is not a State. Use 'Federal Capital Territory' or 'FCT'"
           )
-        
+
         if (!num.abuja || num.missed > num.abuja)
           .warn_on_misspelling('state')
       }
     }
-    
+
     return(new_states(states))
   }
-  
-  state.list <- get_all_states()
-  
+
   if (!all)
     state.list$fct <- NULL
-  
+
   if (!is.null(gpz) && missing(states)) {
     if (!is.character(gpz))
       cli_abort("argument 'gpz' is not of type 'character'")
-    
+
     gpz <- tolower(gsub("\\s+", "", gpz))
-    x <- match.arg(gpz, names(state.list), several.ok = TRUE)
+    x <- match.arg(gpz, localGpz, several.ok = TRUE)
     state.list <- state.list[x]
   }
-  
+
   ss <- as.vector(unlist(state.list), mode = 'character')
-  
-  if (is.null(gpz)) 
+
+  if (is.null(gpz))
     ss <- sort(ss)
-  
+
   new_states(ss)
 }
 
@@ -121,7 +131,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 
 
 ## Low-level S3 constructor
-new_states <- function(x) 
+new_states <- function(x)
 {
   structure(x, class = c("states", "regions", class(x)))
 }
@@ -134,7 +144,7 @@ is_state <- function(x)
 {
   if (!is.atomic(x) || is.null(x)) # as is.atomic(NULL) == TRUE
     cli::cli_abort("Expected a non-null atomic vector as input")
-  
+
   ## Return the object rather than stop execution for this condition.
   ## This is to enable unhindered traversal when this function
   ## is applied across an object.
@@ -142,17 +152,17 @@ is_state <- function(x)
     cli_warn("{sQuote(x)} is not a character vector. Nothing done")
     return(x)
   }
-  
+
   na.pos <- 0L
   if (anyNA(x)) {
     cli_warn("Invalid entries were replaced with NAs")
     excl <- stats::na.exclude(x)
     na.pos <- stats::na.action(excl)
   }
-  
+
   if (length(x) == 0L)
     return(FALSE)
-  
+
   x <- .toggleFct(x, "full")
   res <- x %in% get_all_states(named = FALSE)
   res[na.pos] <- NA
@@ -192,17 +202,17 @@ as_state <- function(x)
 #' name with one of its States.
 #' @param ... Arguments used for methods. See documentation of generic
 #' for details.
-#' 
+#'
 #' @note There are six (6) LGAs that share names with their State - Bauchi,
 #' Ebonyi, Gombe, Katsina, Kogi and Ekiti.
-#' 
+#'
 #' @return If length of \code{ng.state} == 1L, a character vector containing
 #' the names of Local Government Areas; otherwise a named list, whose elements
 #' are character vectors of the LGAs in each state.
 #' \code{is_lga} returms a vector the same length as the input object
 #' (each element that is not a valid Local Government Area will evaluate to
 #' \code{FALSE}); with \code{as_lga}, an object of class \code{lgas}.
-#' 
+#'
 #' @examples
 #' how_many_lgas <- function(state) {
 #'   require(naijR)
@@ -214,53 +224,53 @@ as_state <- function(x)
 #' how_many_lgas("Sokoto")
 #' how_many_lgas("Ekiti")
 #' is_lga(c("Pankshen", "Pankshin"))
-#' 
+#'
 #' # With coercion
 #' kt.st <- states("Katsina")  # Ensure this is a State, not an LGA.
 #' kt.lg <- suppressWarnings(as_lga(kt.st))
 #' is_state(kt.st)             # TRUE
 #' is_lga(kt.lg)               # TRUE
-#' 
+#'
 #' ## Where there's no ambiguity, it doesn't make sense to coerce
 #' ## This kind of operation ends with an error
 #' \dontrun{
 #' as_state("Kano")
 #' as_lga("Michika")
 #' }
-#' 
+#'
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
 #' @importFrom utils data
-#' 
+#'
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   data("lgas_nigeria", package = "naijR", envir = environment())
-  
+
   if (is.factor(region))  # TODO: Perhaps implement methods.
     region <- as.character(region)
-  
+
   if (!is.character(region))
     cli_abort("Expected an object of type 'character'")
-  
+
   if (strict) {
     not.synonymous <- !(region %in% lgas_like_states())
-    
+
     if (any(not.synonymous)) {
       nouns <- paste(region[not.synonymous], collapse = ", ")
-      verb <- 
+      verb <-
         sprintf(ngettext(sum(not.synonymous), "is %s", "are %ss"), "no LGA")
       cli_abort("There {verb} {nouns} sharing State names")
     }
   }
-  
+
   if (length(region) == 1L && is.na(region))
     return(new_lgas(lgas_nigeria$lga))
-  
+
   lst <- region
-  
+
   if (all(is_state(region)) && !strict) {
     lst <- .list_lgas_by_state(region)
-    
+
     if (length(region) == 1L)
       lst <- unname(unlist(lst))
   }
@@ -268,10 +278,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     lst <- .list_states_by_lga(region)
     lst.names <- names(lst)
     stt.num <- vapply(lst, length, integer(1))
-    
+
     if (any(stt.num > 1L)) {
       multi <- which(stt.num > 1L)
-      
+
       for (elem in multi) {
         stts <- lst[[elem]]
         nm <- lst.names[elem]
@@ -285,14 +295,14 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   else if (.has_misspelt_lgas(region)) {
     if (warn && isFALSE(.is_nested_fix_dont_warn()))
       .warn_on_misspelling('lga')
-    
+
     region <- NULL
   }
   else if (.all_are_not_lgas(region))
     cli_abort("None of the items is a valid LGA")
-  # TODO: An object that belongs to more than one State should 
+  # TODO: An object that belongs to more than one State should
   # have a State attribute that lists the States and this should
-  # apply to lgas objects that have just one element so that 
+  # apply to lgas objects that have just one element so that
   # there is no confusion.
   structure(new_lgas(lst), State = region)
 }
@@ -315,7 +325,7 @@ is_lga <- function(x)
 {
   if (!is.character(x))
     cli::cli_abort("x should be of type 'character'")
-  
+
   x %in% lgas()
 }
 
@@ -353,21 +363,21 @@ as_lga <- function(x) {
 {
   if (is.factor(obj))
     obj <- as.character(obj)
-  
+
   if (!is.character(obj))
     cli_abort("Expected a character vector")
-  
+
   if (length(obj) > 1L)
     cli_abort("To coerce a region with synonyms, use a vector of length 1L")
-  
+
   if (!obj %in% lgas_like_states())
     cli_abort("The object does not possess State/LGA synonyms")
-  
+
   if (inherits(obj, "regions")) {
     obj <- unclass(obj)
     cli::cli_warn("Object was stripped down to mode 'character'")
   }
-  
+
   obj
 }
 
@@ -385,10 +395,10 @@ as_lga <- function(x) {
     length(x) == 1L
   })
   lgastr <- as.character(x)
-  
+
   if (length(lgastr) > 1L)
     cli::cli_abort("More than one LGA was provided")
-  
+
   s <- attr(x, "State")
   lga.states <- lgas_nigeria$state[lgas_nigeria$lga == lgastr]
   s %in% lga.states
@@ -439,7 +449,7 @@ c.states <- function(...)
 
 
 #' @rdname lgas
-#' @export 
+#' @export
 c.lgas <- function(...)
 {
   ls <- .unlistDots(...)
@@ -502,7 +512,7 @@ na.exclude.states <- function(object, ...)
 {
   if (!anyNA(object))
     return(object)
-  
+
   .excluderForNas(object, "states", ...)
 }
 
@@ -511,12 +521,12 @@ na.exclude.states <- function(object, ...)
 
 #' @rdname lgas
 #' @param object An object of class \code{regions}
-#' @export 
+#' @export
 na.exclude.lgas <- function(object, ...)
 {
   if (!anyNA(object))
     return(object)
-  
+
   .excluderForNas(object, "lgas", ...)
 }
 
@@ -533,4 +543,3 @@ na.exclude.lgas <- function(object, ...)
   attr(obj, "na.action") <- obj.attrs$na.action
   obj
   }
-  

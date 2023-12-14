@@ -21,3 +21,5 @@
 ^codemeta\.json$
 ^\.covrignore$
 ^\.lintr$
+^doc$
+^Meta$

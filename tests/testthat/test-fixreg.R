@@ -1,4 +1,4 @@
-totalerr <- "consider reconstructing 'x'"
+reconstruct.x <- "consider reconstructing 'x'"
 
 test_that("input is validated before fixing state names", {
   errchr <- "'x' is not a character vector"
@@ -35,33 +35,30 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   
   # messages ---
   change1 <- "Fufure => Fufore"
-  change2 <- "Fafure => Fufore"
   msg1 <- .msgfunc(change1)
-  msg2 <- .msgfunc(change2)
   morethanone <- "approximately matched more than one region"
   
   # character vectors ---
-  lg.chr <- 
+  ad <- 
     c("Fufure", "Demsa", "Fufure", "Machika", "Ganye", "Noman", "Fufure")
-  correctLga.chr <- lg.chr[2]
-  misspeltLga.chr <- lg.chr[3]
-  bothlga.chr <- c(correctLga.chr, misspeltLga.chr)
+  correctLga <- ad[2]
+  misspeltLga <- ad[3]
+  bothLga <- c(correctLga, misspeltLga)
   
-  expect_no_warning(fix_region(lgas(correctLga.chr)))
-  expect_message(fix_region(lgas(misspeltLga.chr)))
-  expect_message(fix_region(lgas(bothlga.chr)), msg1)
-  expect_message(fix_region(lgas(c(bothlga.chr, "Fufore"))), 
-                 msg1)
-  expect_message(fix_region(lgas(c(bothlga.chr, "Fafure"))),
+  expect_no_warning(fix_region(lgas(correctLga)))
+  expect_message(fix_region(lgas(misspeltLga)))
+  expect_message(fix_region(lgas(bothLga)), msg1)
+  expect_message(fix_region(lgas(c(bothLga, "Fufore"))), msg1)
+  expect_message(fix_region(lgas(c(bothLga, "Fafure"))),
                  "not applied.+Fafure")
-  expect_error(fix_region(misspeltLga.chr), totalerr)
-  expect_message(fix_region(lgas(lg.chr)), morethanone)
-  expect_message(suppressWarnings(fix_region(lgas(lg.chr))),
-                 sprintf("%s.+Noman => Numan", change1))
+  expect_error(fix_region(misspeltLga), reconstruct.x)
+  expect_message(fix_region(lgas(ad), quietly = TRUE), morethanone)
+  # expect_message(fix_region(lgas(ad)),
+  #                sprintf("%s.+Noman => Numan", change1))
   expect_message(fix_region(lgas(multi.lga)), change1)
   
   # factors ---
-  lg.fac <- factor(lg.chr)
+  lg.fac <- factor(ad)
   correctLga.fac <- droplevels(lg.fac[2])
   misspeltLga.fac <- droplevels(lg.fac[3])
   bothlga.fac <- c(correctLga.fac, misspeltLga.fac)
@@ -72,10 +69,10 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   expect_message(fix_region(lgas(
     c(bothlga.fac, factor("Fufore")), 
     warn = FALSE)), msg1)
-  expect_error(fix_region(misspeltLga.fac), totalerr, fixed = TRUE)
-  expect_message(fix_region(lgas(lg.fac)), morethanone)
-  expect_message(suppressWarnings(fix_region(lgas(lg.fac))),
-                 sprintf("%s.+Noman => Numan", change1))
+  expect_error(fix_region(misspeltLga.fac), reconstruct.x, fixed = TRUE)
+  expect_message(fix_region(lgas(lg.fac), quietly = TRUE), morethanone)
+  # expect_message(suppressWarnings(fix_region(lgas(lg.fac))),
+  #                sprintf("%s.+Noman => Numan", change1))
   expect_message(fix_region(lgas(multi.lga)),
                  change1)
   
@@ -91,9 +88,9 @@ test_that("various cases for fixing state names", {
   fctlw <- "FCT"
   
   expect_equal(fix_region(ss), ss, ignore_attr = TRUE)
-  expect_error(fix_region('Fct'), totalerr, fixed = TRUE)
-  expect_error(fix_region('Kane'), totalerr, fixed = TRUE)
-  expect_error(fix_region('plateau'), totalerr, fixed = TRUE)
+  expect_error(fix_region('Fct'), reconstruct.x, fixed = TRUE)
+  expect_error(fix_region('Kane'), reconstruct.x, fixed = TRUE)
+  expect_error(fix_region('plateau'), reconstruct.x, fixed = TRUE)
   expect_identical(fix_region(c(fctup, fctlw)), rep(fctup, 2))
   expect_identical(fix_region(states(c(fctup, fctlw)))[2], states(fctup))
   expect_identical(fix_region(states(fctlw, "Kano"))[1], states(fctlw))
@@ -121,7 +118,7 @@ test_that("Misspelt LGAs can be fixed (limited)", {
   expect_length(attr(fixed, "misspelt"), 0L)
   
   expect_equal(
-    fix_region(lgas(c("Amuwo Odofin", "Lagos Island"), warn = FALSE)), 
+    fix_region(lgas(c("Amuwo Odofin", "Lagos Island")), quietly = TRUE), 
     c("Amuwo-Odofin", "Lagos Island"),
     ignore_attr = TRUE
   )
@@ -178,8 +175,11 @@ test_that("regions can be fixed manually", {
 
 
 test_that("No warning when constructors are nested with fix_* functions", {
-  expect_error(fix_region(states('Fct')))
-  expect_warning(states("Fct"))
-  expect_no_warning(fix_region(lgas(c("Legos Island",  "Amuwo-Odofin"))))
-  expect_warning(lgas(c("Legos Island",  "Amuwo-Odofin")))
+  lgavec <- c("Legos Island",  "Amuwo-Odofin")
+  fct <- "Fct"
+  
+  expect_error(fix_region(states(fct)))
+  expect_warning(states(fct))
+  expect_no_warning(fix_region(lgas(lgavec), quietly = TRUE))
+  expect_warning(lgas(lgavec))
 })

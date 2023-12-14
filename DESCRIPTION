@@ -25,11 +25,29 @@ Suggests:
     readxl,
     rmarkdown,
     testthat (>= 3.0.0),
-    usethis
-Authors@R: person("Victor", "Ordu", 
-              email = "victorordu@outlook.com",
-              role = c("aut", "cre"),
-              comment = c(ORCID = "0000-0003-3716-0668"))
+    usethis,
+    WikidataR
+Authors@R: 
+	c(person(given = "Victor", 
+	         family = "Ordu",
+             role = c("aut", "cre"),
+             email = "victorordu@outlook.com",
+             comment = c(ORCID = "0000-0003-3716-0668")),
+	  person(given = "Laura",
+			 family = "DeCicco",
+			 role = "ctb",
+			 email = "ldecicco@usgs.gov"),
+	  person(given = "Emily",
+	         family = "Riederer",
+			 role = "rev",
+			 email = "emilyriederer@gmail.com"),
+	  person(given = "Margaret",
+	         family = "Siple",
+			 role = "rev"),
+	  person(given = "Cagri",
+	         family = "Alican",
+			 role = "rev")
+	)
 Description: A set of convenience functions as well as geographical/political
   data about Nigeria, aimed at simplifying work with data and information that
   are specific to the country.
@@ -39,6 +57,6 @@ Encoding: UTF-8
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 RdMacros: lifecycle
-URL: https://brovic.github.io/naijR/
-BugReports: https://github.com/BroVic/naijR/issues
+URL: https://docs.ropensci.org/naijR/
+BugReports: https://github.com/ropensci/naijR/issues
 Config/testthat/edition: 3
