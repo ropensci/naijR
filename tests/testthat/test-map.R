@@ -407,17 +407,21 @@ test_that("Points are mapped", {
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE),
                "Expected a character vector as 'region'")
   
-  x[4] <- -3; y[4] <- 1000
+  x[4] <- -3
+  y[4] <- 1000
+  
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Expected a character vector as 'region'")
   
   expect_error(map_ng(x = 15, y = 45, plot = FALSE),
                "Coordinates are beyond the bounds of the plotted area")
   
-  
-  capitals <- read.csv(here::here("data-raw/state-capitals.csv"))
-  out <- 
-    map_ng(x = capitals$longitude, y = capitals$latitude, plot = FALSE)
+  capitals <- data.frame(
+    location = c("Lagos", "Kano", "Ibadan", "Port Harcourt", "Enugu"),
+    lat = c(6.5244, 12.0022, 7.3776, 4.8175, 6.5244),
+    long = c(3.3792, 8.591956, 3.9476, 7.0146, 7.5106)
+  )
+  out <- map_ng(x = capitals$long, y = capitals$lat, plot = FALSE)
   
   expect_s3_class(out, maptype)
 })
