@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.6.1.9000
+Version: 0.6.1.9001
 Depends: R (>= 3.6)
 Imports:
     RColorBrewer (>= 1.1.2),
