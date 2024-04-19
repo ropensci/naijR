@@ -46,12 +46,7 @@ local({
     
     data
   }
-  
-  rda_exists <- \(obj) {
-    fname <- paste0(deparse(substitute(obj)), ".rda")
-    file.exists(here::here("data", fname))
-  }
-  
+
   get_lga_list <- \(state) {
     require(WikidataR)
     cli_inform("* {state}")
@@ -109,7 +104,7 @@ local({
     add_gpz("state", "gpz")
   
   cli_inform("Saving object with {nrow(states_nigeria)} States")
-  use_data(states_nigeria, overwrite = rda_exists(states_nigeria))
+  use_data(states_nigeria, overwrite = .__rda_exists(states_nigeria))
   
   
   # Local Government Areas ----
@@ -129,5 +124,5 @@ local({
     cli_abort("Only {LGAdownloaded}/{LGAtotal} LGAs were downloaded")
   
   cli_inform("Saving LGA data")
-  use_data(lgas_nigeria, overwrite = rda_exists(lgas_nigeria))
+  use_data(lgas_nigeria, overwrite = .__rda_exists(lgas_nigeria))
 })

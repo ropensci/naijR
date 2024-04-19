@@ -1,3 +1,7 @@
+# naijR 0.7.
+## New Features:
+* Introduced new package data: An object of class `dist` which is a distance matrix of the kilometer distances (by road) between the State capitals of Nigeria.
+
 # naijR 0.6.1
 * Added more function examples and other documentation improvements.
 * Increased compression for internal data.

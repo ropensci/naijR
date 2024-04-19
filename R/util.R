@@ -38,3 +38,12 @@
   }
   invisible(lapply(states(), doOneMap))
 }
+
+
+
+
+## Check whether a package data object exists
+.__rda_exists <- function(obj) {
+  fname <- paste0(deparse(substitute(obj)), ".rda")
+  file.exists(here::here("data", fname))
+}
