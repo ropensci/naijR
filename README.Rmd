@@ -117,13 +117,11 @@ To download and install the current stable version of this package from CRAN:
 install.packages("naijR")
 ```
 
-The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
+The development version can be obtained from [GitHub](https://github.com/ropensci/naijR) with:
 
 ``` {r dev-install, eval = FALSE}
-# install.packages("remotes")
-remotes::install_github("BroVic/naijR",
-                        dependencies = TRUE,
-                        build_vignettes = TRUE)
+# install.packages("pak")  # if necessary
+pak::pkg_install("ropensci/naijR")
 ```
 
 Please note that this package is released with a [Contributor
