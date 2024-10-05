@@ -192,3 +192,7 @@ The development version can be obtained from
 # install.packages("pak")  # if necessary
 pak::pkg_install("ropensci/naijR")
 ```
+
+Please note that this package is released with a [Contributor Code of
+Conduct](https://ropensci.org/code-of-conduct/). By contributing to this
+project, you agree to abide by its terms.

@@ -48,7 +48,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/BroVic/naijR/" class="external-link">
+  <a href="https://github.com/ropensci/naijR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -63,7 +63,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/BroVic/naijR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ropensci/naijR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -89,7 +89,8 @@
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.2" id="naijr-052">naijR 0.5.2<small>2023-06-14</small><a class="anchor" aria-label="anchor" href="#naijr-052"></a></h2>
-<ul><li>Quietened a verbose warning introduced via the soon-to-be-retired spatial data packages.</li></ul></div>
+<ul><li>Quietened a verbose warning introduced via the soon-to-be-retired spatial data packages.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="naijr-051">naijR 0.5.1<small>2022-12-02</small><a class="anchor" aria-label="anchor" href="#naijr-051"></a></h2>
 <ul><li>In nested calls with the function <code>fix_region</code>, the <code>lgas</code> constructor function does not warn if there are spelling mistakes, as this turned out to be a bit confusing when it was used. In earlier versions, warnings persisted even after fixes were applied.</li>
@@ -101,40 +102,46 @@
 <h2 class="page-header" data-toc-text="0.5.0" id="naijr-050">naijR 0.5.0<small>2022-09-30</small><a class="anchor" aria-label="anchor" href="#naijr-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-5-0">New features:<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
-<ul><li>New methods for <code><a href="https://rdrr.io/r/base/InternalMethods.html" class="external-link">?InternalGenerics</a></code> were introduced e.g. for <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>, <code>[</code>, <code>[[</code>, <code>na.exclude</code>, etc.</li></ul></div>
+<ul><li>New methods for <code><a href="https://rdrr.io/r/base/InternalMethods.html" class="external-link">?InternalGenerics</a></code> were introduced e.g. for <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>, <code>[</code>, <code>[[</code>, <code>na.exclude</code>, etc.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="enhancements-0-5-0">Enhancements:<a class="anchor" aria-label="anchor" href="#enhancements-0-5-0"></a></h3>
 <ul><li>Effectively handle mobile numbers that have common separators in them, namely whitespace, ‘-’ or ‘.’.</li>
 <li>Repair mobile numbers where poor data entry interchanges zeros (<code>0</code>s) with the letter <code>O</code> (works for both upper and lower case).</li>
 <li>Repair of mobile numbers now offers optional information for users.</li>
 <li>Allow the use of factor input when creating objects of class <code>regions</code>.</li>
-<li>Added a new argument <code>legend.text</code> for <code>map_ng</code> using an idiom that is similar to the one used in <code>base::barplot</code>, thanks to observations made by <a href="https://github.com/VictoriaLatham" class="external-link">@VictoriaLatham</a> in issue <a href="https://github.com/BroVic/naijR/issues/27" class="external-link">#27</a>.</li>
+<li>Added a new argument <code>legend.text</code> for <code>map_ng</code> using an idiom that is similar to the one used in <code>base::barplot</code>, thanks to observations made by <a href="https://github.com/VictoriaLatham" class="external-link">@VictoriaLatham</a> in issue <a href="https://github.com/ropensci/naijR/issues/27" class="external-link">#27</a>.</li>
 <li>Simplified the creation of choropleth maps with 2-column data frames; one of the columns is to be a vector of valid States or Local Government Areas, and the other a factor or something coercible to one.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-0">Bug fixes:<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-0"></a></h3>
 <ul><li>
-<code>map_ng</code> accepted arguments that were not <code>data.frame</code>s leading to unwieldy errors. It is now made sure to fail early in such cases</li></ul></div>
+<code>map_ng</code> accepted arguments that were not <code>data.frame</code>s leading to unwieldy errors. It is now made sure to fail early in such cases</li>
+</ul></div>
 <div class="section level3">
 <h3 id="deprecated-0-5-0">Deprecated:<a class="anchor" aria-label="anchor" href="#deprecated-0-5-0"></a></h3>
-<ul><li>Arguments of <code>map_ng</code> - <code>leg.x</code>, <code>leg.y</code>, and <code>leg.orient</code> were marked for deprecation in the next minor release.</li></ul></div>
+<ul><li>Arguments of <code>map_ng</code> - <code>leg.x</code>, <code>leg.y</code>, and <code>leg.orient</code> were marked for deprecation in the next minor release.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.4" id="naijr-044">naijR 0.4.4<small>2022-08-30</small><a class="anchor" aria-label="anchor" href="#naijr-044"></a></h2>
 <div class="section level3">
 <h3 id="bug-fix-0-4-4">Bug fix:<a class="anchor" aria-label="anchor" href="#bug-fix-0-4-4"></a></h3>
 <ul><li>
-<code>fix_mobile</code> fails unexpectedly when only <code>NA</code> is supplied as argument. This causes practical problems when, for example, it encounters a column with only missing values.</li></ul></div>
+<code>fix_mobile</code> fails unexpectedly when only <code>NA</code> is supplied as argument. This causes practical problems when, for example, it encounters a column with only missing values.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.3" id="naijr-043">naijR 0.4.3<small>2022-08-08</small><a class="anchor" aria-label="anchor" href="#naijr-043"></a></h2>
-<ul><li>Addressed a build problem related to CRAN submission.</li></ul></div>
+<ul><li>Addressed a build problem related to CRAN submission.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.2" id="naijr-042">naijR 0.4.2<a class="anchor" aria-label="anchor" href="#naijr-042"></a></h2>
-<ul><li>Improved type checking for mapping functionality and better fidelity.</li></ul></div>
+<ul><li>Improved type checking for mapping functionality and better fidelity.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.1" id="naijr-041">naijR 0.4.1<a class="anchor" aria-label="anchor" href="#naijr-041"></a></h2>
-<ul><li>Enable the exclusion of selected States from a choropleth map (<a href="https://github.com/BroVic/naijR/issues/27" class="external-link">#27</a>).</li>
+<ul><li>Enable the exclusion of selected States from a choropleth map (<a href="https://github.com/ropensci/naijR/issues/27" class="external-link">#27</a>).</li>
 <li>Cleaner output for <code>states</code> and <code>lgas</code> objects.</li>
 </ul></div>
     <div class="section level2">
@@ -144,13 +151,16 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.4" id="naijr-034">naijR 0.3.4<small>2021-12-06</small><a class="anchor" aria-label="anchor" href="#naijr-034"></a></h2>
-<ul><li>Fixed package-wide misuse of the word <em>Nasarawa</em>.</li></ul></div>
+<ul><li>Fixed package-wide misuse of the word <em>Nasarawa</em>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.3" id="naijr-033">naijR 0.3.3<small>2021-11-05</small><a class="anchor" aria-label="anchor" href="#naijr-033"></a></h2>
-<ul><li>Fixed repetitions in the output when multiple LGAs’ spellings are corrected.</li></ul></div>
+<ul><li>Fixed repetitions in the output when multiple LGAs’ spellings are corrected.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.2" id="naijr-032">naijR 0.3.2<small>2021-10-20</small><a class="anchor" aria-label="anchor" href="#naijr-032"></a></h2>
-<ul><li>Improved on print methods</li></ul></div>
+<ul><li>Improved on print methods</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.1" id="naijr-031">naijR 0.3.1<small>2021-09-30</small><a class="anchor" aria-label="anchor" href="#naijr-031"></a></h2>
 <ul><li>Fixed a bug that affected the proper rendering of LGA-level maps for some of the States. The approach used was to simply filter the entire data when requiring a State map, so as to reduce name clashes that occurred from synonyms amongst some of the LGAs and/or States.</li>
@@ -165,7 +175,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.2" id="naijr-022">naijR 0.2.2<small>2021-04-30</small><a class="anchor" aria-label="anchor" href="#naijr-022"></a></h2>
-<ul><li>Export S3 generic <code>fix_region</code>.</li></ul></div>
+<ul><li>Export S3 generic <code>fix_region</code>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.1" id="naijr-021">naijR 0.2.1<small>2021-04-25</small><a class="anchor" aria-label="anchor" href="#naijr-021"></a></h2>
 <ul><li>Fixed incorrect URLs, as noted by CRAN</li>
@@ -179,10 +190,12 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.5" id="naijr-015">naijR 0.1.5<a class="anchor" aria-label="anchor" href="#naijr-015"></a></h2>
-<ul><li>Built new package website.</li></ul></div>
+<ul><li>Built new package website.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.4" id="naijr-014">naijR 0.1.4<small>2020-08-25</small><a class="anchor" aria-label="anchor" href="#naijr-014"></a></h2>
-<ul><li>Suppress deprecation warning for <code>is_state</code> when it is called internally by package function; displayed only when function is called directly.</li></ul></div>
+<ul><li>Suppress deprecation warning for <code>is_state</code> when it is called internally by package function; displayed only when function is called directly.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.3" id="naijr-013">naijR 0.1.3<small>2020-08-03</small><a class="anchor" aria-label="anchor" href="#naijr-013"></a></h2>
 <ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
