@@ -20,7 +20,7 @@ An R package on Nigeria and for Nigeria
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/package=naijR)
 [![Codecov test coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/BroVic/naijR?branch=master)
-[![R build status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
+[![R build status](https://github.com/ropensci/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/naijR/actions)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Status at rOpenSci Software Peer Review](https://badges.ropensci.org/600_status.svg)](https://github.com/ropensci/software-review/issues/600)
 <!-- badges: end -->
@@ -117,9 +117,9 @@ To download and install the current stable version of this package from CRAN:
 install.packages("naijR")
 ```
 
-The development version can be obtained from [GitHub](https://github.com/BroVic/naijR) with:
+The development version can be obtained from [GitHub](https://github.com/ropensci/naijR) with:
 
 ``` {r dev-install, eval = FALSE}
 # install.packages("pak")  # if necessary
-pak::pkg_install("BroVic/naijR")
+pak::pkg_install("ropensci/naijR")
 ```

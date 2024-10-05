@@ -12,7 +12,7 @@ status](https://www.r-pkg.org/badges/version/naijR)](https://cran.r-project.org/
 [![Codecov test
 coverage](https://codecov.io/gh/BroVic/naijR/branch/master/graph/badge.svg)](https://app.codecov.io/gh/BroVic/naijR?branch=master)
 [![R build
-status](https://github.com/BroVic/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/BroVic/naijR/actions)
+status](https://github.com/ropensci/naijR/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/naijR/actions)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Status at rOpenSci Software Peer
@@ -48,14 +48,12 @@ call `states()`.
 library(naijR, quietly = TRUE)
 ss <- states()
 head(ss)
-States
------- 
-- Abia
-- Adamawa
-- Akwa Ibom
-- Anambra
-- Bauchi
-- Bayelsa 
+Abia
+Adamawa
+Akwa Ibom
+Anambra
+Bauchi
+Bayelsa
 cat(sprintf("\n...but Nigeria has %i States.", length(ss)))
 
 ...but Nigeria has 37 States.
@@ -65,14 +63,12 @@ States from a given geo-political zone can also be selected:
 
 ``` r
 states(gpz = "ne")  # i.e. North-East
-States
------- 
-- Adamawa
-- Bauchi
-- Borno
-- Gombe
-- Taraba
-- Yobe 
+Adamawa
+Bauchi
+Borno
+Gombe
+Taraba
+Yobe
 ```
 
 For other capabilities of this function, see `?states()`.
@@ -84,35 +80,33 @@ of Local Government Areas within a given State:
 
 ``` r
 lgas("Imo")
-LGAs
----- 
-- Aboh Mbaise
-- Ahiazu Mbaise
-- Ehime Mbano
-- Ihitte/Uboma
-- Ideato North
-- Ideato South
-- Ezinihitte-Mbaise
-- Isu
-- Oguta
-- Obowo
-- Nwangele
-- Njaba
-- Ngor Okpala
-- Mbaitoli
-- Nkwerre
-- Orsu
-- Orlu
-- Onuimo
-- Okigwe
-- Ohaji/Egbema
-- Oru East
-- Isiala Mbano
-- Ikeduru
-- Owerri Municipal
-- Owerri West
-- Owerri North
-- Oru West 
+Aboh Mbaise
+Ahiazu Mbaise
+Ehime Mbano
+Ihitte/Uboma
+Ideato North
+Ideato South
+Ezinihitte-Mbaise
+Isu
+Oguta
+Obowo
+Nwangele
+Njaba
+Ngor Okpala
+Mbaitoli
+Nkwerre
+Orsu
+Orlu
+Onuimo
+Okigwe
+Ohaji/Egbema
+Oru East
+Isiala Mbano
+Ikeduru
+Owerri Municipal
+Owerri West
+Owerri North
+Oru West
 ```
 
 To list all the LGAs in Nigeria, call the same function without any
@@ -192,9 +186,9 @@ install.packages("naijR")
 ```
 
 The development version can be obtained from
-[GitHub](https://github.com/BroVic/naijR) with:
+[GitHub](https://github.com/ropensci/naijR) with:
 
 ``` r
 # install.packages("pak")  # if necessary
-pak::pkg_install("BroVic/naijR")
+pak::pkg_install("ropensci/naijR")
 ```
