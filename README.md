@@ -189,15 +189,8 @@ The development version can be obtained from
 [GitHub](https://github.com/ropensci/naijR) with:
 
 ``` r
-<<<<<<< HEAD
-# install.packages("remotes")
-remotes::install_github("BroVic/naijR",
-                        dependencies = TRUE,
-                        build_vignettes = TRUE)
-=======
 # install.packages("pak")  # if necessary
 pak::pkg_install("ropensci/naijR")
->>>>>>> fix-url
 ```
 
 Please note that this package is released with a [Contributor Code of
