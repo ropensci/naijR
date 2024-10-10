@@ -414,10 +414,9 @@ test_that("Points are mapped", {
   expect_error(map_ng(x = 15, y = 45, plot = FALSE),
                "Coordinates are beyond the bounds of the plotted area")
   
-  
-  capitals <- read.csv(here::here("data-raw/state-capitals.csv"))
-  out <- 
-    map_ng(x = capitals$longitude, y = capitals$latitude, plot = FALSE)
+  # map points representing the State capitals
+  capitals <- readRDS("data/state-capitals.rds")
+  out <- map_ng(x = capitals$longitude, y = capitals$latitude, plot = FALSE)
   
   expect_s3_class(out, maptype)
 })
