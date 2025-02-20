@@ -16,7 +16,8 @@
 #' that may have been removed from the vector, by setting the option
 #' \code{verbose} to \code{TRUE}.
 #'
-#' @param x A character vector of numerical strings.
+#' @param x Values to be fixed, represented either as \code{numeric} or
+#' \code{character} vectors.
 #'
 #' @return The updated vector, usually the column of a data frame.
 #' 

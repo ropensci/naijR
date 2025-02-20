@@ -105,8 +105,8 @@ test_that("Wrong mobile numbers are repaired or removed.", {
 
 
 test_that("Numbers read from MS Excel are appropriately treated", {
-  df <- as.data.frame(readxl::read_xlsx("data/numbers.xlsx"))
-  fx <- fix_mobile(df[, 1])
+  df <- readRDS("data/numbers.rds")
+  fx <- fix_mobile(df$Number)
   
   expect_true(all(nchar(fx) == 11))
   expect_false(anyNA(fx))
