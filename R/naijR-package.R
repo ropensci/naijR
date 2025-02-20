@@ -8,7 +8,7 @@
 #' as well as making available a number of facilities for geospatial data
 #' visualisation.
 #' 
-#' @docType package
+#' @docType _Package
 #' @name naijR
 #' @author Victor Ordu
 #' @aliases naijR-package
