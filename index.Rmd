@@ -37,12 +37,14 @@ install.packages('naijR')
 ```
 
 <br>
-This will install the **stable version** from [CRAN](https://cran.r-project.org/package=naijR). To work with the **development version** of the package, it can be installed from [GitHub](https://github.com/BroVic/naijR) with
+
+This will install the **stable version** from [CRAN](https://cran.r-project.org/package=naijR). To work with the **development version** of the package, it can be installed from [GitHub](https://github.com/ropensci/naijR) with
 
 ```{r install_github}
-# install.packages('remotes')
-remotes::install_github("BroVic/naijR")
+# install.packages('pak')
+pak::pkg_install("ropensci/naijR")
 ```
 
 <br>
+
 For an introduction to the package's ability to draw Nigeria country maps, read this [article](articles/nigeria-maps.html)
