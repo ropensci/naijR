@@ -532,7 +532,7 @@
 # Note: This check is probably too expensive. Consider passing just the range
 # though the loss of typing may make this less reliable down the line
 #' @importFrom rlang is_double
-.xy_within_bounds <- function(map, x, y)
+.pts_within_bounds <- function(map, x, y)
 { 
   stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
   
