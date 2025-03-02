@@ -88,9 +88,6 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' @import sf
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
-#' @importFrom lifecycle deprecate_warn
-#' @importFrom lifecycle deprecated
-#' @importFrom lifecycle is_present
 #' @importFrom rlang !!
 #' @importFrom rlang as_name
 #' @importFrom rlang caller_env
@@ -220,7 +217,7 @@ map_ng <- function(region = character(),
   }, 
   error = function(e) stop(e))
   
-  if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
+  if (!is_null(y) && !.pts_within_bounds(sfdata, x, y))
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   
   if (plot) { 
