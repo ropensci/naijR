@@ -8,7 +8,6 @@ Imports:
     cli (>= 3.6.0),
     grDevices,
     graphics,
-    lifecycle,
     mapdata (>= 2.3.0),
     maps (>= 3.3.0),
     rlang (>= 0.4.0),
@@ -55,7 +54,6 @@ LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
-RdMacros: lifecycle
 URL: https://docs.ropensci.org/naijR/
 BugReports: https://github.com/ropensci/naijR/issues
 Config/testthat/edition: 3
