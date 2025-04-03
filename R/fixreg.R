@@ -4,9 +4,9 @@
 #
 # Copyright (C) 2019-2023 Victor Ordu.
 
-#' Fix Misspelling of Adminstrative Regions
+#' Fix Misspelling of Administrative Regions
 #' 
-#' Correct any misspelt names of administrative regions e.g. States and LGAs.
+#' Correct any misspelled names of administrative regions e.g. States and LGAs.
 #' 
 #' @details \code{fix_region} will look through a character vector and try to 
 #' determine if State or LGA names have been wrongly entered. This presupposes
@@ -17,16 +17,16 @@
 #' update the spelling.
 #' 
 #' @note When passed a character vector of length \code{1L}, in the case of a
-#' misspelt LGA, the function signals an error; the presumption is that a fix
+#' misspelled LGA, the function signals an error; the presumption is that a fix
 #' can readily be applied interactively. When all the items provided are 
-#' misspelt, nothing happens, but the user is advised to use the appropriate
+#' misspelled, nothing happens, but the user is advised to use the appropriate
 #' constructor function so as to improve the accuracy of the repairs. When
-#' there is a mix of misspelt and properly spelt LGAs, other functionalities
+#' there is a mix of misspelled and properly spelled LGAs, other avenues
 #' for fixing the mistakes are available via mode \code{interactive}.
 #' 
 #' @param x An S3 object of class \code{states} or \code{lgas}. For 
 #' \code{fix_region.default}, a character vector (or an object coercible to 
-#' one) can be passed but only that for 'States' will be interpretable.
+#' one) can be passed but only that for 'States' can be interpreted.
 #' @param ... Arguments passed to methods.
 #' 
 #' @return The transformed object. If all names are correct, the object is
@@ -67,7 +67,7 @@ fix_region.states <- function(x, ...)
     ss <- sub(fullFCT, abbrFCT, ss)
   
   x <- .fix_region_internal(x, ss)
-  nofix <- attr(x, "misspelt")
+  nofix <- attr(x, "misspelled")
   
   if (length(nofix)) {
     commasep <- paste(nofix, collapse = ", ")
@@ -174,13 +174,13 @@ fix_region.lgas <-
   ## For the LGAs case, the expectation is that in a vector with more than
   ## one element, if any of the elements passess the test of being an LGA
   ## then one can safely assume that the other element(s) that fail the test
-  ## did so because they were misspelt. An automatic fix will then be attempted.
+  ## did so because they were misspelled. An automatic fix will then be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
   nonSynonyms <- x[!x %in% lgas_like_states()]
   
   region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
     lgas(x, warn = FALSE)                    # to allow creation of temporary,
-  else if (any(is_state(nonSynonyms)))       # even with misspelt elements
+  else if (any(is_state(nonSynonyms)))       # even with misspelled elements
     states(x, warn = FALSE)
   else
     cli_abort(
@@ -197,8 +197,8 @@ fix_region.lgas <-
 
 #' @rdname fix_region
 #' 
-#' @param wrong The misspelt element(s) of \code{x}.
-#' @param correct The correction that is to be applied to the misspelt 
+#' @param wrong The misspelled element(s) of \code{x}.
+#' @param correct The correction that is to be applied to the misspelled 
 #' element(s)
 #' 
 #' @examples
