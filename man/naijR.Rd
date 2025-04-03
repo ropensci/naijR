@@ -14,6 +14,14 @@ management of data sets of interest including data cleaning and wrangling,
 as well as making available a number of facilities for geospatial data
 visualisation.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://docs.ropensci.org/naijR/}
+  \item Report bugs at \url{https://github.com/ropensci/naijR/issues}
+}
+
+}
 \author{
 Victor Ordu
 }

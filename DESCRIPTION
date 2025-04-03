@@ -54,7 +54,7 @@ Description: A set of convenience functions as well as geographical/political
 License: GPL-3
 LazyData: TRUE
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://docs.ropensci.org/naijR/

@@ -263,7 +263,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     }
   }
 
-  if (length(region) == 1L && is.na(region))
+  if (length(region) == 1L && is.na(region))  # TODO: Huh?
     return(new_lgas(lgas_nigeria$lga))
 
   lst <- region
@@ -313,7 +313,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 # Low-level S3 constructor for lgas object
 new_lgas <- function(x)
 {
-  structure(x, class = c("lgas", "regions", class(x)))
+  structure(sort(x), class = c("lgas", "regions", class(x)))
 }
 
 
