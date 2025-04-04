@@ -75,13 +75,18 @@ test_that("FCT can be selectively removed", {
 
 test_that("illegal input is caught early", {
   chErr <- "Expected an object of type 'character'"
-
+  chErr2 <- "Illegal use of empty string/missing character values"
+  
   expect_error(lgas("Saarland"))
   expect_error(lgas("Maryland"), "None of the items is a valid LGA")
   expect_error(lgas(888), chErr)
   expect_error(lgas(NULL), chErr)
   expect_error(lgas(TRUE), chErr)
   expect_error(lgas(3.14), chErr)
+  expect_error(lgas(c(NA, NA)), chErr)
+  # expect_error(lgas(c(NA_character_, NA)), chErr2)
+  # expect_error(lgas(""), chErr2)
+  # expect_error(lgas(character(2)), chErr2)
 })
 
 
@@ -98,6 +103,8 @@ test_that("LGAs are returned correctly", {
   expect_length(res2, 2L)
   expect_warning(lgas(c("Oyo West", "Obomo Ngwa")),
                  "One or more items is not an LGA")
+  expect_false(is.unsorted(lgas()))
+  expect_false(is.unsorted(unclass(res)))
 })
 
 test_that("Correct number of LGAs are returned for each State", {
@@ -122,7 +129,7 @@ test_that("State/LGAs synonyms are handled", {
   expect_length(lgas("Bauchi", strict = TRUE), 1L)
 })
 
-test_that("LGA objects' attributes appropriately", {
+test_that("LGA objects' attributes are appropriately formed", {
   expect_identical(attr(lgas("Abia"), "State"), "Abia")
   expect_length(attr(lgas(c("Kebbi", "Jigawa")), "State"), 2L)
   expect_length(attributes(lgas("Rivers")), 2L)
