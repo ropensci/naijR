@@ -251,6 +251,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 
   if (!is.character(region))
     cli_abort("Expected an object of type 'character'")
+  
+  # if ((!is.na(region) && all(region == "")) || 
+  #     (all(is.na(region)) && length(region) > 1))
+  #   cli_abort("Illegal use of empty string/missing character values")
 
   if (strict) {
     not.synonymous <- !(region %in% lgas_like_states())
@@ -263,8 +267,10 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     }
   }
 
-  if (length(region) == 1L && is.na(region))  # TODO: Huh?
-    return(new_lgas(lgas_nigeria$lga))
+  if (length(region) == 1L && is.na(region)) {
+    lgvec <- sort(lgas_nigeria$lga)
+    return(new_lgas(lgvec))
+  }
 
   lst <- region
 
@@ -304,7 +310,15 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   # have a State attribute that lists the States and this should
   # apply to lgas objects that have just one element so that
   # there is no confusion.
-  structure(new_lgas(lst), State = region)
+  if (inherits(lst, "list"))
+    lst <- lapply(lst, sort)
+  
+  if (inherits(lst, "character"))
+    lst <- sort(lst)
+  
+  obj <- new_lgas(lst)
+  attr(obj, which = "State") <- region
+  obj
 }
 
 
@@ -313,7 +327,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
 # Low-level S3 constructor for lgas object
 new_lgas <- function(x)
 {
-  structure(sort(x), class = c("lgas", "regions", class(x)))
+  structure(x, class = c("lgas", "regions", class(x)))
 }
 
 

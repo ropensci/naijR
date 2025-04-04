@@ -67,7 +67,7 @@ fix_region.states <- function(x, ...)
     ss <- sub(fullFCT, abbrFCT, ss)
   
   x <- .fix_region_internal(x, ss)
-  nofix <- attr(x, "misspelled")
+  nofix <- attr(x, "misspelt")
   
   if (length(nofix)) {
     commasep <- paste(nofix, collapse = ", ")
