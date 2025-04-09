@@ -1,7 +1,7 @@
 Package: naijR
 Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.6.1
+Version: 0.6.2
 Depends: R (>= 3.6)
 Imports:
     RColorBrewer (>= 1.1.2),
@@ -54,7 +54,7 @@ Description: A set of convenience functions as well as geographical/political
 License: GPL-3
 LazyData: TRUE
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 RdMacros: lifecycle
 URL: https://docs.ropensci.org/naijR/

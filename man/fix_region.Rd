@@ -6,7 +6,7 @@
 \alias{fix_region.lgas}
 \alias{fix_region.default}
 \alias{fix_region_manual}
-\title{Fix Misspelling of Adminstrative Regions}
+\title{Fix Misspelling of Administrative Regions}
 \usage{
 fix_region(x, ...)
 
@@ -21,7 +21,7 @@ fix_region_manual(x, wrong, correct)
 \arguments{
 \item{x}{An S3 object of class \code{states} or \code{lgas}. For 
 \code{fix_region.default}, a character vector (or an object coercible to 
-one) can be passed but only that for 'States' will be interpretable.}
+one) can be passed but only that for 'States' can be interpreted.}
 
 \item{...}{Arguments passed to methods.}
 
@@ -33,9 +33,9 @@ options.}
 
 \item{graphic}{Whether to make use of native GUI elements (on Windows only).}
 
-\item{wrong}{The misspelt element(s) of \code{x}.}
+\item{wrong}{The misspelled element(s) of \code{x}.}
 
-\item{correct}{The correction that is to be applied to the misspelt 
+\item{correct}{The correction that is to be applied to the misspelled 
 element(s)}
 }
 \value{
@@ -43,7 +43,7 @@ The transformed object. If all names are correct, the object is
 returned unchanged.
 }
 \description{
-Correct any misspelt names of administrative regions e.g. States and LGAs.
+Correct any misspelled names of administrative regions e.g. States and LGAs.
 }
 \details{
 \code{fix_region} will look through a character vector and try to 
@@ -56,11 +56,11 @@ update the spelling.
 }
 \note{
 When passed a character vector of length \code{1L}, in the case of a
-misspelt LGA, the function signals an error; the presumption is that a fix
+misspelled LGA, the function signals an error; the presumption is that a fix
 can readily be applied interactively. When all the items provided are 
-misspelt, nothing happens, but the user is advised to use the appropriate
+misspelled, nothing happens, but the user is advised to use the appropriate
 constructor function so as to improve the accuracy of the repairs. When
-there is a mix of misspelt and properly spelt LGAs, other functionalities
+there is a mix of misspelled and properly spelled LGAs, other avenues
 for fixing the mistakes are available via mode \code{interactive}.
 }
 \examples{
