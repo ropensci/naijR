@@ -85,7 +85,6 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' the data used to draw the map and thus can be used by this and other 
 #' popular R packages to visualize the spatial data.
 #'
-#' @import sf
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
 #' @importFrom rlang !!

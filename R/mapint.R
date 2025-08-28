@@ -161,7 +161,6 @@
 
 
 
-#' @import mapdata
 .get_map_data.default <- function(x) 
 {
   if (is.factor(x))

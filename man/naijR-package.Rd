@@ -6,9 +6,13 @@
 \alias{naijR-package}
 \title{naijR: Operations to Ease Data Analyses Specific to Nigeria}
 \description{
-\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
-
-A set of convenience functions as well as geographical/political data about Nigeria, aimed at simplifying work with data and information that are specific to the country.
+The naijR package is essentially an R package about Nigeria and for Nigeria.
+}
+\details{
+naijR contains a number of functions that facilitate the
+management of data sets of interest including data cleaning and wrangling,
+as well as making available a number of facilities for geospatial data
+visualisation.
 }
 \seealso{
 Useful links:
@@ -19,15 +23,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Victor Ordu \email{victorordu@outlook.com} (\href{https://orcid.org/0000-0003-3716-0668}{ORCID})
-
-Other contributors:
-\itemize{
-  \item Laura DeCicco \email{ldecicco@usgs.gov} [contributor]
-  \item Emily Riederer \email{emilyriederer@gmail.com} [reviewer]
-  \item Margaret Siple [reviewer]
-  \item Cagri Alican [reviewer]
-}
-
+Victor Ordu
 }
 \keyword{internal}

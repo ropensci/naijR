@@ -66,25 +66,6 @@ get_all_states <- function(named = TRUE)
 
 
 
-.subset_lgas_by_state <- function(s)
-{
-  stopifnot(is.character(s))
-  stateInd <- lgas_nigeria$state %in% s
-  lgas_nigeria$lga[stateInd]
-}
-
-
-
-
-.list_lgas_by_state <- function(s) {
-  stopifnot(all(is_state(s)))
-  ll <- lapply(s, .subset_lgas_by_state)
-  names(ll) <- s
-  ll
-}
-
-
-
 # For LGAs ----
 # Do not warn if this function is used inside a call to `fix_region`
 .is_nested_fix_dont_warn <- function() {
