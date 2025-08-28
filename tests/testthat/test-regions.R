@@ -84,9 +84,6 @@ test_that("illegal input is caught early", {
   expect_error(lgas(TRUE), chErr)
   expect_error(lgas(3.14), chErr)
   expect_error(lgas(c(NA, NA)), chErr)
-  # expect_error(lgas(c(NA_character_, NA)), chErr2)
-  # expect_error(lgas(""), chErr2)
-  # expect_error(lgas(character(2)), chErr2)
 })
 
 
@@ -99,13 +96,19 @@ test_that("LGAs are returned correctly", {
   expect_type(res, "character")
   expect_null(names(res))
   expect_type(res2, "list")
-  expect_named(res2, nam)
   expect_length(res2, 2L)
   expect_warning(lgas(c("Oyo West", "Obomo Ngwa")),
                  "One or more items is not an LGA")
-  expect_false(is.unsorted(lgas()))
-  expect_false(is.unsorted(unclass(res)))
 })
+
+
+test_that("Output is sorted appropriately", {
+  expect_false(is.unsorted(lgas()))
+  expect_false(is.unsorted(lgas("Akwa Ibom")))
+  expect_false(is.unsorted(names(lgas(c("Ebonyi", "Abia")))))
+  expect_false(is.unsorted(names(lgas(c("Oyo", "Osun", "Ondo")))))
+})
+
 
 test_that("Correct number of LGAs are returned for each State", {
   ss <- states()
@@ -139,6 +142,7 @@ test_that("LGA objects' attributes are appropriately formed", {
   expect_length(attr(suppressWarnings(eval(benuelgafun)), "State"), 0L)
   expect_warning(eval(benuelgafun), "'Obi' LGA is found in 2 States")
 })
+
 
 ## ---- Internal generics ----
 test_that("objects can be concatenated", {

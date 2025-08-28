@@ -8,11 +8,10 @@
 #' as well as making available a number of facilities for geospatial data
 #' visualisation.
 #' 
-#' @docType package
-#' @name naijR
 #' @author Victor Ordu
 #' @aliases naijR-package
-NULL
+#' @keywords internal
+"_PACKAGE"
 
 
 

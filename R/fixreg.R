@@ -174,7 +174,7 @@ fix_region.lgas <-
   ## For the LGAs case, the expectation is that in a vector with more than
   ## one element, if any of the elements passess the test of being an LGA
   ## then one can safely assume that the other element(s) that fail the test
-  ## did so because they were misspelled. An automatic fix will then be attempted.
+  ## did so because they were misspelled. An automatic fix will be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
   nonSynonyms <- x[!x %in% lgas_like_states()]
   

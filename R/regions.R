@@ -244,7 +244,12 @@ as_state <- function(x)
 #'
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
-  data("lgas_nigeria", package = "naijR", envir = environment())
+  data(
+    "lgas_nigeria",
+    package = "naijR",
+    envir = environment(),
+    verbose = FALSE
+  )
 
   if (is.factor(region))  # TODO: Perhaps implement methods.
     region <- as.character(region)
@@ -275,10 +280,17 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   lst <- region
 
   if (all(is_state(region)) && !strict) {
-    lst <- .list_lgas_by_state(region)
+    .extract_state_lgas <- function(states, dt = lgas_nigeria) {
+      idx <- dt$state %in% states
+      dt$lga[idx]
+    }
+    
+    lst <- region %>% 
+      lapply(.extract_state_lgas) %>%
+      stats::setNames(region)
 
     if (length(region) == 1L)
-      lst <- unname(unlist(lst))
+      lst <- lst %>% unlist %>% unname
   }
   else if (all(is_lga(region))) {
     lst <- .list_states_by_lga(region)
@@ -310,10 +322,11 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   # have a State attribute that lists the States and this should
   # apply to lgas objects that have just one element so that
   # there is no confusion.
-  if (inherits(lst, "list"))
-    lst <- lapply(lst, sort)
-  
-  if (inherits(lst, "character"))
+  if (inherits(lst, "list")) {
+   lst <-  lapply(lst, sort)
+   lst <- lst[sort(names(lst))]
+  }
+  else if (inherits(lst, "character"))
     lst <- sort(lst)
   
   obj <- new_lgas(lst)
@@ -433,19 +446,30 @@ print.states <- function(x, ...) { # nocov start
 #' @rdname lgas
 #' @export
 print.lgas <- function(x, ...) { # nocov start
-  .printoutRegion(x, "LGAs")
+  length(x)
+  if (is.atomic(x))
+    .printoutRegion(x, "Local Government Areas")
+  else
+    for (state in names(x)) {
+      state_in_full <- paste(state, "State")
+      mainborder <- paste0(strrep("=", nchar(state_in_full)), "\n")
+      cat(mainborder)
+      cat(state_in_full, "\n")
+      cat(mainborder)
+      .printoutRegion(x[[state]])
+    }
 } # nocov end
 
 
 
 # Creates the formatted printout for 'regions' objects
-.printoutRegion <- function(x, regiontype = c("States", "LGAs")) {
-  hdr <- match.arg(regiontype)
-  dash <- "-"
-  underline <- strrep(dash, nchar(hdr))
-  newline <- "\n"
-  cat(paste(hdr, underline, sep = newline), newline)
-  cat(paste(dash, x, collapse = newline), newline)
+.printoutRegion <- function(items, hdr = NULL) {
+  if (!is.null(hdr)) {
+    underline <- strrep("-", nchar(hdr))
+    cat(paste(hdr, underline, sep = "\n"), "\n")
+  }
+  
+  cat(paste("*", items, collapse = "\n"), "\n")
 }
 
 
