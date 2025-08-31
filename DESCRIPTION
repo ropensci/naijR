@@ -1,19 +1,16 @@
 Package: naijR
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.6.2.9001
-Depends: R (>= 3.6)
+Version: 0.6.3
+Depends: R (>= 3.6), grDevices, graphics, stats, utils
 Imports:
     RColorBrewer (>= 1.1.2),
     cli (>= 3.6.0),
-    grDevices,
-    graphics,
+    lifecycle (>= 0.2.0),
     mapdata (>= 2.3.0),
     maps (>= 3.3.0),
     rlang (>= 0.4.0),
     sf (>= 1.0-12),
-    stats,
     stringi (>= 1.7.6),
-    utils
 Suggests: 
     ISOcodes,
     covr,
@@ -26,23 +23,23 @@ Suggests:
     WikidataR
 Authors@R: 
 	c(person(given = "Victor", 
-	         family = "Ordu",
-             role = c("aut", "cre"),
-             email = "victorordu@outlook.com",
-             comment = c(ORCID = "0000-0003-3716-0668")),
+	     family = "Ordu",
+       role = c("aut", "cre"),
+       email = "victorordu@outlook.com",
+       comment = c(ORCID = "0000-0003-3716-0668")),
 	  person(given = "Laura",
 			 family = "DeCicco",
 			 role = "ctb",
 			 email = "ldecicco@usgs.gov"),
 	  person(given = "Emily",
-	         family = "Riederer",
+	     family = "Riederer",
 			 role = "rev",
 			 email = "emilyriederer@gmail.com"),
 	  person(given = "Margaret",
-	         family = "Siple",
+	     family = "Siple",
 			 role = "rev"),
 	  person(given = "Cagri",
-	         family = "Alican",
+	     family = "Alican",
 			 role = "rev")
 	)
 Description: A set of convenience functions as well as geographical/political
