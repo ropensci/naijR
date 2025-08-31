@@ -105,7 +105,7 @@ local({
   states_nigeria <- ISO_3166_2 |>
     subset(startsWith(Code, "NG"), select = Code:Name) |>
     transform(Name = sub("^Abuja\\s", "", Name)) |>
-    setNames(c("isocode", "state")) |>
+    stats::setNames(c("isocode", "state")) |>
     add_gpz("state", "gpz")
   
   cli_inform("Saving object with {nrow(states_nigeria)} States")
