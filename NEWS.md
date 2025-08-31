@@ -1,3 +1,7 @@
+# naijR 0.6.3
+- Fixes a bug where `naijR::lgas(<states>)` failed because the package was not attached to the search path due to an internal issue with object lookup.
+- Improves the output of the `lgas()` function. LGA output for objects constructed from multiple States is now properly sorted, including the constituent State names. This will improve naked eye search by users.
+
 # naijR 0.6.2
 - Return LGA output after object creation as sorted values. This is to enhance the user experience.
 
