@@ -7,7 +7,8 @@
 fix_mobile(x)
 }
 \arguments{
-\item{x}{A character vector of numerical strings.}
+\item{x}{Values to be fixed, represented either as \code{numeric} or
+\code{character} vectors.}
 }
 \value{
 The updated vector, usually the column of a data frame.

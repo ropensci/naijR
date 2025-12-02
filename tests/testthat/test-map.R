@@ -407,7 +407,9 @@ test_that("Points are mapped", {
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE),
                "Expected a character vector as 'region'")
   
-  x[4] <- -3; y[4] <- 1000
+  x[4] <- -3
+  y[4] <- 1000
+  
   expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
                "Expected a character vector as 'region'")
   

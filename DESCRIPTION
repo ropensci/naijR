@@ -1,5 +1,4 @@
 Package: naijR
-Type: Package
 Title: Operations to Ease Data Analyses Specific to Nigeria
 Version: 0.6.3
 Depends: R (>= 3.6), grDevices, graphics, stats, utils
@@ -18,7 +17,6 @@ Suggests:
     here,
     knitr,
     purrr,
-    readxl,
     rmarkdown,
     testthat (>= 3.0.0),
     usethis,
@@ -52,7 +50,6 @@ LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
-RdMacros: lifecycle
 URL: https://docs.ropensci.org/naijR/
 BugReports: https://github.com/ropensci/naijR/issues
 Config/testthat/edition: 3

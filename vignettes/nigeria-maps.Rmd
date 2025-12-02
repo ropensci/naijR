@@ -19,7 +19,7 @@ The need for relatively easy-to-use tools in the R statistical environment for m
 
 The main function for drawing Nigeria maps is `map_ng`. It uses data from the CIA World Database provided by the `{mapdata}` package as well as ESRI shapefiles from the World Bank to draw simple maps of Nigeria.
 
-```{r original-map}
+```{r original-map, fig.alt = "Map of Nigeria with all its States"}
 library(naijR)
 
 map_ng()
@@ -27,26 +27,27 @@ map_ng()
 
 To show the map without the state borders, set the first argument (`region`) to `NULL`. Thus, with all other arguments set to default values, that would be
 
-```{r outline-map}
+```{r outline-map, fig.alt = "Outline map of Nigeria"}
 map_ng("Nigeria")
 ```
 
 All the Local Government Areas can equally be displayed, using a map that, by default, does not display text, so as to avoid cluttering. This kind of map is useful for charting choropleth maps, as shown below for the States. To this, we pass the value produced by `lgas()`.
 
-```{r all-lga-map}
+```{r all-lga-map, fig.alt="Map of all the LGAs in Nigeria"}
 map_ng(lgas())
 ```
 
 
 It is also possible to make maps of sub-national divisions by defining them via `region`. For example, `states("sw")` returns a character vector of the states in the South-West geopolitical zone (see `?states`). To display them on a map with a few embellishments like labelling and colour, write
 
-```{r south-west, warning=FALSE}
+```{r south-west, warning=FALSE, fig.alt="State of the South-west geopolitical zone"}
 map_ng(states(gpz = "sw"), show.text = TRUE, col = 4)
 ```
 
+
 A single state can also be drawn:
 
-```{r, singleton, warning=FALSE}
+```{r, singleton, warning=FALSE, fig.alt="Kebbi State"}
 kk <- "Kebbi"
 map_ng(kk, col = 6, title = paste(kk, "State"))
 ```
@@ -75,7 +76,7 @@ head(dd)
 ### Using a data frame
 The easiest way to draw the choropleth map is to pass a two-column data frame to the `data` argument. Thus if the data frame has more columns, it is trivial to subset it and extract the 2 columns of interest. Continuing with our example,
 
-```{r df-approach}
+```{r df-approach, fig.alt="A choropleth map of Nigeria's states"}
 map_ng(data = dd)
 ```
 
@@ -87,7 +88,7 @@ Note the following:
 
 ### Using atomic vectors
 We can use the same data to make the same map, but with a different coding approach:
-```{r vec-approach}
+```{r vec-approach, fig.alt="Chroropleth map based on reds"}
 map_ng(region = states(), x = vv, col = "red", show.text = FALSE)
 ```
 
@@ -100,7 +101,7 @@ map_ng(region = states(), x = var)
 ### Numerical values
 When the data to be categorized are `numeric` vectors, the categories have to be defined. To achieve this, the `breaks` argument has to be supplied. This is a numeric vector that describes class limits for grouping the values. The number of classes is `length(breaks) - 1`.
 
-```{r numeric-choropleth} 
+```{r numeric-choropleth, fig.alt="Choropleth map with numeric values"} 
 nn <- runif(numStates, max = 100)  # random real numbers ranging from 0 - 100
 bb <- c(0, 40, 60, 100)
 
@@ -115,7 +116,7 @@ map_ng(
 
 To get a more meaningful and interpretable legend, use the `categories` argument.
 
-```{r good-legend} 
+```{r good-legend, fig.alt="Choropleth map with a proper legent"}
 map_ng(
   region = states(),
   x = nn,
@@ -131,7 +132,7 @@ Note that various colour arguments have been used, some of them kind of cryptic.
 ## Mapping of point data
 To show the distribution of point data on any the maps such as GIS location data, a different set of arguments is employed. Since point data requires a pair of coordinates to be accurate, both the `x` and `y` arguments MUST be provided. Once the function receives both coordinates, either as separate atomic vectors or as columns from a data frame, `map_ng` defaults to the mapping of points only in within the boundaries indicated by `region`. It looks like this:
 
-```{r pointmap}
+```{r pointmap, fig.alt="Mapping of points"}
 x <- c(3.000, 4.000, 6.000, 5.993, 5.444, 6.345, 5.744)
 y <- c(8.000, 9.000, 9.300, 10.432, 8.472, 6.889, 9.654)
 
