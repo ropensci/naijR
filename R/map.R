@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 globalVariables(c("STATE", "shp.state", "shp.lga"))
 
@@ -96,6 +96,9 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' @importFrom rlang eval_tidy
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
+#' @importFrom sf st_as_sf
+#' @importFrom sf st_crs
+#' @importFrom sf st_union
 #' 
 #' @export
 map_ng <- function(region = character(),
@@ -244,8 +247,8 @@ map_ng <- function(region = character(),
       # sets args to default values when not supplied via interface
       if_null_1 <- function(arg) if (is.null(arg)) 1 else arg
       
-      st.pts <- st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
-      st_crs(st.pts) <- st_crs(sfdata)
+      st.pts <- sf::st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
+      sf::st_crs(st.pts) <- sf::st_crs(sfdata)
 
       pch <- dots$pch
       lwd <- dots$lwd
@@ -260,7 +263,7 @@ map_ng <- function(region = character(),
           lty = if_null_1(lty)
         )
         
-        sfdata <- st_union(sfdata, st.pts)
+        sfdata <- sf::st_union(sfdata, st.pts)
       })
     }
     

@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 ## Get a vector with both the abbreviated and full versions of the 
 ## national capital's name, just return one of the two.

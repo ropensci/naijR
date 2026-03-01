@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2024 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 #' Local Government Areas of Nigeria
 #'

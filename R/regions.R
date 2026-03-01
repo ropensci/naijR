@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 globalVariables(c("lgas_nigeria", "state", "lga"))
 
@@ -285,12 +285,11 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
       dt$lga[idx]
     }
     
-    lst <- region %>% 
-      lapply(.extract_state_lgas) %>%
-      stats::setNames(region)
+    lst <- lapply(region, .extract_state_lgas)
+    names(lst) <- region
 
     if (length(region) == 1L)
-      lst <- lst %>% unlist %>% unname
+      lst <- unname(unlist(lst))
   }
   else if (all(is_lga(region))) {
     lst <- .list_states_by_lga(region)

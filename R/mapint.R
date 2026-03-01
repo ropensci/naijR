@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 # Internal helper function(s) for plotting Nigeria maps
 
@@ -11,6 +11,7 @@
 # @param plot If FALSE, the 'sf' object is returned without plotting
 # @param col Passed to the `col` argument of `plot`
 # @param ... Arguments passed on to internal methods
+#' @importFrom sf st_geometry
 .mymap <- function(sfdata, plot, ...)
 {
   stopifnot(exprs = {
@@ -154,7 +155,8 @@
   UseMethod(".get_map_data")
 
 
-
+#' @import mapdata 
+#' @importFrom sf st_as_sf
 .get_map_data.default <- function(x) 
 {
   if (is.factor(x))
@@ -524,6 +526,7 @@
 # Note: This check is probably too expensive. Consider passing just the range
 # though the loss of typing may make this less reliable down the line
 #' @importFrom rlang is_double
+#' @importFrom sf st_bbox
 .pts_within_bounds <- function(map, x, y)
 { 
   stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
@@ -591,7 +594,8 @@
 
 
 
-
+#' @importFrom sf st_centroid
+#' @importFrom sf st_as_text
 .get_point_coords <- function(sfobj) {
   stopifnot(inherits(sfobj, "sf"))
   geom <- sf::st_centroid(sfobj$geometry)
