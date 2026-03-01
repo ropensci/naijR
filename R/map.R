@@ -164,11 +164,11 @@ map_ng <- function(region = character(),
   }
   
   mapdata <- .get_map_data(region)
-  mapq <- expr(.mymap(mapdata, regions = region, plot = plot, ...))
+  mapq <- expr(.mymap(mapdata, plot = plot, ...))
   dots <- list(...)
   
   if (use.choropleth) {
-    mapq <- expr(.mymap(mapdata, region, plot = plot))
+    mapq <- expr(.mymap(mapdata, plot = plot))
     
     cpleth.inputs <- list(
       region = region,

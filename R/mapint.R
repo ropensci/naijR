@@ -8,27 +8,21 @@
 
 # Creates the map to be plotted
 # @param sfdata An objecct of class 'sf'
-# @param region An object of class 'regions'
 # @param plot If FALSE, the 'sf' object is returned without plotting
+# @param col Passed to the `col` argument of `plot`
 # @param ... Arguments passed on to internal methods
-.mymap <- function(sf, regions, plot = TRUE, col = NA, ...)
+.mymap <- function(sfdata, plot, ...)
 {
   stopifnot(exprs = {
-    inherits(sf, "sf")
+    inherits(sfdata, "sf")
     is.logical(plot)
+    !is.na(plot)
   })
   
-  if (plot) {
-    geom <- if (inherits(regions, "regions")) {
-      namefield <- .get_shpfileprop_element(regions, "namefield")
-      sf::st_geometry(sf, namefield)
-    } 
-    else
-      sf::st_geometry(sf)
-    
-    plot(geom, col = col, ...)
-  }
-  sf
+  if (plot)
+    plot(sf::st_geometry(sfdata), ...)
+  
+  sfdata  # always return this object
 }
 
 
@@ -41,7 +35,7 @@
   stopifnot(is.character(x))
   len <- length(x)
   
-  if (len == 0L)
+  if (len == 0L)  # when the default arg is
     return(states(all = TRUE))
   
   if (!(all(is_state(x)) || all(is_lga(x)))) {
@@ -167,22 +161,19 @@
     x <- as.character(x)
   
   stopifnot(is.character(x))
-  ngstr <- "Nigeria"
   
-  if (identical(x, ngstr)) {
+  if (identical(x, "Nigeria")) {
     # nolint start:
     # Setting `fill` to TRUE solved problematic rendering of the polygons.
     # See https://gis.stackexchange.com/questions/230608/creating-an-sf-object-from-the-maps-package
     # nolint end
     map.data <- 
-      maps::map("mapdata::worldHires", ngstr, plot = FALSE, fill = TRUE)
+      maps::map("mapdata::worldHires", "Nigeria", plot = FALSE, fill = TRUE)
     map.data <- sf::st_as_sf(map.data)
-    sfc <- "sf_column"
-    old.geom.name <- attr(map.data, sfc)
+    old.geom.name <- attr(map.data, "sf_column")
     pos <- match(old.geom.name, names(map.data))
-    new.geom.name <- "geometry"
-    names(map.data)[pos] <- new.geom.name
-    attr(map.data, sfc) <- new.geom.name
+    names(map.data)[pos] <- "geometry"
+    attr(map.data, "sf_column") <- "geometry"
     return(map.data)
   }
   region.data <- lgas(x)
@@ -256,12 +247,14 @@
     inherits(spatialobject, "sf")
     inherits(regions, "regions")
   })
+  
   # Because of duplicated LGA names, when dealing with an `lgas` object
   # first subset the spatial object by its State
   if (inherits(regions, "lgas")) {
     state <- attr(regions, "State")
     spatialobject <- spatialobject[spatialobject$STATE == state, ]
   }
+  
   reg.rgx <- paste0(regions, collapse = "|")
   reg.col <- .get_shpfileprop_element(regions, "namefield")
   reg.index <- grep(reg.rgx, spatialobject[[reg.col]])
