@@ -2,10 +2,11 @@
 ### New Features:
 -   Introduced new package data: An object of class `dist` which is a distance matrix of the kilometer distances (by road) between the State capitals of Nigeria.
 
-### Minor Changes:
--   Removed `{readxl}` from `Suggests` and adjusted the unit test that depended on it.
+### Bug fixes:
+- Fixed non-interactive vignette builds due to a failure to explicitly import key functions.
 
-# naijR 0.6.3
+
+## naijR 0.6.3
 - Fixes a bug where `naijR::lgas(<states>)` failed because the package was not attached to the search path due to an internal issue with object lookup.
 - Improves the output of the `lgas()` function. LGA output for objects constructed from multiple States is now properly sorted, including the constituent State names. This will improve naked eye search by users.
 
