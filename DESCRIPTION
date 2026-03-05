@@ -1,6 +1,6 @@
 Package: naijR
 Title: Operations to Ease Data Analyses Specific to Nigeria
-Version: 0.6.3.9002
+Version: 0.6.3.9004
 Depends: R (>= 3.6), grDevices, graphics, stats, utils
 Imports:
     RColorBrewer (>= 1.1.2),
@@ -19,6 +19,7 @@ Suggests:
     purrr,
     rmarkdown,
     testthat (>= 3.0.0),
+    tibble,
     usethis
 Authors@R: 
 	c(person(given = "Victor", 
