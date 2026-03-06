@@ -12,6 +12,11 @@ test_that("ng_distance returns correct value for known pair", {
   expect_equal(ng_distance("Kano", "lagos"), 1139)
 })
 
+test_that("'Lagos' is equivalent to 'Ikeja'", {
+  expect_identical(ng_distance("Lagos", "Abuja"), ng_distance("Ikeja", "Abuja"))
+  expect_identical(ng_distance("Lagos", "Ikeja"), 0)
+})
+
 test_that("unit conversion to miles works", {
   expect_equal(ng_distance("Abuja", "Kano", unit = "miles"), 246.1)
 })
