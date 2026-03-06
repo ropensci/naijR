@@ -17,6 +17,7 @@ Suggests:
     knitr,
     lifecycle,
     purrr,
+    readr,
     rmarkdown,
     testthat (>= 3.0.0),
     tibble,
