@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 globalVariables(c("STATE", "shp.state", "shp.lga"))
 
@@ -87,9 +87,6 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #'
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
-#' @importFrom lifecycle deprecate_warn
-#' @importFrom lifecycle deprecated
-#' @importFrom lifecycle is_present
 #' @importFrom rlang !!
 #' @importFrom rlang as_name
 #' @importFrom rlang caller_env
@@ -99,6 +96,9 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' @importFrom rlang eval_tidy
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
+#' @importFrom sf st_as_sf
+#' @importFrom sf st_crs
+#' @importFrom sf st_union
 #' 
 #' @export
 map_ng <- function(region = character(),
@@ -167,11 +167,11 @@ map_ng <- function(region = character(),
   }
   
   mapdata <- .get_map_data(region)
-  mapq <- expr(.mymap(mapdata, regions = region, plot = plot, ...))
+  mapq <- expr(.mymap(mapdata, plot = plot, ...))
   dots <- list(...)
   
   if (use.choropleth) {
-    mapq <- expr(.mymap(mapdata, region, plot = plot))
+    mapq <- expr(.mymap(mapdata, plot = plot))
     
     cpleth.inputs <- list(
       region = region,
@@ -219,7 +219,7 @@ map_ng <- function(region = character(),
   }, 
   error = function(e) stop(e))
   
-  if (!is_null(y) && !.xy_within_bounds(sfdata, x, y))
+  if (!is_null(y) && !.pts_within_bounds(sfdata, x, y))
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   
   if (plot) { 
@@ -247,8 +247,8 @@ map_ng <- function(region = character(),
       # sets args to default values when not supplied via interface
       if_null_1 <- function(arg) if (is.null(arg)) 1 else arg
       
-      st.pts <- st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
-      st_crs(st.pts) <- st_crs(sfdata)
+      st.pts <- sf::st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
+      sf::st_crs(st.pts) <- sf::st_crs(sfdata)
 
       pch <- dots$pch
       lwd <- dots$lwd
@@ -263,7 +263,7 @@ map_ng <- function(region = character(),
           lty = if_null_1(lty)
         )
         
-        sfdata <- st_union(sfdata, st.pts)
+        sfdata <- sf::st_union(sfdata, st.pts)
       })
     }
     

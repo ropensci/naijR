@@ -3,6 +3,7 @@
 inst/doc
 .vscode
 sandbox
-naijR.Rproj
 /doc/
 /Meta/
+cran-comments.md
+CRAN-SUBMISSION

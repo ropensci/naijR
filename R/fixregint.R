@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 ## Approximately matches a string on a list of regions i.e States or LGAs.
 ## @param str A string to be matched

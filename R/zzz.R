@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 .onLoad <- function(libname, pkgname)
 {
   options(

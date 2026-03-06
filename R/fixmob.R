@@ -2,7 +2,7 @@
 #
 # GPL-3 License
 #
-# Copyright (C) 2019-2023 Victor Ordu.
+# Copyright (C) 2019-2026 Victor Ordu.
 
 #' Fix mobile numbers
 #'
@@ -16,7 +16,8 @@
 #' that may have been removed from the vector, by setting the option
 #' \code{verbose} to \code{TRUE}.
 #'
-#' @param x A character vector of numerical strings.
+#' @param x Values to be fixed, represented either as \code{numeric} or
+#' \code{character} vectors.
 #'
 #' @return The updated vector, usually the column of a data frame.
 #' 
