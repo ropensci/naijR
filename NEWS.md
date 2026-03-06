@@ -1,9 +1,10 @@
 ## naijR 0.7.0
 ### New Features:
--   Introduced new package data: An object of class `dist` which is a distance matrix of the kilometer distances (by road) between the State capitals of Nigeria.
+-   Introduced `ngdist`, a `dist` object containing road distances (in km) between all 37 Nigerian State capitals, sourced from UNDP.
+-   Added `ng_distance()` for convenient lookup of the driving distance between any two State capitals, with support for kilometres and miles.
 
 ### Bug fixes:
-- Fixed non-interactive vignette builds due to a failure to explicitly import key functions.
+-   Fixed non-interactive vignette builds due to a failure to explicitly import key functions.
 
 
 ## naijR 0.6.3

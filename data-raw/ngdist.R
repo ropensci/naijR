@@ -4,8 +4,8 @@
 #
 # Copyright (c) 2024-2026 Victor Ordu
 
-# The creation of a distance city_matrix that contains the distances between State
-# captals of Nigeria (in kilometres)
+# The creation of a distance matrix that contains the distances between State
+# capitals of Nigeria (in kilometres)
 local({
   devtools::load_all()
   
@@ -391,7 +391,7 @@ local({
     
     "Dutse",         "Enugu",          910,
     "Dutse",         "Gombe",          895,
-    "Dutse",         "Gusau",          4416,   # note: this looks like a possible typo (4416 km?); check your source
+    "Dutse",         "Gusau",          295,
     "Dutse",         "Ibadan",         963,
     "Dutse",         "Lagos",          1110,
     "Dutse",         "Ilorin",         846,

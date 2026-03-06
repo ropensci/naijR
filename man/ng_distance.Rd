@@ -7,28 +7,31 @@
 ng_distance(a, b, unit = c("km", "miles"))
 }
 \arguments{
-\item{a, b}{Character. Name of a city (case-insensitive).}
+\item{a, b}{Character vector. Name(s) of city/cities (case-insensitive).
+Must be the same length; vector recycling is not permitted.}
 
-\item{unit}{Character. Unit of distance to return. One of "km" (default) or 
+\item{unit}{Character. Unit of distance to return. One of "km" (default) or
 "miles".}
 }
 \value{
-Numeric scalar: the road distance between the two cities in the
-  requested unit (rounded to 1 decimal place).
+Numeric vector of road distances in the requested unit (rounded to
+  1 decimal place), with the same length as \code{a} and \code{b}.
 }
 \description{
-Retrieves the precomputed road (driving) distance between two Nigerian
-state capitals.
+Retrieves the precomputed road (driving) distance between Nigerian
+state capitals. Both \code{a} and \code{b} can be vectors of the same
+length, in which case distances are computed element-wise.
 }
 \details{
-Distances are approximate driving distances sourced from [your source, e.g.,
-Google Maps / OSRM snapshot in 2025]. They represent typical road travel
-and may vary due to traffic, road conditions, or security factors.
+Distances are approximate driving distances sourced from UNDP.
+They represent typical road travel and may vary due to route choice,
+road conditions, or detours.
 City names are matched case-insensitively.
 }
 \examples{
 ng_distance("Lagos", "Kano")
 ng_distance("Abuja", "Port Harcourt", unit = "miles")
 ng_distance("Ibadan", "enugu")  # case-insensitive
+ng_distance(c("Lagos", "Abuja"), c("Kano", "Enugu"))  # vectorized
 
 }
