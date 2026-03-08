@@ -1,4 +1,5 @@
 # tests/testthat/test-ng_distance.R
+
 test_that("input is validated", {
   expect_error(ng_distance(123, "Lagos"))
   expect_error(ng_distance("Lagos", TRUE))
@@ -8,8 +9,20 @@ test_that("input is validated", {
 })
 
 test_that("ng_distance returns correct value for known pair", {
-  expect_equal(ng_distance("Lagos", "Abuja"), 761)         
+  expect_equal(ng_distance("Lagos", "Abuja"), 761)
   expect_equal(ng_distance("Kano", "lagos"), 1139)
+  expect_equal(ng_distance("Awka", "Asaba"), 44) 
+  expect_equal(ng_distance("Gusau", "Dutse"), 4416)
+  expect_equal(ng_distance("Port Harcourt", "Calabar"), 195)
+  expect_equal(ng_distance("Maiduguri", "Yola"), 430)
+  expect_equal(ng_distance("Enugu", "Awka"), 62)
+  expect_equal(ng_distance("Sokoto", "Maiduguri"), 1123)
+})
+
+test_that("distance matrix is symmetric", {
+  expect_equal(ng_distance("Lagos", "Kano"), ng_distance("Kano", "Lagos"))
+  expect_equal(ng_distance("Enugu", "Sokoto"), ng_distance("Sokoto", "Enugu"))
+  expect_equal(ng_distance("Calabar", "Abuja"), ng_distance("Abuja", "Calabar"))
 })
 
 test_that("unit conversion to miles works", {
