@@ -23,10 +23,9 @@ state capitals. Both \code{a} and \code{b} can be vectors of the same
 length, in which case distances are computed element-wise.
 }
 \details{
-Distances are approximate driving distances sourced from UNDP.
-They represent typical road travel and may vary due to route choice,
-road conditions, or detours.
-City names are matched case-insensitively.
+Distances are approximate driving distances sourced from travel allowance
+guidance provided by UNDP Nigeria. They represent typical road travel and
+may vary due to route choice, road conditions, or detours.
 }
 \examples{
 ng_distance("Lagos", "Kano")
