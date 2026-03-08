@@ -25,6 +25,11 @@ test_that("distance matrix is symmetric", {
   expect_equal(ng_distance("Calabar", "Abuja"), ng_distance("Abuja", "Calabar"))
 })
 
+test_that("'Lagos' is equivalent to 'Ikeja'", {
+  expect_identical(ng_distance("Lagos", "Abuja"), ng_distance("Ikeja", "Abuja"))
+  expect_identical(ng_distance("Lagos", "Ikeja"), 0)
+})
+
 test_that("unit conversion to miles works", {
   expect_equal(ng_distance("Abuja", "Kano", unit = "miles"), 246.1)
 })

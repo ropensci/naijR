@@ -15,10 +15,9 @@ globalVariables("ngdist")
 #'   1 decimal place), with the same length as \code{a} and \code{b}.
 #'
 #' @details
-#' Distances are approximate driving distances sourced from UNDP.
-#' They represent typical road travel and may vary due to route choice,
-#' road conditions, or detours.
-#' City names are matched case-insensitively.
+#' Distances are approximate driving distances sourced from travel allowance
+#' guidance provided by UNDP Nigeria. They represent typical road travel and
+#' may vary due to route choice, road conditions, or detours.
 #'
 #' @examples
 #' ng_distance("Lagos", "Kano")
@@ -32,9 +31,19 @@ globalVariables("ngdist")
 ng_distance <- function(a, b, unit = c("km", "miles")) {
   if (missing(a) || missing(b))
     cli_abort("Inputs 'a' and 'b' must both be supplied")
-
   if (length(a) != length(b))
     cli_abort("Inputs 'a' and 'b' must be the same length")
+  
+  # Ikeja is the capital of Lagos State, but is most commonly called 
+  # 'Lagos'. Thus, we will permit its use as a query term.
+  accept_lagos <- function(x) {
+    haslagos <- grepl("lagos", x, ignore.case = TRUE)
+    if (any(haslagos))
+      x[haslagos] <- "Ikeja"
+    x
+  }  # TODO: add a warning
+  a <- accept_lagos(a)
+  b <- accept_lagos(b)
 
   data("ngdist", package = "naijR", envir = environment(), verbose = FALSE)
   unit <- match.arg(unit)
