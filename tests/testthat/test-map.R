@@ -448,6 +448,6 @@ test_that("Labels can be resized", {
   
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
   
-  expect_s3_class(map_ng(show.text = TRUE, cex = .5, plot = FALSE), 
+  expect_s3_class(map_ng(show.text = TRUE, cex = 0.5, plot = FALSE), 
                   maptype)
 })

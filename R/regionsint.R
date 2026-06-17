@@ -86,19 +86,6 @@ get_all_states <- function(named = TRUE)
 
 
 
-.has_mix_of_non_lga <- function(x) {
-  stopifnot(is.character(x))
-  matches <- .bools_partial_lga_matches(x)
-  
-  if (.all_are_not_lgas(x))
-    return(FALSE)
-  
-  sum(matches) < length(x)
-}
-
-
-
-
 .all_are_not_lgas <- function(x) {
   stopifnot(is.character(x))
   sum(.bools_partial_lga_matches(x)) == 0L

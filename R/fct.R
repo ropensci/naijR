@@ -27,17 +27,3 @@
   versions <- .fct_options()
   sub(versions[-i], versions[i], x, fixed = TRUE)
 }
-
-
-
-## Repairs the use of Abuja in a vector that is intended to be States
-.fixAbujaFct <- function(x, type = c("full", "abbrev"))
-{
-  stopifnot(exprs = {any(is_state(x)) && length(unique(x)) > 1L})
-  abj <- "Abuja"
-  
-  if (!abj %in% x)
-    return(x)
-  
-  sub(x, abj, .fct_options(type), fixed = TRUE)
-}

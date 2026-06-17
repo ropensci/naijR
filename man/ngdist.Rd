@@ -10,7 +10,7 @@ An object of class \code{dist} with 37 labels — one for each
   \code{"Lagos"}, \code{"Port Harcourt"}).
 }
 \usage{
-ngdist
+data(ngdist)
 }
 \description{
 A symmetric distance matrix containing approximate road (driving)
