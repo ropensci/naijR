@@ -13,7 +13,7 @@ A \code{data.frame} with 37 rows and 2 columns
 }
 }
 \usage{
-states_nigeria
+data(states_nigeria)
 }
 \description{
 A dataset of the 36 States and Federal Capital Territory of Nigeria.

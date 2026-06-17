@@ -439,6 +439,7 @@ as_lga <- function(x) {
 #' @export
 print.states <- function(x, ...) { # nocov start
   .printoutRegion(x, "States")
+  invisible(x)
 } # nocov end
 
 
@@ -457,6 +458,7 @@ print.lgas <- function(x, ...) { # nocov start
       cat(mainborder)
       .printoutRegion(x[[state]])
     }
+  invisible(x)
 } # nocov end
 
 

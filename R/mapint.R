@@ -419,7 +419,7 @@
   
   if (is.factor(val)) {
     
-    if (length(levels(val)) >= 10L)
+    if (nlevels(val) >= 10L)
       cli_abort("Too many categories")
     
     return(val)
@@ -496,18 +496,6 @@
   pal <- grDevices::palette()
   grDevices::palette('R4')
   pal
-}
-
-
-
-
-# Provides a regex pattern for checking polygons for jurisdictions that
-# are matched more than once e.g. foo:1, foo:2, bar:1, bar:2, bar:3
-# TODO: Deprecate
-.regex_duplicated_poly <- function(x)
-{
-  stopifnot(is.character(x))
-  paste0("^(", paste0(x, collapse = "|"),")(\\:\\d)?$")
 }
 
 

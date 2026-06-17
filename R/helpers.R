@@ -59,23 +59,6 @@ first_elem_warn <- function(arg)
 
 
 
-.next_minor_version <- function()
-{
-  values <- unlist(utils::packageVersion("naijR"))
-  nextver <- paste(values[1], values[2] + 1, "0", sep = ".")
-  numeric_version(nextver)
-}
-
-
-
-
-.deprec_msg <- function(arg) {
-  sprintf("map_ng(%s = )", deparse(substitute(arg)))
-}
-
-
-
-
 # Checks whether a logical argument is correctly passed
 assert.lgl.arg <- function(arg) {
   argname <- deparse(substitute(arg))
