@@ -1,3 +1,5 @@
+
+
 ## naijR 0.7.0
 ### New Features:
 -   Introduced `ngdist`, a `dist` object containing road distances (in km) between all 37 Nigerian State capitals, sourced from UNDP.
