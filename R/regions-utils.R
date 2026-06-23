@@ -1,4 +1,4 @@
-# Source file: regionsint.R
+# Source file: regions-utils.R
 #
 # GPL-3 License
 #
