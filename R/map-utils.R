@@ -1,4 +1,4 @@
-# Source file: mapint.R
+# Source file: map-utils.R
 #
 # GPL-3 License
 #

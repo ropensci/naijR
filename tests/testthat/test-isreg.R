@@ -39,7 +39,7 @@ test_that("States can be identified in an object", {
   expect_equal(sum(has.na, na.rm = TRUE), 34L)
   expect_true(anyNA(has.na))
   expect_equal(sum(nas.but.good), 1L)
-  expect_equal(length(nas.but.good), 1L)
+  expect_length(nas.but.good, 1L)
   expect_equal(sum(is.na(has.na)), length(ind.nas))
 })
 

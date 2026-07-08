@@ -1,4 +1,4 @@
-# Source file: fixregint.R
+# Source file: fixregions-utils.R
 #
 # GPL-3 License
 #
@@ -15,8 +15,7 @@
 .fix_region_internal <- function(x, region, interactive = FALSE)
 {
   stopifnot(is.character(x), is.character(region))
-  cant.fix <- character()
-  fix.status <- character()
+  cant.fix <- fix.status <- character()
   
   ## Internal function to enable identification of entries that need to
   ## be fixed and preparing attributes that will enable further processing
@@ -28,10 +27,8 @@
       return(str)
     
     if (inherits(regions, "states")) {
-      
       if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
           && identical(toupper(str), abbrFCT))
-        
         return(abbrFCT)
     }
     
@@ -73,12 +70,13 @@
     str
   }
   
-  spellchecked <-
-    vapply(x,
-           get_proper_value,
-           character(1),
-           regions = region,
-           USE.NAMES = FALSE)
+  spellchecked <- vapply(
+    x, 
+    get_proper_value, 
+    character(1), 
+    regions = region, 
+    USE.NAMES = FALSE
+  )
   
   attr(spellchecked, "misspelt") <- sort(unique(cant.fix))
   

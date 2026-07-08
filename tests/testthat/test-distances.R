@@ -9,20 +9,20 @@ test_that("input is validated", {
 })
 
 test_that("ng_distance returns correct value for known pair", {
-  expect_equal(ng_distance("Lagos", "Abuja"), 761)
-  expect_equal(ng_distance("Kano", "lagos"), 1139)
-  expect_equal(ng_distance("Awka", "Asaba"), 44) 
-  expect_equal(ng_distance("Gusau", "Dutse"), 416)
-  expect_equal(ng_distance("Port Harcourt", "Calabar"), 196)
-  expect_equal(ng_distance("Maiduguri", "Yola"), 436)
-  expect_equal(ng_distance("Enugu", "Awka"), 62)
-  expect_equal(ng_distance("Sokoto", "Maiduguri"), 1123)
+  expect_identical(ng_distance("Lagos", "Abuja"), 761)
+  expect_identical(ng_distance("Kano", "lagos"), 1139)
+  expect_identical(ng_distance("Awka", "Asaba"), 44) 
+  expect_identical(ng_distance("Gusau", "Dutse"), 416)
+  expect_identical(ng_distance("Port Harcourt", "Calabar"), 196)
+  expect_identical(ng_distance("Maiduguri", "Yola"), 436)
+  expect_identical(ng_distance("Enugu", "Awka"), 62)
+  expect_identical(ng_distance("Sokoto", "Maiduguri"), 1123)
 })
 
 test_that("distance matrix is symmetric", {
-  expect_equal(ng_distance("Lagos", "Kano"), ng_distance("Kano", "Lagos"))
-  expect_equal(ng_distance("Enugu", "Sokoto"), ng_distance("Sokoto", "Enugu"))
-  expect_equal(ng_distance("Calabar", "Abuja"), ng_distance("Abuja", "Calabar"))
+  expect_identical(ng_distance("Lagos", "Kano"), ng_distance("Kano", "Lagos"))
+  expect_identical(ng_distance("Enugu", "Sokoto"), ng_distance("Sokoto", "Enugu"))
+  expect_identical(ng_distance("Calabar", "Abuja"), ng_distance("Abuja", "Calabar"))
 })
 
 test_that("'Lagos' is equivalent to 'Ikeja'", {
@@ -31,11 +31,11 @@ test_that("'Lagos' is equivalent to 'Ikeja'", {
 })
 
 test_that("unit conversion to miles works", {
-  expect_equal(ng_distance("Abuja", "Kano", unit = "miles"), 246.1)
+  expect_identical(ng_distance("Abuja", "Kano", unit = "miles"), 246.1)
 })
 
 test_that("case insensitivity works", {
-  expect_equal(ng_distance("PORt HarCOurt", "EnUGu"),
+  expect_identical(ng_distance("PORt HarCOurt", "EnUGu"),
                ng_distance("Port Harcourt", "Enugu"))
 })
 
@@ -45,28 +45,28 @@ test_that("error on unknown city", {
 })
 
 test_that("same city returns 0", {
-  expect_equal(ng_distance("Abuja", "Abuja"), 0)
-  expect_equal(ng_distance("ibadan", "Ibadan"), 0)
+  expect_identical(ng_distance("Abuja", "Abuja"), 0)
+  expect_identical(ng_distance("ibadan", "Ibadan"), 0)
 })
 
 test_that("output is numeric with 1 decimal place", {
   d <- ng_distance("Jos", "Maiduguri")
   expect_type(d, "double")
   expect_length(d, 1)
-  expect_equal(d, round(d, 1))
+  expect_identical(d, round(d, 1))
 })
 
 test_that("vector inputs return element-wise distances", {
   d <- ng_distance(c("Lagos", "Abuja"), c("Abuja", "Kano"))
   expect_length(d, 2)
-  expect_equal(d[1], ng_distance("Lagos", "Abuja"))
-  expect_equal(d[2], ng_distance("Abuja", "Kano"))
+  expect_identical(d[1], ng_distance("Lagos", "Abuja"))
+  expect_identical(d[2], ng_distance("Abuja", "Kano"))
 })
 
 test_that("vector inputs with unit conversion work", {
   d <- ng_distance(c("Lagos", "Abuja"), c("Kano", "Enugu"), unit = "miles")
-  expect_equal(d[1], ng_distance("Lagos", "Kano", unit = "miles"))
-  expect_equal(d[2], ng_distance("Abuja", "Enugu", unit = "miles"))
+  expect_identical(d[1], ng_distance("Lagos", "Kano", unit = "miles"))
+  expect_identical(d[2], ng_distance("Abuja", "Enugu", unit = "miles"))
 })
 
 test_that("unequal length vectors are rejected", {

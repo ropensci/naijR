@@ -1,4 +1,4 @@
-# Source file: fixreg.R
+# Source file: fixregions.R
 #
 # GPL-3 License
 #
