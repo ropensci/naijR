@@ -29,7 +29,7 @@ test_that("Input is validated", {
                "A non-NULL input for 'data' must be a data frame")
   expect_error(map_ng(data = data.frame(col = runif(10))),
                "Insufficient variables in 'data' to generate a plot")
-  expect_error(map_ng(data.frame()), "A data frame was passed;")
+  expect_error(map_ng(data.frame()), "A data frame was passed")
   # TODO: Add test case for choropleths with too few regions
 })
 

@@ -9,13 +9,11 @@
 ## Provides some uniformity in the messaging b/w States & LGAs
 .warn_on_misspelling <- function(region.type) {
   region.type <- match.arg(region.type, c("state", "lga"))
-  
   regionstr <- switch(
     region.type, 
     state = "a State", 
     lga = "an LGA"
   )
-  
   cli::cli_warn("One or more items is not {regionstr}. Spelling error?")
 }
 
@@ -32,12 +30,10 @@ get_all_states <- function(named = TRUE)
   })
   data("states_nigeria", package = "naijR", envir = environment())
   states.by.zone <- split(states_nigeria$state, states_nigeria$gpz)
-  
   if (!named) {
     s <- unlist(states.by.zone, use.names = FALSE)
     return(sort(s))
   }
-  
   names(states.by.zone) <- sub("\\.state", "", names(states.by.zone))
   states.by.zone
 }
@@ -74,11 +70,10 @@ get_all_states <- function(named = TRUE)
     any(nest.func %in% funs)
   }
   nest.func <- c("fix_region", "disambiguate_lga")
-  
   ## Check to pre-empt any future removal of these functions
-  if (!sum(vapply(nest.func, exists, logical(1))))  
+  if (!sum(vapply(nest.func, exists, logical(1)))) {
     cli::cli_abort("The nesting function does not exist")
-  
+  }
   found <- vapply(sys.calls(), check_nesting_func, logical(1))
   any(found)
 }
@@ -97,10 +92,9 @@ get_all_states <- function(named = TRUE)
 .has_misspelt_lgas <- function(x) {
   stopifnot(is.character(x))
   matches <- .bools_exact_lga_matches(x)
-  
-  if (.all_are_not_lgas(x))
+  if (.all_are_not_lgas(x)) {
     return(FALSE)
-  
+  }
   sum(matches) < length(x)
 }
 
@@ -117,7 +111,6 @@ get_all_states <- function(named = TRUE)
 
 .bools_partial_lga_matches <- function(x) {
   stopifnot(is.character(x))
-  
   agrepl(.lgas_regex(x),
          lgas(),
          fixed = FALSE,
@@ -135,4 +128,28 @@ get_all_states <- function(named = TRUE)
 .lgas_regex <- function(x) {
   stopifnot(is.character(x))
   paste0("^", paste(x, collapse = "|"), "$")
+}
+
+
+
+
+## Returns those LGAs that share names with their State or, in other words,
+## States that are also the names of LGAs e.g. Bauchi, Ekiti
+lgas_like_states <- function()
+{
+  ll <- unclass(lgas())
+  statelike <- which(is_state(ll))
+  unique(ll[statelike])
+}
+
+
+
+
+# For messages ----
+# Checks whether a logical argument is correctly passed
+assert_logical_arg <- function(arg) {
+  argname <- deparse(substitute(arg))
+  if (!is.logical(arg) || is.na(arg)) {
+    cli_abort("'{argname}' should be TRUE/FALSE")
+  }
 }

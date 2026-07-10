@@ -47,28 +47,23 @@ fix_region.states <- function(x, ...)
   ## Process possible FCT values
   abbrFCT <- .fct_options("abbrev")
   fullFCT <- .fct_options("full")
-  
   ## Replace any 'Abuja' with FCT in full
   x[x %in% "Abuja"] <- fullFCT
-  
   ## Find and replace abbreviated with full version
   sumFct <- sum(.fct_options() %in% x)
-  
   ## Both full and abbreviated versions coexist
-  if (sumFct == 2)
+  if (sumFct == 2) {
     x <- sub(abbrFCT, fullFCT, x)
-  
+  }
   ## Allow use of abbreviated version before carrying
   ## out the check
   isFct <- x %in% abbrFCT
   ss <- states()
-  
-  if (sum(isFct)) 
+  if (sum(isFct)) {
     ss <- sub(fullFCT, abbrFCT, ss)
-  
+  }
   x <- .fix_region_internal(x, ss)
   nofix <- attr(x, "misspelt")
-  
   if (length(nofix)) {
     commasep <- paste(nofix, collapse = ", ")
     cli::cli_abort("The following are not States: {commasep}")
@@ -96,44 +91,45 @@ fix_region.states <- function(x, ...)
 #' fix_region(c("Owerri north", "Owerri West"))
 #' 
 #' @export
-fix_region.lgas <- 
-  function(x, interactive = FALSE, quietly = FALSE, graphic = FALSE, ...)
-  {
-    # TODO: add an optional 'state' argument to fine-tune the matching
-    if (!is.logical(interactive) ||
-        !is.logical(quietly) ||
-        !is.logical(graphic)) {
-      cli::cli_abort("Invalid input where logical argument expected")
-    }
-    if (graphic) {
-      if (!interactive)
-        cli::cli_warn("'graphic' was reset to FALSE in non-interactive mode")
-      
-      graphic <- interactive
-    }
-    vals <- .fix_region_internal(x, lgas(), interactive)
-    usedialog <- .Platform$OS.type == "windows" && graphic
-    
-    if (interactive) { # nocov start
-      vals <- .fix_lgas_interactive(vals, usedialog)
-    
-      if (is.null(vals)) {
-        msg <- "The operation was cancelled"
-        
-        if (usedialog)
-          utils::winDialog("ok", msg)
-        else
-          cli::cli_alert_info(msg)
-        
-        return(invisible(x))
-      } # nocov end
-    }
-    if (!quietly)
-      .report_on_fixes(vals, usedialog)
-    
-    vals
+fix_region.lgas <- function(x,
+                            interactive = FALSE,
+                            quietly = FALSE,
+                            graphic = FALSE,
+                            ...)
+{
+  # TODO: add an optional 'state' argument to fine-tune the matching
+  if (!is.logical(interactive) ||
+      !is.logical(quietly) ||
+      !is.logical(graphic)) {
+    cli::cli_abort("Invalid input where logical argument expected")
   }
-
+  if (graphic) {
+    if (!interactive) {
+      cli::cli_warn("'graphic' was reset to FALSE in non-interactive mode")
+    }
+    graphic <- interactive
+  }
+  vals <- .fix_region_internal(x, lgas(), interactive)
+  usedialog <- .Platform$OS.type == "windows" && graphic
+  if (interactive) {
+    # nocov start
+    vals <- .fix_lgas_interactive(vals, usedialog)
+    if (is.null(vals)) {
+      msg <- "The operation was cancelled"
+      if (usedialog) {
+        utils::winDialog("ok", msg)
+      }
+      else {
+        cli::cli_alert_info(msg)
+      }
+      return(invisible(x))
+    } # nocov end
+  }
+  if (!quietly) {
+    .report_on_fixes(vals, usedialog)
+  }
+  vals
+}
 
 
 
@@ -152,43 +148,42 @@ fix_region.lgas <-
 #' @export
   fix_region.default <- function(x, ...)
 {
-  if (is.factor(x))
+  if (is.factor(x)) {
     x <- as.character(x)
-  
-  if (!is.character(x))
+  }
+  if (!is.character(x)) {
     cli_abort("'x' is not a character vector")
-  
+  }
   empty <- grepl("^$", x)
-  
-  if (length(empty) > 0L && all(empty))  ## diff character(0) and character(1)
+  if (length(empty) > 0L && all(empty)) { ## diff character(0) and character(1)
     cli_abort("'x' only has empty strings")
-  
-  if (any(empty))
+  }
+  if (any(empty)) {
     cli_warn("Tried to fix empty strings - may produce errors")
-  
+  }
   if (all(is.na(x)) || !length(x)) {
     cli_warn("'x' has length 0L or only missing values")
     return(x)
   }
-  
   ## For the LGAs case, the expectation is that in a vector with more than
   ## one element, if any of the elements passess the test of being an LGA
   ## then one can safely assume that the other element(s) that fail the test
   ## did so because they were misspelled. An automatic fix will be attempted.
   ## First, ignore synonymous elements i.e. those that are both States/LGAs.
   nonSynonyms <- x[!x %in% lgas_like_states()]
-  
-  region <- if (any(is_lga(nonSynonyms)))    # We use 'any()' because we want
+  region <- if (any(is_lga(nonSynonyms))) {   # We use 'any()' because we want
     lgas(x, warn = FALSE)                    # to allow creation of temporary,
-  else if (any(is_state(nonSynonyms)))       # even with misspelled elements
+  }
+  else if (any(is_state(nonSynonyms))) {     # even with misspelled elements
     states(x, warn = FALSE)
-  else
+  }
+  else {
     cli_abort(
         "Incorrect region name(s);
         consider reconstructing 'x' with
         `states()` or `lgas()` for a more reliable fix"
     )
-  
+  }
   invisible(as.character(fix_region(region, ...)))
 }
 
@@ -214,36 +209,32 @@ fix_region.lgas <-
 fix_region_manual <- function(x, wrong, correct)
 {
   arg <- substitute(x)
-  
   if (!(inherits(x, "states") && !inherits(x, "lgas"))) {
-    
-    if (!is.character(x))
+    if (!is.character(x)) {
       cli_abort(
         "The operation cannot be done on objects of type {sQuote(typeof(x))}"
       )
+    }
   }
-  
-  if ((length(wrong) != length(correct)) && length(correct) > 1L)
+  if ((length(wrong) != length(correct)) && length(correct) > 1L) {
     cli_abort(
       "Substitutions must be single or the same number as targetted fixes"
     )
-  
+  }
   if (length(correct) == 1L) {
     correct <- .assert_region(correct)
     x[x %in% wrong] <- correct
     return(x)
   }
-  
   ## In the loop, we will allow exception handling so that execution is
   ## not made clunky when multiple corrections are attempted at once.
   for (i in seq_along(wrong)) {
     iCorrect <- correct[i]
     iWrong <- wrong[i]
-    
-    if (!match(iWrong, x, nomatch = 0))
+    if (!match(iWrong, x, nomatch = 0)) {
       cli_abort("{sQuote(iWrong, q = FALSE)} is not an element of
                 {sQuote(arg, q = FALSE)}")
-    
+    }
     tryCatch({
       iCorrect <- .assert_region(iCorrect)
       x[x %in% iWrong] <- iCorrect

@@ -29,31 +29,30 @@ globalVariables("ngdist")
 #'
 #' @export
 ng_distance <- function(a, b, unit = c("km", "miles")) {
-  if (missing(a) || missing(b))
+  if (missing(a) || missing(b)) {
     cli_abort("Inputs 'a' and 'b' must both be supplied")
-  if (length(a) != length(b))
+  }
+  if (length(a) != length(b)) {
     cli_abort("Inputs 'a' and 'b' must be the same length")
-  
+  }
   # Ikeja is the capital of Lagos State, but is most commonly called 
   # 'Lagos'. Thus, we will permit its use as a query term.
   accept_lagos <- function(x) {
     haslagos <- grepl("lagos", x, ignore.case = TRUE)
-    if (any(haslagos))
+    if (any(haslagos)) {
       x[haslagos] <- "Ikeja"
+    }
     x
   }  # TODO: add a warning
   a <- accept_lagos(a)
   b <- accept_lagos(b)
-
   data("ngdist", package = "naijR", envir = environment(), verbose = FALSE)
   unit <- match.arg(unit)
   a_idx <- match(stringi::stri_trans_totitle(a), labels(ngdist))
   b_idx <- match(stringi::stri_trans_totitle(b), labels(ngdist))
-
   bad_a <- which(is.na(a_idx))
   bad_b <- which(is.na(b_idx))
   bad_idx <- union(bad_a, bad_b)
-
   if (length(bad_idx)) {
     bad_names <- unique(c(a[bad_a], b[bad_b]))
     cli_abort(c(
@@ -61,12 +60,10 @@ ng_distance <- function(a, b, unit = c("km", "miles")) {
       "i" = "At position{?s} {bad_idx} of the input"
     ))
   }
-
   mat <- as.matrix(ngdist)
   d <- mat[cbind(a_idx, b_idx)]
-
-  if (identical(unit, "miles"))
+  if (identical(unit, "miles")) {
     d <- d * 0.6214
-
+  }
   round(d, 1)
 }

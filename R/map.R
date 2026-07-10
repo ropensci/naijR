@@ -101,27 +101,19 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' @importFrom sf st_union
 #' 
 #' @export
-map_ng <- function(region = character(),
-                   data = NULL,
-                   x = NULL,
-                   y = NULL,
-                   breaks = NULL,
-                   categories = NULL,
-                   excluded = NULL,
-                   exclude.fill = NULL,
-                   title = NULL,
-                   caption = NULL,
-                   show.neighbours = FALSE,
-                   show.text = FALSE,
-                   legend.text = NULL,
-                   leg.title,
-                   plot = TRUE,
-                   ...)
-{    ## TODO: Allow this function to accept a matrix e.g. for plotting points
+## TODO: Allow this function to accept a matrix e.g. for plotting points
+map_ng <- 
+  function(region = character(), data = NULL, x = NULL, y = NULL, breaks = NULL,
+           categories = NULL, excluded = NULL, exclude.fill = NULL,title = NULL,
+           caption = NULL, show.neighbours = FALSE, show.text = FALSE,
+           legend.text = NULL, leg.title, plot = TRUE, ...) { 
   if (!is.character(region)) {
+    # NB: The internal function 'arg_str' uses non-standard evaluation
+    # internally. Thus, care should be taken during any refactoring, so as to 
+    # ensure that the target objects are parsed correctly
     msg <- sprintf("Expected a character vector as '%s'.", arg_str(region))
     addmsg <- if (is.data.frame(region)) {
-      "A data frame was passed; did you mean to use 'data' instead?"
+      "A data frame was passed. Did you mean to use the 'data' argument?"
     }
     cli_abort("{msg} {addmsg}")
   }
