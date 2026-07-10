@@ -167,7 +167,6 @@ map_ng <-
     )
     if (!is_null(data)) {
       region.col <- .region_column_index(data, region)
-      
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
       value.x <- if (is_null(value.x) && ncol(data) == 2L) {
@@ -259,7 +258,6 @@ map_ng <-
         namefield <- get(shpfileprop)$namefield
         txt <- df.only[[namefield]]
         # nocov end
-        
         if (all(is_state(region))) {
           txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
         }

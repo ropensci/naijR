@@ -5,6 +5,7 @@
 # Copyright (C) 2019-2026 Victor Ordu.
 
 # Internal functions for regions.R
+globalVariables("states_nigeria")
 
 ## Provides some uniformity in the messaging b/w States & LGAs
 .warn_on_misspelling <- function(region.type) {
