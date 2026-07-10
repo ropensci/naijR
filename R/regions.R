@@ -450,7 +450,7 @@ print.lgas <- function(x, ...) { # nocov start
 .printoutRegion <- function(items, hdr = NULL) {
   if (!is.null(hdr)) {
     underline <- strrep("-", nchar(hdr))
-    cat(paste(hdr, underline, sep = "\n"), "\n"):w
+    cat(paste(hdr, underline, sep = "\n"), "\n")
   }
   cat(paste("*", items, collapse = "\n"), "\n")
 }
