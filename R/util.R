@@ -25,7 +25,6 @@
 {
   doOneMap <- function(s) {
     ret <- NULL
-    
     tryCatch({
       message("Drawing map of ", s, " State ... ", appendLF = FALSE)
       ret <- map_ng(lgas(s), title = paste("Map of", s, "State"))
@@ -33,7 +32,6 @@
     }, error = function(err) {
       message("Failed")
     })
-    
     ret
   }
   invisible(lapply(states(), doOneMap))

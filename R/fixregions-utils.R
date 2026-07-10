@@ -16,55 +16,47 @@
 {
   stopifnot(is.character(x), is.character(region))
   cant.fix <- fix.status <- character()
-  
   ## Internal function to enable identification of entries that need to
   ## be fixed and preparing attributes that will enable further processing
   ## downstream.
   get_proper_value <- function(str, regions) {
     abbrFCT <- .fct_options("abbrev")
-    
-    if (!is.na(match(str, regions)))
+    if (!is.na(match(str, regions))) {
       return(str)
-    
+    } 
     if (inherits(regions, "states")) {
-      if (agrepl(str, abbrFCT, max.distance = .pkgLevDistance())
-          && identical(toupper(str), abbrFCT))
-        return(abbrFCT)
+      if ( agrepl(str, abbrFCT, max.distance = .pkgLevDistance()) &&
+          identical(toupper(str), abbrFCT)) {
+        return(abbrFCT) 
+      }
     }
-    
     ## First remove spaces around slashes and hyphens
     ## Note: run `.__why_no_pipe()` for rationale behind this approach
     str <- gsub("\\s\\/", "/", str)
     str <- gsub("\\/\\s", "/", str)
     str <- sub("-\\s", "-", str)
     str <- sub("^Egbado/", "", str) ## TODO: Address hard-coding
-    
     ## Now, check for exact matching.
     rgx <- paste0('^', str, '$')
     good <- unique(grep(rgx, regions, value = TRUE, ignore.case = TRUE))
-    
-    if (length(good) == 1L) 
+    if (length(good) == 1L) { 
       return(good)
-    
+    }
     ## Otherwise check for approximate matches.
     fixed <- agrep(str, regions, value = TRUE, max.distance = 1)
     numFixed <- length(fixed)
-    
     if (numFixed == 1L) {
       fs <- c(fix.status, fixed)
       names(fs) <- c(names(fix.status), str)
       fix.status <<- fs
       return(fixed)
     }
-    
     if (numFixed > 1L && !interactive) {
       multimatch <- paste(fixed, collapse = ", ")
-      
       cli::cli_inform(
         "'{str}' approximately matched more than one region - {multimatch}"
       )
     }
-    
     # if we get to this point, return the misspelt string unchanged
     cant.fix <<- c(cant.fix, str)
     str
@@ -77,20 +69,16 @@
     regions = region, 
     USE.NAMES = FALSE
   )
-  
   attr(spellchecked, "misspelt") <- sort(unique(cant.fix))
-  
   ## Reduce data for reporting on fixes to only the 
   ## unique instances i.e. avoid redundant output
   if (length(fix.status) > 1L) {
     allfix <- names(fix.status)
-    
     if (anyDuplicated(allfix)) {
       dups <- which(duplicated(allfix))
       fix.status <- fix.status[-dups]
     }
   }
-  
   attr(spellchecked, "regions.fixed") <- fix.status
   spellchecked
 }
@@ -106,41 +94,35 @@
   badspell <- spell.details$misspelt
   hasBadspell <- !identical(badspell, character(0))
   msg.bad <- msg.good <- ""
-  
   if (hasBadspell) {
     hdr.bad <- .messageHeader("Fix(es) not applied")
     nofix.bullets <-
       vapply(badspell, function(x) paste("*", x), character(1))
     msg.bad <- paste0(hdr.bad, paste(nofix.bullets, collapse = "\n"))
   }
-  
   # Put the message together
   fixes <- spell.details$regions.fixed
-  
   if (!identical(fixes, character(0))) {
     hdr.good <- .messageHeader("Successful fix(es)")
-    
     fixed.bullets <-
       mapply(function(a, z) {
         sprintf("* %s => %s", a, z)
       }, 
       names(fixes), fixes)
-    
     msg.good <- paste0(hdr.good, paste(fixed.bullets, collapse = "\n"))
-    
     if (hasBadspell)
       msg.good <- paste0(msg.good, "\n")    # just add newline
   }
-  
-  if (!nchar(msg.good) && !nchar(msg.bad))
+  if (!nchar(msg.good) && !nchar(msg.bad)) {
     return()
-  
+  }
   final.msg <- paste(msg.good, msg.bad, sep = "\n")
-  
-  if (usedialog)
+  if (usedialog) {
     utils::winDialog("ok", final.msg)
-  else
+  }
+  else {
     cli::cli_alert_info(final.msg)
+  }
 }
 
 
@@ -149,7 +131,6 @@
 .messageHeader <- function(hdr)
 {
   stopifnot(is.character(hdr))
-  
   hdr <- paste0(hdr, ":")
   dashes <- strrep("-", nchar(hdr))
   hdr <- paste(hdr, dashes, sep = '\n')
@@ -171,7 +152,6 @@
   menuopt <- integer()
   skipped <- character()
   bad.values <- attr(lga.list, "misspelt")
-  
   # This list doesn't need to be re-created with each loop iteration
   # that's why it's been created here.
   special.options <- list(
@@ -179,39 +159,35 @@
     skip = "SKIP",
     quit = "QUIT"
   )
-  
   for (bad in bad.values) {
     msg.fixWhich <- paste("Fixing", sQuote(bad))
-    
     repeat {
       prompt <- paste(msg.fixWhich, "Enter a search term: ", sep = ' - ')
-      
-      pattern <- if (usedialog)
+      pattern <- if (usedialog) {
         utils::winDialogString(prompt, "")
-      else
+      }
+      else {
         readline(prompt)
-      
-      if (pattern == "" || is.null(pattern))
+      }
+      if (pattern == "" || is.null(pattern)) {
         return()
-      
+      }
       used.lgas <- 
         sort(grep(pattern, allLgas, value = TRUE, ignore.case = TRUE))
       choices <- c(used.lgas, unlist(unname(special.options)))
       menuopt <- utils::menu(choices, graphics = usedialog, "Select the LGA")
       chosen <- choices[menuopt]
-      
-      if (chosen != special.options$retry)
+      if (chosen != special.options$retry) {
         break
+      }
     }
-    
-    if (chosen == special.options$quit)
+    if (chosen == special.options$quit) {
       break
-    
+    }
     if (chosen == special.options$skip) {
       skipped <- c(skipped, bad)
       next
     }
-    
     # Note that pipes were deliberately not used here.
     lga.list <- sub(bad, chosen, lga.list, fixed = TRUE)
     attr.misspelt <- attr(lga.list, "misspelt")
@@ -221,18 +197,18 @@
     attr.regfixed <- c(attr.regfixed, chosen)
     names(attr.regfixed) <- c(names(attr.regfixed), bad)
   }
-  
   if (length(skipped)) {
     msg <-
       paste(
         "The following items were skipped and should be fixed manually:",
         paste(skipped, collapse = ", ")
       )
-    
-    if (usedialog)
+    if (usedialog) {
       utils::winDialog("ok", msg)
-    else
+    }
+    else {
       cli::cli_inform(msg)
+    }
   }
   lga.list
 }
@@ -241,7 +217,8 @@
 
 
 .assert_region <- function(x) {
-  if (!is_state(x) && !is_lga(x))
+  if (!is_state(x) && !is_lga(x)) {
     cli::cli_abort("{sQuote(x, q = FALSE)} is not a valid region")
+  }
   x
 }

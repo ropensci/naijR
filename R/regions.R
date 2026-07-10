@@ -75,55 +75,48 @@ globalVariables(c("lgas_nigeria", "state", "lga"))
 #' @export
 states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
 {
-  assert.lgl.arg(all)
-  assert.lgl.arg(warn)
-
+  assert_logical_arg(all)
+  assert_logical_arg(warn)
   state.list <- get_all_states()
   localGpz <- names(state.list)
-
   if (!missing(states) && is.character(states)) {
-    if (length(states) == 1L && (states %in% localGpz))
+    if (length(states) == 1L && (states %in% localGpz)) {
       cli_abort("'{states}' represents a geopolitical zone, not a State.
                 Use the `gpz` argument to get the relevant States")
-
+    }
     num.missed <- sum(!is_state(states))
-
     if (num.missed) {
       if (warn && isFALSE(.is_nested_fix_dont_warn())) {
         abujas <- which(states %in% "Abuja")
         num.abuja <- length(abujas)
-
-        if (num.abuja)
+        if (num.abuja) {
           cli_warn(
             "'Abuja' in position(s) {paste(abujas, collapse = ', ')}
              is not a State. Use 'Federal Capital Territory' or 'FCT'"
           )
-
-        if (!num.abuja || num.missed > num.abuja)
+        }
+        if (!num.abuja || num.missed > num.abuja) {
           .warn_on_misspelling('state')
+        }
       }
     }
-
     return(new_states(states))
   }
-
-  if (!all)
+  if (!all) {
     state.list$fct <- NULL
-
+  }
   if (!is.null(gpz) && missing(states)) {
-    if (!is.character(gpz))
+    if (!is.character(gpz)) {
       cli_abort("argument 'gpz' is not of type 'character'")
-
+    }
     gpz <- tolower(gsub("\\s+", "", gpz))
     x <- match.arg(gpz, localGpz, several.ok = TRUE)
     state.list <- state.list[x]
   }
-
   ss <- as.vector(unlist(state.list), mode = 'character')
-
-  if (is.null(gpz))
+  if (is.null(gpz)) {
     ss <- sort(ss)
-
+  }
   new_states(ss)
 }
 
@@ -142,9 +135,9 @@ new_states <- function(x)
 #' @export
 is_state <- function(x)
 {
-  if (!is.atomic(x) || is.null(x)) # as is.atomic(NULL) == TRUE
+  if (!is.atomic(x) || is.null(x)) { # as is.atomic(NULL) == TRUE
     cli::cli_abort("Expected a non-null atomic vector as input")
-
+  }
   ## Return the object rather than stop execution for this condition.
   ## This is to enable unhindered traversal when this function
   ## is applied across an object.
@@ -152,17 +145,15 @@ is_state <- function(x)
     cli_warn("{sQuote(x)} is not a character vector. Nothing done")
     return(x)
   }
-
   na.pos <- 0L
   if (anyNA(x)) {
     cli_warn("Invalid entries were replaced with NAs")
     excl <- stats::na.exclude(x)
     na.pos <- stats::na.action(excl)
   }
-
-  if (length(x) == 0L)
+  if (length(x) == 0L) {
     return(FALSE)
-
+  }
   x <- .toggleFct(x, "full")
   res <- x %in% get_all_states(named = FALSE)
   res[na.pos] <- NA
@@ -250,20 +241,17 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     envir = environment(),
     verbose = FALSE
   )
-
-  if (is.factor(region))  # TODO: Perhaps implement methods.
+  if (is.factor(region)) { # TODO: Perhaps implement methods.
     region <- as.character(region)
-
-  if (!is.character(region))
+  }
+  if (!is.character(region)) {
     cli_abort("Expected an object of type 'character'")
-  
+  }
   # if ((!is.na(region) && all(region == "")) || 
   #     (all(is.na(region)) && length(region) > 1))
   #   cli_abort("Illegal use of empty string/missing character values")
-
   if (strict) {
     not.synonymous <- !(region %in% lgas_like_states())
-
     if (any(not.synonymous)) {
       nouns <- paste(region[not.synonymous], collapse = ", ")
       verb <-
@@ -271,34 +259,28 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
       cli_abort("There {verb} {nouns} sharing State names")
     }
   }
-
   if (length(region) == 1L && is.na(region)) {
     lgvec <- sort(lgas_nigeria$lga)
     return(new_lgas(lgvec))
   }
-
   lst <- region
-
   if (all(is_state(region)) && !strict) {
     .extract_state_lgas <- function(states, dt = lgas_nigeria) {
       idx <- dt$state %in% states
       dt$lga[idx]
     }
-    
     lst <- lapply(region, .extract_state_lgas)
     names(lst) <- region
-
-    if (length(region) == 1L)
+    if (length(region) == 1L) {
       lst <- unname(unlist(lst))
+    }
   }
   else if (all(is_lga(region))) {
     lst <- .list_states_by_lga(region)
     lst.names <- names(lst)
     stt.num <- vapply(lst, length, integer(1))
-
     if (any(stt.num > 1L)) {
       multi <- which(stt.num > 1L)
-
       for (elem in multi) {
         stts <- lst[[elem]]
         nm <- lst.names[elem]
@@ -310,13 +292,14 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
     region <- NULL
   }
   else if (.has_misspelt_lgas(region)) {
-    if (warn && isFALSE(.is_nested_fix_dont_warn()))
+    if (warn && isFALSE(.is_nested_fix_dont_warn())) {
       .warn_on_misspelling('lga')
-
+    }
     region <- NULL
   }
-  else if (.all_are_not_lgas(region))
+  else if (.all_are_not_lgas(region)) {
     cli_abort("None of the items is a valid LGA")
+  }
   # TODO: An object that belongs to more than one State should
   # have a State attribute that lists the States and this should
   # apply to lgas objects that have just one element so that
@@ -325,9 +308,9 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
    lst <-  lapply(lst, sort)
    lst <- lst[sort(names(lst))]
   }
-  else if (inherits(lst, "character"))
+  else if (inherits(lst, "character")) {
     lst <- sort(lst)
-  
+  }
   obj <- new_lgas(lst)
   attr(obj, which = "State") <- region
   obj
@@ -349,9 +332,9 @@ new_lgas <- function(x)
 #' @export
 is_lga <- function(x)
 {
-  if (!is.character(x))
+  if (!is.character(x)) {
     cli::cli_abort("x should be of type 'character'")
-
+  }
   x %in% lgas()
 }
 
@@ -387,23 +370,22 @@ as_lga <- function(x) {
 #' @importFrom cli cli_abort
 .assert_if_coercible <- function(obj)
 {
-  if (is.factor(obj))
+  if (is.factor(obj)) {
     obj <- as.character(obj)
-
-  if (!is.character(obj))
+  }
+  if (!is.character(obj)) {
     cli_abort("Expected a character vector")
-
-  if (length(obj) > 1L)
+  }
+  if (length(obj) > 1L) {
     cli_abort("To coerce a region with synonyms, use a vector of length 1L")
-
-  if (!obj %in% lgas_like_states())
+  }
+  if (!obj %in% lgas_like_states()) {
     cli_abort("The object does not possess State/LGA synonyms")
-
+  }
   if (inherits(obj, "regions")) {
     obj <- unclass(obj)
     cli::cli_warn("Object was stripped down to mode 'character'")
   }
-
   obj
 }
 
@@ -421,10 +403,9 @@ as_lga <- function(x) {
     length(x) == 1L
   })
   lgastr <- as.character(x)
-
-  if (length(lgastr) > 1L)
+  if (length(lgastr) > 1L) {
     cli::cli_abort("More than one LGA was provided")
-
+  }
   s <- attr(x, "State")
   lga.states <- lgas_nigeria$state[lgas_nigeria$lga == lgastr]
   s %in% lga.states
@@ -447,9 +428,10 @@ print.states <- function(x, ...) { # nocov start
 #' @export
 print.lgas <- function(x, ...) { # nocov start
   length(x)
-  if (is.atomic(x))
+  if (is.atomic(x)) {
     .printoutRegion(x, "Local Government Areas")
-  else
+  }
+  else {
     for (state in names(x)) {
       state_in_full <- paste(state, "State")
       mainborder <- paste0(strrep("=", nchar(state_in_full)), "\n")
@@ -458,6 +440,7 @@ print.lgas <- function(x, ...) { # nocov start
       cat(mainborder)
       .printoutRegion(x[[state]])
     }
+  }
   invisible(x)
 } # nocov end
 
@@ -467,9 +450,8 @@ print.lgas <- function(x, ...) { # nocov start
 .printoutRegion <- function(items, hdr = NULL) {
   if (!is.null(hdr)) {
     underline <- strrep("-", nchar(hdr))
-    cat(paste(hdr, underline, sep = "\n"), "\n")
+    cat(paste(hdr, underline, sep = "\n"), "\n"):w
   }
-  
   cat(paste("*", items, collapse = "\n"), "\n")
 }
 
@@ -549,9 +531,9 @@ c.lgas <- function(...)
 #' @export
 na.exclude.states <- function(object, ...)
 {
-  if (!anyNA(object))
+  if (!anyNA(object)) {
     return(object)
-
+  }
   .excluderForNas(object, "states", ...)
 }
 
@@ -563,9 +545,9 @@ na.exclude.states <- function(object, ...)
 #' @export
 na.exclude.lgas <- function(object, ...)
 {
-  if (!anyNA(object))
+  if (!anyNA(object)) {
     return(object)
-
+  }
   .excluderForNas(object, "lgas", ...)
 }
 

@@ -37,18 +37,18 @@
 #' 
 disambiguate_lga <- function(lga, state = NULL, ...)
 {
-  if (!inherits(lga, "lgas"))
+  if (!inherits(lga, "lgas")) {
     cli_abort("Expected an object of class `lgas`")
-  
-  if (length(lga) > 1L)
+  }
+  if (length(lga) > 1L) {
     cli_abort("Disambiguation is only done for objects with one element")
-  
+  }
   lgattr <- attr(lga, "State")
   
   if (is.null(state)) {
-    if (!interactive())
+    if (!interactive()) {
       cli_abort("This operation can only be done in interactive mode")
-    
+    }
     if (length(lgattr) > 1L) { # nocov start
       title <- sprintf("Which State does '%s LGA' belong to?", lga)
       opt <- utils::menu(lgattr, title = title, ...)
@@ -56,9 +56,8 @@ disambiguate_lga <- function(lga, state = NULL, ...)
     } # nocov end
   }
   attr(lga, "State") <- state
-  
-  if (isFALSE(.lga_state_is_valid(lga)))
+  if (isFALSE(.lga_state_is_valid(lga))) {
     cli_abort("{as.character(lga)} LGA is not in {state} State")
-  
+  }
   lga
 }

@@ -10,10 +10,9 @@
 {
   opt <- match.arg(opt)
   versions <- c(full = "Federal Capital Territory", abbrev = "FCT")
-  
-  if (opt != "all")
+  if (opt != "all") {
     return(versions[opt])
-  
+  }
   versions
 }
 
