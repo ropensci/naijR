@@ -138,21 +138,21 @@ map_ng <-
   }
   region <- .process_region_params(region, call = caller_env())
   legend.params <- .set_legend_params(legend.text)
-  value.x <- if (is_null(data) && !is_null(x)) {
+  xvalue <- if (is_null(data) && !is_null(x)) {
     enquo(x) 
   }
-  else  {
+  else {
     enexpr(x)
   }
-  use.choropleth <- if (is_null(value.x) || is_symbol(value.x)) {
-    .validate_choropleth_params(!!value.x, region, data)  # TODO: Refactor
+  use.choropleth <- if (is_null(xvalue) || is_symbol(xvalue)) {
+    .validate_choropleth_params(!!xvalue, region, data)  # TODO: Refactor
   }
   else if (!is_null(y)) {
     FALSE
   }
   else {
-    value.x <- eval_tidy(value.x)
-    .validate_choropleth_params(value.x, region, data)
+    xvalue <- eval_tidy(xvalue)
+    .validate_choropleth_params(xvalue, region, data)
   }
   mapdata <- .get_map_data(region)
   mapq <- expr(.mymap(mapdata, plot = plot, ...))
@@ -161,7 +161,7 @@ map_ng <-
     mapq <- expr(.mymap(mapdata, plot = plot))
     cpleth.inputs <- list(
       region = region,
-      value = value.x,
+      value = xvalue,
       breaks = breaks,
       categories = categories
     )
@@ -169,13 +169,13 @@ map_ng <-
       region.col <- .region_column_index(data, region)
       ## Bet on a two-column data frame that has a
       ## a column with valid regions
-      value.x <- if (is_null(value.x) && ncol(data) == 2L) {
+      xvalue <- if (is_null(xvalue) && ncol(data) == 2L) {
         names(data)[-region.col]
       }
       else {
-        as_name(value.x)
+        as_name(xvalue)
       }
-      cpleth.inputs$value <-  data[[value.x]]
+      cpleth.inputs$value <-  data[[xvalue]]
       cpleth.inputs$region <- data[[region.col]]
     }
     cpleth.opts <- .prep_choropleth_opts(
@@ -209,7 +209,7 @@ map_ng <-
     graphics::title(main = title, sub = caption) # nocov start
     if (use.choropleth && legend.params$show) {
       if (missing(leg.title)) {
-        leg.title <- value.x
+        leg.title <- xvalue
         if (is_null(data)) {
           leg.title <- deparse(substitute(x))
         }
