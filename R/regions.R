@@ -87,7 +87,7 @@ states <- function(states, gpz = NULL, all = TRUE, warn = TRUE)
     num.missed <- sum(!is_state(states))
     if (num.missed) {
       if (warn && isFALSE(.is_nested_fix_dont_warn())) {
-        abujas <- which(states %in% "Abuja")
+        abujas <- which(states == "Abuja")
         num.abuja <- length(abujas)
         if (num.abuja) {
           cli_warn(

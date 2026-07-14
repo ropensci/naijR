@@ -48,21 +48,19 @@ fix_region.states <- function(x, ...)
   abbrFCT <- .fct_options("abbrev")
   fullFCT <- .fct_options("full")
   ## Replace any 'Abuja' with FCT in full
-  x[x %in% "Abuja"] <- fullFCT
+  x[x == "Abuja"] <- fullFCT
   ## Find and replace abbreviated with full version
   sumFct <- sum(.fct_options() %in% x)
-  ## Both full and abbreviated versions coexist
-  if (sumFct == 2) {
+  if (sumFct == 2) {    ## i.e. both full and abbreviated versions coexist
     x <- sub(abbrFCT, fullFCT, x)
   }
-  ## Allow use of abbreviated version before carrying
-  ## out the check
+  ## Allow use of abbreviated version before carrying out the check
   isFct <- x %in% abbrFCT
   ss <- states()
   if (sum(isFct)) {
     ss <- sub(fullFCT, abbrFCT, ss)
   }
-  x <- .fix_region_internal(x, ss)
+  x <- .fix_region_automatic(x, ss)
   nofix <- attr(x, "misspelt")
   if (length(nofix)) {
     commasep <- paste(nofix, collapse = ", ")
@@ -109,7 +107,7 @@ fix_region.lgas <- function(x,
     }
     graphic <- interactive
   }
-  vals <- .fix_region_internal(x, lgas(), interactive)
+  vals <- .fix_region_automatic(x, lgas(), interactive)
   usedialog <- .Platform$OS.type == "windows" && graphic
   if (interactive) {
     # nocov start
@@ -146,7 +144,7 @@ fix_region.lgas <- function(x,
 #' @importFrom cli cli_warn
 #' 
 #' @export
-  fix_region.default <- function(x, ...)
+fix_region.default <- function(x, ...)
 {
   if (is.factor(x)) {
     x <- as.character(x)
@@ -154,27 +152,28 @@ fix_region.lgas <- function(x,
   if (!is.character(x)) {
     cli_abort("'x' is not a character vector")
   }
-  empty <- grepl("^$", x)
-  if (length(empty) > 0L && all(empty)) { ## diff character(0) and character(1)
+  empty <- grepl("^$", x)   # Returns FALSE even when 'x' is NA 
+  if (length(empty) && all(empty)) { ## diff character(0) and character(1)
     cli_abort("'x' only has empty strings")
   }
   if (any(empty)) {
-    cli_warn("Tried to fix empty strings - may produce errors")
+    cli_warn("There are empty string elements in x")
   }
   if (all(is.na(x)) || !length(x)) {
     cli_warn("'x' has length 0L or only missing values")
     return(x)
   }
   ## For the LGAs case, the expectation is that in a vector with more than
-  ## one element, if any of the elements passess the test of being an LGA
+  ## one element, if any of the elements passes the test of being an LGA
   ## then one can safely assume that the other element(s) that fail the test
   ## did so because they were misspelled. An automatic fix will be attempted.
-  ## First, ignore synonymous elements i.e. those that are both States/LGAs.
+  ## First, ignore synonymous elements i.e. LGAs that share names with States. 
   nonSynonyms <- x[!x %in% lgas_like_states()]
-  region <- if (any(is_lga(nonSynonyms))) {   # We use 'any()' because we want
-    lgas(x, warn = FALSE)                    # to allow creation of temporary,
+  # Create the appropriate object, allowing for any misspelled elements 
+  region <- if (any(is_lga(nonSynonyms))) {
+    lgas(x, warn = FALSE)
   }
-  else if (any(is_state(nonSynonyms))) {     # even with misspelled elements
+  else if (any(is_state(nonSynonyms))) {     
     states(x, warn = FALSE)
   }
   else {

@@ -11,7 +11,7 @@ test_that("input is validated before fixing state names", {
   expect_error(fix_region(TRUE), errchr)
   expect_error(fix_region(""), "'x' only has empty strings")
   expect_warning(try(fix_region(c("Ogin", "", "Abia")), silent = TRUE),
-                 "Tried to fix empty strings - may produce errors")
+                 "There are empty string elements in x")
   expect_warning(fix_region(NA_character_), warn0)
   expect_warning(fix_region(character()), warn0)
   expect_warning(fix_region(factor()), warn0)
@@ -36,11 +36,10 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   # messages ---
   change1 <- "Fufure => Fufore"
   msg1 <- .msgfunc(change1)
-  morethanone <- "approximately matched more than one region"
+  multimatch <- "approximately matched more than one region"
   
   # character vectors ---
-  ad <- 
-    c("Fufure", "Demsa", "Fufure", "Machika", "Ganye", "Noman", "Fufure")
+  ad <- c("Fufure", "Demsa", "Fufure", "Machika", "Ganye", "Noman", "Fufure")
   correctLga <- ad[2]
   misspeltLga <- ad[3]
   bothLga <- c(correctLga, misspeltLga)
@@ -49,12 +48,9 @@ test_that("Messaging clear when fixing via character vectors or factors", {
   expect_message(fix_region(lgas(misspeltLga)))
   expect_message(fix_region(lgas(bothLga)), msg1)
   expect_message(fix_region(lgas(c(bothLga, "Fufore"))), msg1)
-  expect_message(fix_region(lgas(c(bothLga, "Fafure"))),
-                 "not applied.+Fafure")
+  expect_message(fix_region(lgas(c(bothLga, "Fafure"))), "not applied.+Fafure")
   expect_error(fix_region(misspeltLga), reconstruct.x)
-  expect_message(fix_region(lgas(ad), quietly = TRUE), morethanone)
-  # expect_message(fix_region(lgas(ad)),
-  #                sprintf("%s.+Noman => Numan", change1))
+  expect_message(fix_region(lgas(ad), quietly = TRUE), multimatch)
   expect_message(fix_region(lgas(multi.lga)), change1)
   
   # factors ---
@@ -70,12 +66,8 @@ test_that("Messaging clear when fixing via character vectors or factors", {
     c(bothlga.fac, factor("Fufore")), 
     warn = FALSE)), msg1)
   expect_error(fix_region(misspeltLga.fac), reconstruct.x, fixed = TRUE)
-  expect_message(fix_region(lgas(lg.fac), quietly = TRUE), morethanone)
-  # expect_message(suppressWarnings(fix_region(lgas(lg.fac))),
-  #                sprintf("%s.+Noman => Numan", change1))
-  expect_message(fix_region(lgas(multi.lga)),
-                 change1)
-  
+  expect_message(fix_region(lgas(lg.fac), quietly = TRUE), multimatch)
+  expect_message(fix_region(lgas(multi.lga)), change1)
 })
 
 
