@@ -68,8 +68,7 @@ fix_region.states <- function(x, ...)
   }
   ## After checking, reconstitute the 'states' object
   # x[isFct] <- fullFCT   TODO: Think again.
-  attributes(x) <- NULL
-  states(x)
+  states(.strip_attributes(x))
 }
 
 
@@ -123,10 +122,10 @@ fix_region.lgas <- function(x,
       return(invisible(x))
     } # nocov end
   }
-  if (!quietly) {
+  if (isFALSE(quietly)) {
     .report_on_fixes(vals, usedialog)
   }
-  vals
+  .strip_attributes(vals)
 }
 
 
