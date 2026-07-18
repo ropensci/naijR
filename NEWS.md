@@ -1,3 +1,5 @@
+## naijR 0.8.0
+- When fixing the spellings of Local Government Areas (LGAs), the object returned still has the attributes that were used internally for proecessing the fixes, and they are displayed in the output. These are now removed.
 ## naijR 0.7.0
 ### New Features:
 -   Introduced `ngdist`, a `dist` object containing road distances (in km) between all 37 Nigerian State capitals, sourced from UNDP.

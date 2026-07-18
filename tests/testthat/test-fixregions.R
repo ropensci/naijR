@@ -100,8 +100,6 @@ test_that("various cases for fixing state names", {
 })
 
 
-
-
 test_that("Misspelt LGAs can be fixed (limited)", {
   dt <- readRDS("data/taraba-lga.rds")
   tar.lgas <- lgas(dt, warn = FALSE)
@@ -114,21 +112,17 @@ test_that("Misspelt LGAs can be fixed (limited)", {
     c("Amuwo-Odofin", "Lagos Island"),
     ignore_attr = TRUE
   )
-  
 })
-
 
 
 test_that("outputs", {
   lgs <- c("Fufore", "Demsa")
   
   expect_invisible(fix_region(lgs))
-  expect_warning(fix_region(lgs, interactive = FALSE, graphic = TRUE),
-                 "'graphic' was reset to FALSE in non-interactive mode")
+  expect_message(fix_region(lgs, interactive = FALSE, graphic = TRUE),
+                 "Interactive mode is assumed as 'graphic == TRUE'")
   expect_silent(fix_region(lgs, quietly = TRUE))
 })
-
-
 
 
 test_that("regions can be fixed manually", {
@@ -174,4 +168,15 @@ test_that("No warning when constructors are nested with fix_* functions", {
   expect_warning(states(fct))
   expect_no_warning(fix_region(lgas(lgavec), quietly = TRUE))
   expect_warning(lgas(lgavec))
+})
+
+
+test_that("after fixing, class of objects returned remains unchanged", {
+  statevec <- c("Abio", "Cross Rivers")
+  lgavec <- c("Legos Island", "Amuwo-Odofin")
+  
+  # expect_type(fix_region(statevec), "character")
+  # expect_type(fix_region(lgavec), "character")
+  expect_s3_class(fix_region(states(statevec, warn = FALSE)), "states")
+  expect_s3_class(fix_region(lgas(lgavec, warn = FALSE)), "lgas")
 })
