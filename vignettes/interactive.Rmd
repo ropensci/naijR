@@ -85,7 +85,7 @@ corrected.adamawa <- fix_region(mispelt.adamawa)
 sum(is_lga(corrected.adamawa))
 ```
 
-We see that the string 'Machika' is not an actual LGA and there are more than one possible candidate LGA that are considered as possible replacement. Our  original intent was to use "Michika LGA". To address this mistake, we can run `fix_region` interactively. Note that the `interactive` option is only available for use with objects of class `lgas`.
+We see that the string 'Machika' is not an actual LGA and there are more than one possible candidate LGA that are considered as possible replacements. Our  original intent was to use "Michika LGA". To address this mistake, we can run `fix_region` interactively. Note that the `interactive` option is only available for use with objects of class `lgas`.
 
 ```{r, eval=FALSE}
 adamawa <- fix_region(lgas(corrected.adamawa), interactive = TRUE)
