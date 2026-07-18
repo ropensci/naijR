@@ -68,7 +68,7 @@ fix_region.states <- function(x, ...)
   }
   ## After checking, reconstitute the 'states' object
   # x[isFct] <- fullFCT   TODO: Think again.
-  states(.strip_attributes(x))
+  .strip_temp_attrs(x)
 }
 
 
@@ -100,13 +100,11 @@ fix_region.lgas <- function(x,
       !is.logical(graphic)) {
     cli::cli_abort("Invalid input where logical argument expected")
   }
-  if (graphic) {
-    if (!interactive) {
-      cli::cli_warn("'graphic' was reset to FALSE in non-interactive mode")
-    }
-    graphic <- interactive
+  if (graphic && !interactive) {
+    interactive <- graphic
+    cli::cli_inform("Interactive mode is assumed as 'graphic == TRUE'")
   }
-  vals <- .fix_region_automatic(x, lgas(), interactive)
+  vals <- .fix_region_automatic(x, lgas())
   usedialog <- .Platform$OS.type == "windows" && graphic
   if (interactive) {
     # nocov start
@@ -125,7 +123,7 @@ fix_region.lgas <- function(x,
   if (isFALSE(quietly)) {
     .report_on_fixes(vals, usedialog)
   }
-  .strip_attributes(vals)
+  .strip_temp_attrs(vals)
 }
 
 
