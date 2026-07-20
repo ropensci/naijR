@@ -259,7 +259,7 @@ map_ng <-
         txt <- df.only[[namefield]]
         # nocov end
         if (all(is_state(region))) {
-          txt <- sub(.fct_options("full"), .fct_options("abbrev"), txt)
+          txt <- sub(.toggle_fct_format("full"), .toggle_fct_format("abbrev"), txt)
         }
       }
       cex <- .set_text_size(dots$cex)

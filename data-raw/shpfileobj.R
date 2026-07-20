@@ -89,7 +89,7 @@ local({
       sp <- sp |>
         subset(STATE != "Lake") |>
         fix_bad_shpfile_state("lga", "Nassarawa", "Nasarawa") |>
-        fix_bad_shpfile_state("lga", "Abuja", .fct_options("full"))
+        fix_bad_shpfile_state("lga", "Abuja", .toggle_fct_format("full"))
     }
     
     nmfld <- find_namefield(regions, sp)

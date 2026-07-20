@@ -13,7 +13,7 @@
   ## downstream.
   cant.fix <- fix.status <- character()
   get_proper_value <- function(str, regions) {
-    abbrFCT <- .fct_options("abbrev")
+    abbrFCT <- .toggle_fct_format("abbrev")
     if (!is.na(match(str, regions))) {
       return(str)
     } 
