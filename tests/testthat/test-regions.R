@@ -124,10 +124,15 @@ test_that("Correct number of LGAs are returned for each State", {
 
 test_that("State/LGAs synonyms are handled", {
   eklga <- lgas("Ekiti", strict = T)
+  bau.oyo <- c("Oyo", "Bauchi")
 
   expect_length(lgas("Oyo"), 33L)
   expect_error(lgas("Oyo", strict = TRUE),
                "There is no LGA Oyo sharing State names")
+  expect_error(lgas(bau.oyo, strict = TRUE),
+               "There is no LGA Oyo sharing State names")
+  expect_length(lgas(bau.oyo), 2)
+  expect_type(lgas(bau.oyo), "list")
   expect_length(lgas("Bauchi"), 20L)
   expect_length(lgas("Bauchi", strict = TRUE), 1L)
 })

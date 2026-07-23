@@ -69,10 +69,8 @@
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
 .validate_choropleth_params <- function(val = NULL, region = NULL, data = NULL)
-{   # TODO: Add some verbosity.
+{
   val <- enexpr(val)
-  ## If 'data' is NULL, then both 'val' and 'region' must be present
-  ## and 'region' must have valid States or LGAs
   if (is.null(data)) {
     if (is.null(val) || is.null(region)) {
       return(FALSE)
@@ -80,27 +78,17 @@
     if (!.all_are_regions(region) && !is.null(val)) {
       return(FALSE)
     }
-    # At this point, we have two valid vectors only
-  }
+  }  # At this point, we have two valid vectors only
   data.has.regions <- FALSE
   if (is.data.frame(data)) {
-    index <- .region_column_index(data)
-    data.has.regions <- as.logical(index)
-    # Once identified, the regions in the data frame are
-    # to replace those in the original variable. Since this
-    # function is designed to return a boolean value, a 
-    # super-assignment is used to effect the change.
+    data.has.regions <- as.logical(.region_column_index(data))
     if (data.has.regions) {
-      r <- data[[index]]
-      assign(deparse(substitute(region)), r, envir = parent.frame())
+      assign(deparse(substitute(region)), data[[index]], envir = parent.frame())
     }
   }
   else if (!is.null(data)) {
-    cli::cli_warn(
-      "'{arg_str(data)}' is invalid for choropleths but was ignored"
-    )
+    cli::cli_warn("'{arg_str(data)}' is invalid for choropleths but was ignored")
   }
-  ## If 'region' is NULL, it must be found automatically in 'data'
   if (is.null(region)) {
     if (isFALSE(data.has.regions)) {
       return(FALSE)
@@ -110,10 +98,6 @@
   if (!.all_are_regions(region)) {
     return(FALSE)
   }
-  ## If 'val' is null, it must exist in 'data', but can only be
-  ## deduced if 'data' has only 2 columns and the other column is 
-  ## confirmed to contain strings representing regions (i.e. States
-  ## or LGAs).
   if (is.null(val)) {
     if (is.null(data)) {
       return(FALSE)
