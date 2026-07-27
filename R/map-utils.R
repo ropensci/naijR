@@ -81,7 +81,8 @@
   }  # At this point, we have two valid vectors only
   data.has.regions <- FALSE
   if (is.data.frame(data)) {
-    data.has.regions <- as.logical(.region_column_index(data))
+    index <- .region_column_index(data)
+    data.has.regions <- as.logical(index)
     if (data.has.regions) {
       assign(deparse(substitute(region)), data[[index]], envir = parent.frame())
     }
@@ -235,7 +236,7 @@
 ## used for drawing a choropleth map
 #' @importFrom rlang abort
 #' @importFrom rlang warn
-.region_column_index <- function(dt, s = NULL)
+.region_column_index <- function(dt, state = NULL)
 {
   stopifnot(is.data.frame(dt))
   ## Checks if a column has the names of States, returning TRUE if so.
@@ -256,16 +257,18 @@
     ret
   }
   n <- vapply(dt, .fx, logical(1))
-  if (is.null(s)) {
-    s <- states()
+  if (is.null(state)) {
+    state <- states()
   }
   if (!sum(n)) {
     cli::cli_abort("No column with elements in '{deparse(substitute(dt))}'.")
   } 
-  if (sum(n) > 1) {
+  index <- which(n)
+  if (length(index) > 1) {
+    index <- index[1]
     cli::cli_warn("Multiple columns have regions, so the first was used")
   }
-  which(n)[1]
+  index
 }
 
 

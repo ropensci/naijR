@@ -58,51 +58,6 @@ test_that("LGAs are plotted", {
   expect_s3_class(map_ng(lgas("Owerri North"), plot = FALSE), maptype)
 })
 
-# Plain individual sub-national maps ----
-test_that("All individual plain State maps can be drawn", {
-  for (s in states())
-    expect_s3_class(map_ng(s, plot = FALSE), maptype)
-})
-
-test_that("All LGAs within a given State are drawn", {
-  for (s in states()) {
-    expect_s3_class(map_ng(lgas(s), plot = FALSE), maptype)
-  }
-})
-
-test_that("All individual LGA maps can be drawn", {
-  for (s in states()) {
-    lgs <- lgas(s)
-    
-    for (lg in lgs) {
-      x <- suppressWarnings(lgas(lg))
-      state <- attr(x, "State")
-      
-      if (length(state) > 1L)
-        x <- disambiguate_lga(x, state = s)
-      
-      expect_s3_class(map_ng(x, plot = FALSE), maptype)
-    }
-  }
-})
-
-test_that("Map LGAs together as individual blocs", {
-  abiaLga <- lgas("Abia")
-  testMap <- "data/test-map.png"
-  
-  if (file.exists(testMap))
-    file.remove(testMap)
-  
-  png(testMap)
-  val <- try(map_ng(abiaLga), silent = TRUE)
-  dev.off()
-  
-  expect_s3_class(val, maptype)
-  expect_false(inherits(val, "try-error"))
-  expect_true(file.exists(testMap))
-  
-  file.remove(testMap)
-})
 
 # Choropleth map ----
 set.seed(4)
@@ -450,4 +405,53 @@ test_that("Labels can be resized", {
   
   expect_s3_class(map_ng(show.text = TRUE, cex = 0.5, plot = FALSE), 
                   maptype)
+})
+
+
+# Plain individual sub-national maps ----
+test_that("All individual plain State maps can be drawn", {
+  for (s in states())
+    expect_s3_class(map_ng(s, plot = FALSE), maptype)
+})
+
+test_that("All LGAs within a given State are drawn", {
+  for (s in states()) {
+    expect_s3_class(map_ng(lgas(s), plot = FALSE), maptype)
+  }
+})
+
+
+test_that("Map LGAs together as individual blocs", {
+  abiaLga <- lgas("Abia")
+  testMap <- "data/test-map.png"
+  
+  if (file.exists(testMap))
+    file.remove(testMap)
+  
+  png(testMap)
+  val <- try(map_ng(abiaLga), silent = TRUE)
+  dev.off()
+  
+  expect_s3_class(val, maptype)
+  expect_false(inherits(val, "try-error"))
+  expect_true(file.exists(testMap))
+  
+  file.remove(testMap)
+})
+
+
+test_that("All individual LGA maps can be drawn", {
+  for (s in states()) {
+    lgs <- lgas(s)
+    
+    for (lg in lgs) {
+      x <- suppressWarnings(lgas(lg))
+      state <- attr(x, "State")
+      
+      if (length(state) > 1L)
+        x <- disambiguate_lga(x, state = s)
+      
+      expect_s3_class(map_ng(x, plot = FALSE), maptype)
+    }
+  }
 })
