@@ -100,10 +100,7 @@
     return(FALSE)
   }
   if (is.null(val)) {
-    if (is.null(data)) {
-      return(FALSE)
-    }
-    if (ncol(data) > 2L) {
+    if (is.null(data) || ncol(data) > 2L) {
       return(FALSE)
     }
     if (isFALSE(.all_are_regions(region)) && isFALSE(data.has.regions)) {
