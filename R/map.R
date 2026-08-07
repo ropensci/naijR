@@ -137,7 +137,6 @@ map_ng <-
     cli::cli_abort("Display of neighbouring regions is temporarily disabled")
   }
   region <- .process_region_params(region, call = caller_env())
-  legend.params <- .set_legend_params(legend.text)
   xvalue <- if (is_null(data) && !is_null(x)) {
     enquo(x) 
   }
@@ -189,6 +188,7 @@ map_ng <-
     if (is_null(categories)) {
       categories <- cpleth.opts$bins
     }
+    legend.params <- .set_legend_params(legend.text)
     if (is.character(legend.params$text)) {
       if (length(categories) != length(legend.params$text)) {
         cli_abort("Lengths of 'categories' and provided legend do not match")
