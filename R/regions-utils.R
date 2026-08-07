@@ -115,14 +115,14 @@ get_all_states <- function(named = TRUE)
   agrepl(.lgas_regex(x),
          lgas(),
          fixed = FALSE,
-         max.distance = .pkgLevDistance())
+         max.distance = .defaultDistance())
 }
 
 
 
 # Sets the Levenshtein distance being used package-wide for functions that
 # carry out partial matching
-.pkgLevDistance <- function() {1L}
+.defaultDistance <- function() {1L}
 
 
 

@@ -45,12 +45,12 @@ fix_region.states <- function(x, ...)
 { 
   # TODO: Consider reporting on fixes made
   ## Process possible FCT values
-  abbrFCT <- .fct_options("abbrev")
-  fullFCT <- .fct_options("full")
+  abbrFCT <- .toggle_fct_format("abbrev")
+  fullFCT <- .toggle_fct_format("full")
   ## Replace any 'Abuja' with FCT in full
   x[x == "Abuja"] <- fullFCT
   ## Find and replace abbreviated with full version
-  sumFct <- sum(.fct_options() %in% x)
+  sumFct <- sum(.toggle_fct_format() %in% x)
   if (sumFct == 2) {    ## i.e. both full and abbreviated versions coexist
     x <- sub(abbrFCT, fullFCT, x)
   }

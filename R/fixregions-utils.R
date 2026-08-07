@@ -3,72 +3,104 @@
 # GPL-3 License
 #
 # Copyright (C) 2019-2026 Victor Ordu.
-
+#
+# Automatically attempts to fix the wrong spellings of regions (States or LGAs).
+# At the end of the operation, the object being checked is returned with
+# data on the outcome of the attempted fix. These are added on as attributes,
+# and these exist temporarily until the entire process of updating spelling
+# mistateks is completed in the parent environment.
 .fix_region_automatic <- function(regions_object, region_table)
 {
   stopifnot(is.object(regions_object))
-  region_table <- unclass(region_table)
-  ## Internal function to enable identification of entries that need to
-  ## be fixed and preparing attributes that will enable further processing
-  ## downstream.
-  cant.fix <- fix.status <- character()
-  get_proper_value <- function(str, regions) {
-    abbrFCT <- .fct_options("abbrev")
-    if (!is.na(match(str, regions))) {
-      return(str)
-    } 
-    if (inherits(regions, "states")) {
-      if ( agrepl(str, abbrFCT, max.distance = .pkgLevDistance()) &&
-          identical(toupper(str), abbrFCT)) {
-        return(abbrFCT) 
-      }
+  region_class <- class(regions_object)
+  regions_object <- unclass(regions_object)
+  matched <- cant.fix <- fix.status <- character()
+  result <- list()
+  for (name in regions_object) {
+    result <- .get_proper_value(name, region_table)
+    matched <- c(matched, result$str)
+    fix.status <- c(fix.status, result$fixes)
+    cant.fix <- c(cant.fix, result$nofix)
+  }
+  .get_updated_obj_with_attrs(matched, fix.status, cant.fix, region_class)
+}
+
+
+
+
+## Internal function to enable identification of entries that need to
+## be fixed and preparing attributes that will enable further processing
+## downstream.
+#' @importFrom rlang is_string
+.get_proper_value <- function(str, regions) {
+  stopifnot(exprs = {rlang::is_string(str); inherits(regions, "regions")})
+  result <- list()
+  if (!is.na(match(str, regions))) {
+    result$str <- str
+    return(result)
+  }
+  if (inherits(regions, "states")) {
+    abbrFCT <- .toggle_fct_format("abbrev")
+    if ( agrepl(str, abbrFCT, max.distance = .defaultDistance()) &&
+        identical(toupper(str), abbrFCT)) {
+      result$str <- abbrFCT
+      result$fixes <- structure(abbrFCT, names = str)
+      return(result) 
     }
-    str <- .trim_whitespace(str)
-    ## Now, check for exact matching.
-    rgx <- paste0('^', str, '$')
-    good <- unique(grep(rgx, regions, value = TRUE, ignore.case = TRUE))
-    if (length(good) == 1L) { 
-      return(good)
-    }
-    ## Otherwise check for approximate matches.
-    fixed <- agrep(str, regions, value = TRUE, max.distance = .pkgLevDistance())
-    if (length(fixed) == 1L) {
-      fs <- c(fix.status, fixed)
-      names(fs) <- c(names(fix.status), str)
-      fix.status <<- fs
-      return(fixed)
-    }
+  }
+  # result$str <- .trim_whitespace(result$str)
+  ## Now, check for exact matching, case-insensitively
+  matched <- 
+    grep(paste0("^", str, '$'), regions, value = TRUE, ignore.case = TRUE)
+  if (length(matched)) { 
+    result$str <- matched
+    result$fixes <- structure(matched, names = str)
+    return(result)
+  }
+  ## Otherwise check for approximate matches.
+  fixed <- agrep(str, regions, value = TRUE, max.distance = .defaultDistance(),
+                 ignore.case = TRUE)
+  if (length(fixed) == 1L) {
+    result$fixes <- structure(fixed, names = str)
+    result$str <- fixed
+  }
+  else {
     if (length(fixed) > 1L) {
       multimatch <- paste(fixed, collapse = ", ")
       cli::cli_inform(
         "'{str}' approximately matched more than one region - {multimatch}"
       )
     }
-    # if we get to this point, return the misspelt region unchanged
-    cant.fix <<- c(cant.fix, str)
-    str
+    result$nofix <- str
   }
-  spellchecked <- vapply(
-    regions_object,
-    get_proper_value,
-    character(1),
-    regions = region_table,
-    USE.NAMES = FALSE
-  )
-  ## Reduce data for reporting on fixes to only unique instances 
-  if (length(fix.status) > 1L) {
-    allfixes <- names(fix.status)
-    if (anyDuplicated(allfixes)) {
-      duplicates <- which(duplicated(allfixes))
-      fix.status <- fix.status[-duplicates]
-    }
-  }
-  attr(spellchecked, "regions.fixed") <- fix.status
-  attr(spellchecked, "misspelt") <- sort(unique(cant.fix))
-  structure(spellchecked, class = class(regions_object))
+  result
 }
 
 
+
+
+## Reduce data for reporting on fixes to only unique instances 
+.get_updated_obj_with_attrs <- function(checked, fixed, notfixed, class) {
+  stopifnot(
+    is.character(checked) || is.character(fixed) || is.character(notfixed)
+  )
+  if (length(fixed) > 0L && !rlang::is_named(fixed)) {
+    cli_abort("'fixed' must be named if length > 0")
+  }
+  if (length(fixed) > 1L) {
+    # we keep only unique values using this method in order to preserve
+    # the names, and also bearing in mind that different typos might map
+    # to the same true value.
+    original <- names(fixed)
+    if (anyDuplicated(original)) {
+      duplicates <- which(duplicated(original))
+      fixed <- fixed[-duplicates]
+    }
+  }
+  attr(checked, "regions.fixed") <- fixed
+  attr(checked, "misspelt") <- sort(unique(notfixed))
+  structure(checked, class = class)
+}
 
 
 .trim_whitespace <- function(x)

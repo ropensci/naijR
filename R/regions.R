@@ -235,29 +235,15 @@ as_state <- function(x)
 #'
 #' @export
 lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
-  data(
-    "lgas_nigeria",
-    package = "naijR",
-    envir = environment(),
-    verbose = FALSE
-  )
+  data("lgas_nigeria", package = "naijR", envir = environment(),verbose = FALSE)
   if (is.factor(region)) { # TODO: Perhaps implement methods.
     region <- as.character(region)
   }
   if (!is.character(region)) {
     cli_abort("Expected an object of type 'character'")
   }
-  # if ((!is.na(region) && all(region == "")) || 
-  #     (all(is.na(region)) && length(region) > 1))
-  #   cli_abort("Illegal use of empty string/missing character values")
   if (strict) {
-    not.synonymous <- !(region %in% lgas_like_states())
-    if (any(not.synonymous)) {
-      nouns <- paste(region[not.synonymous], collapse = ", ")
-      verb <-
-        sprintf(ngettext(sum(not.synonymous), "is %s", "are %ss"), "no LGA")
-      cli_abort("There {verb} {nouns} sharing State names")
-    }
+    .assert_lga_state_synonyms(region)
   }
   if (length(region) == 1L && is.na(region)) {
     lgvec <- sort(lgas_nigeria$lga)
@@ -265,30 +251,14 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   }
   lst <- region
   if (all(is_state(region)) && !strict) {
-    .extract_state_lgas <- function(states, dt = lgas_nigeria) {
-      idx <- dt$state %in% states
-      dt$lga[idx]
-    }
-    lst <- lapply(region, .extract_state_lgas)
+    lst <- lapply(region, .extract_state_lgas, mydata = lgas_nigeria)
     names(lst) <- region
     if (length(region) == 1L) {
       lst <- unname(unlist(lst))
     }
   }
   else if (all(is_lga(region))) {
-    lst <- .list_states_by_lga(region)
-    lst.names <- names(lst)
-    stt.num <- vapply(lst, length, integer(1))
-    if (any(stt.num > 1L)) {
-      multi <- which(stt.num > 1L)
-      for (elem in multi) {
-        stts <- lst[[elem]]
-        nm <- lst.names[elem]
-        stts.msg <- paste(stts, collapse = ", ")
-        cli_warn("'{nm}' LGA is found in {length(stts)} States: {stts.msg}")
-      }
-    }
-    lst <- unique(lst.names)
+    lst <- .warn_lga_shared_by_states(region)
     region <- NULL
   }
   else if (.has_misspelt_lgas(region)) {
@@ -300,10 +270,6 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   else if (.all_are_not_lgas(region)) {
     cli_abort("None of the items is a valid LGA")
   }
-  # TODO: An object that belongs to more than one State should
-  # have a State attribute that lists the States and this should
-  # apply to lgas objects that have just one element so that
-  # there is no confusion.
   if (inherits(lst, "list")) {
    lst <-  lapply(lst, sort)
    lst <- lst[sort(names(lst))]
@@ -316,6 +282,40 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   obj
 }
 
+
+
+
+.assert_lga_state_synonyms <- function(x) {
+  nosynonym <- !(x %in% lgas_like_states())
+  if (any(nosynonym)) {
+    nouns <- paste(x[nosynonym], collapse = ", ")
+    verb <- sprintf(ngettext(sum(nosynonym), "is %s", "are %ss"), "no LGA")
+    cli_abort("There {verb} {nouns} sharing State names")
+  }
+}
+
+.warn_lga_shared_by_states <- function(x) {
+  state_by_lga <- .list_states_by_lga(x)
+  state_by_lga.names <- names(state_by_lga)
+  num_states <- vapply(state_by_lga, length, integer(1))
+  if (any(num_states > 1L)) {
+    multi <- which(num_states > 1L)
+    for (elem in multi) {
+      statenames <- state_by_lga[[elem]]
+      nm <- state_by_lga.names[elem]
+      statetxt <- paste(statenames, collapse = ", ")
+      cli_warn("'{nm}' LGA is found in {length(statenames)} States: {statetxt}")
+    }
+  }
+  unique(state_by_lga.names)
+}
+
+
+# Used mapping within `lgas()`
+.extract_state_lgas <- function(states, mydata) {
+  index <- mydata$state %in% states
+  mydata$lga[index]
+}
 
 
 

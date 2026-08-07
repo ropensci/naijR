@@ -69,10 +69,8 @@
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
 .validate_choropleth_params <- function(val = NULL, region = NULL, data = NULL)
-{   # TODO: Add some verbosity.
+{
   val <- enexpr(val)
-  ## If 'data' is NULL, then both 'val' and 'region' must be present
-  ## and 'region' must have valid States or LGAs
   if (is.null(data)) {
     if (is.null(val) || is.null(region)) {
       return(FALSE)
@@ -80,27 +78,18 @@
     if (!.all_are_regions(region) && !is.null(val)) {
       return(FALSE)
     }
-    # At this point, we have two valid vectors only
-  }
+  }  # At this point, we have two valid vectors only
   data.has.regions <- FALSE
   if (is.data.frame(data)) {
     index <- .region_column_index(data)
     data.has.regions <- as.logical(index)
-    # Once identified, the regions in the data frame are
-    # to replace those in the original variable. Since this
-    # function is designed to return a boolean value, a 
-    # super-assignment is used to effect the change.
     if (data.has.regions) {
-      r <- data[[index]]
-      assign(deparse(substitute(region)), r, envir = parent.frame())
+      assign(deparse(substitute(region)), data[[index]], envir = parent.frame())
     }
   }
   else if (!is.null(data)) {
-    cli::cli_warn(
-      "'{arg_str(data)}' is invalid for choropleths but was ignored"
-    )
+    cli::cli_warn("'{arg_str(data)}' is invalid for choropleths but was ignored")
   }
-  ## If 'region' is NULL, it must be found automatically in 'data'
   if (is.null(region)) {
     if (isFALSE(data.has.regions)) {
       return(FALSE)
@@ -110,15 +99,8 @@
   if (!.all_are_regions(region)) {
     return(FALSE)
   }
-  ## If 'val' is null, it must exist in 'data', but can only be
-  ## deduced if 'data' has only 2 columns and the other column is 
-  ## confirmed to contain strings representing regions (i.e. States
-  ## or LGAs).
   if (is.null(val)) {
-    if (is.null(data)) {
-      return(FALSE)
-    }
-    if (ncol(data) > 2L) {
+    if (is.null(data) || ncol(data) > 2L) {
       return(FALSE)
     }
     if (isFALSE(.all_are_regions(region)) && isFALSE(data.has.regions)) {
@@ -251,7 +233,7 @@
 ## used for drawing a choropleth map
 #' @importFrom rlang abort
 #' @importFrom rlang warn
-.region_column_index <- function(dt, s = NULL)
+.region_column_index <- function(dt, state = NULL)
 {
   stopifnot(is.data.frame(dt))
   ## Checks if a column has the names of States, returning TRUE if so.
@@ -272,16 +254,18 @@
     ret
   }
   n <- vapply(dt, .fx, logical(1))
-  if (is.null(s)) {
-    s <- states()
+  if (is.null(state)) {
+    state <- states()
   }
   if (!sum(n)) {
     cli::cli_abort("No column with elements in '{deparse(substitute(dt))}'.")
   } 
-  if (sum(n) > 1) {
+  index <- which(n)
+  if (length(index) > 1) {
+    index <- index[1]
     cli::cli_warn("Multiple columns have regions, so the first was used")
   }
-  which(n)[1]
+  index
 }
 
 
