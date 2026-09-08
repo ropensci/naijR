@@ -28,24 +28,28 @@
 
 
 
-## Processes character input, presumably States, and when empty
+## Processes character input, presumably regions, and when a zero-length
 ## character vector, provide all the States as a default value.
+#' @importFrom rlang as_name
+#' @importFrom rlang enexpr
 .process_region_params <- function(x, ...)
 {
+  xarg <- enexpr(x) # parse symbol prior to evaluation
   stopifnot(is.character(x))
   len <- length(x)
   if (len == 0L) {  # when the default arg is
     return(states(all = TRUE))
   }
-  if (!(all(is_state(x)) || all(is_lga(x)))) {
-    str <-  deparse(substitute(x))
+  if (!.all_are_regions(x)) {
+    # str <- deparse(substitute(x))
+    str <-  as_name(xarg)
     if (len > 1L) {
       cli::cli_abort(
         "One or more elements of '{str}' is not a Nigerian region", 
         ...
       )
     }
-    else if (isFALSE(identical(x, country_name()))) {
+    if (isFALSE(identical(x, country_name()))) {
       cli::cli_abort(
         "Single inputs for '{str}' only support the value '{country_name()}'",
         ...
@@ -58,56 +62,61 @@
 
 
 
+# Enables a decision on whether to draw a choropleth map
+# It does this by checking the kind of arguments that were
+# passed into the mapping function and then carrying out 
+# some validation checks.
+# Returns either TRUE or FALSE
+#' @importFrom rlang eval_tidy
+#' @importFrom rlang is_null
+#' @importFrom rlang is_symbol
+.check_choropleth_use <- function(region, data, x, y) {
+  if (is_null(x) || is_symbol(x)) {
+    x <- enexpr(x)
+
+    return(.validate_choropleth_params(region, data, !!x))
+  }
+  if (!is_null(y)) {
+    return(FALSE)
+  }
+  x <- eval_tidy(x)
+  .validate_choropleth_params(region, data, x)
+}
+
+
+
 # Makes sure that elements required for making a choropleth map are available. 
-# These are:
-# - A data frame with a value and region column identified
-# - A 2-column data frame with one column of regions
-# - A region and value as separate vectors
+# These are the possible scenarios where this condition is fulfilled:
+# - A data frame with a value and region column identified via arguments
+# - A 2-column data frame with one column of regions and values deduced
+# - A region and value data structure as separate atomic vectors
 #
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
 #' @importFrom rlang is_null
 #' @importFrom rlang is_symbol
-.validate_choropleth_params <- function(val = NULL, region = NULL, data = NULL)
+.validate_choropleth_params <- function(region, data, x)
 {
-  val <- enexpr(val)
-  if (is.null(data)) {
-    if (is.null(val) || is.null(region)) {
-      return(FALSE)
-    }
-    if (!.all_are_regions(region) && !is.null(val)) {
-      return(FALSE)
-    }
-  }  # At this point, we have two valid vectors only
+  val <- enexpr(x)
+  region <- enexpr(region)
+  if (is_null(data) && is_null(val)) {
+    return(FALSE)
+  }
   data.has.regions <- FALSE
-  if (is.data.frame(data)) {
+  if (!is_null(data)) {
     index <- .region_column_index(data)
     data.has.regions <- as.logical(index)
     if (data.has.regions) {
-      assign(deparse(substitute(region)), data[[index]], envir = parent.frame())
+      assign(as_name(region), data[[index]], envir = parent.frame())
     }
   }
-  else if (!is.null(data)) {
-    cli::cli_warn("'{arg_str(data)}' is invalid for choropleths but was ignored")
-  }
-  if (is.null(region)) {
-    if (isFALSE(data.has.regions)) {
-      return(FALSE)
-    }
-    region <- character()
-  }
-  if (!.all_are_regions(region)) {
-    return(FALSE)
-  }
-  if (is.null(val)) {
-    if (is.null(data) || ncol(data) > 2L) {
-      return(FALSE)
-    }
-    if (isFALSE(.all_are_regions(region)) && isFALSE(data.has.regions)) {
+  if (is_null(val)) {
+    no.valid.df <- is_null(data) || ncol(data) > 2L
+    if (no.valid.df || !data.has.regions) {
       return(FALSE)
     }
   }
-  if (!is.null(val)) {
+  else {
     if (is.data.frame(data)) {
       if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
         cli::cli_abort("The column '{(arg_str(val))}'
@@ -115,7 +124,7 @@
       }
     }
   }
-  TRUE
+  TRUE  # NB: Also when no data frame input but x is a vector
 }
 
 
@@ -269,6 +278,39 @@
 }
 
 
+
+#' @importFrom rlang enexpr
+.get_choropleth_opts <- 
+  function(mapobj, data, region, x, breaks, categories, 
+    col, excluded, exclude.fill) {
+  # x <- enexpr(x)
+  cpleth.inputs <- list(
+    region = region,
+    breaks = breaks,
+    categories = categories
+  )
+  if (!is_null(data)) {
+    region.col <- .region_column_index(data, region)
+    datacolname <- if (is_null(x) && ncol(data) == 2L) {
+      names(data)[-region.col]
+    }
+    else {
+      as_name(x)
+    }
+    cpleth.inputs$value <-  data[[datacolname]]
+    cpleth.inputs$region <- data[[region.col]]
+  }
+  else {
+    cpleth.inputs$value <- eval_tidy(x)
+  }
+  .prep_choropleth_opts(
+    mapobj,
+    cpleth.inputs,
+    col,
+    excluded,
+    exclude.fill
+  )
+}
 
 
 .prep_choropleth_opts <- function(map, opts, col = NULL, ...) {
@@ -558,10 +600,11 @@ country_name <- function()
 
 
 
-
+#' @importFrom rlang as_name
+#' @importFrom rlang enexpr
 arg_str <- function(arg)
 {
-  deparse(substitute(arg))
+  as_name(enexpr(arg))
 }
 
 

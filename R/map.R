@@ -87,15 +87,12 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #'
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
-#' @importFrom rlang !!
 #' @importFrom rlang as_name
 #' @importFrom rlang caller_env
 #' @importFrom rlang enexpr
 #' @importFrom rlang enquo
 #' @importFrom rlang expr
-#' @importFrom rlang eval_tidy
 #' @importFrom rlang is_null
-#' @importFrom rlang is_symbol
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_crs
 #' @importFrom sf st_union
@@ -141,49 +138,18 @@ map_ng <-
     enquo(x) 
   }
   else {
-    enexpr(x)
-  }
-  use.choropleth <- if (is_null(xvalue) || is_symbol(xvalue)) {
-    .validate_choropleth_params(!!xvalue, region, data)  # TODO: Refactor
-  }
-  else if (!is_null(y)) {
-    FALSE
-  }
-  else {
-    xvalue <- eval_tidy(xvalue)
-    .validate_choropleth_params(xvalue, region, data)
+    enexpr(x)  # we are making sure to account for when x is NULL (default)
   }
   mapdata <- .get_map_data(region)
   mapq <- expr(.mymap(mapdata, plot = plot, ...))
   dots <- list(...)
+  use.choropleth <- .check_choropleth_use(region, data, xvalue, y)
   if (use.choropleth) {
     mapq <- expr(.mymap(mapdata, plot = plot))
-    cpleth.inputs <- list(
-      region = region,
-      value = xvalue,
-      breaks = breaks,
-      categories = categories
-    )
-    if (!is_null(data)) {
-      region.col <- .region_column_index(data, region)
-      ## Bet on a two-column data frame that has a
-      ## a column with valid regions
-      xvalue <- if (is_null(xvalue) && ncol(data) == 2L) {
-        names(data)[-region.col]
-      }
-      else {
-        as_name(xvalue)
-      }
-      cpleth.inputs$value <-  data[[xvalue]]
-      cpleth.inputs$region <- data[[region.col]]
-    }
-    cpleth.opts <- .prep_choropleth_opts(
-      mapdata,
-      cpleth.inputs,
-      dots$col,
-      excluded,
-      exclude.fill
-    )
+    col <- dots$col
+    cpleth.opts <- 
+      .get_choropleth_opts(mapdata, data, region, xvalue, breaks,
+                           categories, col, excluded, exclude.fill)
     mapq$col <- cpleth.opts$colors
     if (is_null(categories)) {
       categories <- cpleth.opts$bins
@@ -268,4 +234,4 @@ map_ng <-
     }
   }
   invisible(sfdata)
-}
+  }
