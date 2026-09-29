@@ -5,6 +5,36 @@
 # Copyright (C) 2019-2026 Victor Ordu.
 
 # Internal helper function(s) for plotting Nigeria maps
+## Checks the parameters supplied to the mapping function.
+.checkParams <- function(region, data, show.neighbours, fun) {
+  if (!is.character(region)) {
+    msg <- sprintf("Expected a character vector as '%s'.", fun(region))
+    addmsg <- if (is.data.frame(region)) {
+      "A data frame was passed. Did you mean to use the 'data' argument?"
+    }
+    cli_abort("{msg} {addmsg}")
+  }
+  if (!is_null(data) && !is.data.frame(data)) {
+    cli_abort(sprintf("A non-NULL input for '%s' must be a data frame",
+                fun(data)))
+  }
+  if (is.data.frame(data) && ncol(data) < 2L) {
+    cli_abort(
+      "Insufficient variables in '{deparse(quote(data))}' to generate a plot"
+    )
+  }
+  if (!is.logical(show.neighbours)) {
+    cli_abort("'{fun(show.neighbours)}' should be a logical value")
+  }
+  if (length(show.neighbours) > 1L) {
+    show.neighbours <- show.neighbours[1]
+    cli_warn("{first_elem_warn(fun(show.neighbours))}")
+  }
+  if (show.neighbours) {
+    cli::cli_abort("Display of neighbouring regions is temporarily disabled")
+  }
+  show.neighbours
+}
 
 # Creates the map to be plotted
 # @param sfdata An objecct of class 'sf'
@@ -535,20 +565,81 @@
 
 
 
-.set_legend_params <- function(leg.arg)
+.set_legend_params <- function(text, categories, xcord = 13L, ycord = 7L)
 {
-  stopifnot(is.character(leg.arg) || is.logical(leg.arg) || is.null(leg.arg))
-  result <- .set_legend_text(leg.arg)
-  obj <- list(x = 13L, y = 7L, text = NULL, show = TRUE, xpd = NA)
+  stopifnot(is.character(text) || is.logical(text) || is.null(text))
+  stopifnot(exprs = {
+    is.integer(xcord)
+    is.integer(ycord)
+  })
+  result <- .set_legend_text(text)
+  obj <- list(
+    x = xcord, 
+    y = ycord,
+    text = NULL,
+    show = TRUE, 
+    xpd = NA,
+    categories = categories
+  )
   if (is.character(result)) {
     obj$text <- result
   }
   if (is.logical(result)) {
     obj$show <- result
   }
+  if (is.character(obj$text)) {
+    if (length(obj$categories) != length(obj$text)) {
+      cli_abort("Lengths of 'categories' and provided legend do not match")
+    }
+    obj$categories <- obj$text
+  }
   obj
 }
 
+
+
+
+.plot_points <- function(sfdata, x, y, ...) {
+  st.pts <- sf::st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
+  sf::st_crs(st.pts) <- sf::st_crs(sfdata)
+  arglist <- list(...)
+  if_null_1 <- function(arg) if (is_null(arg)) 1 else arg
+  suppressWarnings({
+    plot(
+      st.pts,
+      add = TRUE,
+      pch = if_null_1(arglist$pch),
+      lwd = if_null_1(arglist$lwd),
+      lty = if_null_1(arglist$lty)
+    )
+    sf::st_union(sfdata, st.pts)
+  })
+}
+
+
+
+
+.show_map_text <- function(mapdata, region, cex) {
+  txt <- country_name()
+  df.only <- as.data.frame(sfdata) 
+  if (inherits(region, "regions")) {
+    region.type <- sub("(.+)(s$)", "\\1", class(region)[1])
+    shpfileprop <- paste0("shp.", region.type)
+    namefield <- get(shpfileprop)$namefield
+    txt <- df.only[[namefield]]
+    # nocov end
+    if (all(is_state(region))) {
+      txt <- sub(
+        .toggle_fct_format("full"), 
+        .toggle_fct_format("abbrev"), 
+        txt
+      )
+    }
+  }
+  cex <- .set_text_size(dots$cex)
+  xycoord <- .get_point_coords(sfdata)
+  graphics::text(xycoord[, 'x'], xycoord[, 'y'], labels = txt, cex = cex)
+}
 
 
 
@@ -602,6 +693,9 @@ country_name <- function()
 
 #' @importFrom rlang as_name
 #' @importFrom rlang enexpr
+# NB: The internal function 'arg_str' uses non-standard evaluation
+# internally. Thus, care should be taken during any refactoring, so as to 
+# ensure that the target objects are parsed correctly
 arg_str <- function(arg)
 {
   as_name(enexpr(arg))

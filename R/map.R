@@ -104,37 +104,9 @@ map_ng <-
            categories = NULL, excluded = NULL, exclude.fill = NULL,title = NULL,
            caption = NULL, show.neighbours = FALSE, show.text = FALSE,
            legend.text = NULL, leg.title, plot = TRUE, ...) { 
-  if (!is.character(region)) {
-    # NB: The internal function 'arg_str' uses non-standard evaluation
-    # internally. Thus, care should be taken during any refactoring, so as to 
-    # ensure that the target objects are parsed correctly
-    msg <- sprintf("Expected a character vector as '%s'.", arg_str(region))
-    addmsg <- if (is.data.frame(region)) {
-      "A data frame was passed. Did you mean to use the 'data' argument?"
-    }
-    cli_abort("{msg} {addmsg}")
-  }
-  if (!is.null(data) && !is.data.frame(data)) {
-    cli_abort(sprintf("A non-NULL input for '%s' must be a data frame",
-                 arg_str(data)))
-  }
-  if (is.data.frame(data) && ncol(data) < 2L) {
-    cli_abort(
-      "Insufficient variables in '{deparse(quote(data))}' to generate a plot"
-    )
-  }
-  if (!is.logical(show.neighbours)) {
-    cli_abort("'{arg_str(show.neighbours)}' should be a logical value")
-  }
-  if (length(show.neighbours) > 1L) {
-    show.neighbours <- show.neighbours[1]
-    cli_warn("{first_elem_warn(arg_str(show.neighbours))}")
-  }
-  if (show.neighbours) {
-    cli::cli_abort("Display of neighbouring regions is temporarily disabled")
-  }
+  .checkParams(region, data, show.neighbours, arg_str)
   region <- .process_region_params(region, call = caller_env())
-  xvalue <- if (is_null(data) && !is_null(x)) {
+  xname <- if (is_null(data) && !is_null(x)) {
     enquo(x) 
   }
   else {
@@ -143,94 +115,39 @@ map_ng <-
   mapdata <- .get_map_data(region)
   mapq <- expr(.mymap(mapdata, plot = plot, ...))
   dots <- list(...)
-  use.choropleth <- .check_choropleth_use(region, data, xvalue, y)
+  use.choropleth <- .check_choropleth_use(region, data, xname, y)
   if (use.choropleth) {
     mapq <- expr(.mymap(mapdata, plot = plot))
-    col <- dots$col
     cpleth.opts <- 
-      .get_choropleth_opts(mapdata, data, region, xvalue, breaks,
-                           categories, col, excluded, exclude.fill)
+      .get_choropleth_opts(mapdata, data, region, xname, breaks,
+                           categories, dots$col, excluded, exclude.fill)
     mapq$col <- cpleth.opts$colors
     if (is_null(categories)) {
       categories <- cpleth.opts$bins
     }
-    legend.params <- .set_legend_params(legend.text)
-    if (is.character(legend.params$text)) {
-      if (length(categories) != length(legend.params$text)) {
-        cli_abort("Lengths of 'categories' and provided legend do not match")
-      }
-      categories <- legend.params$text
-    }
+    lp <- .set_legend_params(legend.text, categories)
   }
-  tryCatch({
-    sfdata <- eval(mapq)
-  }, 
-  error = function(e) {
-    stop(e)
-  })
+  tryCatch(sfdata <- eval(mapq), error = function(e) stop(e))
   if (!is_null(y) && !.pts_within_bounds(sfdata, x, y)) {
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   }
   if (plot) { 
     graphics::title(main = title, sub = caption) # nocov start
-    if (use.choropleth && legend.params$show) {
+    if (use.choropleth && lp$show) {
       if (missing(leg.title)) {
-        leg.title <- xvalue
+        leg.title <- xname
         if (is_null(data)) {
           leg.title <- deparse(substitute(x))
         }
       }
-      graphics::legend(
-        x = legend.params$x,
-        y = legend.params$y,
-        legend = categories,
-        fill = cpleth.opts$scheme,
-        xpd = legend.params$xpd,
-        title = leg.title
-      )
+     legend(x = lp$x, y = lp$y, legend = lp$categories, fill = cpleth.opts$scheme,
+            xpd = lp$xpd, title = leg.title)
     }
     if (!is_null(y)) {
-      # sets args to default values when not supplied via interface
-      if_null_1 <- function(arg) {
-        if (is.null(arg)) {
-          1 
-        }
-        else { 
-          arg
-        }
-      }
-      st.pts <- sf::st_as_sf(data.frame(x = x, y = y), coords = c("x", "y"))
-      sf::st_crs(st.pts) <- sf::st_crs(sfdata)
-      pch <- dots$pch
-      lwd <- dots$lwd
-      lty <- dots$lty
-      suppressWarnings({
-        plot(
-          st.pts,
-          add = TRUE,
-          pch = if_null_1(pch),
-          lwd = if_null_1(lwd),
-          lty = if_null_1(lty)
-        )
-        sfdata <- sf::st_union(sfdata, st.pts)
-      })
+      sfdata <- .plot_points(sfdata, x, y, ...)
     }
     if (show.text) {
-      txt <- country_name()
-      df.only <- as.data.frame(sfdata) 
-      if (inherits(region, "regions")) {
-        region.type <- sub("(.+)(s$)", "\\1", class(region)[1])
-        shpfileprop <- paste0("shp.", region.type)
-        namefield <- get(shpfileprop)$namefield
-        txt <- df.only[[namefield]]
-        # nocov end
-        if (all(is_state(region))) {
-          txt <- sub(.toggle_fct_format("full"), .toggle_fct_format("abbrev"), txt)
-        }
-      }
-      cex <- .set_text_size(dots$cex)
-      xycoord <- .get_point_coords(sfdata)
-      graphics::text(xycoord[, 'x'], xycoord[, 'y'], labels = txt, cex = cex)
+      .show_map_text(sfdata, region, dots$cex)
     }
   }
   invisible(sfdata)
