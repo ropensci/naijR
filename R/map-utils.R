@@ -621,7 +621,7 @@
 
 .show_map_text <- function(mapdata, region, cex) {
   txt <- country_name()
-  df.only <- as.data.frame(sfdata) 
+  df.only <- as.data.frame(mapdata) 
   if (inherits(region, "regions")) {
     region.type <- sub("(.+)(s$)", "\\1", class(region)[1])
     shpfileprop <- paste0("shp.", region.type)
@@ -636,8 +636,8 @@
       )
     }
   }
-  cex <- .set_text_size(dots$cex)
-  xycoord <- .get_point_coords(sfdata)
+  cex <- .set_text_size(cex)
+  xycoord <- .get_point_coords(mapdata)
   graphics::text(xycoord[, 'x'], xycoord[, 'y'], labels = txt, cex = cex)
 }
 

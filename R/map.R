@@ -87,6 +87,8 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #'
 #' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
+#' @importFrom graphics legend
+#' @importFrom graphics title
 #' @importFrom rlang as_name
 #' @importFrom rlang caller_env
 #' @importFrom rlang enexpr
@@ -132,7 +134,7 @@ map_ng <-
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   }
   if (plot) { 
-    graphics::title(main = title, sub = caption) # nocov start
+    title(main = title, sub = caption) # nocov start
     if (use.choropleth && lp$show) {
       if (missing(leg.title)) {
         leg.title <- xname
