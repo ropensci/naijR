@@ -48,8 +48,6 @@
       return(result) 
     }
   }
-  # result$str <- .trim_whitespace(result$str)
-  ## Now, check for exact matching, case-insensitively
   matched <- 
     grep(paste0("^", str, '$'), regions, value = TRUE, ignore.case = TRUE)
   if (length(matched)) { 
@@ -100,17 +98,6 @@
   attr(checked, "regions.fixed") <- fixed
   attr(checked, "misspelt") <- sort(unique(notfixed))
   structure(checked, class = class)
-}
-
-
-.trim_whitespace <- function(x)
-{
-  ## First remove spaces around slashes and hyphens
-  # str <- gsub("\\s\\/", "/", str)
-  # str <- gsub("\\/\\s", "/", str)
-  # str <- sub("-\\s", "-", str)
-  # sub("^Egbado/", "", str) ## TODO: Address hard-coding
-  x
 }
 
 
