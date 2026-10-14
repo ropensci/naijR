@@ -72,31 +72,35 @@ test_that("Messaging clear when fixing via character vectors or factors", {
 
 
 test_that("various cases for fixing state names", {
-  ss <- states()
-  ss2 <- states(c("Oyo", "Legos"), warn = FALSE)
-  ssx <- states(c("xxx", "Benue"), warn = FALSE)
-  ss.us <- c("kentucky", "Bornu", "Abia")
-  fctup <- "Federal Capital Territory"
-  fctlw <- "FCT"
-  
-  expect_equal(fix_region(ss), ss, ignore_attr = TRUE)
+  fct_full <- "Federal Capital Territory"
+  fct_abbr <- "FCT"
+  expect_equal(fix_region(states()), states(), ignore_attr = TRUE)
   expect_error(fix_region('Fct'), reconstruct.x, fixed = TRUE)
   expect_error(fix_region('Kane'), reconstruct.x, fixed = TRUE)
   expect_error(fix_region('plateau'), reconstruct.x, fixed = TRUE)
-  expect_identical(fix_region(c(fctup, fctlw)), rep(fctup, 2))
-  expect_identical(fix_region(states(c(fctup, fctlw)))[2], states(fctup))
-  expect_identical(fix_region(states(fctlw, "Kano"))[1], states(fctlw))
-  # expect_identical(fix_region('FCT'), fedcap)
-  # expect_identical(fix_region(states('Fct')), states(fedcap))
-  expect_identical(fix_region(states('Kane')), states("Kano"))
-  expect_identical(fix_region(states('plateau')), states('Plateau'))
+  expect_identical(fix_region(c(fct_full, fct_abbr)), rep(fct_full, 2))
+  expect_identical(fix_region(states(c(fct_full, fct_abbr)))[2], states(fct_full))
+  expect_identical(fix_region(states(fct_abbr, "Kano"))[1], states(fct_abbr))
+  # Check various cases for testing States (quirks have been identified)
+  # These apply to automatic fixes where the mistakes can be handled by
+  # partial matching using the default settings in the package.
+  misspeltStates <- c(Kano = "Kane", Plateau = "plateau", Abia = "Abya")
+  for (i in seq_along(misspeltStates)) {
+    correct <- names(misspeltStates)[i]
+    wrong <- misspeltStates[[i]]  # ensure `names` attribute is lost
+    expect_identical(fix_region(states(wrong)), states(correct))
+  }
+  oyo_lag_bad <- c("Oyo", "Legos")
+  expect_silent(fix_region(states(oyo_lag_bad)))
+  oyo_lag_fixed <- fix_region(states(oyo_lag_bad))
+  expect_identical(oyo_lag_fixed, states(oyo_lag_bad))
+  expect_length(oyo_lag_fixed, 2L)
+  # Check total departure from a State's spelling. These are not
+  # expected to be fixed automatically, so we want to interrupt execution.
   expect_error(fix_region(states(c("Owerri north", "Owerri West"))))
-  
-  fixed2 <- suppressMessages(fix_region(ss2))
-  expect_identical(fixed2, states(c("Oyo", "Lagos")))
-  expect_length(fixed2, 2L)
+  ssx <- states(c("xxx", "Benue"), warn = FALSE)
   expect_error(fix_region(ssx))
-  expect_error(fix_region(ss.us))
+  expect_error(fix_region(c("kentucky", "Bornu", "Abia")))
 })
 
 
