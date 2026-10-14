@@ -567,8 +567,8 @@
 
 .set_legend_params <- function(text, categories, xcord = 13L, ycord = 7L)
 {
-  stopifnot(is.character(text) || is.logical(text) || is.null(text))
   stopifnot(exprs = {
+    is.character(text) || is.logical(text) || is.null(text)
     is.integer(xcord)
     is.integer(ycord)
   })
@@ -627,7 +627,6 @@
     shpfileprop <- paste0("shp.", region.type)
     namefield <- get(shpfileprop)$namefield
     txt <- df.only[[namefield]]
-    # nocov end
     if (all(is_state(region))) {
       txt <- sub(
         .toggle_fct_format("full"), 

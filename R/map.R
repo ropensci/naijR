@@ -129,12 +129,12 @@ map_ng <-
     }
     lp <- .set_legend_params(legend.text, categories)
   }
-  tryCatch(sfdata <- eval(mapq), error = function(e) stop(e))
+  tryCatch({sfdata <- eval(mapq)}, error = function(e) stop(e))
   if (!is_null(y) && !.pts_within_bounds(sfdata, x, y)) {
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   }
   if (plot) { 
-    title(main = title, sub = caption) # nocov start
+    title(main = title, sub = caption)
     if (use.choropleth && lp$show) {
       if (missing(leg.title)) {
         leg.title <- xname
