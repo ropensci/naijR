@@ -56,8 +56,14 @@
     return(result)
   }
   ## Otherwise check for approximate matches.
-  fixed <- agrep(str, regions, value = TRUE, max.distance = .defaultDistance(),
-                 ignore.case = TRUE)
+  fixed <- agrep(
+    pattern = str,
+    x = regions,
+    value = TRUE,
+    max.distance = .defaultDistance(),
+    ignore.case = FALSE,
+    fixed = TRUE
+  )
   if (length(fixed) == 1L) {
     result$fixes <- structure(fixed, names = str)
     result$str <- fixed

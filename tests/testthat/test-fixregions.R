@@ -79,7 +79,9 @@ test_that("various cases for fixing state names", {
   expect_error(fix_region('Kane'), reconstruct.x, fixed = TRUE)
   expect_error(fix_region('plateau'), reconstruct.x, fixed = TRUE)
   expect_identical(fix_region(c(fct_full, fct_abbr)), rep(fct_full, 2))
-  expect_identical(fix_region(states(c(fct_full, fct_abbr)))[2], states(fct_full))
+  expect_identical(
+    fix_region(states(c(fct_full, fct_abbr)))[2], states(fct_full)
+  )
   expect_identical(fix_region(states(fct_abbr, "Kano"))[1], states(fct_abbr))
   # Check various cases for testing States (quirks have been identified)
   # These apply to automatic fixes where the mistakes can be handled by
@@ -93,7 +95,7 @@ test_that("various cases for fixing state names", {
   oyo_lag_bad <- c("Oyo", "Legos")
   expect_silent(fix_region(states(oyo_lag_bad)))
   oyo_lag_fixed <- fix_region(states(oyo_lag_bad))
-  expect_identical(oyo_lag_fixed, states(oyo_lag_bad))
+  expect_identical(oyo_lag_fixed, states(c("Oyo", "Lagos")))
   expect_length(oyo_lag_fixed, 2L)
   # Check total departure from a State's spelling. These are not
   # expected to be fixed automatically, so we want to interrupt execution.
