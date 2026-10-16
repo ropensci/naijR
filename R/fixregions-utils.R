@@ -15,9 +15,8 @@
   region_class <- class(regions_object)
   regions_object <- unclass(regions_object)
   matched <- cant.fix <- fix.status <- character()
-  result <- list()
   for (name in regions_object) {
-    result <- .get_proper_value(name, region_table)
+    result <- .get_proper_value(name, region_table)  # returns a list
     matched <- c(matched, result$str)
     fix.status <- c(fix.status, result$fixes)
     cant.fix <- c(cant.fix, result$nofix)
@@ -42,7 +41,7 @@
   if (inherits(regions, "states")) {
     abbrFCT <- .toggle_fct_format("abbrev")
     if ( agrepl(str, abbrFCT, max.distance = .defaultDistance()) &&
-        identical(toupper(str), abbrFCT)) {
+        identical(toupper(str), unname(abbrFCT))) {
       result$str <- abbrFCT
       result$fixes <- structure(abbrFCT, names = str)
       return(result) 

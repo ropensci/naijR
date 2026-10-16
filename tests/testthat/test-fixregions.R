@@ -75,9 +75,6 @@ test_that("various cases for fixing state names", {
   fct_full <- "Federal Capital Territory"
   fct_abbr <- "FCT"
   expect_equal(fix_region(states()), states(), ignore_attr = TRUE)
-  expect_error(fix_region('Fct'), reconstruct.x, fixed = TRUE)
-  expect_error(fix_region('Kane'), reconstruct.x, fixed = TRUE)
-  expect_error(fix_region('plateau'), reconstruct.x, fixed = TRUE)
   expect_identical(fix_region(c(fct_full, fct_abbr)), rep(fct_full, 2))
   expect_identical(
     fix_region(states(c(fct_full, fct_abbr)))[2], states(fct_full)
@@ -86,10 +83,17 @@ test_that("various cases for fixing state names", {
   # Check various cases for testing States (quirks have been identified)
   # These apply to automatic fixes where the mistakes can be handled by
   # partial matching using the default settings in the package.
-  misspeltStates <- c(Kano = "Kane", Plateau = "plateau", Abia = "Abya")
+  misspeltStates <- c(
+    Kano = "Kane",
+    Plateau = "plateau",
+    Abia = "Abya",
+    Nasarawa = "Nassarawa",
+    FCT = "FCt"
+  )
   for (i in seq_along(misspeltStates)) {
     correct <- names(misspeltStates)[i]
     wrong <- misspeltStates[[i]]  # ensure `names` attribute is lost
+    expect_error(fix_region(wrong), reconstruct.x, fixed = TRUE)
     expect_identical(fix_region(states(wrong)), states(correct))
   }
   oyo_lag_bad <- c("Oyo", "Legos")
