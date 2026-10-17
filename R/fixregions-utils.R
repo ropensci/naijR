@@ -12,16 +12,16 @@
 .fix_region_automatic <- function(regions_object, region_table)
 {
   stopifnot(is.object(regions_object))
-  region_class <- class(regions_object)
-  regions_object <- unclass(regions_object)
   matched <- cant.fix <- fix.status <- character()
-  for (name in regions_object) {
-    result <- .get_proper_value(name, region_table)  # returns a list
+  for (region in regions_object) {
+    result <- .get_proper_value(region, region_table)
     matched <- c(matched, result$str)
     fix.status <- c(fix.status, result$fixes)
     cant.fix <- c(cant.fix, result$nofix)
   }
-  .get_updated_obj_with_attrs(matched, fix.status, cant.fix, region_class)
+  .get_updated_obj_with_attrs(
+    matched, fix.status, cant.fix, class(regions_object)
+  )
 }
 
 
@@ -42,16 +42,14 @@
     abbrFCT <- .toggle_fct_format("abbrev")
     if ( agrepl(str, abbrFCT, max.distance = .defaultDistance()) &&
         identical(toupper(str), unname(abbrFCT))) {
-      result$str <- abbrFCT
-      result$fixes <- structure(abbrFCT, names = str)
+      result <- .get_fix_results(str, abbrFCT)
       return(result) 
     }
   }
   matched <- 
     grep(paste0("^", str, '$'), regions, value = TRUE, ignore.case = TRUE)
   if (length(matched)) { 
-    result$str <- matched
-    result$fixes <- structure(matched, names = str)
+    result <- .get_fix_results(str, matched)
     return(result)
   }
   ## Otherwise check for approximate matches.
@@ -64,8 +62,7 @@
     fixed = TRUE
   )
   if (length(fixed) == 1L) {
-    result$fixes <- structure(fixed, names = str)
-    result$str <- fixed
+    result <- .get_fix_results(str, fixed)
   }
   else {
     if (length(fixed) > 1L) {
@@ -79,6 +76,15 @@
   result
 }
 
+
+
+
+.get_fix_results <- function(wrong, correct) {
+  x <- list()
+  x$fixes <- structure(correct, names = wrong)
+  x$str <- correct
+  x
+}
 
 
 

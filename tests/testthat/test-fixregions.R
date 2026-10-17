@@ -96,17 +96,21 @@ test_that("various cases for fixing state names", {
     expect_error(fix_region(wrong), reconstruct.x, fixed = TRUE)
     expect_identical(fix_region(states(wrong)), states(correct))
   }
+  # Testing fixes for State objects with more than one element
   oyo_lag_bad <- c("Oyo", "Legos")
   expect_silent(fix_region(states(oyo_lag_bad)))
   oyo_lag_fixed <- fix_region(states(oyo_lag_bad))
   expect_identical(oyo_lag_fixed, states(c("Oyo", "Lagos")))
   expect_length(oyo_lag_fixed, 2L)
+  expect_identical(
+    fix_region(states(c("fCT", "FcT", "FCt"))), states(rep("FCT", 3))
+  )
   # Check total departure from a State's spelling. These are not
   # expected to be fixed automatically, so we want to interrupt execution.
+  e <- "The following are not States:"
+  expect_error(fix_region(c("xxx", "Benue")), e, fixed = TRUE)
+  expect_error(fix_region(c("kentucky", "Bornu", "Abia")), e, fixed = TRUE)
   expect_error(fix_region(states(c("Owerri north", "Owerri West"))))
-  ssx <- states(c("xxx", "Benue"), warn = FALSE)
-  expect_error(fix_region(ssx))
-  expect_error(fix_region(c("kentucky", "Bornu", "Abia")))
 })
 
 
