@@ -88,7 +88,8 @@ test_that("various cases for fixing state names", {
     Plateau = "plateau",
     Abia = "Abya",
     Nasarawa = "Nassarawa",
-    FCT = "FCt"
+    FCT = "FCt",
+    Oyo = "Oya"
   )
   for (i in seq_along(misspeltStates)) {
     correct <- names(misspeltStates)[i]

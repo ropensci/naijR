@@ -89,13 +89,11 @@
 
 
 ## Reduce data for reporting on fixes to only unique instances 
+#' @importFrom rlang is_named
 .get_updated_obj_with_attrs <- function(checked, fixed, notfixed, class) {
   stopifnot(
     is.character(checked) || is.character(fixed) || is.character(notfixed)
   )
-  if (length(fixed) > 0L && !rlang::is_named(fixed)) {
-    cli_abort("'fixed' must be named if length > 0")
-  }
   if (length(fixed) > 1L) {
     # we keep only unique values using this method in order to preserve
     # the names, and also bearing in mind that different typos might map
@@ -239,10 +237,6 @@
 # to fix spelling mistakes. This attributes are required internally for
 # assessing the status of the fixes applied and for reporting to the user
 .update_attributes <- function(misspelled, repaired, obj) {
-  stopifnot(exprs = {
-    rlang::is_string(misspelled)
-    rlang::is_string(repaired)
-  })
   obj <- sub(misspelled, repaired, obj, fixed = TRUE)
   attr.misspelt <- attr(obj, "misspelt")
   attr(obj, "misspelt") <- attr.misspelt[attr.misspelt != misspelled]

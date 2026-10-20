@@ -427,7 +427,6 @@ print.states <- function(x, ...) { # nocov start
 #' @rdname lgas
 #' @export
 print.lgas <- function(x, ...) { # nocov start
-  length(x)
   if (is.atomic(x)) {
     .printoutRegion(x, "Local Government Areas")
   }
