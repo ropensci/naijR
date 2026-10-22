@@ -78,6 +78,7 @@ plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 \details{
 The default value for \code{region} is to print all State 
 boundaries.
+
 \code{data} enables the extraction of data for plotting from an object
 of class \code{data.frame}. Columns containing regions (i.e. States as well
 as supported sub-national jurisdictions) are identified. The argument also
