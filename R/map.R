@@ -42,6 +42,7 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' 
 #' @details The default value for \code{region} is to print all State 
 #' boundaries.
+#' 
 #' \code{data} enables the extraction of data for plotting from an object
 #' of class \code{data.frame}. Columns containing regions (i.e. States as well
 #' as supported sub-national jurisdictions) are identified. The argument also
@@ -142,8 +143,7 @@ map_ng <-
           leg.title <- deparse(substitute(x))
         }
       }
-     legend(x = lp$x, y = lp$y, legend = lp$categories, fill = cpleth.opts$scheme,
-            xpd = lp$xpd, title = leg.title)
+      .draw_legend(leg.title, lp, cpleth.opts)
     }
     if (!is_null(y)) {
       sfdata <- .plot_points(sfdata, x, y, ...)

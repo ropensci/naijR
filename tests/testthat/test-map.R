@@ -115,7 +115,7 @@ test_that("Choropleth mapping succeeds", {
       category = cat,
       col = 2L,
       plot = FALSE),
-    "The column 'val' does not exist in 'data'")
+    "The column 'xval' does not exist in 'data'")
 
   expect_s3_class(
     map_ng(
@@ -151,7 +151,7 @@ test_that("Choropleth mapping succeeds", {
   ), maptype)
 })
 
-test_that("Draw choropleth automatically with 2-column data frames", {
+test_that("Automatic choropleth on a 2-column table; fail otherwise", {
   ds <- data.frame(state = states(), value = sample(LETTERS[1:5], 37, TRUE))
   dl <- data.frame(LGA = lgas(), value = sample(LETTERS[1:5], 774, TRUE))
   
@@ -159,7 +159,12 @@ test_that("Draw choropleth automatically with 2-column data frames", {
   expect_s3_class(suppressWarnings(map_ng(data = dl, plot = FALSE)), maptype)
   expect_warning(map_ng(data = dl, plot = FALSE),
                  "Duplicated LGAs found, but may or may not need a review")
+  expect_error(
+    map_ng(data = cbind(ds, number = 1:37), plot = FALSE),
+    "has 3 columns"
+  )
 })
+
 
 test_that("Choropleth parameters can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')

@@ -127,30 +127,28 @@
 #' @importFrom rlang is_symbol
 .validate_choropleth_params <- function(region, data, x)
 {
-  val <- enexpr(x)
+  xval <- enexpr(x)
   region <- enexpr(region)
-  if (is_null(data) && is_null(val)) {
+  if (is_null(data) && is_null(xval)) {
     return(FALSE)
   }
   data.has.regions <- FALSE
   if (!is_null(data)) {
     index <- .region_column_index(data)
-    data.has.regions <- as.logical(index)
-    if (data.has.regions) {
+    if (index) {
       assign(as_name(region), data[[index]], envir = parent.frame())
     }
   }
-  if (is_null(val)) {
-    no.valid.df <- is_null(data) || ncol(data) > 2L
-    if (no.valid.df || !data.has.regions) {
-      return(FALSE)
+  if (is_null(xval)) {
+    if (ncol(data) > 2L) {
+      cli::cli_abort("'x' is NULL but 'data' has {ncol(data)} columns")
     }
   }
   else {
     if (is.data.frame(data)) {
-      if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
-        cli::cli_abort("The column '{(arg_str(val))}'
-                       does not exist in '{(arg_str(data))}'")
+      if (is_symbol(xval) && isFALSE(as_name(xval) %in% names(data))) {
+        cli::cli_abort("The column '{arg_str(xval)}'
+                       does not exist in '{arg_str(data)}'")
       }
     }
   }
@@ -169,8 +167,6 @@
 #' @importFrom sf st_as_sf
 .get_map_data.default <- function(x) 
 {
-  if (is.factor(x))
-    x <- as.character(x)
   stopifnot(is.character(x))
   if (identical(x, "Nigeria")) {
     # nolint start:
@@ -200,11 +196,6 @@
 .get_map_data.lgas <- function(x)
 {
   statename <- attr(x, 'State')
-  if (length(statename) > 1L) {
-    cli::cli_abort(
-      "LGA-level maps for adjoining States are not yet supported"
-    )
-  }
   full.spo <- .get_shpfileprop_element(x, "spatialObject")
   if (isFALSE(is.null(statename))) {
     statelgas <- lgas(statename)
@@ -213,7 +204,6 @@
   if (length(x) < length(lgas())) {
     return(.subset_spatial_by_region(full.spo, x))
   }
-  full.spo
 }
 
 
@@ -231,9 +221,10 @@
 # Extracts an element of the ShapefileProps internal object by name
 # @param regiontype A character vector of length 1 stating the type of region
 # @param element A character vector of length 1 naming the element extracted
+#' @importFrom rlang  is_string
 .get_shpfileprop_element <- function(region, element)
 {
-  stopifnot(inherits(region, "regions"), length(element) == 1L)
+  stopifnot(inherits(region, "regions"), is_string(element))
   suff <- sub("(.)(s$)", "\\1", class(region)[1])
   shpfileprop <- paste("shp", suff, sep = ".")
   getElement(object = get(shpfileprop), name = element)
@@ -272,7 +263,7 @@
 ## used for drawing a choropleth map
 #' @importFrom rlang abort
 #' @importFrom rlang warn
-.region_column_index <- function(dt, state = NULL)
+.region_column_index <- function(dt)
 {
   stopifnot(is.data.frame(dt))
   ## Checks if a column has the names of States, returning TRUE if so.
@@ -293,9 +284,6 @@
     ret
   }
   n <- vapply(dt, .fx, logical(1))
-  if (is.null(state)) {
-    state <- states()
-  }
   if (!sum(n)) {
     cli::cli_abort("No column with elements in '{deparse(substitute(dt))}'.")
   } 
@@ -320,7 +308,7 @@
     categories = categories
   )
   if (!is_null(data)) {
-    region.col <- .region_column_index(data, region)
+    region.col <- .region_column_index(data)
     datacolname <- if (is_null(x) && ncol(data) == 2L) {
       names(data)[-region.col]
     }
@@ -542,29 +530,6 @@
 
 
 
-# Returns either a logical(1) or character(n)
-.set_legend_text <- function(val)
-{
-  # The default setting of 'legend.text' is to return TRUE
-  if (is.null(val)) {
-    return(TRUE)
-  }
-  arg <- "legend.text"
-  if (!is.character(val) && !is.logical(val)) {
-    cli::cli_abort("'{arg}' must be of type character or logical")
-  }
-  if (is.logical(val)) {
-    if (length(val) > 1L) {
-      cli::cli_warn(first_elem_warn(arg))
-    }
-    return(val[1])
-  }
-  val
-}
-
-
-
-
 .set_legend_params <- function(text, categories, xcord = 13L, ycord = 7L)
 {
   stopifnot(exprs = {
@@ -582,18 +547,53 @@
     categories = categories
   )
   if (is.character(result)) {
-    obj$text <- result
-  }
-  if (is.logical(result)) {
-    obj$show <- result
-  }
-  if (is.character(obj$text)) {
-    if (length(obj$categories) != length(obj$text)) {
+    if (length(obj$categories) != length(result)) {
       cli_abort("Lengths of 'categories' and provided legend do not match")
     }
+    obj$text <- result
     obj$categories <- obj$text
   }
+  else if (is.logical(result)) {
+    obj$show <- result
+  }
   obj
+}
+
+
+
+
+# Returns either a logical(1) or character(n)
+.set_legend_text <- function(val)
+{
+  # The default setting of 'legend.text' is to return TRUE
+  if (is.null(val)) {
+    return(TRUE)
+  }
+  arg <- "legend.text"
+  if (!is.character(val) && !is.logical(val)) {
+    cli::cli_abort("'{arg}' must be of type character or logical")
+  }
+  if (is.logical(val)) {
+    if (length(val) > 1L) {
+      cli::cli_warn(first_elem_warn(arg))
+    }
+    val <- val[1]
+  }
+  val
+}
+
+
+
+
+.draw_legend <- function(title, legend_params, choropleth_opts) {
+  legend(
+    x = legend_params$x,
+    y = legend_params$y,
+    legend = legend_params$categories,
+    fill = choropleth_opts$scheme,
+    xpd = legend_params$xpd,
+    title = title
+  )
 }
 
 
