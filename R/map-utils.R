@@ -141,6 +141,9 @@
   }
   if (is_null(xval)) {
     if (ncol(data) > 2L) {
+      # TODO: Use condition handling to suppress any warning from
+      # `.region_column_index()` as it would no longer be relevant.
+      # Or isn't it???
       cli::cli_abort("'x' is NULL but 'data' has {ncol(data)} columns")
     }
   }
@@ -297,11 +300,13 @@
 
 
 
-#' @importFrom rlang enexpr
+
+#' @importFrom rlang as_name
+#' @importFrom rlang eval_tidy
+#' @importFrom rlang is_null
 .get_choropleth_opts <- 
   function(mapobj, data, region, x, breaks, categories, 
     col, excluded, exclude.fill) {
-  # x <- enexpr(x)
   cpleth.inputs <- list(
     region = region,
     breaks = breaks,
@@ -315,7 +320,7 @@
     else {
       as_name(x)
     }
-    cpleth.inputs$value <-  data[[datacolname]]
+    cpleth.inputs$value <-  data[[datacolname]]  # newly added element
     cpleth.inputs$region <- data[[region.col]]
   }
   else {
@@ -335,9 +340,7 @@
   # TODO: Set limits for variables and brk
   # TODO: Accept numeric input for col
   stopifnot(inherits(map, 'sf'))
-  if (!.assert_list_elements(opts)) {
-    cli::cli_abort("One or more inputs for generating choropleth options are invalid")
-  }
+  .assert_list_elements(opts)
   if (anyDuplicated(opts$region)) {
     if (all(is_state(opts$region))) {
       cli::cli_abort("Data cannot be matched with map. Aggregate them by States")
@@ -360,6 +363,27 @@
        scheme = colrange,
        bins = cats)
 }
+
+
+
+
+.assert_list_elements <- function(x) {
+  stopifnot(c('region', 'value', 'breaks') %in% names(x))
+  region.valid <- .all_are_regions(x$region)
+  v <- x$value
+  value.valid <- is.numeric(v) || is.factor(v) || is.character(v)
+  c <- x$categories
+  cat.valid <- if (!is.null(c)) {
+      is.character(c) || is.factor(c)
+  }
+  else {
+    TRUE
+  }
+  stopifnot(all(region.valid, value.valid, cat.valid))
+}
+
+
+
 
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
@@ -400,54 +424,41 @@
 
 
 
-.assert_list_elements <- function(x) {
-  stopifnot(c('region', 'value', 'breaks') %in% names(x))
-  region.valid <- .all_are_regions(x$region)
-  v <- x$value
-  value.valid <- is.numeric(v) || is.factor(v) || is.character(v)
-  c <- x$categories
-  cat.valid <- if (!is.null(c)) {
-      is.character(c) || is.factor(c)
-  }
-  else {
-    TRUE
-  }
-  all(region.valid, value.valid, cat.valid)
-}
-
-
-
-
 # Creates a  categorised variable from its inputs if not already a factor
 # and is to be used in generating choropleth maps
 #' @importFrom cli cli_abort
-.create_categorized <- function(val, brks = NULL, ...)
+#' @importFrom rlang is_bare_numeric
+#' @importFrom rlang is_null
+#' @importFrom rlang is_scalar_integer
+.create_categorized <- function(values, brks = NULL, ...)
 {
-  if (is.character(val)) {
-    val <- as.factor(val)
+  if (is.character(values)) {
+    values <- as.factor(values)
   }
-  if (is.factor(val)) {
-    if (nlevels(val) >= 10L) {
+  max_cats <- 10L
+  if (is.factor(values)) {
+    if (nlevels(values) >= max_cats) {
       cli_abort("Too many categories")
     }
-    return(val)
+    return(values)
   }
-  if (!is.numeric(val)) {
-    msg <- paste(sQuote(typeof(val)), "is not a supported type")
-    cli_abort(msg)
-  }
-  if (is.null(brks)) {
+  if (is_null(brks) && is_bare_numeric(values)) {
     cli_abort(paste("Breaks were not provided for the", 
                     "categorization of a numeric type"))
   }
-  rr <- range(val)
-  if (rlang::is_scalar_integer(brks)) {
+  else {
+    if (length(brks) >= max_cats + 1) {
+      cli_abort("Too many categories")
+    }
+  }
+  rr <- range(values)
+  if (is_scalar_integer(brks)) {
     brks <- seq(rr[1], rr[2], diff(rr) / brks)
   }
   if (rr[1] < min(brks) || rr[2] > max(brks)) {
     cli_abort("Values are out of range of breaks")
   }
-  cut(val, brks, include.lowest = TRUE)
+  cut(values, brks, include.lowest = TRUE)
 }
 
 

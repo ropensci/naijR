@@ -58,21 +58,7 @@ test_that("LGAs are plotted", {
   expect_s3_class(map_ng(lgas("Owerri North"), plot = FALSE), maptype)
 })
 
-
-# Choropleth map ----
-set.seed(4)
-df <- data.frame(region = states(all = TRUE), value = sample(0:6, 37, TRUE))
-mp <- map_ng(plot = FALSE)
-brks <- seq(0, 6, 2)
-vals <- df$value
-lso <-
-  list(
-    region = df$region,
-    value = df[, 'value'],
-    breaks = brks,
-    category = LETTERS[seq_len(length(brks))]
-  )
-
+# Choropleth maps ----
 test_that("Choropleth mapping succeeds", {
   pop.groups <- c(1e6, 2.5e6, 5e6, 7.5e6, 1e7)
   dat <- readRDS("data/pvc2015.rds")
@@ -135,7 +121,7 @@ test_that("Choropleth mapping succeeds", {
   expect_s3_class(map_ng(
     region = ss,
     x = runif(length(ss), max = 100),
-    breaks = c(0, 40, 60, 100),
+    breaks = round(seq(0, 100, length.out = 4), -1),
     col = 'YlOrRd',
     show.text = FALSE,
     plot = FALSE
@@ -166,9 +152,23 @@ test_that("Automatic choropleth on a 2-column table; fail otherwise", {
 })
 
 
+test_that("table with > 2 columns are appropriately handled", {
+  dsl <- data.frame(
+    state = states(),
+    value = sample(LETTERS[1:5], 37, TRUE),
+    sample(lgas(), 37, FALSE)
+  )
+  
+  map_exp <- rlang::expr(map_ng(data = dsl, x = value, plot = FALSE)) 
+  expect_s3_class(suppressWarnings(rlang::eval_tidy(map_exp)), maptype)
+  # expect_warning(rlang::eval_tidy(map_exp), "Multiple columns have regions")
+  expect_warning(map_ng(data = dsl, x = value, plot = FALSE))
+})
+
+
 test_that("Choropleth parameters can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
-  breaks <- c(1000000, 2500000, 5000000, 7500000, 10000000)
+  breaks <- round(seq(1e6, 1e7, length.out = 5), digits = -4)
   categories <- c("Small", "Moderate", "Large", "Mega")
   
   # Colours
@@ -200,12 +200,25 @@ test_that("Choropleth parameters can be controlled at interface", {
     ),
     "Lengths of 'categories' and provided legend do not match"
   )
+
+  # Too many breaks
+  breaks_x <- round(seq(1e6, 1e7, length.out = 12), -4)
+  categories_x <- c("Tiny", "Small", "Modest", "Moderate", "Medium", "Sizeable",
+                "Large", "Very large", "Huge", "Massive", "Mega")
+  expect_error(map_ng(
+    data = dat,
+    x = total.pop,
+    breaks = breaks_x,
+    categories = categories_x,
+    plot = FALSE
+  ),
+  "Too many categories")
 })
 
 test_that("Factors can draw choropleth", {
   getSmpl <- function(seed) { 
     set.seed(seed)
-    sample(letters[1:5], 37, T) 
+    sample(letters[1:5], 37, TRUE) 
   }
   
   getDblSmpl <- function(seed = round(runif(100, max = 500))) {
@@ -249,6 +262,10 @@ test_that("Factors can draw choropleth", {
   expect_s3_class(eval(qq), maptype)
   qq$col <- "green"
   expect_s3_class(eval(qq), maptype)
+
+  # multiple categories
+  expect_error(map_ng(x = factor(sample(letters[1:11], 37, TRUE))),
+  "Too many categories")
 })
 
 test_that("Choropleth map can be formed with excluded regions", {
