@@ -429,7 +429,7 @@
 #' @importFrom cli cli_abort
 #' @importFrom rlang is_bare_numeric
 #' @importFrom rlang is_null
-#' @importFrom rlang is_scalar_integer
+#' @importFrom rlang is_scalar_integerish
 .create_categorized <- function(values, brks = NULL, ...)
 {
   if (is.character(values)) {
@@ -452,7 +452,7 @@
     }
   }
   rr <- range(values)
-  if (is_scalar_integer(brks)) {
+  if (is_scalar_integerish(brks)) {
     brks <- seq(rr[1], rr[2], diff(rr) / brks)
   }
   if (rr[1] < min(brks) || rr[2] > max(brks)) {
@@ -476,7 +476,7 @@
     all.cols <- sub("(green)(3)", "\\1", default.pal)
     all.cols <- sub("gray", "grey", all.cols)
     if (!col %in% seq_along(all.cols)) {
-      cli_abort("'color' must range between 1L and {length(all.cols)}L")
+      cli_abort("'col' must range from 1L to {length(all.cols)}L")
     }
     col <- all.cols[col]
   }

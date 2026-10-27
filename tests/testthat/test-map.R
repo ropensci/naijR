@@ -77,7 +77,6 @@ test_that("Choropleth mapping succeeds", {
     )
   ),
   "No column with elements in 'data'")
-  
   expect_error(map_ng(
     region = dat$region,
     x = dat$total.pop,
@@ -85,14 +84,12 @@ test_that("Choropleth mapping succeeds", {
     plot = FALSE
   ),
   "Expected a character vector as 'region'")
-  
   expect_error(
     map_ng(region = baddat$state,
            x = dat$total.pop,
            plot = FALSE),
     "One or more elements of 'region' is not a Nigerian region"
   )
-  
   expect_error(
     map_ng(
       data = dat,
@@ -102,7 +99,6 @@ test_that("Choropleth mapping succeeds", {
       col = 2L,
       plot = FALSE),
     "The column 'xval' does not exist in 'data'")
-
   expect_s3_class(
     map_ng(
       data = dat,
@@ -111,26 +107,19 @@ test_that("Choropleth mapping succeeds", {
       plot = FALSE,
       fill = FALSE
     ), maptype)
-  
-  expect_s3_class(map_ng(data = dat,
-                         x = alpha,
-                         plot = FALSE),
-                  maptype)
-  
-  ss <- states()
+  expect_s3_class(map_ng(data = dat, x = alpha, plot = FALSE), maptype)
   expect_s3_class(map_ng(
-    region = ss,
-    x = runif(length(ss), max = 100),
+    region = states(),
+    x = runif(length(states()), max = 100),
     breaks = round(seq(0, 100, length.out = 4), -1),
     col = 'YlOrRd',
     show.text = FALSE,
     plot = FALSE
   ),
   maptype)
-  
   expect_s3_class(map_ng(
-    region = ss,
-    x = sample(LETTERS[1:5], length(ss), TRUE),
+    region = states(),
+    x = sample(LETTERS[1:5], length(states()), TRUE),
     col = "red",
     show.text = FALSE,
     plot = FALSE
@@ -152,7 +141,7 @@ test_that("Automatic choropleth on a 2-column table; fail otherwise", {
 })
 
 
-test_that("table with > 2 columns are appropriately handled", {
+test_that("Tables with > 2 columns are appropriately handled", {
   dsl <- data.frame(
     state = states(),
     value = sample(LETTERS[1:5], 37, TRUE),
@@ -181,13 +170,18 @@ test_that("Choropleth parameters can be controlled at interface", {
     col = NULL
   ))
   expect_s3_class(eval_tidy(func), maptype)
-  
-  func$col <- "YlOrRd"
-  expect_s3_class(eval_tidy(func), maptype)
-  
-  func$col <- 'blue'
-  expect_s3_class(eval_tidy(func), maptype)
-  
+  # Using different types of valid coloring arguments
+  for (arg in list("YlOrRd", "blue", 3, "BrBG")) {  # list() prevents coercion of '3'
+    func$col <- arg
+    expect_s3_class(eval_tidy(func), maptype)
+  }
+  func$col <- 0
+  expect_error(eval_tidy(func), "must range from 1L")
+  func$col <- 9
+  expect_error(eval_tidy(func), "must range from 1L")
+  func$col <- "Baba"
+  expect_error(eval_tidy(func), "not a supported colour or palette")
+
   # Legends
   expect_error(
     map_ng(
@@ -213,6 +207,30 @@ test_that("Choropleth parameters can be controlled at interface", {
     plot = FALSE
   ),
   "Too many categories")
+
+  # Set breaks with an integer value
+  expect_s3_class(map_ng(
+    data = dat,
+    x = total.pop,
+    breaks = 5L,
+    categories = categories,
+    plot = FALSE
+  ), maptype)
+
+
+  # Out-of-range breaks
+  expect_error(map_ng(
+    data = dat,
+    x = total.pop,
+    breaks = seq(min(dat$total.pop) + 1, 1e7, length.out = 5),
+    categories = categories
+  ), "out of range")
+  expect_error(map_ng(
+    data = dat,
+    x = total.pop,
+    breaks = seq(1e6, max(dat$total.pop) - 1, length.out = 5),
+    categories = categories
+  ), "out of range")
 })
 
 test_that("Factors can draw choropleth", {
