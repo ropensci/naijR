@@ -194,7 +194,59 @@ test_that("Choropleth parameters can be controlled at interface", {
     ),
     "Lengths of 'categories' and provided legend do not match"
   )
-
+  expect_error(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories,
+      legend.text = 4,
+      plot = FALSE
+    ),
+    "must be of type character or logical"
+  )
+  expect_warning(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories,
+      legend.text = c(FALSE, TRUE),
+      plot = FALSE
+    ),
+    "Only the first element of"
+  )
+  expect_warning(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories,
+      legend.text = c(TRUE, FALSE),
+      plot = FALSE
+    ),
+    "Only the first element of"
+  )
+  expect_s3_class(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories,
+      legend.text = c(TRUE, FALSE)
+    ), 
+    maptype
+  )
+  expect_s3_class(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories,
+      legend.text = c("Klein", "Maessig", "Gross", "Mega")
+    ), 
+    maptype
+  )
   # Too many breaks
   breaks_x <- round(seq(1e6, 1e7, length.out = 12), -4)
   categories_x <- c("Tiny", "Small", "Modest", "Moderate", "Medium", "Sizeable",
@@ -405,10 +457,10 @@ test_that("Points are mapped", {
   x[4] <- -3
   y[4] <- 1000
   
-  expect_error(map_ng(NULL, x = x, y = y, plot = FALSE), 
-               "Expected a character vector as 'region'")
+  expect_error(map_ng(x = x, y = y, plot = FALSE), 
+               "Coordinates are beyond the bounds of the plotted area")
   
-  expect_error(map_ng(x = 15, y = 45, plot = FALSE),
+  expect_error(map_ng(x = 15, y = 45),
                "Coordinates are beyond the bounds of the plotted area")
   
   # map points representing the State capitals

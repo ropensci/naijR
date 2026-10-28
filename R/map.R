@@ -132,6 +132,8 @@ map_ng <-
   }
   tryCatch({sfdata <- eval(mapq)}, error = function(e) stop(e))
   if (!is_null(y) && !.pts_within_bounds(sfdata, x, y)) {
+    # Don't move this condition into the plotting branch, even if it seems
+    # repetitive. We want early failure even if `plot` is set to `FALSE`.
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   }
   if (plot) { 

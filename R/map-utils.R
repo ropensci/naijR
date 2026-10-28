@@ -353,7 +353,7 @@
   df <- data.frame(region = opts$region, value = opts$value)
   df$cat <- .create_categorized(df$value, brks)
   cats <- levels(df$cat)
-  colrange <- .process_colouring(col, length(cats))
+  colrange <- .get_color_range(col, length(cats))
   # At this point, our value of
   # interest is definitely a factor
   df$ind <- as.integer(df$cat)
@@ -380,45 +380,6 @@
     TRUE
   }
   stopifnot(all(region.valid, value.valid, cat.valid))
-}
-
-
-
-
-# Reassigns colours to polygons that refer to similar regions i.e. duplicated
-# polygon, ensuring that when the choropleth is drawn, the colours are 
-# properly applied to the respective regions and not recycled.
-#' @importFrom cli cli_abort
-.reassign_colours <- function(all.regions,
-                              polygon.colors,
-                              excl.region = NULL,
-                              excl.col = NULL) {
-  stopifnot(is.character(all.regions), .isHexColor(polygon.colors))
-  if (!is.null(excl.region)) {
-    off.color <- "grey"
-    if (!is.null(excl.col)) {
-      if (length(excl.col) > 1L) {
-        cli_abort(
-          "Only one colour can be used to denote regions excluded
-                     from the choropleth colouring scheme"
-        )
-      }
-      if (!is.character(excl.col)) {
-        cli_abort("Colour indicators of type '{typeof(excl.col)}'
-                    are not supported")
-      }
-      if (!excl.col %in% grDevices::colours()) {
-        cli_abort(
-          "The colour used for excluded regions must be valid
-                     i.e. an element of the built-in set 'colours()'"
-        )
-      }
-      off.color <- excl.col
-    }
-    excluded <- which(all.regions %in% excl.region)
-    polygon.colors[excluded] <- off.color
-  }
-  structure(polygon.colors, names = all.regions)
 }
 
 
@@ -464,11 +425,15 @@
 
 
 
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom RColorBrewer brewer.pal.info
 #' @importFrom cli cli_abort
-.process_colouring <- function(col = NULL, n, ...)
+#' @importFrom tools toTitleCase
+#' @importFrom rlang is_null
+.get_color_range <- function(col = NULL, n, ...)
 {
   .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
-  if (is.null(col)) {
+  if (is_null(col)) {
     col <- .DefaultChoroplethColours[1]
   }
   if (is.numeric(col)) {
@@ -483,7 +448,7 @@
   among.def.cols <- col %in% .DefaultChoroplethColours
   in.other.pal <-
     !among.def.cols &&
-    (col %in% rownames(RColorBrewer::brewer.pal.info))
+    (col %in% rownames(brewer.pal.info))
   pal <- if (!among.def.cols) {
     if (!in.other.pal) {
       cli_abort("'{col}' is not a supported colour or palette")
@@ -491,9 +456,56 @@
     col
   }
   else {
-    paste0(tools::toTitleCase(col), "s")
+    paste0(toTitleCase(col), "s")
   }
-  RColorBrewer::brewer.pal(n, pal)
+  brewer.pal(n, pal)
+}
+
+
+
+
+# Reassigns colours to polygons that refer to similar regions i.e. duplicated
+# polygon, ensuring that when the choropleth is drawn, the colours are 
+# properly applied to the respective regions and not recycled.
+#' @importFrom cli cli_abort
+.reassign_colours <- function(all.regions,
+                              polygon.colors,
+                              excl.region = NULL,
+                              excl.col = NULL) {
+  stopifnot(is.character(all.regions), .isHexColor(polygon.colors))
+  if (!is.null(excl.region)) {
+    off.color <- "grey"
+    if (!is.null(excl.col)) {
+      if (length(excl.col) > 1L) {
+        cli_abort(
+          "Only one colour can be used to denote regions excluded
+                     from the choropleth colouring scheme"
+        )
+      }
+      if (!is.character(excl.col)) {
+        cli_abort("Colour indicators of type '{typeof(excl.col)}'
+                    are not supported")
+      }
+      if (!excl.col %in% grDevices::colours()) {
+        cli_abort(
+          "The colour used for excluded regions must be valid
+                     i.e. an element of the built-in set 'colours()'"
+        )
+      }
+      off.color <- excl.col
+    }
+    excluded <- which(all.regions %in% excl.region)
+    polygon.colors[excluded] <- off.color
+  }
+  structure(polygon.colors, names = all.regions)
+}
+
+
+
+
+.isHexColor <- function(x) 
+{
+  all(grepl("^#", x), nchar(x) == 7L)
 }
 
 
@@ -513,50 +525,18 @@
 
 
 
-.isHexColor <- function(x) 
+#' @importFrom cli cli_abort
+.set_legend_params <- function(text, categories)
 {
-  if (!is.character(x)) {
-    return(FALSE)
-  }
-  all(grepl("^#", x), nchar(x) == 7L)
-}
-
-
-
-
-# Checks that x and y coordinates are within the bounds of given map
-# Note: This check is probably too expensive. Consider passing just the range
-# though the loss of typing may make this less reliable down the line
-#' @importFrom rlang is_double
-#' @importFrom sf st_bbox
-.pts_within_bounds <- function(map, x, y)
-{ 
-  stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
-  rr <- sf::st_bbox(map)
-  xx <- x >= rr[1] & x <= rr[3]
-  yy <- y >= rr[2] & y <= rr[4]
-  all(xx, yy)
-}
-
-
-
-
-.set_legend_params <- function(text, categories, xcord = 13L, ycord = 7L)
-{
-  stopifnot(exprs = {
-    is.character(text) || is.logical(text) || is.null(text)
-    is.integer(xcord)
-    is.integer(ycord)
-  })
-  result <- .set_legend_text(text)
   obj <- list(
-    x = xcord, 
-    y = ycord,
+    x_coord = 13L, 
+    y_coord = 17L,
     text = NULL,
     show = TRUE, 
     xpd = NA,
     categories = categories
   )
+  result <- .set_legend_text(text)
   if (is.character(result)) {
     if (length(obj$categories) != length(result)) {
       cli_abort("Lengths of 'categories' and provided legend do not match")
@@ -574,23 +554,24 @@
 
 
 # Returns either a logical(1) or character(n)
-.set_legend_text <- function(val)
+#' @immportFrom cli cli_abort
+#' @importFrom cli cli_warn
+#' @importFrom rlang is_null
+.set_legend_text <- function(setting)
 {
   # The default setting of 'legend.text' is to return TRUE
-  if (is.null(val)) {
+  if (is_null(setting)) {
     return(TRUE)
   }
   arg <- "legend.text"
-  if (!is.character(val) && !is.logical(val)) {
-    cli::cli_abort("'{arg}' must be of type character or logical")
+  if (!is.character(setting) && !is.logical(setting)) {
+    cli_abort("'{arg}' must be of type character or logical")
   }
-  if (is.logical(val)) {
-    if (length(val) > 1L) {
-      cli::cli_warn(first_elem_warn(arg))
-    }
-    val <- val[1]
+  if (is.logical(setting) && length(setting) > 1L) {
+    setting <- setting[1]
+    cli_warn(first_elem_warn(arg))
   }
-  val
+  setting
 }
 
 
@@ -598,8 +579,8 @@
 
 .draw_legend <- function(title, legend_params, choropleth_opts) {
   legend(
-    x = legend_params$x,
-    y = legend_params$y,
+    x = legend_params$x_coord,
+    y = legend_params$y_coord,
     legend = legend_params$categories,
     fill = choropleth_opts$scheme,
     xpd = legend_params$xpd,
@@ -625,6 +606,23 @@
     )
     sf::st_union(sfdata, st.pts)
   })
+}
+
+
+
+
+# Checks that x and y coordinates are within the bounds of given map
+# Note: This check is probably too expensive. Consider passing just the range
+# though the loss of typing may make this less reliable down the line
+#' @importFrom rlang is_double
+#' @importFrom sf st_bbox
+.pts_within_bounds <- function(map, x, y)
+{ 
+  stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
+  rr <- sf::st_bbox(map)
+  xx <- x >= rr[1] & x <= rr[3]
+  yy <- y >= rr[2] & y <= rr[4]
+  all(xx, yy)
 }
 
 
