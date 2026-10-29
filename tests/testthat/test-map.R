@@ -181,7 +181,6 @@ test_that("Choropleth parameters can be controlled at interface", {
   expect_error(eval_tidy(func), "must range from 1L")
   func$col <- "Baba"
   expect_error(eval_tidy(func), "not a supported colour or palette")
-
   # Legends
   expect_error(
     map_ng(
@@ -247,6 +246,7 @@ test_that("Choropleth parameters can be controlled at interface", {
     ), 
     maptype
   )
+
   # Too many breaks
   breaks_x <- round(seq(1e6, 1e7, length.out = 12), -4)
   categories_x <- c("Tiny", "Small", "Modest", "Moderate", "Medium", "Sizeable",
@@ -355,7 +355,6 @@ test_that("Choropleth map can be formed with excluded regions", {
     ),
     maptype
   )
-  
   expect_s3_class(
     map_ng(
       data = d,
@@ -367,7 +366,6 @@ test_that("Choropleth map can be formed with excluded regions", {
     ),
     maptype
   )
-  
   expect_s3_class(
     map_ng(
       data = d,
@@ -380,7 +378,6 @@ test_that("Choropleth map can be formed with excluded regions", {
     ),
     maptype
   )
-  
   expect_error(
     map_ng(
       data = d,
@@ -395,7 +392,6 @@ test_that("Choropleth map can be formed with excluded regions", {
           "from the choropleth colouring scheme"),
     fixed = TRUE
   )
-  
   expect_error(
     map_ng(
       data = d,
@@ -410,7 +406,6 @@ test_that("Choropleth map can be formed with excluded regions", {
           "i.e. an element of the built-in set 'colours()'"),
     fixed = TRUE
   )
-  
   expect_error(
     map_ng(
       data = d,
@@ -421,6 +416,15 @@ test_that("Choropleth map can be formed with excluded regions", {
       leg.title = "Legend title",
       plot = FALSE
     )
+  )
+  expect_s3_class(
+    map_ng(
+      states(),
+      x = round(runif(37, max = 100)),
+      breaks = seq(0, 100, length.out = 5),
+      legend.title = "numbers"
+    ),
+    maptype
   )
 })
 
@@ -465,17 +469,19 @@ test_that("Points are mapped", {
   
   # map points representing the State capitals
   capitals <- readRDS("data/state-capitals.rds")
-  out <- map_ng(x = capitals$longitude, y = capitals$latitude, plot = FALSE)
   
-  expect_s3_class(out, maptype)
+  expect_s3_class(
+    map_ng(x = capitals$longitude, y = capitals$latitude),
+    maptype
+  )
 })
 
 # Labels ----
 test_that("Labels are shown", {
-  expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
+  expect_s3_class(map_ng(show.text = TRUE), maptype)
   
   expect_s3_class(
-    map_ng(states(gpz = "sw"), show.text = TRUE, plot = FALSE), maptype)
+    map_ng(states(gpz = "sw"), show.text = TRUE), maptype)
   
   expect_s3_class(map_ng(
     states(gpz = "sw"),
