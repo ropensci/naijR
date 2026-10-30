@@ -498,11 +498,8 @@ test_that("Labels can be resized", {
   # a need to review the function's logic.
   # expect_error(map_ng(show.text = TRUE, cex = ".75", plot = FALSE),
   #              "'cex' is not of class 'numeric'")
-  
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
-  
-  expect_s3_class(map_ng(show.text = TRUE, cex = 0.5, plot = FALSE), 
-                  maptype)
+  expect_s3_class(map_ng(show.text = TRUE, cex = 0.5), maptype)
 })
 
 
@@ -553,3 +550,9 @@ test_that("All individual LGA maps can be drawn", {
     }
   }
 })
+
+
+# Snapshot tests ----
+# test_that("maps are produced consistently", {
+#   expect_snapshot_file(map_ng(), "base-ng-map.png")
+# })
