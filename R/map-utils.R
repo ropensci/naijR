@@ -4,6 +4,8 @@
 #
 # Copyright (C) 2019-2026 Victor Ordu.
 
+getRversion <- NULL
+
 # Internal helper function(s) for plotting Nigeria maps
 ## Checks the parameters supplied to the mapping function.
 .checkParams <- function(region, data, show.neighbours, fun) {
@@ -437,8 +439,7 @@
     col <- .DefaultChoroplethColours[1]
   }
   if (is.numeric(col)) {
-    default.pal <- .get_R_palette()
-    all.cols <- sub("(green)(3)", "\\1", default.pal)
+    all.cols <- sub("(green)(3)", "\\1", .get_R_palette())
     all.cols <- sub("gray", "grey", all.cols)
     if (!col %in% seq_along(all.cols)) {
       cli_abort("'col' must range from 1L to {length(all.cols)}L")
@@ -509,16 +510,17 @@
 }
 
 
-
-
+# Ensures that we are using the R3 palette for mapping colours.
+# This is to enforce consistency in appearance between R v.3 and others
+#' @importFrom grDevices palette
 .get_R_palette <- function()
 {
   if (getRversion() < as.numeric_version('4.0.0')) {
-    return(grDevices::palette())
+    return(palette())
   }
-  grDevices::palette('R3')
-  pal <- grDevices::palette()
-  grDevices::palette('R4')
+  palette('R3')
+  pal <- palette()
+  palette('default')
   pal
 }
 
@@ -554,7 +556,7 @@
 
 
 # Returns either a logical(1) or character(n)
-#' @immportFrom cli cli_abort
+#' @importFrom cli cli_abort
 #' @importFrom cli cli_warn
 #' @importFrom rlang is_null
 .set_legend_text <- function(setting)

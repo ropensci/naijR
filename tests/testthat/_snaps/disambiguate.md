@@ -17,14 +17,6 @@
 ---
 
     Code
-      disambiguate_lga(obilga)
-    Condition
-      Error in `disambiguate_lga()`:
-      ! This operation can only be done in interactive mode
-
----
-
-    Code
       disambiguate_lga(obilga, state = "Abia")
     Condition
       Error in `disambiguate_lga()`:

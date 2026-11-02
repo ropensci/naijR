@@ -462,3 +462,10 @@ test_that("Warnings on multiple LGAs", {
   expect_warning(lgas(nas, strict = TRUE), wrn)
   expect_warning(lgas(nas, strict = TRUE, warn = FALSE), wrn)
 })
+
+
+test_that("correct output of regions are printed", {
+  expect_snapshot(print(states()))
+  expect_snapshot(print(lgas("Abia")))
+  expect_snapshot(print(lgas(c("Abia", "Imo"))))
+})

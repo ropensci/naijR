@@ -154,7 +154,6 @@ test_that("Tables with > 2 columns are appropriately handled", {
   expect_warning(map_ng(data = dsl, x = value, plot = FALSE))
 })
 
-
 test_that("Choropleth parameters can be controlled at interface", {
   dat <- readRDS('data/pvc2015.rds')
   breaks <- round(seq(1e6, 1e7, length.out = 5), digits = -4)
@@ -181,6 +180,18 @@ test_that("Choropleth parameters can be controlled at interface", {
   expect_error(eval_tidy(func), "must range from 1L")
   func$col <- "Baba"
   expect_error(eval_tidy(func), "not a supported colour or palette")
+  local_mocked_bindings(
+    getRversion = function(...) as.numeric_version("3.6.0")
+  )
+  expect_s3_class(
+    map_ng(
+      data = dat,
+      x = total.pop,
+      breaks = breaks,
+      categories = categories
+    ),
+    maptype
+  )
   # Legends
   expect_error(
     map_ng(
@@ -492,12 +503,10 @@ test_that("Labels are shown", {
 })
 
 test_that("Labels can be resized", {
-  # TODO: This test failed when `plot` == FALSE. This is likely due
-  # to an issue in the flow of control, where plotting is carried
-  # out as a side effect ever before annotation is done. So, there is
-  # a need to review the function's logic.
-  # expect_error(map_ng(show.text = TRUE, cex = ".75", plot = FALSE),
-  #              "'cex' is not of class 'numeric'")
+  expect_error(
+    map_ng(show.text = TRUE, cex = ".75"),
+    "'cex' is not of class 'numeric'"
+  )
   expect_s3_class(map_ng(show.text = TRUE, plot = FALSE), maptype)
   expect_s3_class(map_ng(show.text = TRUE, cex = 0.5), maptype)
 })
