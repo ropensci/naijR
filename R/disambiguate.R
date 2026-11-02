@@ -23,6 +23,7 @@
 #' \code{State} attribute.
 #' 
 #' @importFrom cli cli_abort
+#' @importFrom utils menu
 #' 
 #' @export
 #' 
@@ -49,11 +50,12 @@ disambiguate_lga <- function(lga, state = NULL, ...)
     if (!interactive()) {
       cli_abort("This operation can only be done in interactive mode")
     }
-    if (length(lgattr) > 1L) { # nocov start
+    if (length(lgattr) > 1L) {
+      stopifnot(all(is_state(lgattr)))
       title <- sprintf("Which State does '%s LGA' belong to?", lga)
-      opt <- utils::menu(lgattr, title = title, ...)
+      opt <- menu(lgattr, title = title, ...)
       state <- lgattr[opt]
-    } # nocov end
+    }
   }
   attr(lga, "State") <- state
   if (isFALSE(.lga_state_is_valid(lga))) {
@@ -62,6 +64,7 @@ disambiguate_lga <- function(lga, state = NULL, ...)
   lga
 }
 
+menu <- NULL
 
 
 
