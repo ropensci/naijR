@@ -144,9 +144,9 @@
     return()
   }
   final.msg <- paste(msg.good, msg.bad, sep = "\n")
-  if (usedialog) {
+  if (usedialog) { # nocov start
     utils::winDialog("ok", final.msg)
-  }
+  } # nocov end
   else {
     cli::cli_alert_info(final.msg)
   }
