@@ -4,6 +4,7 @@
 #
 # Copyright (C) 2019-2026 Victor Ordu.
 
+
 # Internal helper function(s) for plotting Nigeria maps
 ## Checks the parameters supplied to the mapping function.
 .checkParams <- function(region, data, show.neighbours, fun) {
@@ -127,30 +128,31 @@
 #' @importFrom rlang is_symbol
 .validate_choropleth_params <- function(region, data, x)
 {
-  val <- enexpr(x)
+  xval <- enexpr(x)
   region <- enexpr(region)
-  if (is_null(data) && is_null(val)) {
+  if (is_null(data) && is_null(xval)) {
     return(FALSE)
   }
   data.has.regions <- FALSE
   if (!is_null(data)) {
     index <- .region_column_index(data)
-    data.has.regions <- as.logical(index)
-    if (data.has.regions) {
+    if (index) {
       assign(as_name(region), data[[index]], envir = parent.frame())
     }
   }
-  if (is_null(val)) {
-    no.valid.df <- is_null(data) || ncol(data) > 2L
-    if (no.valid.df || !data.has.regions) {
-      return(FALSE)
+  if (is_null(xval)) {
+    if (ncol(data) > 2L) {
+      # TODO: Use condition handling to suppress any warning from
+      # `.region_column_index()` as it would no longer be relevant.
+      # Or isn't it???
+      cli::cli_abort("'x' is NULL but 'data' has {ncol(data)} columns")
     }
   }
   else {
     if (is.data.frame(data)) {
-      if (is_symbol(val) && isFALSE(as_name(val) %in% names(data))) {
-        cli::cli_abort("The column '{(arg_str(val))}'
-                       does not exist in '{(arg_str(data))}'")
+      if (is_symbol(xval) && isFALSE(as_name(xval) %in% names(data))) {
+        cli::cli_abort("The column '{arg_str(xval)}'
+                       does not exist in '{arg_str(data)}'")
       }
     }
   }
@@ -169,8 +171,6 @@
 #' @importFrom sf st_as_sf
 .get_map_data.default <- function(x) 
 {
-  if (is.factor(x))
-    x <- as.character(x)
   stopifnot(is.character(x))
   if (identical(x, "Nigeria")) {
     # nolint start:
@@ -200,11 +200,6 @@
 .get_map_data.lgas <- function(x)
 {
   statename <- attr(x, 'State')
-  if (length(statename) > 1L) {
-    cli::cli_abort(
-      "LGA-level maps for adjoining States are not yet supported"
-    )
-  }
   full.spo <- .get_shpfileprop_element(x, "spatialObject")
   if (isFALSE(is.null(statename))) {
     statelgas <- lgas(statename)
@@ -213,7 +208,6 @@
   if (length(x) < length(lgas())) {
     return(.subset_spatial_by_region(full.spo, x))
   }
-  full.spo
 }
 
 
@@ -231,9 +225,10 @@
 # Extracts an element of the ShapefileProps internal object by name
 # @param regiontype A character vector of length 1 stating the type of region
 # @param element A character vector of length 1 naming the element extracted
+#' @importFrom rlang  is_string
 .get_shpfileprop_element <- function(region, element)
 {
-  stopifnot(inherits(region, "regions"), length(element) == 1L)
+  stopifnot(inherits(region, "regions"), is_string(element))
   suff <- sub("(.)(s$)", "\\1", class(region)[1])
   shpfileprop <- paste("shp", suff, sep = ".")
   getElement(object = get(shpfileprop), name = element)
@@ -272,7 +267,7 @@
 ## used for drawing a choropleth map
 #' @importFrom rlang abort
 #' @importFrom rlang warn
-.region_column_index <- function(dt, state = NULL)
+.region_column_index <- function(dt)
 {
   stopifnot(is.data.frame(dt))
   ## Checks if a column has the names of States, returning TRUE if so.
@@ -293,9 +288,6 @@
     ret
   }
   n <- vapply(dt, .fx, logical(1))
-  if (is.null(state)) {
-    state <- states()
-  }
   if (!sum(n)) {
     cli::cli_abort("No column with elements in '{deparse(substitute(dt))}'.")
   } 
@@ -309,25 +301,27 @@
 
 
 
-#' @importFrom rlang enexpr
+
+#' @importFrom rlang as_name
+#' @importFrom rlang eval_tidy
+#' @importFrom rlang is_null
 .get_choropleth_opts <- 
   function(mapobj, data, region, x, breaks, categories, 
     col, excluded, exclude.fill) {
-  # x <- enexpr(x)
   cpleth.inputs <- list(
     region = region,
     breaks = breaks,
     categories = categories
   )
   if (!is_null(data)) {
-    region.col <- .region_column_index(data, region)
+    region.col <- .region_column_index(data)
     datacolname <- if (is_null(x) && ncol(data) == 2L) {
       names(data)[-region.col]
     }
     else {
       as_name(x)
     }
-    cpleth.inputs$value <-  data[[datacolname]]
+    cpleth.inputs$value <-  data[[datacolname]]  # newly added element
     cpleth.inputs$region <- data[[region.col]]
   }
   else {
@@ -347,9 +341,7 @@
   # TODO: Set limits for variables and brk
   # TODO: Accept numeric input for col
   stopifnot(inherits(map, 'sf'))
-  if (!.assert_list_elements(opts)) {
-    cli::cli_abort("One or more inputs for generating choropleth options are invalid")
-  }
+  .assert_list_elements(opts)
   if (anyDuplicated(opts$region)) {
     if (all(is_state(opts$region))) {
       cli::cli_abort("Data cannot be matched with map. Aggregate them by States")
@@ -362,7 +354,7 @@
   df <- data.frame(region = opts$region, value = opts$value)
   df$cat <- .create_categorized(df$value, brks)
   cats <- levels(df$cat)
-  colrange <- .process_colouring(col, length(cats))
+  colrange <- .get_color_range(col, length(cats))
   # At this point, our value of
   # interest is definitely a factor
   df$ind <- as.integer(df$cat)
@@ -372,6 +364,105 @@
        scheme = colrange,
        bins = cats)
 }
+
+
+
+
+.assert_list_elements <- function(x) {
+  stopifnot(c('region', 'value', 'breaks') %in% names(x))
+  region.valid <- .all_are_regions(x$region)
+  v <- x$value
+  value.valid <- is.numeric(v) || is.factor(v) || is.character(v)
+  c <- x$categories
+  cat.valid <- if (!is.null(c)) {
+      is.character(c) || is.factor(c)
+  }
+  else {
+    TRUE
+  }
+  stopifnot(all(region.valid, value.valid, cat.valid))
+}
+
+
+
+
+# Creates a  categorised variable from its inputs if not already a factor
+# and is to be used in generating choropleth maps
+#' @importFrom cli cli_abort
+#' @importFrom rlang is_bare_numeric
+#' @importFrom rlang is_null
+#' @importFrom rlang is_scalar_integerish
+.create_categorized <- function(values, brks = NULL, ...)
+{
+  if (is.character(values)) {
+    values <- as.factor(values)
+  }
+  max_cats <- 10L
+  if (is.factor(values)) {
+    if (nlevels(values) >= max_cats) {
+      cli_abort("Too many categories")
+    }
+    return(values)
+  }
+  if (is_null(brks) && is_bare_numeric(values)) {
+    cli_abort(paste("Breaks were not provided for the", 
+                    "categorization of a numeric type"))
+  }
+  else {
+    if (length(brks) >= max_cats + 1) {
+      cli_abort("Too many categories")
+    }
+  }
+  rr <- range(values)
+  if (is_scalar_integerish(brks)) {
+    brks <- seq(rr[1], rr[2], diff(rr) / brks)
+  }
+  if (rr[1] < min(brks) || rr[2] > max(brks)) {
+    cli_abort("Values are out of range of breaks")
+  }
+  cut(values, brks, include.lowest = TRUE)
+}
+
+
+
+
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom RColorBrewer brewer.pal.info
+#' @importFrom cli cli_abort
+#' @importFrom tools toTitleCase
+#' @importFrom rlang is_null
+.get_color_range <- function(col = NULL, n, ...)
+{
+  .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
+  if (is_null(col)) {
+    col <- .DefaultChoroplethColours[1]
+  }
+  if (is.numeric(col)) {
+    all.cols <- sub("(green)(3)", "\\1", .get_R_palette())
+    all.cols <- sub("gray", "grey", all.cols)
+    if (!col %in% seq_along(all.cols)) {
+      cli_abort("'col' must range from 1L to {length(all.cols)}L")
+    }
+    col <- all.cols[col]
+  }
+  among.def.cols <- col %in% .DefaultChoroplethColours
+  in.other.pal <-
+    !among.def.cols &&
+    (col %in% rownames(brewer.pal.info))
+  pal <- if (!among.def.cols) {
+    if (!in.other.pal) {
+      cli_abort("'{col}' is not a supported colour or palette")
+    }
+    col
+  }
+  else {
+    paste0(toTitleCase(col), "s")
+  }
+  brewer.pal(n, pal)
+}
+
+
+
 
 # Reassigns colours to polygons that refer to similar regions i.e. duplicated
 # polygon, ensuring that when the choropleth is drawn, the colours are 
@@ -412,188 +503,91 @@
 
 
 
-.assert_list_elements <- function(x) {
-  stopifnot(c('region', 'value', 'breaks') %in% names(x))
-  region.valid <- .all_are_regions(x$region)
-  v <- x$value
-  value.valid <- is.numeric(v) || is.factor(v) || is.character(v)
-  c <- x$categories
-  cat.valid <- if (!is.null(c)) {
-      is.character(c) || is.factor(c)
-  }
-  else {
-    TRUE
-  }
-  all(region.valid, value.valid, cat.valid)
-}
-
-
-
-
-# Creates a  categorised variable from its inputs if not already a factor
-# and is to be used in generating choropleth maps
-#' @importFrom cli cli_abort
-.create_categorized <- function(val, brks = NULL, ...)
-{
-  if (is.character(val)) {
-    val <- as.factor(val)
-  }
-  if (is.factor(val)) {
-    if (nlevels(val) >= 10L) {
-      cli_abort("Too many categories")
-    }
-    return(val)
-  }
-  if (!is.numeric(val)) {
-    msg <- paste(sQuote(typeof(val)), "is not a supported type")
-    cli_abort(msg)
-  }
-  if (is.null(brks)) {
-    cli_abort(paste("Breaks were not provided for the", 
-                    "categorization of a numeric type"))
-  }
-  rr <- range(val)
-  if (rlang::is_scalar_integer(brks)) {
-    brks <- seq(rr[1], rr[2], diff(rr) / brks)
-  }
-  if (rr[1] < min(brks) || rr[2] > max(brks)) {
-    cli_abort("Values are out of range of breaks")
-  }
-  cut(val, brks, include.lowest = TRUE)
-}
-
-
-
-
-#' @importFrom cli cli_abort
-.process_colouring <- function(col = NULL, n, ...)
-{
-  .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
-  if (is.null(col)) {
-    col <- .DefaultChoroplethColours[1]
-  }
-  if (is.numeric(col)) {
-    default.pal <- .get_R_palette()
-    all.cols <- sub("(green)(3)", "\\1", default.pal)
-    all.cols <- sub("gray", "grey", all.cols)
-    if (!col %in% seq_along(all.cols)) {
-      cli_abort("'color' must range between 1L and {length(all.cols)}L")
-    }
-    col <- all.cols[col]
-  }
-  among.def.cols <- col %in% .DefaultChoroplethColours
-  in.other.pal <-
-    !among.def.cols &&
-    (col %in% rownames(RColorBrewer::brewer.pal.info))
-  pal <- if (!among.def.cols) {
-    if (!in.other.pal) {
-      cli_abort("'{col}' is not a supported colour or palette")
-    }
-    col
-  }
-  else {
-    paste0(tools::toTitleCase(col), "s")
-  }
-  RColorBrewer::brewer.pal(n, pal)
-}
-
-
-
-
-.get_R_palette <- function()
-{
-  if (getRversion() < as.numeric_version('4.0.0')) {
-    return(grDevices::palette())
-  }
-  grDevices::palette('R3')
-  pal <- grDevices::palette()
-  grDevices::palette('R4')
-  pal
-}
-
-
-
-
 .isHexColor <- function(x) 
 {
-  if (!is.character(x)) {
-    return(FALSE)
-  }
   all(grepl("^#", x), nchar(x) == 7L)
 }
 
 
+# Ensures that we are using the R3 palette for mapping colours.
+# This is to enforce consistency in appearance between R v.3 and others
+#' @importFrom grDevices palette
+.get_R_palette <- function()
+{
+  if (getRversion() < as.numeric_version('4.0.0')) {
+    return(palette())
+  }
+  palette('R3')
+  pal <- palette()
+  palette('default')
+  pal
+}
+
+getRversion <- NULL
 
 
-# Checks that x and y coordinates are within the bounds of given map
-# Note: This check is probably too expensive. Consider passing just the range
-# though the loss of typing may make this less reliable down the line
-#' @importFrom rlang is_double
-#' @importFrom sf st_bbox
-.pts_within_bounds <- function(map, x, y)
-{ 
-  stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
-  rr <- sf::st_bbox(map)
-  xx <- x >= rr[1] & x <= rr[3]
-  yy <- y >= rr[2] & y <= rr[4]
-  all(xx, yy)
+
+#' @importFrom cli cli_abort
+.set_legend_params <- function(text, categories)
+{
+  obj <- list(
+    x_coord = 13L, 
+    y_coord = 17L,
+    text = NULL,
+    show = TRUE, 
+    xpd = NA,
+    categories = categories
+  )
+  result <- .set_legend_text(text)
+  if (is.character(result)) {
+    if (length(obj$categories) != length(result)) {
+      cli_abort("Lengths of 'categories' and provided legend do not match")
+    }
+    obj$text <- result
+    obj$categories <- obj$text
+  }
+  else if (is.logical(result)) {
+    obj$show <- result
+  }
+  obj
 }
 
 
 
 
 # Returns either a logical(1) or character(n)
-.set_legend_text <- function(val)
+#' @importFrom cli cli_abort
+#' @importFrom cli cli_warn
+#' @importFrom rlang is_null
+.set_legend_text <- function(setting)
 {
   # The default setting of 'legend.text' is to return TRUE
-  if (is.null(val)) {
+  if (is_null(setting)) {
     return(TRUE)
   }
   arg <- "legend.text"
-  if (!is.character(val) && !is.logical(val)) {
-    cli::cli_abort("'{arg}' must be of type character or logical")
+  if (!is.character(setting) && !is.logical(setting)) {
+    cli_abort("'{arg}' must be of type character or logical")
   }
-  if (is.logical(val)) {
-    if (length(val) > 1L) {
-      cli::cli_warn(first_elem_warn(arg))
-    }
-    return(val[1])
+  if (is.logical(setting) && length(setting) > 1L) {
+    setting <- setting[1]
+    cli_warn(first_elem_warn(arg))
   }
-  val
+  setting
 }
 
 
 
 
-.set_legend_params <- function(text, categories, xcord = 13L, ycord = 7L)
-{
-  stopifnot(exprs = {
-    is.character(text) || is.logical(text) || is.null(text)
-    is.integer(xcord)
-    is.integer(ycord)
-  })
-  result <- .set_legend_text(text)
-  obj <- list(
-    x = xcord, 
-    y = ycord,
-    text = NULL,
-    show = TRUE, 
-    xpd = NA,
-    categories = categories
+.draw_legend <- function(title, legend_params, choropleth_opts) {
+  legend(
+    x = legend_params$x_coord,
+    y = legend_params$y_coord,
+    legend = legend_params$categories,
+    fill = choropleth_opts$scheme,
+    xpd = legend_params$xpd,
+    title = title
   )
-  if (is.character(result)) {
-    obj$text <- result
-  }
-  if (is.logical(result)) {
-    obj$show <- result
-  }
-  if (is.character(obj$text)) {
-    if (length(obj$categories) != length(obj$text)) {
-      cli_abort("Lengths of 'categories' and provided legend do not match")
-    }
-    obj$categories <- obj$text
-  }
-  obj
 }
 
 
@@ -614,6 +608,23 @@
     )
     sf::st_union(sfdata, st.pts)
   })
+}
+
+
+
+
+# Checks that x and y coordinates are within the bounds of given map
+# Note: This check is probably too expensive. Consider passing just the range
+# though the loss of typing may make this less reliable down the line
+#' @importFrom rlang is_double
+#' @importFrom sf st_bbox
+.pts_within_bounds <- function(map, x, y)
+{ 
+  stopifnot(inherits(map, 'sf'), is_double(x), is_double(y))
+  rr <- sf::st_bbox(map)
+  xx <- x >= rr[1] & x <= rr[3]
+  yy <- y >= rr[2] & y <= rr[4]
+  all(xx, yy)
 }
 
 

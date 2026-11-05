@@ -75,9 +75,6 @@ test_that("various cases for fixing state names", {
   fct_full <- "Federal Capital Territory"
   fct_abbr <- "FCT"
   expect_equal(fix_region(states()), states(), ignore_attr = TRUE)
-  expect_error(fix_region('Fct'), reconstruct.x, fixed = TRUE)
-  expect_error(fix_region('Kane'), reconstruct.x, fixed = TRUE)
-  expect_error(fix_region('plateau'), reconstruct.x, fixed = TRUE)
   expect_identical(fix_region(c(fct_full, fct_abbr)), rep(fct_full, 2))
   expect_identical(
     fix_region(states(c(fct_full, fct_abbr)))[2], states(fct_full)
@@ -86,23 +83,35 @@ test_that("various cases for fixing state names", {
   # Check various cases for testing States (quirks have been identified)
   # These apply to automatic fixes where the mistakes can be handled by
   # partial matching using the default settings in the package.
-  misspeltStates <- c(Kano = "Kane", Plateau = "plateau", Abia = "Abya")
+  misspeltStates <- c(
+    Kano = "Kane",
+    Plateau = "plateau",
+    Abia = "Abya",
+    Nasarawa = "Nassarawa",
+    FCT = "FCt",
+    Oyo = "Oya"
+  )
   for (i in seq_along(misspeltStates)) {
     correct <- names(misspeltStates)[i]
     wrong <- misspeltStates[[i]]  # ensure `names` attribute is lost
+    expect_error(fix_region(wrong), reconstruct.x, fixed = TRUE)
     expect_identical(fix_region(states(wrong)), states(correct))
   }
+  # Testing fixes for State objects with more than one element
   oyo_lag_bad <- c("Oyo", "Legos")
   expect_silent(fix_region(states(oyo_lag_bad)))
   oyo_lag_fixed <- fix_region(states(oyo_lag_bad))
   expect_identical(oyo_lag_fixed, states(c("Oyo", "Lagos")))
   expect_length(oyo_lag_fixed, 2L)
+  expect_identical(
+    fix_region(states(c("fCT", "FcT", "FCt"))), states(rep("FCT", 3))
+  )
   # Check total departure from a State's spelling. These are not
   # expected to be fixed automatically, so we want to interrupt execution.
+  e <- "The following are not States:"
+  expect_error(fix_region(c("xxx", "Benue")), e, fixed = TRUE)
+  expect_error(fix_region(c("kentucky", "Bornu", "Abia")), e, fixed = TRUE)
   expect_error(fix_region(states(c("Owerri north", "Owerri West"))))
-  ssx <- states(c("xxx", "Benue"), warn = FALSE)
-  expect_error(fix_region(ssx))
-  expect_error(fix_region(c("kentucky", "Bornu", "Abia")))
 })
 
 
@@ -121,13 +130,16 @@ test_that("Misspelt LGAs can be fixed (limited)", {
 })
 
 
-test_that("outputs", {
+test_that("outputs are properly formed", {
   lgs <- c("Fufore", "Demsa")
-  
+
   expect_invisible(fix_region(lgs))
+  expect_identical(fix_region(lgs), c("Fufore", "Demsa"))  # maintain order
+  expect_length(fix_region(c("Demsa", "Fufore", "Demsa")), 3)
   expect_message(fix_region(lgs, interactive = FALSE, graphic = TRUE),
                  "Interactive mode is assumed as 'graphic == TRUE'")
   expect_silent(fix_region(lgs, quietly = TRUE))
+  expect_true(length(fix_region(lgas('Oba'))) > 0)
 })
 
 
@@ -185,4 +197,19 @@ test_that("after fixing, class of objects returned remains unchanged", {
   # expect_type(fix_region(lgavec), "character")
   expect_s3_class(fix_region(states(statevec, warn = FALSE)), "states")
   expect_s3_class(fix_region(lgas(lgavec, warn = FALSE)), "lgas")
+})
+
+
+test_that("interactive fixes are applied", {
+  mock_menu <- function(opt) {
+    function(choices, graphics, title) {
+      opt
+    }
+  }
+  local_mocked_bindings(readline = function(prompt) "")
+  expect_message(fix_region(lgas("Oba"), interactive = TRUE))
+  local_mocked_bindings(
+    readline = function(prompt) "Ona Ara",
+    menu = mock_menu(1)
+  )
 })

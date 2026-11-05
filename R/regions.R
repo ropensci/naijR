@@ -370,12 +370,7 @@ as_lga <- function(x) {
 #' @importFrom cli cli_abort
 .assert_if_coercible <- function(obj)
 {
-  if (is.factor(obj)) {
-    obj <- as.character(obj)
-  }
-  if (!is.character(obj)) {
-    cli_abort("Expected a character vector")
-  }
+  stopifnot(is.character(obj))
   if (length(obj) > 1L) {
     cli_abort("To coerce a region with synonyms, use a vector of length 1L")
   }
@@ -392,44 +387,21 @@ as_lga <- function(x) {
 
 
 
-## Checks whether the 'State' attribute of and lgas object is actually
-## the correct one for that LGA. This function is provided for cases
-## where a State attribute is wrongfully enforced on a LGA name. This
-## could happen inadvertently when implementing some of these functions.
-.lga_state_is_valid <- function(x)
-{
-  stopifnot(exprs = {
-    is_lga(x)
-    length(x) == 1L
-  })
-  lgastr <- as.character(x)
-  if (length(lgastr) > 1L) {
-    cli::cli_abort("More than one LGA was provided")
-  }
-  s <- attr(x, "State")
-  lga.states <- lgas_nigeria$state[lgas_nigeria$lga == lgastr]
-  s %in% lga.states
-}
-
-
-
-
 # Methods for internal generics ----
 
 #' @rdname states
 #' @export
-print.states <- function(x, ...) { # nocov start
-  .printoutRegion(x, "States")
+print.states <- function(x, ...) {
+  .printoutRegion(x, hdr = "States")
   invisible(x)
-} # nocov end
+}
 
 
 #' @rdname lgas
 #' @export
-print.lgas <- function(x, ...) { # nocov start
-  length(x)
+print.lgas <- function(x, ...) {
   if (is.atomic(x)) {
-    .printoutRegion(x, "Local Government Areas")
+    .printoutRegion(x, hdr = "Local Government Areas")
   }
   else {
     for (state in names(x)) {
@@ -442,7 +414,7 @@ print.lgas <- function(x, ...) { # nocov start
     }
   }
   invisible(x)
-} # nocov end
+}
 
 
 
@@ -514,6 +486,8 @@ c.lgas <- function(...)
 {
   new_states(NextMethod())
 }
+
+
 
 
 #' @rdname lgas

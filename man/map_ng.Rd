@@ -78,6 +78,7 @@ plotting idiom utilised by \link[maps:map]{maps:map} and its variants.
 \details{
 The default value for \code{region} is to print all State 
 boundaries.
+
 \code{data} enables the extraction of data for plotting from an object
 of class \code{data.frame}. Columns containing regions (i.e. States as well
 as supported sub-national jurisdictions) are identified. The argument also
@@ -93,10 +94,10 @@ that can be coerced to a factor should be used.
 
 For plain plots, the \code{col} argument works the same as with
 \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
-a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
-available colour options can be checked with 
-\code{getOption("choropleth.colours")} and this can also be modified by the 
-user.
+a (sequential) colour palette based on \code{RColorBrewer::brewer.pal} and
+the available palettes can listed in \code{RColorBrewer::brewer.pal.info}. 
+The available broad colour options can be checked and modified via 
+\code{getOption("choropleth.colours")}.
 
 If the default legend is unsatisfactory, it is recommended that the user
 sets the \code{legend.text} argument to \code{FALSE}; the next function

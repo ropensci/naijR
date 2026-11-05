@@ -14,6 +14,7 @@
 # loaded. Whenever this script is run, the objects will be recreated.
 library(cli)
 library(here)
+library(rlang)
 library(sf)
 
 local({
@@ -170,7 +171,7 @@ local({
       }
     }
     
-    if (is.null(field) || is.na(field))
+    if (is_null(field) || is.na(field))
       stop("Problem retrieving the namefield")
     
     field
@@ -285,7 +286,7 @@ local({
     newies <- scan.result[[state]]
     oldies <- attr(newies, "incorrect")
     
-    if (is.null(newies)) {
+    if (is_null(newies)) {
       cli_inform("Skipping {state}")
       next
     }
@@ -347,7 +348,7 @@ local({
   
   scan.result2 <- scan_lga_mismatch()
   
-  if (!all(vapply(scan.result2, is.null, logical(1))))
+  if (!all(vapply(scan.result2, is_null, logical(1))))
     cli_abort("There are still bad LGA entries in the shapefile")
   
   # Save objects ----

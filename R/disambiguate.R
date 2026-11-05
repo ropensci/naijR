@@ -23,6 +23,8 @@
 #' \code{State} attribute.
 #' 
 #' @importFrom cli cli_abort
+#' @importFrom rlang is_null
+#' @importFrom utils menu
 #' 
 #' @export
 #' 
@@ -32,9 +34,9 @@
 #' 
 #' obi.benue <- disambiguate_lga(obi.lga, "Benue")
 #' 
-#' if (interactive())
+#' if (interactive()) {
 #'   map_ng(obi.benue)
-#' 
+#' } 
 disambiguate_lga <- function(lga, state = NULL, ...)
 {
   if (!inherits(lga, "lgas")) {
@@ -45,19 +47,41 @@ disambiguate_lga <- function(lga, state = NULL, ...)
   }
   lgattr <- attr(lga, "State")
   
-  if (is.null(state)) {
+  if (is_null(state)) {
     if (!interactive()) {
       cli_abort("This operation can only be done in interactive mode")
     }
-    if (length(lgattr) > 1L) { # nocov start
+    if (length(lgattr) > 1L) {
+      stopifnot(all(is_state(lgattr)))
       title <- sprintf("Which State does '%s LGA' belong to?", lga)
-      opt <- utils::menu(lgattr, title = title, ...)
+      opt <- menu(lgattr, title = title, ...)
       state <- lgattr[opt]
-    } # nocov end
+    }
   }
   attr(lga, "State") <- state
   if (isFALSE(.lga_state_is_valid(lga))) {
     cli_abort("{as.character(lga)} LGA is not in {state} State")
   }
   lga
+}
+
+menu <- NULL
+interactive <- NULL
+
+
+
+## Checks whether the 'State' attribute of and lgas object is actually
+## the correct one for that LGA. This function is provided for cases
+## where a State attribute is wrongfully enforced on a LGA name. This
+## could happen inadvertently when implementing some of these functions.
+.lga_state_is_valid <- function(x)
+{
+  stopifnot(exprs = {
+    is_lga(x)
+    length(x) == 1L
+  })
+  lgastr <- as.character(x)
+  s <- attr(x, "State")
+  lga.states <- lgas_nigeria$state[lgas_nigeria$lga == lgastr]
+  s %in% lga.states
 }

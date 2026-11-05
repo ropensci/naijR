@@ -42,6 +42,7 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' 
 #' @details The default value for \code{region} is to print all State 
 #' boundaries.
+#' 
 #' \code{data} enables the extraction of data for plotting from an object
 #' of class \code{data.frame}. Columns containing regions (i.e. States as well
 #' as supported sub-national jurisdictions) are identified. The argument also
@@ -57,10 +58,10 @@ globalVariables(c("STATE", "shp.state", "shp.lga"))
 #' 
 #' For plain plots, the \code{col} argument works the same as with
 #' \code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
-#' a (sequential) colour palette based on \code{RColorBrewer::brewer.pal}. The 
-#' available colour options can be checked with 
-#' \code{getOption("choropleth.colours")} and this can also be modified by the 
-#' user.
+#' a (sequential) colour palette based on \code{RColorBrewer::brewer.pal} and
+#' the available palettes can listed in \code{RColorBrewer::brewer.pal.info}. 
+#' The available broad colour options can be checked and modified via 
+#' \code{getOption("choropleth.colours")}.
 #' 
 #' If the default legend is unsatisfactory, it is recommended that the user
 #' sets the \code{legend.text} argument to \code{FALSE}; the next function
@@ -131,6 +132,8 @@ map_ng <-
   }
   tryCatch({sfdata <- eval(mapq)}, error = function(e) stop(e))
   if (!is_null(y) && !.pts_within_bounds(sfdata, x, y)) {
+    # Don't move this condition into the plotting branch, even if it seems
+    # repetitive. We want early failure even if `plot` is set to `FALSE`.
     cli_abort("Coordinates are beyond the bounds of the plotted area")
   }
   if (plot) { 
@@ -142,8 +145,7 @@ map_ng <-
           leg.title <- deparse(substitute(x))
         }
       }
-     legend(x = lp$x, y = lp$y, legend = lp$categories, fill = cpleth.opts$scheme,
-            xpd = lp$xpd, title = leg.title)
+      .draw_legend(leg.title, lp, cpleth.opts)
     }
     if (!is_null(y)) {
       sfdata <- .plot_points(sfdata, x, y, ...)
