@@ -282,7 +282,8 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   if (all(is_state(region)) && !strict) {
     .extract_state_lgas <- function(states, dt = lgas_nigeria) {
       idx <- dt$state %in% states
-      dt$lga[idx]
+      state_lgas <- dt$lga[idx]
+      sort(state_lgas)
     }
     
     lst <- lapply(region, .extract_state_lgas)
@@ -306,7 +307,7 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
         cli_warn("'{nm}' LGA is found in {length(stts)} States: {stts.msg}")
       }
     }
-    lst <- unique(lst.names)
+    lst <- lst.names
     region <- NULL
   }
   else if (.has_misspelt_lgas(region)) {
@@ -325,8 +326,6 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
    lst <-  lapply(lst, sort)
    lst <- lst[sort(names(lst))]
   }
-  else if (inherits(lst, "character"))
-    lst <- sort(lst)
   
   obj <- new_lgas(lst)
   attr(obj, which = "State") <- region
@@ -467,8 +466,8 @@ print.lgas <- function(x, ...) { # nocov start
     underline <- strrep("-", nchar(hdr))
     cat(paste(hdr, underline, sep = "\n"), "\n")
   }
-  
-  cat(paste("*", items, collapse = "\n"), "\n")
+  formatted <- sort(unique(items))
+  cat(paste("*", formatted, collapse = "\n"), "\n")
 }
 
 

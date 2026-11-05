@@ -13,7 +13,7 @@ A data frame with 774 rows and 2 columns
    }
 }
 \usage{
-lgas_nigeria
+data(lgas_nigeria)
 }
 \description{
 A dataset containing the 774 Local Government Areas of Nigeria.
