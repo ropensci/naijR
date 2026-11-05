@@ -251,14 +251,42 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
   }
   lst <- region
   if (all(is_state(region)) && !strict) {
+<<<<<<< HEAD
     lst <- lapply(region, .extract_state_lgas, mydata = lgas_nigeria)
+=======
+    .extract_state_lgas <- function(states, dt = lgas_nigeria) {
+      idx <- dt$state %in% states
+      state_lgas <- dt$lga[idx]
+      sort(state_lgas)
+    }
+    
+    lst <- lapply(region, .extract_state_lgas)
+>>>>>>> bugfix-sorting
     names(lst) <- region
     if (length(region) == 1L) {
       lst <- unname(unlist(lst))
     }
   }
   else if (all(is_lga(region))) {
+<<<<<<< HEAD
     lst <- .warn_lga_shared_by_states(region)
+=======
+    lst <- .list_states_by_lga(region)
+    lst.names <- names(lst)
+    stt.num <- vapply(lst, length, integer(1))
+
+    if (any(stt.num > 1L)) {
+      multi <- which(stt.num > 1L)
+
+      for (elem in multi) {
+        stts <- lst[[elem]]
+        nm <- lst.names[elem]
+        stts.msg <- paste(stts, collapse = ", ")
+        cli_warn("'{nm}' LGA is found in {length(stts)} States: {stts.msg}")
+      }
+    }
+    lst <- lst.names
+>>>>>>> bugfix-sorting
     region <- NULL
   }
   else if (.has_misspelt_lgas(region)) {
@@ -274,9 +302,13 @@ lgas <- function(region = NA_character_, strict = FALSE, warn = TRUE) {
    lst <-  lapply(lst, sort)
    lst <- lst[sort(names(lst))]
   }
+<<<<<<< HEAD
   else if (inherits(lst, "character")) {
     lst <- sort(lst)
   }
+=======
+  
+>>>>>>> bugfix-sorting
   obj <- new_lgas(lst)
   attr(obj, which = "State") <- region
   obj
@@ -424,7 +456,8 @@ print.lgas <- function(x, ...) {
     underline <- strrep("-", nchar(hdr))
     cat(paste(hdr, underline, sep = "\n"), "\n")
   }
-  cat(paste("*", items, collapse = "\n"), "\n")
+  formatted <- sort(unique(items))
+  cat(paste("*", formatted, collapse = "\n"), "\n")
 }
 
 

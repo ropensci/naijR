@@ -68,7 +68,13 @@ test_that("FCT can be selectively removed", {
 
 
 
-
+test_that("printout is correct", {
+  expect_snapshot(states())
+  expect_snapshot(states("Akwa Ibom"))
+  expect_snapshot(states(c("Abia", "Kaduna", "Bauchi")))
+  expect_snapshot(states(c("Avia", "Dalta", "Keduna", "Dulta")))
+  expect_warning(states(c("Avia", "Dalta", "Keduna", "Dulta")))
+})
 
 
 ## ---- LGA related tests ----
@@ -107,6 +113,7 @@ test_that("Output is sorted appropriately", {
   expect_false(is.unsorted(lgas("Akwa Ibom")))
   expect_false(is.unsorted(names(lgas(c("Ebonyi", "Abia")))))
   expect_false(is.unsorted(names(lgas(c("Oyo", "Osun", "Ondo")))))
+  expect_true(is.unsorted(lgas(c("Fufore", "Demsa"))))
 })
 
 
@@ -119,6 +126,8 @@ test_that("Correct number of LGAs are returned for each State", {
 
   for (i in seq_along(ss))
     expect_equal(length(lgas(ss[i])), numLg[i], label = ss[i])
+
+  expect_length(lgas(c("Fufore", "Demsa", "Fufore")), 3L)
 })
 
 
@@ -148,6 +157,13 @@ test_that("LGA objects' attributes are appropriately formed", {
   expect_warning(eval(benuelgafun), "'Obi' LGA is found in 2 States")
 })
 
+test_that("printout for LGAs is correct", {
+  expect_snapshot(lgas())
+  expect_snapshot(lgas("Akwa Ibom"))
+  expect_snapshot(lgas(c('Fufore', 'Demsa', "Fufore")))
+  expect_snapshot(lgas(c("Fafure", "Damsa", "Fufore", "Dumsa")))
+  expect_warning(lgas(c("Fafure", "Damsa", "Fufore", "Dumsa")))
+})
 
 ## ---- Internal generics ----
 test_that("objects can be concatenated", {

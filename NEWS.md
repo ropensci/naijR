@@ -1,6 +1,12 @@
 ## naijR 0.8.0
 - When fixing the spellings of Local Government Areas (LGAs), the object returned still has the attributes that were used internally for proecessing the fixes, and they are displayed in the output. These are now removed.
 - Test coverage of the package has been significantly improved.
+
+## naijR 0.7.1
+### Critical bug fix:
+- When `regions` objects are created (i.e. `states` and `lgas`) two things occur that potentially malform the user's data: 1) Only unique values were returned and 2) the result was sorted. The two constructor functions were fixed so that these 2 changes no longer occur.
+- The initial purpose for sorting and presenting unique values was for readability of the output. As a result, these actions are now restricted to the `print` methods. Thus, the output show sorted, unique values, but the underlying vector remains unchanged.
+
 ## naijR 0.7.0
 ### New Features:
 -   Introduced `ngdist`, a `dist` object containing road distances (in km) between all 37 Nigerian State capitals, sourced from UNDP.
