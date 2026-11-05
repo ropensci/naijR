@@ -58,15 +58,16 @@ fix_region.states <- function(x, ...)
   if (sum(isFct)) {
     ss <- sub(fullFCT, abbrFCT, ss)
   }
-  x <- .fix_region_automatic(x, ss)
-  nofix <- attr(x, "misspelt")
+  out <- .fix_region_internal(x, ss)
+  nofix <- attr(out, "misspelt")
   if (length(nofix)) {
     commasep <- paste(nofix, collapse = ", ")
     cli::cli_abort("The following are not States: {commasep}")
   }
   ## After checking, reconstitute the 'states' object
   # x[isFct] <- fullFCT   TODO: Think again.
-  .strip_temp_attrs(x)
+  attributes(out) <- NULL
+  states(out)
 }
 
 
@@ -102,26 +103,26 @@ fix_region.lgas <- function(x,
     interactive <- graphic
     cli::cli_inform("Interactive mode is assumed as 'graphic == TRUE'")
   }
-  vals <- .fix_region_automatic(x, lgas())
-  usedialog <- .Platform$OS.type == "windows" && graphic
+  out <- .fix_region_internal(x, lgas())
+  use_win_dialog <- .Platform$OS.type == "windows" && graphic
   if (interactive) {
-    # nocov start
-    vals <- .fix_lgas_interactive(vals, usedialog)
-    if (is.null(vals)) {
+    out <- .fix_lgas_interactive(out, use_win_dialog)
+    if (is.null(out)) {
       msg <- "The operation was cancelled"
-      if (usedialog) {
+      if (use_win_dialog) {
         utils::winDialog("ok", msg)
       }
       else {
         cli::cli_alert_info(msg)
       }
       return(invisible(x))
-    } # nocov end
+    }
   }
   if (isFALSE(quietly)) {
-    .report_on_fixes(vals, usedialog)
+    .report_on_fixes(out, use_win_dialog)
   }
-  .strip_temp_attrs(vals)
+  attributes(out) <- NULL
+  lgas(out)
 }
 
 

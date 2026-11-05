@@ -8,10 +8,21 @@ test_that("inputs are validated", {
   attr(obilga, "State") <- c("Benue", "Nassarawa")  # misspelled 
   expect_snapshot(disambiguate_lga(obilga), error = TRUE)
   attr(obilga, "State") <- c("Benue", "Nasarawa")
-  local_mocked_bindings(menu = function(choices, graphics, title) 1L)
+  mock_menu <- function(opt) {
+    function(choices, graphics, title) {
+      opt
+    }
+  }
+  local_mocked_bindings(
+    menu = mock_menu(1L),
+    interactive = function() TRUE
+  )
   expect_no_error(disambiguate_lga(obilga))
   expect_identical(attr(disambiguate_lga(obilga), "State"), "Benue")
-  local_mocked_bindings(menu = function(choicde, graphics, title) 2L)
+  local_mocked_bindings(
+    menu = mock_menu(2L),
+    interactive = function() TRUE
+  )
   expect_identical(attr(disambiguate_lga(obilga), "State"), "Nasarawa")
   expect_snapshot(disambiguate_lga(obilga, state = "Abia"), error = TRUE)
   })

@@ -4,7 +4,6 @@
 #
 # Copyright (C) 2019-2026 Victor Ordu.
 
-getRversion <- NULL
 
 # Internal helper function(s) for plotting Nigeria maps
 ## Checks the parameters supplied to the mapping function.
@@ -524,6 +523,7 @@ getRversion <- NULL
   pal
 }
 
+getRversion <- NULL
 
 
 

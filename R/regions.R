@@ -391,15 +391,15 @@ as_lga <- function(x) {
 
 #' @rdname states
 #' @export
-print.states <- function(x, ...) { # nocov start
+print.states <- function(x, ...) {
   .printoutRegion(x, hdr = "States")
   invisible(x)
-} # nocov end
+}
 
 
 #' @rdname lgas
 #' @export
-print.lgas <- function(x, ...) { # nocov start
+print.lgas <- function(x, ...) {
   if (is.atomic(x)) {
     .printoutRegion(x, hdr = "Local Government Areas")
   }
@@ -414,7 +414,7 @@ print.lgas <- function(x, ...) { # nocov start
     }
   }
   invisible(x)
-} # nocov end
+}
 
 
 

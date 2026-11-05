@@ -72,9 +72,9 @@ get_all_states <- function(named = TRUE)
   }
   nest.func <- c("fix_region", "disambiguate_lga")
   ## Check to pre-empt any future removal of these functions
-  if (!sum(vapply(nest.func, exists, logical(1)))) { # nocov start
+  if (!sum(vapply(nest.func, exists, logical(1)))) {
     cli::cli_abort("The nesting function does not exist")
-  } # nocov end
+  }
   found <- vapply(sys.calls(), check_nesting_func, logical(1))
   any(found)
 }

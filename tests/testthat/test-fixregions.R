@@ -130,13 +130,16 @@ test_that("Misspelt LGAs can be fixed (limited)", {
 })
 
 
-test_that("outputs", {
+test_that("outputs are properly formed", {
   lgs <- c("Fufore", "Demsa")
-  
+
   expect_invisible(fix_region(lgs))
+  expect_identical(fix_region(lgs), c("Fufore", "Demsa"))  # maintain order
+  expect_length(fix_region(c("Demsa", "Fufore", "Demsa")), 3)
   expect_message(fix_region(lgs, interactive = FALSE, graphic = TRUE),
                  "Interactive mode is assumed as 'graphic == TRUE'")
   expect_silent(fix_region(lgs, quietly = TRUE))
+  expect_true(length(fix_region(lgas('Oba'))) > 0)
 })
 
 
@@ -194,4 +197,19 @@ test_that("after fixing, class of objects returned remains unchanged", {
   # expect_type(fix_region(lgavec), "character")
   expect_s3_class(fix_region(states(statevec, warn = FALSE)), "states")
   expect_s3_class(fix_region(lgas(lgavec, warn = FALSE)), "lgas")
+})
+
+
+test_that("interactive fixes are applied", {
+  mock_menu <- function(opt) {
+    function(choices, graphics, title) {
+      opt
+    }
+  }
+  local_mocked_bindings(readline = function(prompt) "")
+  expect_message(fix_region(lgas("Oba"), interactive = TRUE))
+  local_mocked_bindings(
+    readline = function(prompt) "Ona Ara",
+    menu = mock_menu(1)
+  )
 })

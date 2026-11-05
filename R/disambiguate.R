@@ -23,6 +23,7 @@
 #' \code{State} attribute.
 #' 
 #' @importFrom cli cli_abort
+#' @importFrom rlang is_null
 #' @importFrom utils menu
 #' 
 #' @export
@@ -46,7 +47,7 @@ disambiguate_lga <- function(lga, state = NULL, ...)
   }
   lgattr <- attr(lga, "State")
   
-  if (is.null(state)) {
+  if (is_null(state)) {
     if (!interactive()) {
       cli_abort("This operation can only be done in interactive mode")
     }
@@ -65,6 +66,7 @@ disambiguate_lga <- function(lga, state = NULL, ...)
 }
 
 menu <- NULL
+interactive <- NULL
 
 
 
