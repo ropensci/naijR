@@ -54,6 +54,7 @@ test_that("Geo-political Zones are plotted", {
 })
 
 test_that("LGAs are plotted", {
+  expect_s3_class(map_ng(lgas(), plot = FALSE), maptype)
   expect_s3_class(map_ng(lgas("Akinyele"), plot = FALSE), maptype)
   expect_s3_class(map_ng(lgas("Owerri North"), plot = FALSE), maptype)
 })

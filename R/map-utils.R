@@ -208,6 +208,7 @@
   if (length(x) < length(lgas())) {
     return(.subset_spatial_by_region(full.spo, x))
   }
+  full.spo
 }
 
 
