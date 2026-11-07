@@ -20,7 +20,7 @@
       disambiguate_lga(obilga)
     Condition
       Error in `disambiguate_lga()`:
-      ! all(is_state(lgattr)) is not TRUE
+      ! This operation can only be done in interactive mode
 
 ---
 
