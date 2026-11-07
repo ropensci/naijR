@@ -186,12 +186,12 @@
     if (is.null(result)) {
       return()
     }
-    if (identical(result, character())) {    # QUIT
-      break
-    }
     if (identical(result, bad)) {            # SKIP
       skipped <- c(skipped, bad)
       next
+    }
+    if (identical(result, character())) {    # QUIT
+      break
     }
     lgas.object <- .update_attributes(bad, result, lgas.object)
   }
@@ -201,7 +201,7 @@
 
 
 
-
+#' @importFrom utils menu
 .attempt_lga_fix <- function(bad, usedialog) {
   allLgas <- lgas()
   specialopts <- list(retry = "RETRY", skip = "SKIP", quit = "QUIT")
@@ -214,23 +214,23 @@
     }
     matched <- sort(grep(pattern, allLgas, value = TRUE, ignore.case = TRUE))
     choices <- c(matched, unlist(unname(specialopts)))
-    menuopt <- utils::menu(choices, graphics = usedialog, "Select the LGA")
+    menuopt <- menu(choices, graphics = usedialog, "Select the LGA")
     chosen <- choices[menuopt]
     if (chosen == specialopts$retry) {
       next
     }
     break
   }
-  if (chosen == specialopts$quit) {
-    return(character())
-  }
   if (chosen == specialopts$skip) {
     return(bad)
+  }
+  if (chosen == specialopts$quit) {
+    return(character())
   }
   chosen
 }
 
-
+menu <- NULL
 
 
 .collect_searchterm <- function(prompt, useWinDialog) {

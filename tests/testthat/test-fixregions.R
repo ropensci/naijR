@@ -201,15 +201,58 @@ test_that("after fixing, class of objects returned remains unchanged", {
 
 
 test_that("interactive fixes are applied", {
+  mock_readline <- local(function(prompt) "Ona Ara")
   mock_menu <- function(opt) {
     function(choices, graphics, title) {
       opt
     }
   }
   local_mocked_bindings(readline = function(prompt) "")
-  expect_message(fix_region(lgas("Oba"), interactive = TRUE))
+  oba <- lgas("Oba", warn = FALSE)
+  expect_message(fix_region(oba, interactive = TRUE))
+  expect_snapshot(fix_region(oba, interactive = TRUE))
   local_mocked_bindings(
-    readline = function(prompt) "Ona Ara",
+    readline = mock_readline,
     menu = mock_menu(1)
   )
+  expect_snapshot(fix_region(oba, interactive = TRUE))
+  expect_s3_class(fix_region(oba, interactive = TRUE), 'lgas')
+  oba10 <- lgas(rep("Oba", 10L), warn = FALSE)
+  expect_length(fix_region(oba10, interactive = TRUE), 10L)
+  expect_snapshot(fix_region(oba10, interactive = TRUE))
+  expect_length(unique(fix_region(oba10, interactive = TRUE)), 1L)
+  # Testing 'special' options
+  mock_menu_special <- function(opt) {
+    opt <- switch(opt, retry = 2L, skip = 3L, quit = 4L)
+    function(choices, graphics, title) {
+      choice <- NA
+      if (opt == 2L) {
+        choice <- opt
+        opt <<- 1L
+        return(choice)
+      }
+      else if (opt == 3L || opt == 4L) {
+        return(opt)
+      }
+      opt
+    }
+  }
+  local_mocked_bindings(
+    readline = mock_readline,
+    menu = mock_menu_special('retry')
+  )
+  expect_s3_class(fix_region(oba, interactive = TRUE), 'lgas')
+  expect_snapshot(fix_region(oba, interactive = TRUE))
+  local_mocked_bindings(
+    readline = mock_readline,
+    menu = mock_menu_special('skip')
+  )
+  expect_identical(as.character(fix_region(oba, interactive = TRUE)), "Oba")
+  expect_snapshot(fix_region(oba, interactive = TRUE))
+  local_mocked_bindings(
+    readline = mock_readline,
+    menu = mock_menu_special('quit')
+  )
+  expect_identical(as.character(fix_region(oba, interactive = TRUE)), "Oba")
+  expect_snapshot(fix_region(oba, interactive = TRUE))
 })

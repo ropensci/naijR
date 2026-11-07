@@ -51,6 +51,8 @@ test_that("'states' object is properly constructed", {
   expect_warning(states(c("kentucky", "Bornu", "Abia")))
   expect_warning(states(c("Nassarawa", "Oyo")), wrn)
   expect_identical(states(gpz = NULL), sort(shuffled))
+  expect_true(is.unsorted(states(c("Benue", "Abia"))))
+  expect_length(states(c("Jigawa", "Ebonyi", "Jigawa")), 3L)
 })
 
 

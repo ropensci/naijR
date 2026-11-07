@@ -152,7 +152,7 @@ test_that("Tables with > 2 columns are appropriately handled", {
   map_exp <- rlang::expr(map_ng(data = dsl, x = value, plot = FALSE)) 
   expect_s3_class(suppressWarnings(rlang::eval_tidy(map_exp)), maptype)
   # expect_warning(rlang::eval_tidy(map_exp), "Multiple columns have regions")
-  expect_warning(map_ng(data = dsl, x = value, plot = FALSE))
+  expect_snapshot(map_ng(data = dsl, x = value, plot = FALSE)) # 2 warnings
 })
 
 test_that("Choropleth parameters can be controlled at interface", {
@@ -238,16 +238,14 @@ test_that("Choropleth parameters can be controlled at interface", {
     ),
     "Only the first element of"
   )
-  expect_s3_class(
+  expect_warning(
     map_ng(
       data = dat,
       x = total.pop,
       breaks = breaks,
       categories = categories,
       legend.text = c(TRUE, FALSE)
-    ), 
-    maptype
-  )
+    ))
   expect_s3_class(
     map_ng(
       data = dat,
