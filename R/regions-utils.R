@@ -68,12 +68,7 @@ get_all_states <- function(named = TRUE)
 .is_nested_fix_dont_warn <- function() {
   check_nesting_func <- function(funcall) {
     funs <- as.list(funcall)
-    any(nest.func %in% funs)
-  }
-  nest.func <- c("fix_region", "disambiguate_lga")
-  ## Check to pre-empt any future removal of these functions
-  if (!sum(vapply(nest.func, exists, logical(1)))) {
-    cli::cli_abort("The nesting function does not exist")
+    any(c("fix_region", "disambiguate_lga") %in% funs)
   }
   found <- vapply(sys.calls(), check_nesting_func, logical(1))
   any(found)
