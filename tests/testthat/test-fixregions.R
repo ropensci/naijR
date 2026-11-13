@@ -97,7 +97,10 @@ test_that("various cases for fixing state names", {
     expect_error(fix_region(wrong), reconstruct.x, fixed = TRUE)
     expect_identical(fix_region(states(wrong)), states(correct))
   }
-  # Testing fixes for State objects with more than one element
+})
+
+
+test_that("fixes for State objects with more than one element", {
   oyo_lag_bad <- c("Oyo", "Legos")
   expect_silent(fix_region(states(oyo_lag_bad)))
   oyo_lag_fixed <- fix_region(states(oyo_lag_bad))
@@ -106,8 +109,10 @@ test_that("various cases for fixing state names", {
   expect_identical(
     fix_region(states(c("fCT", "FcT", "FCt"))), states(rep("FCT", 3))
   )
-  # Check total departure from a State's spelling. These are not
-  # expected to be fixed automatically, so we want to interrupt execution.
+})
+
+
+test_that("total departure from a State's spelling", {
   e <- "The following are not States:"
   expect_error(fix_region(c("xxx", "Benue")), e, fixed = TRUE)
   expect_error(fix_region(c("kentucky", "Bornu", "Abia")), e, fixed = TRUE)
@@ -119,9 +124,7 @@ test_that("Misspelt LGAs can be fixed (limited)", {
   dt <- readRDS("data/taraba-lga.rds")
   tar.lgas <- lgas(dt, warn = FALSE)
   fixed <- suppressMessages(fix_region(tar.lgas))
-  
   expect_length(attr(fixed, "misspelt"), 0L)
-  
   expect_equal(
     fix_region(lgas(c("Amuwo Odofin", "Lagos Island")), quietly = TRUE), 
     c("Amuwo-Odofin", "Lagos Island"),
@@ -132,7 +135,6 @@ test_that("Misspelt LGAs can be fixed (limited)", {
 
 test_that("outputs are properly formed", {
   lgs <- c("Fufore", "Demsa")
-
   expect_invisible(fix_region(lgs))
   expect_identical(fix_region(lgs), c("Fufore", "Demsa"))  # maintain order
   expect_length(fix_region(c("Demsa", "Fufore", "Demsa")), 3)
@@ -150,7 +152,6 @@ test_that("regions can be fixed manually", {
   errTyp <- "The operation cannot be done on objects of type"
   output2 <- lgas(c("Damboo", "Biu", "Hawul", "Shani", "Damboe"), warn = FALSE)
   wrong2 <- c("Hawl", "Shank")
-  
   expect_error(fix_region_manual(bs, lag, "Legos"),
                "'Legos' is not a valid region")
   for (elem in list(999L, NULL, NA, TRUE, pi))
@@ -181,7 +182,6 @@ test_that("regions can be fixed manually", {
 test_that("No warning when constructors are nested with fix_* functions", {
   lgavec <- c("Legos Island",  "Amuwo-Odofin")
   fct <- "Fct"
-  
   expect_error(fix_region(states(fct)))
   expect_warning(states(fct))
   expect_no_warning(fix_region(lgas(lgavec), quietly = TRUE))
@@ -192,9 +192,6 @@ test_that("No warning when constructors are nested with fix_* functions", {
 test_that("after fixing, class of objects returned remains unchanged", {
   statevec <- c("Abio", "Cross Rivers")
   lgavec <- c("Legos Island", "Amuwo-Odofin")
-  
-  # expect_type(fix_region(statevec), "character")
-  # expect_type(fix_region(lgavec), "character")
   expect_s3_class(fix_region(states(statevec, warn = FALSE)), "states")
   expect_s3_class(fix_region(lgas(lgavec, warn = FALSE)), "lgas")
 })
