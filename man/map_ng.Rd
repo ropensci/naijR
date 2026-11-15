@@ -92,17 +92,22 @@ the user is to make a choropleth map, and thus, numeric vector arguments are
 converted into factors i.e. number classes. Otherwise factors or any object 
 that can be coerced to a factor should be used.
 
-For plain plots, the \code{col} argument works the same as with
-\code{\link[maps]{map}}. For choropleth maps, the colour provided represents 
-a (sequential) colour palette based on \code{RColorBrewer::brewer.pal} and
-the available palettes can listed in \code{RColorBrewer::brewer.pal.info}. 
-The available broad colour options can be checked and modified via 
-\code{getOption("choropleth.colours")}.
+For plain plots, a \code{col} argument can be passed that works as with
+\code{\link[maps]{map}}. For choropleth maps, the value provided represents
+a (sequential) colour palette. This can be based on a
+single colour provided as a string (e.g. "\code{red}"); in this case, it is
+the 'base' colour for the sequential palette. The available base colour
+options can be checked via package-level options
+(\code{getOption("choropleth.colours")}). These can be modified by
+developers taking a dependency on this package, but this is not recommended
+until the \code{naijR} has reached maturity, by which time the colour
+management schemes would have been fully developed. Alternatively, a
+scalar can be used as an index to select these base colours.
 
 If the default legend is unsatisfactory, it is recommended that the user
 sets the \code{legend.text} argument to \code{FALSE}; the next function
-call should be \code{\link[graphics]{legend}} which will enable finer
-control over the legend.
+call should be \code{\link[graphics]{legend}} which will superimpose the
+legend on the existing map, thereby enabling finer control over the legend.
 }
 \note{
 When adjusting the default colour choices for choropleth maps, it is

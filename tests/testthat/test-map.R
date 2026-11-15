@@ -155,12 +155,11 @@ test_that("Tables with > 2 columns are appropriately handled", {
   expect_snapshot(map_ng(data = dsl, x = value, plot = FALSE)) # 2 warnings
 })
 
-test_that("Choropleth parameters can be controlled at interface", {
+
+test_that("choropleth colour management", {
   dat <- readRDS('data/pvc2015.rds')
   breaks <- round(seq(1e6, 1e7, length.out = 5), digits = -4)
   categories <- c("Small", "Moderate", "Large", "Mega")
-  
-  # Colours
   func <- expr(map_ng(
     data = dat,
     x = total.pop,
@@ -180,20 +179,14 @@ test_that("Choropleth parameters can be controlled at interface", {
   func$col <- 9
   expect_error(eval_tidy(func), "must range from 1L")
   func$col <- "Baba"
-  expect_error(eval_tidy(func), "not a supported colour or palette")
-  local_mocked_bindings(
-    getRversion = function(...) as.numeric_version("3.6.0")
-  )
-  expect_s3_class(
-    map_ng(
-      data = dat,
-      x = total.pop,
-      breaks = breaks,
-      categories = categories
-    ),
-    maptype
-  )
-  # Legends
+  expect_snapshot(eval_tidy(func), error = TRUE)
+})
+
+
+test_that("legends for choropleth maps", {
+  dat <- readRDS('data/pvc2015.rds')
+  breaks <- round(seq(1e6, 1e7, length.out = 5), digits = -4)
+  categories <- c("Small", "Moderate", "Large", "Mega")
   expect_error(
     map_ng(
       data = dat,
@@ -256,7 +249,13 @@ test_that("Choropleth parameters can be controlled at interface", {
     ), 
     maptype
   )
+})
 
+
+test_that("use of breaks for choropleth map categorization", {
+  dat <- readRDS('data/pvc2015.rds')
+  breaks <- round(seq(1e6, 1e7, length.out = 5), digits = -4)
+  categories <- c("Small", "Moderate", "Large", "Mega")
   # Too many breaks
   breaks_x <- round(seq(1e6, 1e7, length.out = 12), -4)
   categories_x <- c("Tiny", "Small", "Modest", "Moderate", "Medium", "Sizeable",
@@ -269,7 +268,6 @@ test_that("Choropleth parameters can be controlled at interface", {
     plot = FALSE
   ),
   "Too many categories")
-
   # Set breaks with an integer value
   expect_s3_class(map_ng(
     data = dat,
@@ -278,8 +276,6 @@ test_that("Choropleth parameters can be controlled at interface", {
     categories = categories,
     plot = FALSE
   ), maptype)
-
-
   # Out-of-range breaks
   expect_error(map_ng(
     data = dat,
@@ -300,32 +296,25 @@ test_that("Factors can draw choropleth", {
     set.seed(seed)
     sample(letters[1:5], 37, TRUE) 
   }
-  
   getDblSmpl <- function(seed = round(runif(100, max = 500))) {
     set.seed(seed)
     runif(37, max = 100)
   }
-  
   Fac <- ordered(getSmpl(2))
   expect_s3_class(map_ng(x = Fac, plot = FALSE), maptype)
-  
   Char <- getSmpl(5)
   expect_s3_class(map_ng(x = Char, plot = FALSE), maptype)
-  
   sss <- states()
   dd <- data.frame(region = sss, Col = Fac, stringsAsFactors = FALSE)
   expect_s3_class(map_ng(data = dd, x = Col, plot = FALSE), maptype)
-  
   expect_s3_class(map_ng(sss, x = Fac, plot = FALSE), maptype)
   expect_s3_class(map_ng(sss, x = Char, plot = FALSE), maptype)
-  
   Int <- sample(1L:5L, 37, TRUE)
   expect_error(
     map_ng(sss, x = Int, plot = FALSE),
     'Breaks were not provided for the categorization of a numeric type'
   )
   expect_s3_class(map_ng(sss, x = as.factor(Int), plot = FALSE), maptype)
-  
   brks <- c(0, 40, 60, 100)
   expect_s3_class(
     map_ng(sss,
@@ -334,7 +323,6 @@ test_that("Factors can draw choropleth", {
            plot = FALSE
     ), 
     maptype)
-  
   dd$dblCol <- getDblSmpl()
   qq <- quote(map_ng(data = dd, x = dblCol, breaks = brks, plot = FALSE))
   expect_s3_class(eval(qq), maptype)
@@ -342,8 +330,6 @@ test_that("Factors can draw choropleth", {
   expect_s3_class(eval(qq), maptype)
   qq$col <- "green"
   expect_s3_class(eval(qq), maptype)
-
-  # multiple categories
   expect_error(map_ng(x = factor(sample(letters[1:11], 37, TRUE))),
   "Too many categories")
 })
@@ -354,7 +340,6 @@ test_that("Choropleth map can be formed with excluded regions", {
   exclusion.color <- "green"
   d <- data.frame(state = states(),
                   total = sample(LETTERS[1:4], 37, TRUE))
-  
   expect_s3_class(
     map_ng(
       data = d,

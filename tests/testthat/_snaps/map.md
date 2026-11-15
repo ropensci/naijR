@@ -8,3 +8,11 @@
       Warning:
       Multiple columns have regions, so the first was used
 
+# choropleth colour management
+
+    Code
+      eval_tidy(func)
+    Condition
+      Error in `.get_color_range()`:
+      ! `col` is not a supported sequential palette
+
