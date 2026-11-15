@@ -179,7 +179,11 @@ test_that("choropleth colour management", {
   func$col <- 9
   expect_error(eval_tidy(func), "must range from 1L")
   func$col <- "Baba"
+  expect_error(eval_tidy(func))
   expect_snapshot(eval_tidy(func), error = TRUE)
+  func$col <- c("red", "gray", "green")
+  expect_warning(eval_tidy(func))
+  expect_snapshot(eval_tidy(func))
 })
 
 

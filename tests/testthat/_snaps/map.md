@@ -14,5 +14,13 @@
       eval_tidy(func)
     Condition
       Error in `.get_color_range()`:
-      ! `col` is not a supported sequential palette
+      ! "Baba" is not a supported sequential palette
+
+---
+
+    Code
+      eval_tidy(func)
+    Condition
+      Warning:
+      Only the first element of `col` was used
 

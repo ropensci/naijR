@@ -440,12 +440,10 @@
   }
   else {
     if (is.numeric(col)) {
-      all.cols <- sub("(green)(3)", "\\1", .get_R_palette())
-      all.cols <- sub("gray", "grey", all.cols)
-      if (!col %in% seq_along(all.cols)) {
+      if (!col %in% seq_along(base_colors)) {
         cli_abort("{.arg col} must range from 1L to {length(base_colors)}L")
       }
-      col <- all.cols[col]
+      col <- base_colors[col]
     }
     else if (is.character(col)) {
       if (length(col) > 1L) {
@@ -461,31 +459,12 @@
   else {
     seq_pals <- rownames(brewer.pal.info[, 'category' == 'seq'])
     if (!col %in% seq_pals) {
-      cli_abort("{.arg col} is not a supported {.emph sequential} palette")
+      cli_abort("{.val {col}} is not a supported {.emph sequential} palette")
     }
     col
   }
   brewer.pal(n, pal)
 }
-
-
-
-
-# Ensures that we are using the R3 palette for mapping colours.
-# This is to enforce consistency in appearance between R v.3 and others
-#' @importFrom grDevices palette
-.get_R_palette <- function()
-{
-  if (getRversion() < as.numeric_version('4.0.0')) {
-    return(palette())
-  }
-  palette('R3')
-  pal <- palette()
-  palette('default')
-  pal
-}
-
-getRversion <- NULL
 
 
 
