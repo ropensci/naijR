@@ -1,6 +1,7 @@
 ## naijR 0.8.0
+- Minimum supported R version is now 4.2.x.
 - When fixing the spellings of Local Government Areas (LGAs), the object returned still has the attributes that were used internally for proecessing the fixes, and they are displayed in the output. These are now removed.
-- Test coverage of the package has been significantly improved.
+- Test coverage of the package has been significantly improved to over 99%.
 
 ## naijR 0.7.1
 ### Critical bug fix:

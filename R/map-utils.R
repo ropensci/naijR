@@ -338,7 +338,7 @@
 }
 
 
-.prep_choropleth_opts <- function(map, opts, col = NULL, ...) {
+.prep_choropleth_opts <- function(map, opts, col, ...) {
   # TODO: Set limits for variables and brk
   # TODO: Accept numeric input for col
   stopifnot(inherits(map, 'sf'))
@@ -426,38 +426,42 @@
 
 
 
-
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom RColorBrewer brewer.pal.info
 #' @importFrom cli cli_abort
 #' @importFrom tools toTitleCase
 #' @importFrom rlang is_null
-.get_color_range <- function(col = NULL, n, ...)
+.get_color_range <- function(col, n)
 {
-  .DefaultChoroplethColours <- getOption('choropleth.colours') # set in zzz.R
+  base_colors <- getOption('choropleth.colours') # set in zzz.R
   if (is_null(col)) {
-    col <- .DefaultChoroplethColours[1]
-  }
-  if (is.numeric(col)) {
-    all.cols <- sub("(green)(3)", "\\1", .get_R_palette())
-    all.cols <- sub("gray", "grey", all.cols)
-    if (!col %in% seq_along(all.cols)) {
-      cli_abort("'col' must range from 1L to {length(all.cols)}L")
-    }
-    col <- all.cols[col]
-  }
-  among.def.cols <- col %in% .DefaultChoroplethColours
-  in.other.pal <-
-    !among.def.cols &&
-    (col %in% rownames(brewer.pal.info))
-  pal <- if (!among.def.cols) {
-    if (!in.other.pal) {
-      cli_abort("'{col}' is not a supported colour or palette")
-    }
-    col
+    col <- base_colors[1]
+    among.def.cols <- TRUE
   }
   else {
+    if (is.numeric(col)) {
+      if (!col %in% seq_along(base_colors)) {
+        cli_abort("{.arg col} must range from 1L to {length(base_colors)}L")
+      }
+      col <- base_colors[col]
+    }
+    else if (is.character(col)) {
+      if (length(col) > 1L) {
+        cli_warn("Only the first element of {.arg col} was used")
+      }
+      col <- col[[1]]
+    }
+    among.def.cols <- col %in% base_colors
+  }
+  pal <- if (among.def.cols) {
     paste0(toTitleCase(col), "s")
+  }
+  else {
+    seq_pals <- rownames(brewer.pal.info[, 'category' == 'seq'])
+    if (!col %in% seq_pals) {
+      cli_abort("{.val {col}} is not a supported {.emph sequential} palette")
+    }
+    col
   }
   brewer.pal(n, pal)
 }
@@ -509,22 +513,6 @@
   all(grepl("^#", x), nchar(x) == 7L)
 }
 
-
-# Ensures that we are using the R3 palette for mapping colours.
-# This is to enforce consistency in appearance between R v.3 and others
-#' @importFrom grDevices palette
-.get_R_palette <- function()
-{
-  if (getRversion() < as.numeric_version('4.0.0')) {
-    return(palette())
-  }
-  palette('R3')
-  pal <- palette()
-  palette('default')
-  pal
-}
-
-getRversion <- NULL
 
 
 
