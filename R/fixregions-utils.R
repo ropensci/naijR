@@ -234,13 +234,12 @@ menu <- NULL
 
 
 .collect_searchterm <- function(prompt, useWinDialog) {
-  result <- if (useWinDialog) {
-    utils::winDialogString(prompt, "")
+  if (useWinDialog) {
+    utils::winDialogString(prompt, "")  # nocov
   }
   else {
     readline(prompt)
   }
-  result
 }
 
 readline <- NULL
@@ -275,7 +274,7 @@ readline <- NULL
       ". Consider using 'fix_region_manual'"
     )
     if (useWinDialog) {
-      utils::winDialog("ok", msg)
+      utils::winDialog("ok", msg)  # nocov
     }
     else {
       cli::cli_inform(msg)

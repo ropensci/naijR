@@ -110,7 +110,7 @@ fix_region.lgas <- function(x,
     if (is.null(out)) {
       msg <- "The operation was cancelled"
       if (use_win_dialog) {
-        utils::winDialog("ok", msg)
+        utils::winDialog("ok", msg)  # nocov
       }
       else {
         cli::cli_alert_info(msg)
