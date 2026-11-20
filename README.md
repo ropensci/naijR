@@ -50,12 +50,12 @@ ss <- states()
 head(ss)
 States
 ------ 
-- Abia
-- Adamawa
-- Akwa Ibom
-- Anambra
-- Bauchi
-- Bayelsa 
+* Abia
+* Adamawa
+* Akwa Ibom
+* Anambra
+* Bauchi
+* Bayelsa 
 cat(sprintf("\n...but Nigeria has %i States.", length(ss)))
 
 ...but Nigeria has 37 States.
@@ -67,12 +67,12 @@ States from a given geo-political zone can also be selected:
 states(gpz = "ne")  # i.e. North-East
 States
 ------ 
-- Adamawa
-- Bauchi
-- Borno
-- Gombe
-- Taraba
-- Yobe 
+* Adamawa
+* Bauchi
+* Borno
+* Gombe
+* Taraba
+* Yobe 
 ```
 
 For other capabilities of this function, see `?states()`.
@@ -84,35 +84,35 @@ of Local Government Areas within a given State:
 
 ``` r
 lgas("Imo")
-LGAs
----- 
-- Aboh Mbaise
-- Ahiazu Mbaise
-- Ehime Mbano
-- Ihitte/Uboma
-- Ideato North
-- Ideato South
-- Ezinihitte-Mbaise
-- Isu
-- Oguta
-- Obowo
-- Nwangele
-- Njaba
-- Ngor Okpala
-- Mbaitoli
-- Nkwerre
-- Orsu
-- Orlu
-- Onuimo
-- Okigwe
-- Ohaji/Egbema
-- Oru East
-- Isiala Mbano
-- Ikeduru
-- Owerri Municipal
-- Owerri West
-- Owerri North
-- Oru West 
+Local Government Areas
+---------------------- 
+* Aboh Mbaise
+* Ahiazu Mbaise
+* Ehime Mbano
+* Ezinihitte-Mbaise
+* Ideato North
+* Ideato South
+* Ihitte/Uboma
+* Ikeduru
+* Isiala Mbano
+* Isu
+* Mbaitoli
+* Ngor Okpala
+* Njaba
+* Nkwerre
+* Nwangele
+* Obowo
+* Oguta
+* Ohaji/Egbema
+* Okigwe
+* Onuimo
+* Orlu
+* Orsu
+* Oru East
+* Oru West
+* Owerri Municipal
+* Owerri North
+* Owerri West 
 ```
 
 To list all the LGAs in Nigeria, call the same function without any
