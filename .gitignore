@@ -7,3 +7,6 @@ sandbox
 /Meta/
 cran-comments.md
 CRAN-SUBMISSION
+
+/.quarto/
+**/*.quarto_ipynb
